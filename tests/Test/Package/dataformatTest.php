@@ -9,7 +9,7 @@ use function ryunosuke\Functions\Package\csv_import;
 use function ryunosuke\Functions\Package\file_list;
 use function ryunosuke\Functions\Package\html_attr;
 use function ryunosuke\Functions\Package\html_strip;
-use function ryunosuke\Functions\Package\htmltag;
+use function ryunosuke\Functions\Package\html_tag;
 use function ryunosuke\Functions\Package\ini_export;
 use function ryunosuke\Functions\Package\ini_import;
 use function ryunosuke\Functions\Package\json_export;
@@ -638,22 +638,22 @@ line3
         }
     }
 
-    function test_htmltag()
+    function test_html_tag()
     {
-        that(htmltag('a.c1#hoge.c2[target=hoge\[\]][href="http://hoge"][hidden][!readonly]{width:123px;;;height:456px}'))->is(
+        that(html_tag('a.c1#hoge.c2[target=hoge\[\]][href="http://hoge"][hidden][!readonly]{width:123px;;;height:456px}'))->is(
             '<a id="hoge" class="c1 c2" style="width:123px;height:456px" target="hoge[]" href="http://hoge" hidden></a>'
         );
-        that(htmltag(['a.c1#hoge.c2[href="http://hoge"]' => '<b>bold</b>']))->is(
+        that(html_tag(['a.c1#hoge.c2[href="http://hoge"]' => '<b>bold</b>']))->is(
             '<a id="hoge" class="c1 c2" href="http://hoge">&lt;b&gt;bold&lt;/b&gt;</a>'
         );
-        that(htmltag([
+        that(html_tag([
             'a.c1#hoge.c2[href="http://hoge"]' => [
                 'b' => '<bold>',
             ],
         ]))->is(
             '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;bold&gt;</b></a>'
         );
-        that(htmltag([
+        that(html_tag([
             'a.c1#hoge.c2[href="http://hoge"]' => [
                 'b' => [
                     '<plain1>',
@@ -665,7 +665,7 @@ line3
             '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;plain1&gt;<t>&lt;thin&gt;</t>&lt;plain2&gt;</b></a>'
         );
 
-        that(htmltag([
+        that(html_tag([
             "\ndiv\n#hoge" => [
                 "\n  b"   => 'plain1',
                 "\n  b\n" => 'plain2',
@@ -680,7 +680,7 @@ line3
 <span>plain</span>'
         );
 
-        that(self::resolveFunction('htmltag'))('#id.class')->wasThrown('tagname is empty');
+        that(self::resolveFunction('html_tag'))('#id.class')->wasThrown('tagname is empty');
     }
 
     function test_ini_export()

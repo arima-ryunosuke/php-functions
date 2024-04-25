@@ -20,7 +20,7 @@ require_once __DIR__ . '/../constants.php';
  *     public    const C_PUBLIC    = 'public';
  * };
  * // 普通に全定数を返す
- * that(get_class_constants($class))->isSame([
+ * that(class_constants($class))->isSame([
  *     'C_PRIVATE'      => 'private',
  *     'C_PROTECTED'    => 'protected',
  *     'C_PUBLIC'       => 'public',
@@ -28,13 +28,13 @@ require_once __DIR__ . '/../constants.php';
  *     'ARRAY_AS_PROPS' => \ArrayObject::ARRAY_AS_PROPS,
  * ]);
  * // public のみを返す
- * that(get_class_constants($class, IS_PUBLIC))->isSame([
+ * that(class_constants($class, IS_PUBLIC))->isSame([
  *     'C_PUBLIC'       => 'public',
  *     'STD_PROP_LIST'  => \ArrayObject::STD_PROP_LIST,
  *     'ARRAY_AS_PROPS' => \ArrayObject::ARRAY_AS_PROPS,
  * ]);
  * // 自身定義でかつ public のみを返す
- * that(get_class_constants($class, IS_OWNSELF | IS_PUBLIC))->isSame([
+ * that(class_constants($class, IS_OWNSELF | IS_PUBLIC))->isSame([
  *     'C_PUBLIC'       => 'public',
  * ]);
  * ```
@@ -45,7 +45,7 @@ require_once __DIR__ . '/../constants.php';
  * @param ?int $filter アクセスレベル定数
  * @return array クラス定数の配列
  */
-function get_class_constants($class, $filter = null)
+function class_constants($class, $filter = null)
 {
     $class = ltrim(is_object($class) ? get_class($class) : $class, '\\');
     $filter ??= (IS_PUBLIC | IS_PROTECTED | IS_PRIVATE);

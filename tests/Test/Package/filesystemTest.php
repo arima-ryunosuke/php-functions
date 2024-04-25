@@ -26,7 +26,7 @@ use function ryunosuke\Functions\Package\fnmatch_or;
 use function ryunosuke\Functions\Package\globstar;
 use function ryunosuke\Functions\Package\json_export;
 use function ryunosuke\Functions\Package\ltsv_export;
-use function ryunosuke\Functions\Package\memory_path;
+use function ryunosuke\Functions\Package\memory_stream;
 use function ryunosuke\Functions\Package\mkdir_p;
 use function ryunosuke\Functions\Package\path_info;
 use function ryunosuke\Functions\Package\path_is_absolute;
@@ -96,8 +96,8 @@ class filesystemTest extends AbstractTestCase
         that(array_keys($dsttree['dst']['src']['a']['b']['c2']))->is(array_keys($srctree['src']['a']['b']['c2']));
 
         // 隠しファイルとカスタムプロトコル
-        $src = memory_path('cp_rf_src');
-        $dst = memory_path('cp_rf_dst');
+        $src = memory_stream('cp_rf_src');
+        $dst = memory_stream('cp_rf_dst');
         file_set_contents("$src/a.txt", '');
         file_set_contents("$src/dir/a.txt", '');
         cp_rf("$src/", $dst);
@@ -107,8 +107,8 @@ class filesystemTest extends AbstractTestCase
 
     function test_dir_diff()
     {
-        $root1 = memory_path('dir_diff1');
-        $root2 = memory_path('dir_diff2');
+        $root1 = memory_stream('dir_diff1');
+        $root2 = memory_stream('dir_diff2');
         rm_rf($root1);
         rm_rf($root2);
 
@@ -832,7 +832,7 @@ class filesystemTest extends AbstractTestCase
 
         that(self::resolveFunction('file_set_contents'))('/dev/null/::::::/a', '')->wasThrown('failed to mkdir');
 
-        $mpath = memory_path(__FUNCTION__);
+        $mpath = memory_stream(__FUNCTION__);
         file_set_contents("$mpath/hoge.txt", 'hoge');
         that('hoge')->equalsFile("$mpath/hoge.txt");
 
@@ -1596,7 +1596,7 @@ class filesystemTest extends AbstractTestCase
         that(rm_rf("$dir/.dotfile", true))->isTrue();
         that("$dir/.dotfile")->fileNotExists(); // ファイルも消せる
 
-        $dir = memory_path('rm_rf');
+        $dir = memory_stream('rm_rf');
         file_set_contents("$dir/a/x.txt", '');
         file_set_contents("$dir/a.txt", '');
         that(rm_rf($dir))->isTrue();

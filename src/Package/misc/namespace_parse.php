@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/array_explode.php';
 require_once __DIR__ . '/../array/array_find.php';
 require_once __DIR__ . '/../array/last_key.php';
-require_once __DIR__ . '/../misc/parse_php.php';
+require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../strings/concat.php';
 require_once __DIR__ . '/../strings/namespace_split.php';
 require_once __DIR__ . '/../utility/cache.php';
@@ -35,7 +35,7 @@ require_once __DIR__ . '/../utility/cache.php';
  * const InnerConst = 123;
  * ');
  * // このような名前空間配列が得られる
- * that(parse_namespace(sys_get_temp_dir() . '/namespace.php'))->isSame([
+ * that(namespace_parse(sys_get_temp_dir() . '/namespace.php'))->isSame([
  *     'NS1' => [
  *         'const'    => [],
  *         'function' => [
@@ -74,7 +74,7 @@ require_once __DIR__ . '/../utility/cache.php';
  * @param array $options オプション配列
  * @return array 名前空間配列
  */
-function parse_namespace($filename, $options = [])
+function namespace_parse($filename, $options = [])
 {
     $filename = realpath($filename);
     $filemtime = filemtime($filename);
@@ -110,7 +110,7 @@ function parse_namespace($filename, $options = [])
         $tokens = [-1 => null];
         $result = [];
         while (true) {
-            $tokens = parse_php($contents, [
+            $tokens = php_parse($contents, [
                 'flags'  => TOKEN_PARSE,
                 'begin'  => ["define", T_NAMESPACE, T_USE, T_CONST, T_FUNCTION, T_CLASS, T_INTERFACE, T_TRAIT],
                 'end'    => ['{', ';', '(', T_EXTENDS, T_IMPLEMENTS],
@@ -122,7 +122,7 @@ function parse_namespace($filename, $options = [])
             $token = reset($tokens);
             // define は現在の名前空間とは無関係に名前空間定数を宣言することができる
             if ($token[0] === T_STRING && $token[1] === "define") {
-                $tokens = parse_php($contents, [
+                $tokens = php_parse($contents, [
                     'flags'  => TOKEN_PARSE,
                     'begin'  => [T_CONSTANT_ENCAPSED_STRING],
                     'end'    => [T_CONSTANT_ENCAPSED_STRING],
@@ -155,7 +155,7 @@ function parse_namespace($filename, $options = [])
                     $prefix = '';
                     if (end($tokens)[1] === '{') {
                         $prefix = $stringify($tokens);
-                        $tokens = parse_php($contents, [
+                        $tokens = php_parse($contents, [
                             'flags'  => TOKEN_PARSE,
                             'begin'  => ['{'],
                             'end'    => ['}'],
@@ -187,7 +187,7 @@ function parse_namespace($filename, $options = [])
                     }
                     // ブロック内に興味はないので進めておく（function 内 function などはあり得るが考慮しない）
                     if ($token[0] !== T_CONST) {
-                        $tokens = parse_php($contents, [
+                        $tokens = php_parse($contents, [
                             'flags'  => TOKEN_PARSE,
                             'begin'  => ['{'],
                             'end'    => ['}'],

@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../misc/evaluate.php';
-require_once __DIR__ . '/../misc/parse_php.php';
+require_once __DIR__ . '/../misc/php_parse.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -29,7 +29,7 @@ require_once __DIR__ . '/../misc/parse_php.php';
 function calculate_formula($formula)
 {
     // TOKEN_PARSE を渡せばシンタックスチェックも行ってくれる
-    $tokens = parse_php("<?php ($formula);", [
+    $tokens = php_parse("<?php ($formula);", [
         'phptag' => false,
         'flags'  => TOKEN_PARSE,
     ]);

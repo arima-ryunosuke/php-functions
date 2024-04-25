@@ -41,7 +41,7 @@ require_once __DIR__ . '/../var/arrayval.php';
  * @param string[]|string|null $brackets 配列ブラケット文字
  * @return string クエリ文字列
  */
-function build_query($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738, $brackets = null)
+function query_build($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738, $brackets = null)
 {
     $data = arrayval($data, false);
     if (!$data) {

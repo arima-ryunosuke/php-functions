@@ -2,7 +2,7 @@
 
 namespace ryunosuke\Functions;
 
-use function ryunosuke\Functions\Package\indent_php;
+use function ryunosuke\Functions\Package\php_indent;
 use function ryunosuke\Functions\Package\var_export2;
 
 class Transporter
@@ -121,7 +121,7 @@ class Transporter
             $funcname = self::detectDependent($funcname);
         }
 
-        require_once __DIR__ . '/Package/misc/indent_php.php';
+        require_once __DIR__ . '/Package/misc/php_indent.php';
         require_once __DIR__ . '/Package/var/var_export2.php';
 
         $namespace = trim($namespace, '\\');
@@ -134,7 +134,7 @@ class Transporter
             $id = var_export(ltrim("$namespace\\$name", '\\'), true);
             $consts[] = <<<CONSTANT
             if (!defined($id)) {
-                define($id, {$_(trim(indent_php("\n" . var_export2($constant['value'], true), ['baseline' => 0, 'indent' => 4])))});
+                define($id, {$_(trim(php_indent("\n" . var_export2($constant['value'], true), ['baseline' => 0, 'indent' => 4])))});
             }
             
             CONSTANT;
@@ -150,7 +150,7 @@ class Transporter
             $funcs[] = <<<FUNCTION
             assert(!function_exists($id) || (new \ReflectionFunction($id))->isUserDefined());
             if (!function_exists($id)) {
-                {$_(trim(indent_php("\n" . $function['codeblock'], ['baseline' => 0, 'indent' => 4])))}
+                {$_(trim(php_indent("\n" . $function['codeblock'], ['baseline' => 0, 'indent' => 4])))}
             }
             
             FUNCTION;
@@ -179,7 +179,7 @@ class Transporter
 
         $funcname = self::detectDependent($funcname);
 
-        require_once __DIR__ . '/Package/misc/indent_php.php';
+        require_once __DIR__ . '/Package/misc/php_indent.php';
         require_once __DIR__ . '/Package/var/var_export2.php';
 
         $classname = trim($classname, "\\");
@@ -193,7 +193,7 @@ class Transporter
             }
 
             $consts[] = <<<CONSTANT
-                public const $name = {$_(trim(indent_php("\n" . var_export2($constant['value'], true), ['baseline' => 0, 'indent' => 4])))};
+                public const $name = {$_(trim(php_indent("\n" . var_export2($constant['value'], true), ['baseline' => 0, 'indent' => 4])))};
             CONSTANT;
         }
 
@@ -211,7 +211,7 @@ class Transporter
             }
             $body = substr_replace(implode('', array_column($tokens, 1)), 'public static ', $function['funcstart'], 0);
             $funcs[] = <<<FUNCTION
-                {$_(trim(indent_php("\n" . $body, ['baseline' => 0, 'indent' => 4])))}
+                {$_(trim(php_indent("\n" . $body, ['baseline' => 0, 'indent' => 4])))}
             FUNCTION;
         }
 

@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../classobj/get_object_properties.php';
+require_once __DIR__ . '/../classobj/object_properties.php';
 require_once __DIR__ . '/../var/stringify.php';
 // @codeCoverageIgnoreEnd
 
@@ -81,7 +81,7 @@ function stacktrace($traces = null, $option = [])
             // オブジェクトは単にプロパティを配列的に出力する
             elseif (is_object($value)) {
                 $parents[] = $value;
-                return get_class($value) . $export(get_object_properties($value), $nest, $parents);
+                return get_class($value) . $export(object_properties($value), $nest, $parents);
             }
             // 文字列は改行削除
             elseif (is_string($value)) {

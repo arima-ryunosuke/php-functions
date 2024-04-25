@@ -2,28 +2,236 @@
 
 namespace ryunosuke\Test\Package;
 
+use function ryunosuke\Functions\Package\annotation_parse;
 use function ryunosuke\Functions\Package\console_log;
 use function ryunosuke\Functions\Package\evaluate;
 use function ryunosuke\Functions\Package\function_configure;
-use function ryunosuke\Functions\Package\highlight_php;
-use function ryunosuke\Functions\Package\indent_php;
 use function ryunosuke\Functions\Package\mean;
-use function ryunosuke\Functions\Package\parse_annotation;
-use function ryunosuke\Functions\Package\parse_namespace;
-use function ryunosuke\Functions\Package\parse_php;
+use function ryunosuke\Functions\Package\namespace_parse;
+use function ryunosuke\Functions\Package\namespace_resolve;
+use function ryunosuke\Functions\Package\php_highlight;
+use function ryunosuke\Functions\Package\php_indent;
 use function ryunosuke\Functions\Package\php_opcode;
+use function ryunosuke\Functions\Package\php_parse;
+use function ryunosuke\Functions\Package\php_strip;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\process;
 use function ryunosuke\Functions\Package\process_parallel;
-use function ryunosuke\Functions\Package\resolve_symbol;
 use function ryunosuke\Functions\Package\rm_rf;
-use function ryunosuke\Functions\Package\strip_php;
 use function ryunosuke\Functions\Package\unique_id;
 use function ryunosuke\Functions\Package\var_export2;
 use const ryunosuke\Functions\Package\TOKEN_NAME;
 
 class miscTest extends AbstractTestCase
 {
+    function test_annotation_parse()
+    {
+        that(annotation_parse('aaaaa'))->isEmpty();
+
+        $refmethod = new \ReflectionMethod(require __DIR__ . '/files/php/annotation.php', 'm');
+
+        $actual = annotation_parse($refmethod);
+        that($actual)->as('actual:' . var_export2($actual, true))->is([
+            "single"    => ["123"],
+            "closure"   => ["123", "+", "456"],
+            "multi"     => ["a", "b", "c"],
+            "quote"     => ["\"a b c\"", "123"],
+            "noval"     => [
+                null,
+                null,
+            ],
+            "hash"      => [
+                "a" => 123,
+            ],
+            "list"      => [123, 456],
+            "hashX"     => [
+                "a" => 123,
+            ],
+            "listX"     => [123, 456],
+            "block"     => [
+                "message" => ["this is message1\n    this is message2"],
+            ],
+            "blockX"    => [
+                "message1" => ["this is message1"],
+                "message2" => ["this is message2"],
+            ],
+            "double"    => [
+                ["a"],
+                ["b"],
+                ["c\n\nthis", "is", "\\@escape"],
+            ],
+            "DateTime2" => \This\Is\Space\DateTime2::__set_state([
+                "date"          => "2019-12-23 00:00:00.000000",
+                "timezone_type" => 3,
+                "timezone"      => "Asia/Tokyo",
+            ]),
+            "param"     => [
+                ["string", "\$arg1", "引数1"],
+                ["array", "\$arg2", "this", "is", "second", "argument"],
+            ],
+            "return"    => ["null", "返り値\nthis", "is", "\\@escape"],
+        ]);
+
+        $actual = annotation_parse($refmethod, [
+            'single'  => true,
+            'double'  => true,
+            'block'   => true,
+            'blockX'  => true,
+            'closure' => fn($value) => phpval($value),
+        ]);
+        that($actual)->as('actual:' . var_export2($actual, true))->is([
+            "single"    => "123",
+            "closure"   => 579,
+            "multi"     => ["a", "b", "c"],
+            "quote"     => ["\"a b c\"", "123"],
+            "noval"     => [
+                null,
+                null,
+            ],
+            "hash"      => [
+                "a" => 123,
+            ],
+            "list"      => [123, 456],
+            "hashX"     => [
+                "a" => 123,
+            ],
+            "listX"     => [123, 456],
+            "block"     => [
+                "message" => "
+    this is message1
+    this is message2
+",
+            ],
+            "blockX"    => [
+                "message1" => "
+    this is message1
+",
+                "message2" => "
+    this is message2
+",
+            ],
+            "double"    => ["a", "b", "c\n\nthis is \\@escape"],
+            "DateTime2" => \This\Is\Space\DateTime2::__set_state([
+                "date"          => "2019-12-23 00:00:00.000000",
+                "timezone_type" => 3,
+                "timezone"      => "Asia/Tokyo",
+            ]),
+            "param"     => [
+                ["string", "\$arg1", "引数1"],
+                ["array", "\$arg2", "this", "is", "second", "argument"],
+            ],
+            "return"    => ["null", "返り値\nthis", "is", "\\@escape"],
+        ]);
+
+        $actual = annotation_parse(new \ReflectionMethod(\This\Is\Space\DateTime2::class, 'method'), true);
+        that($actual)->as('actual:' . var_export2($actual, true))->is([
+            "message" => 'this is annotation',
+        ]);
+
+        $annotation = '
+@hoge{a: 123}
+
+@fuga {
+    fuga1
+    fuga2
+}
+
+@piyo dummy {
+    piyo1: 1,
+    piyo2: 2
+}';
+        $actual = annotation_parse($annotation);
+        that($actual)->as('actual:' . var_export2($actual, true))->is([
+            "hoge" => ['a' => 123],
+            "fuga" => ["fuga1\n    fuga2"],
+            "piyo" => [
+                "dummy" => [
+                    "piyo1" => 1,
+                    "piyo2" => 2,
+                ],
+            ],
+        ]);
+
+        $actual = annotation_parse($annotation, true);
+        that($actual)->as('actual:' . var_export2($actual, true))->is([
+            "hoge" => "{a: 123}",
+            "fuga" => "
+    fuga1
+    fuga2
+",
+            "piyo" => [
+                "dummy" => "
+    piyo1: 1,
+    piyo2: 2
+",
+            ],
+        ]);
+
+        $actual = annotation_parse('
+@mix type1{
+    hoge1
+    hoge2
+}
+@mix type2 {
+    fuga1
+    fuga2
+}', true);
+        that($actual)->as('actual:' . var_export2($actual, true))->is([
+            "mix" => [
+                "type1" => "
+    hoge1
+    hoge2
+",
+                "type2" => "
+    fuga1
+    fuga2
+",
+            ],
+        ]);
+
+        $actual = annotation_parse('
+@mix hoge
+@mix type {
+    fuga1
+    fuga2
+}');
+        that($actual)->as('actual:' . var_export2($actual, true))->is([
+            "mix" => [
+                0      => ["hoge"],
+                "type" => ["fuga1\n    fuga2"],
+            ],
+        ]);
+
+        $actual = annotation_parse('
+@mix type{
+    hoge1
+    hoge2
+}
+@mix fuga
+}');
+        that($actual)->as('actual:' . var_export2($actual, true))->is([
+            "mix" => [
+                "type" => ["hoge1\n    hoge2"],
+                0      => ["fuga\n}"],
+            ],
+        ]);
+
+        $actual = annotation_parse('
+@hoge This is hoge
+@fuga This is fuga1
+@fuga This is fuga2
+', [
+            'hoge' => [],
+            'fuga' => null,
+        ]);
+        that($actual)->as('actual:' . var_export2($actual, true))->is([
+            "hoge" => [
+                ["This", "is", "hoge"],
+            ],
+            "fuga" => ["This", "is", "fuga2"],
+        ]);
+    }
+
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
@@ -181,517 +389,9 @@ syntax error
         ));
     }
 
-    function test_highlight_php()
+    function test_namespace_parse()
     {
-        $phpcode = '<?php
-// this is comment
-$var1 = "this is var";
-$var2 = "this is embed $var1";
-$var3 = function () { return \ArrayObject::class; };
-';
-        that(highlight_php($phpcode, ['context' => 'plain']))->is($phpcode);
-        that(highlight_php($phpcode, ['context' => 'cli']))->stringContains('[34;3m');
-        that(highlight_php($phpcode, ['context' => 'html']))->stringContains('<span style');
-        that(highlight_php($phpcode))->stringContains('function');
-
-        that(self::resolveFunction('highlight_php'))($phpcode, ['context' => 'hoge'])->wasThrown('is not supported');
-    }
-
-    function test_indent_php()
-    {
-        $phpcode = '
-// this is line comment1
-// this is line comment1
-echo 123;
-# this is line comment2
-echo 123;
-/* this is block comment1 */
-echo 123;
-/*
- * this is block comment2
- */
-echo 123;
-/** this is doccomment1 */
-/**
- * this is doccomment2
- */
-echo 123;
-// this is multiline
-$multiline = "
-1
-2
-3
-";
-
-// empty line below and above
-
-if (true) {
-    echo 123; // this is trailing comment
-    if (true) {
-        /* this is starting comment */echo 123;
-    }
-}
-';
-        $phpcode = indent_php($phpcode, [
-            'indent'    => 4,
-            'trimempty' => false,
-        ]);
-
-        that($phpcode)->is('
-    // this is line comment1
-    // this is line comment1
-    echo 123;
-    # this is line comment2
-    echo 123;
-    /* this is block comment1 */
-    echo 123;
-    /*
-     * this is block comment2
-     */
-    echo 123;
-    /** this is doccomment1 */
-    /**
-     * this is doccomment2
-     */
-    echo 123;
-    // this is multiline
-    $multiline = "
-1
-2
-3
-";
-    
-    // empty line below and above
-    
-    if (true) {
-        echo 123; // this is trailing comment
-        if (true) {
-            /* this is starting comment */echo 123;
-        }
-    }
-    ');
-
-        $phpcode = indent_php($phpcode, "\t\t");
-
-        that($phpcode)->is('
-		// this is line comment1
-		// this is line comment1
-		echo 123;
-		# this is line comment2
-		echo 123;
-		/* this is block comment1 */
-		echo 123;
-		/*
-		 * this is block comment2
-		 */
-		echo 123;
-		/** this is doccomment1 */
-		/**
-		 * this is doccomment2
-		 */
-		echo 123;
-		// this is multiline
-		$multiline = "
-1
-2
-3
-";
-
-		// empty line below and above
-
-		if (true) {
-		    echo 123; // this is trailing comment
-		    if (true) {
-		        /* this is starting comment */echo 123;
-		    }
-		}
-		');
-
-        $phpcode = indent_php($phpcode, [
-            'indent'    => "",
-            'trimempty' => false,
-        ]);
-
-        that($phpcode)->is('
-// this is line comment1
-// this is line comment1
-echo 123;
-# this is line comment2
-echo 123;
-/* this is block comment1 */
-echo 123;
-/*
- * this is block comment2
- */
-echo 123;
-/** this is doccomment1 */
-/**
- * this is doccomment2
- */
-echo 123;
-// this is multiline
-$multiline = "
-1
-2
-3
-";
-
-// empty line below and above
-
-if (true) {
-    echo 123; // this is trailing comment
-    if (true) {
-        /* this is starting comment */echo 123;
-    }
-}
-');
-    }
-
-    function test_indent_php_heredoc()
-    {
-        that(indent_php('
-$heredoc = <<<HERE
-    SELECT
-        $colA
-        {$colB},
-        ${colB}
-    FROM
-        table_name
-    WHERE 1
-        AND cd = ${substr($id, 2)}
-        AND id = ${"id$i"}
-HERE;
-', [
-            'indent'  => '    ',
-            'heredoc' => false,
-        ]))->is('
-    $heredoc = <<<HERE
-    SELECT
-        $colA
-        {$colB},
-        ${colB}
-    FROM
-        table_name
-    WHERE 1
-        AND cd = ${substr($id, 2)}
-        AND id = ${"id$i"}
-HERE;
-    ');
-        $phpcode = '
-$nowdoc = <<<\'HERE\'
-    SELECT
-        $colA
-        {$colB},
-        ${colB}
-    FROM
-        table_name
-    WHERE 1
-        AND cd = ${substr($id, 2)}
-        AND id = ${"id$i"}
-HERE;
-$heredoc1 = <<<HERE
-    SELECT
-        $colA
-        {$colB},
-        ${colB}
-    FROM
-        table_name
-    WHERE 1
-        AND cd = ${substr($id, 2)}
-        AND id = ${"id$i"}
-    HERE;
-$heredoc2 = <<<HERE
-$colA
-        {$colB},
-        ${colB}
-
-    HERE;
-';
-
-        $phpcode = indent_php($phpcode, [
-            'indent'  => "    ",
-            'heredoc' => true,
-        ]);
-
-        that($phpcode)->is('
-    $nowdoc = <<<\'HERE\'
-        SELECT
-            $colA
-            {$colB},
-            ${colB}
-        FROM
-            table_name
-        WHERE 1
-            AND cd = ${substr($id, 2)}
-            AND id = ${"id$i"}
-    HERE;
-    $heredoc1 = <<<HERE
-        SELECT
-            $colA
-            {$colB},
-            ${colB}
-        FROM
-            table_name
-        WHERE 1
-            AND cd = ${substr($id, 2)}
-            AND id = ${"id$i"}
-        HERE;
-    $heredoc2 = <<<HERE
-    $colA
-            {$colB},
-            ${colB}
-    
-        HERE;
-    ');
-
-        $phpcode = indent_php($phpcode, [
-            'indent'  => "",
-            'heredoc' => true,
-        ]);
-
-        that($phpcode)->is('
-$nowdoc = <<<\'HERE\'
-    SELECT
-        $colA
-        {$colB},
-        ${colB}
-    FROM
-        table_name
-    WHERE 1
-        AND cd = ${substr($id, 2)}
-        AND id = ${"id$i"}
-HERE;
-$heredoc1 = <<<HERE
-    SELECT
-        $colA
-        {$colB},
-        ${colB}
-    FROM
-        table_name
-    WHERE 1
-        AND cd = ${substr($id, 2)}
-        AND id = ${"id$i"}
-    HERE;
-$heredoc2 = <<<HERE
-$colA
-        {$colB},
-        ${colB}
-
-    HERE;
-');
-    }
-
-    function test_parse_annotation()
-    {
-        that(parse_annotation('aaaaa'))->isEmpty();
-
-        $refmethod = new \ReflectionMethod(require __DIR__ . '/files/php/annotation.php', 'm');
-
-        $actual = parse_annotation($refmethod);
-        that($actual)->as('actual:' . var_export2($actual, true))->is([
-            "single"    => ["123"],
-            "closure"   => ["123", "+", "456"],
-            "multi"     => ["a", "b", "c"],
-            "quote"     => ["\"a b c\"", "123"],
-            "noval"     => [
-                null,
-                null,
-            ],
-            "hash"      => [
-                "a" => 123,
-            ],
-            "list"      => [123, 456],
-            "hashX"     => [
-                "a" => 123,
-            ],
-            "listX"     => [123, 456],
-            "block"     => [
-                "message" => ["this is message1\n    this is message2"],
-            ],
-            "blockX"    => [
-                "message1" => ["this is message1"],
-                "message2" => ["this is message2"],
-            ],
-            "double"    => [
-                ["a"],
-                ["b"],
-                ["c\n\nthis", "is", "\\@escape"],
-            ],
-            "DateTime2" => \This\Is\Space\DateTime2::__set_state([
-                "date"          => "2019-12-23 00:00:00.000000",
-                "timezone_type" => 3,
-                "timezone"      => "Asia/Tokyo",
-            ]),
-            "param"     => [
-                ["string", "\$arg1", "引数1"],
-                ["array", "\$arg2", "this", "is", "second", "argument"],
-            ],
-            "return"    => ["null", "返り値\nthis", "is", "\\@escape"],
-        ]);
-
-        $actual = parse_annotation($refmethod, [
-            'single'  => true,
-            'double'  => true,
-            'block'   => true,
-            'blockX'  => true,
-            'closure' => fn($value) => phpval($value),
-        ]);
-        that($actual)->as('actual:' . var_export2($actual, true))->is([
-            "single"    => "123",
-            "closure"   => 579,
-            "multi"     => ["a", "b", "c"],
-            "quote"     => ["\"a b c\"", "123"],
-            "noval"     => [
-                null,
-                null,
-            ],
-            "hash"      => [
-                "a" => 123,
-            ],
-            "list"      => [123, 456],
-            "hashX"     => [
-                "a" => 123,
-            ],
-            "listX"     => [123, 456],
-            "block"     => [
-                "message" => "
-    this is message1
-    this is message2
-",
-            ],
-            "blockX"    => [
-                "message1" => "
-    this is message1
-",
-                "message2" => "
-    this is message2
-",
-            ],
-            "double"    => ["a", "b", "c\n\nthis is \\@escape"],
-            "DateTime2" => \This\Is\Space\DateTime2::__set_state([
-                "date"          => "2019-12-23 00:00:00.000000",
-                "timezone_type" => 3,
-                "timezone"      => "Asia/Tokyo",
-            ]),
-            "param"     => [
-                ["string", "\$arg1", "引数1"],
-                ["array", "\$arg2", "this", "is", "second", "argument"],
-            ],
-            "return"    => ["null", "返り値\nthis", "is", "\\@escape"],
-        ]);
-
-        $actual = parse_annotation(new \ReflectionMethod(\This\Is\Space\DateTime2::class, 'method'), true);
-        that($actual)->as('actual:' . var_export2($actual, true))->is([
-            "message" => 'this is annotation',
-        ]);
-
-        $annotation = '
-@hoge{a: 123}
-
-@fuga {
-    fuga1
-    fuga2
-}
-
-@piyo dummy {
-    piyo1: 1,
-    piyo2: 2
-}';
-        $actual = parse_annotation($annotation);
-        that($actual)->as('actual:' . var_export2($actual, true))->is([
-            "hoge" => ['a' => 123],
-            "fuga" => ["fuga1\n    fuga2"],
-            "piyo" => [
-                "dummy" => [
-                    "piyo1" => 1,
-                    "piyo2" => 2,
-                ],
-            ],
-        ]);
-
-        $actual = parse_annotation($annotation, true);
-        that($actual)->as('actual:' . var_export2($actual, true))->is([
-            "hoge" => "{a: 123}",
-            "fuga" => "
-    fuga1
-    fuga2
-",
-            "piyo" => [
-                "dummy" => "
-    piyo1: 1,
-    piyo2: 2
-",
-            ],
-        ]);
-
-        $actual = parse_annotation('
-@mix type1{
-    hoge1
-    hoge2
-}
-@mix type2 {
-    fuga1
-    fuga2
-}', true);
-        that($actual)->as('actual:' . var_export2($actual, true))->is([
-            "mix" => [
-                "type1" => "
-    hoge1
-    hoge2
-",
-                "type2" => "
-    fuga1
-    fuga2
-",
-            ],
-        ]);
-
-        $actual = parse_annotation('
-@mix hoge
-@mix type {
-    fuga1
-    fuga2
-}');
-        that($actual)->as('actual:' . var_export2($actual, true))->is([
-            "mix" => [
-                0      => ["hoge"],
-                "type" => ["fuga1\n    fuga2"],
-            ],
-        ]);
-
-        $actual = parse_annotation('
-@mix type{
-    hoge1
-    hoge2
-}
-@mix fuga
-}');
-        that($actual)->as('actual:' . var_export2($actual, true))->is([
-            "mix" => [
-                "type" => ["hoge1\n    hoge2"],
-                0      => ["fuga\n}"],
-            ],
-        ]);
-
-        $actual = parse_annotation('
-@hoge This is hoge
-@fuga This is fuga1
-@fuga This is fuga2
-', [
-            'hoge' => [],
-            'fuga' => null,
-        ]);
-        that($actual)->as('actual:' . var_export2($actual, true))->is([
-            "hoge" => [
-                ["This", "is", "hoge"],
-            ],
-            "fuga" => ["This", "is", "fuga2"],
-        ]);
-    }
-
-    function test_parse_namespace()
-    {
-        $actual = parse_namespace(__DIR__ . '/files/php/namespace-standard.php');
+        $actual = namespace_parse(__DIR__ . '/files/php/namespace-standard.php');
         that($actual)->as('actual:' . var_export2($actual, true))->is([
             "vendor\\NS"   => [
                 "const"    => [
@@ -735,7 +435,7 @@ $colA
             ],
         ]);
 
-        $actual = parse_namespace(__DIR__ . '/files/php/namespace-multispace1.php');
+        $actual = namespace_parse(__DIR__ . '/files/php/namespace-multispace1.php');
         that($actual)->as('actual:' . var_export2($actual, true))->is([
             "vendor\\NS1"  => [
                 "const"    => [
@@ -813,7 +513,7 @@ $colA
             ],
         ]);
 
-        $actual = parse_namespace(__DIR__ . '/files/php/namespace-multispace2.php');
+        $actual = namespace_parse(__DIR__ . '/files/php/namespace-multispace2.php');
         that($actual)->as('actual:' . var_export2($actual, true))->is([
             "vendor\\NS1"  => [
                 "const"    => [
@@ -893,15 +593,351 @@ $colA
 
         $file = self::$TMPDIR . '/rf-parse_namespace.php';
         file_put_contents($file, '<?php namespace hoge;');
-        that(parse_namespace($file, ['cache' => false]))->hasKey('hoge');
+        that(namespace_parse($file, ['cache' => false]))->hasKey('hoge');
         file_put_contents($file, '<?php namespace fuga;');
-        that(parse_namespace($file, ['cache' => false]))->hasKey('fuga');
+        that(namespace_parse($file, ['cache' => false]))->hasKey('fuga');
     }
 
-    function test_parse_php()
+    function test_namespace_resolve()
+    {
+        $standard = __DIR__ . '/files/php/namespace-standard.php';
+        $multispace1 = __DIR__ . '/files/php/namespace-multispace1.php';
+        $multispace2 = __DIR__ . '/files/php/namespace-multispace2.php';
+
+        that(namespace_resolve('\\Full\\middle\\name', []))->is('\\Full\\middle\\name');
+        that(namespace_resolve('Space\\middle\\name', $standard))->is('Sub\\Space\\middle\\name');
+        that(namespace_resolve('xC', $standard))->is('Main\\Sub\\C');
+        that(namespace_resolve('ArrayObject', $standard))->is('ArrayObject');
+        that(namespace_resolve('ArrayObject', $standard, ['function']))->is(null);
+        that(namespace_resolve('AC', $standard))->is('array_chunk');
+        that(namespace_resolve('AC', $standard, ['const']))->is(null);
+        that(namespace_resolve('DS', $standard))->is('DIRECTORY_SEPARATOR');
+        that(namespace_resolve('DS', $standard, ['alias']))->is(null);
+
+        that(namespace_resolve('D', $standard))->is(null);
+        that(namespace_resolve('D', [$multispace1 => ['vendor\\NS1']]))->is('Main\\Sub11\\D');
+        that(namespace_resolve('D', [$multispace1 => ['vendor\\NS2']]))->is('Main\\Sub12\\D');
+        that(namespace_resolve('D', [$multispace2 => ['vendor\\NS1']]))->is('Main\\Sub21\\D');
+        that(namespace_resolve('D', [$multispace2 => ['vendor\\NS2']]))->is('Main\\Sub22\\D');
+    }
+
+    function test_php_highlight()
+    {
+        $phpcode = '<?php
+// this is comment
+$var1 = "this is var";
+$var2 = "this is embed $var1";
+$var3 = function () { return \ArrayObject::class; };
+';
+        that(php_highlight($phpcode, ['context' => 'plain']))->is($phpcode);
+        that(php_highlight($phpcode, ['context' => 'cli']))->stringContains('[34;3m');
+        that(php_highlight($phpcode, ['context' => 'html']))->stringContains('<span style');
+        that(php_highlight($phpcode))->stringContains('function');
+
+        that(self::resolveFunction('php_highlight'))($phpcode, ['context' => 'hoge'])->wasThrown('is not supported');
+    }
+
+    function test_php_indent()
+    {
+        $phpcode = '
+// this is line comment1
+// this is line comment1
+echo 123;
+# this is line comment2
+echo 123;
+/* this is block comment1 */
+echo 123;
+/*
+ * this is block comment2
+ */
+echo 123;
+/** this is doccomment1 */
+/**
+ * this is doccomment2
+ */
+echo 123;
+// this is multiline
+$multiline = "
+1
+2
+3
+";
+
+// empty line below and above
+
+if (true) {
+    echo 123; // this is trailing comment
+    if (true) {
+        /* this is starting comment */echo 123;
+    }
+}
+';
+        $phpcode = php_indent($phpcode, [
+            'indent'    => 4,
+            'trimempty' => false,
+        ]);
+
+        that($phpcode)->is('
+    // this is line comment1
+    // this is line comment1
+    echo 123;
+    # this is line comment2
+    echo 123;
+    /* this is block comment1 */
+    echo 123;
+    /*
+     * this is block comment2
+     */
+    echo 123;
+    /** this is doccomment1 */
+    /**
+     * this is doccomment2
+     */
+    echo 123;
+    // this is multiline
+    $multiline = "
+1
+2
+3
+";
+    
+    // empty line below and above
+    
+    if (true) {
+        echo 123; // this is trailing comment
+        if (true) {
+            /* this is starting comment */echo 123;
+        }
+    }
+    ');
+
+        $phpcode = php_indent($phpcode, "\t\t");
+
+        that($phpcode)->is('
+		// this is line comment1
+		// this is line comment1
+		echo 123;
+		# this is line comment2
+		echo 123;
+		/* this is block comment1 */
+		echo 123;
+		/*
+		 * this is block comment2
+		 */
+		echo 123;
+		/** this is doccomment1 */
+		/**
+		 * this is doccomment2
+		 */
+		echo 123;
+		// this is multiline
+		$multiline = "
+1
+2
+3
+";
+
+		// empty line below and above
+
+		if (true) {
+		    echo 123; // this is trailing comment
+		    if (true) {
+		        /* this is starting comment */echo 123;
+		    }
+		}
+		');
+
+        $phpcode = php_indent($phpcode, [
+            'indent'    => "",
+            'trimempty' => false,
+        ]);
+
+        that($phpcode)->is('
+// this is line comment1
+// this is line comment1
+echo 123;
+# this is line comment2
+echo 123;
+/* this is block comment1 */
+echo 123;
+/*
+ * this is block comment2
+ */
+echo 123;
+/** this is doccomment1 */
+/**
+ * this is doccomment2
+ */
+echo 123;
+// this is multiline
+$multiline = "
+1
+2
+3
+";
+
+// empty line below and above
+
+if (true) {
+    echo 123; // this is trailing comment
+    if (true) {
+        /* this is starting comment */echo 123;
+    }
+}
+');
+    }
+
+    function test_php_indent_heredoc()
+    {
+        that(php_indent('
+$heredoc = <<<HERE
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+HERE;
+', [
+            'indent'  => '    ',
+            'heredoc' => false,
+        ]))->is('
+    $heredoc = <<<HERE
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+HERE;
+    ');
+        $phpcode = '
+$nowdoc = <<<\'HERE\'
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+HERE;
+$heredoc1 = <<<HERE
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+    HERE;
+$heredoc2 = <<<HERE
+$colA
+        {$colB},
+        ${colB}
+
+    HERE;
+';
+
+        $phpcode = php_indent($phpcode, [
+            'indent'  => "    ",
+            'heredoc' => true,
+        ]);
+
+        that($phpcode)->is('
+    $nowdoc = <<<\'HERE\'
+        SELECT
+            $colA
+            {$colB},
+            ${colB}
+        FROM
+            table_name
+        WHERE 1
+            AND cd = ${substr($id, 2)}
+            AND id = ${"id$i"}
+    HERE;
+    $heredoc1 = <<<HERE
+        SELECT
+            $colA
+            {$colB},
+            ${colB}
+        FROM
+            table_name
+        WHERE 1
+            AND cd = ${substr($id, 2)}
+            AND id = ${"id$i"}
+        HERE;
+    $heredoc2 = <<<HERE
+    $colA
+            {$colB},
+            ${colB}
+    
+        HERE;
+    ');
+
+        $phpcode = php_indent($phpcode, [
+            'indent'  => "",
+            'heredoc' => true,
+        ]);
+
+        that($phpcode)->is('
+$nowdoc = <<<\'HERE\'
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+HERE;
+$heredoc1 = <<<HERE
+    SELECT
+        $colA
+        {$colB},
+        ${colB}
+    FROM
+        table_name
+    WHERE 1
+        AND cd = ${substr($id, 2)}
+        AND id = ${"id$i"}
+    HERE;
+$heredoc2 = <<<HERE
+$colA
+        {$colB},
+        ${colB}
+
+    HERE;
+');
+    }
+
+    function test_php_opcode()
+    {
+        $opcode = php_opcode('$a=1;$b=2;var_dump($a + $b + $c);');
+        that($opcode)->containsAll([
+            'ASSIGN',
+            'INIT_FCALL',
+        ]);
+        that($opcode)->notContainsAny([
+            'Notice',
+            'Undefined',
+        ], false);
+    }
+
+    function test_php_parse()
     {
         $code = 'a(123);';
-        $tokens = parse_php($code, 2);
+        $tokens = php_parse($code, 2);
         that($tokens)->is([
             [T_OPEN_TAG, '<?php ', 1, -6, 'T_OPEN_TAG'],
             [T_STRING, 'a', 1, 0, 'T_STRING'],
@@ -916,7 +952,7 @@ $colA
         echo `this is $backtick`;
         PHP;
 
-        that(parse_php($code, [
+        that(php_parse($code, [
             'backtick' => false,
             'flags'    => TOKEN_NAME,
         ]))->is([
@@ -935,16 +971,16 @@ $colA
         $code = '$c = function ($a = null) use ($x) {
     return $a + $x;
 };';
-        $tokens = parse_php($code, [
+        $tokens = php_parse($code, [
             'line' => [2, 2],
         ]);
         that(implode('', array_column($tokens, 1)))->is('return $a + $x;' . "\n");
-        $tokens = parse_php($code, [
+        $tokens = php_parse($code, [
             'position' => [37, 56],
         ]);
         that(implode('', array_column($tokens, 1)))->is('return $a + $x;' . "\n");
 
-        $tokens = parse_php($code, 4);
+        $tokens = php_parse($code, 4);
         // @formatter:off
         that($tokens)->is([
             #ID, TOKEN,       L, C
@@ -986,23 +1022,23 @@ $colA
         // @formatter:on
 
         $code = 'function($a,$b)use($usevar){if(false)return fn()=>[1,2,3];}';
-        $tokens = parse_php($code, [
+        $tokens = php_parse($code, [
             'begin' => T_FUNCTION,
             'end'   => ',',
         ]);
         that(implode('', array_column($tokens, 1)))->is('function($a,$b)use($usevar){if(false)return fn()=>[1,2,3];}');
-        $tokens = parse_php($code, [
+        $tokens = php_parse($code, [
             'begin'  => T_FUNCTION,
             'end'    => ')',
             'greedy' => true,
         ]);
         that(implode('', array_column($tokens, 1)))->is('function($a,$b)use($usevar){if(false)return fn()=>[1,2,3];}');
-        $tokens = parse_php($code, [
+        $tokens = php_parse($code, [
             'begin' => T_FUNCTION,
             'end'   => '{',
         ]);
         that(implode('', array_column($tokens, 1)))->is('function($a,$b)use($usevar){');
-        $tokens = parse_php($code, [
+        $tokens = php_parse($code, [
             'begin'  => '{',
             'end'    => '}',
             'offset' => count($tokens),
@@ -1010,24 +1046,24 @@ $colA
         that(implode('', array_column($tokens, 1)))->is('{if(false)return fn()=>[1,2,3];}');
 
         $code = 'namespace hoge\\fuga\\piyo;class C {function m(){if(false)return function(){};}}';
-        $tokens = parse_php($code, [
+        $tokens = php_parse($code, [
             'begin' => T_NAMESPACE,
             'end'   => ';',
         ]);
         that(implode('', array_column($tokens, 1)))->is('namespace hoge\fuga\piyo;');
-        $tokens = parse_php($code, [
+        $tokens = php_parse($code, [
             'begin' => T_CLASS,
             'end'   => '}',
         ]);
         that(implode('', array_column($tokens, 1)))->is('class C {function m(){if(false)return function(){};}}');
     }
 
-    function test_parse_php_short_open_tag()
+    function test_php_parse_short_open_tag()
     {
         $providerExpected = function ($code, $short_open_tag) {
             $include = var_export(realpath(__DIR__ . '/../../../include/global.php'), true);
             $export = var_export($code, true);
-            $stdin = "<?php include($include);var_export(parse_php($export, TOKEN_NAME));";
+            $stdin = "<?php include($include);var_export(php_parse($export, TOKEN_NAME));";
             $stdout = '';
             process(PHP_BINARY, [
                 "-d short_open_tag=$short_open_tag",
@@ -1046,54 +1082,18 @@ plain text
 <? echo 789;
 ';
 
-        that(parse_php($code, [
+        that(php_parse($code, [
             'short_open_tag' => true,
             'flags'          => TOKEN_NAME,
         ]))->is($providerExpected($code, 1));
 
-        that(parse_php($code, [
+        that(php_parse($code, [
             'short_open_tag' => false,
             'flags'          => TOKEN_NAME,
         ]))->is($providerExpected($code, 0));
     }
 
-    function test_php_opcode()
-    {
-        $opcode = php_opcode('$a=1;$b=2;var_dump($a + $b + $c);');
-        that($opcode)->containsAll([
-            'ASSIGN',
-            'INIT_FCALL',
-        ]);
-        that($opcode)->notContainsAny([
-            'Notice',
-            'Undefined',
-        ], false);
-    }
-
-    function test_resolve_symbol()
-    {
-        $standard = __DIR__ . '/files/php/namespace-standard.php';
-        $multispace1 = __DIR__ . '/files/php/namespace-multispace1.php';
-        $multispace2 = __DIR__ . '/files/php/namespace-multispace2.php';
-
-        that(resolve_symbol('\\Full\\middle\\name', []))->is('\\Full\\middle\\name');
-        that(resolve_symbol('Space\\middle\\name', $standard))->is('Sub\\Space\\middle\\name');
-        that(resolve_symbol('xC', $standard))->is('Main\\Sub\\C');
-        that(resolve_symbol('ArrayObject', $standard))->is('ArrayObject');
-        that(resolve_symbol('ArrayObject', $standard, ['function']))->is(null);
-        that(resolve_symbol('AC', $standard))->is('array_chunk');
-        that(resolve_symbol('AC', $standard, ['const']))->is(null);
-        that(resolve_symbol('DS', $standard))->is('DIRECTORY_SEPARATOR');
-        that(resolve_symbol('DS', $standard, ['alias']))->is(null);
-
-        that(resolve_symbol('D', $standard))->is(null);
-        that(resolve_symbol('D', [$multispace1 => ['vendor\\NS1']]))->is('Main\\Sub11\\D');
-        that(resolve_symbol('D', [$multispace1 => ['vendor\\NS2']]))->is('Main\\Sub12\\D');
-        that(resolve_symbol('D', [$multispace2 => ['vendor\\NS1']]))->is('Main\\Sub21\\D');
-        that(resolve_symbol('D', [$multispace2 => ['vendor\\NS2']]))->is('Main\\Sub22\\D');
-    }
-
-    function test_strip_php()
+    function test_php_strip()
     {
         $code = '?>
 a<? echo 123 ?>
@@ -1106,19 +1106,19 @@ plain text
 <? echo 789;
 ';
 
-        that(strip_php($code))->is('?>
+        that(php_strip($code))->is('?>
 aplain text
         plain text
      and ');
-        that(strip_php($code, ['replacer' => 'xxx']))->is('?>
+        that(php_strip($code, ['replacer' => 'xxx']))->is('?>
 axxx6plain text
 xxx5    xxx4    plain text
     xxx3 and xxx2xxx1xxx0');
-        that(strip_php($code, ['replacer' => fn($code, $n) => strpos($code, 'foreach') ? 'foreach' : $n . "th"]))->is('?>
+        that(php_strip($code, ['replacer' => fn($code, $n) => strpos($code, 'foreach') ? 'foreach' : $n . "th"]))->is('?>
 a6thplain text
 foreach    4th    plain text
     3th and 2thforeach0th');
-        that(strip_php($code, [
+        that(php_strip($code, [
             'trailing_break' => false,
         ]))->is('?>
 aplain text
@@ -1127,7 +1127,7 @@ aplain text
 ');
 
         $mapping = [];
-        $html = strip_php($code, [], $mapping);
+        $html = php_strip($code, [], $mapping);
         that(strtr($html, $mapping))->is($code);
     }
 

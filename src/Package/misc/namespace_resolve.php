@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../misc/parse_namespace.php';
+require_once __DIR__ . '/../misc/namespace_parse.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -24,10 +24,10 @@ require_once __DIR__ . '/../misc/parse_namespace.php';
  * class InnerClass{}
  * ');
  * // 下記のように解決される
- * that(resolve_symbol('AO', sys_get_temp_dir() . '/symbol.php'))->isSame('ArrayObject');
- * that(resolve_symbol('SL', sys_get_temp_dir() . '/symbol.php'))->isSame('strlen');
- * that(resolve_symbol('InnerFunc', sys_get_temp_dir() . '/symbol.php'))->isSame('vendor\\NS\\InnerFunc');
- * that(resolve_symbol('InnerClass', sys_get_temp_dir() . '/symbol.php'))->isSame('vendor\\NS\\InnerClass');
+ * that(namespace_resolve('AO', sys_get_temp_dir() . '/symbol.php'))->isSame('ArrayObject');
+ * that(namespace_resolve('SL', sys_get_temp_dir() . '/symbol.php'))->isSame('strlen');
+ * that(namespace_resolve('InnerFunc', sys_get_temp_dir() . '/symbol.php'))->isSame('vendor\\NS\\InnerFunc');
+ * that(namespace_resolve('InnerClass', sys_get_temp_dir() . '/symbol.php'))->isSame('vendor\\NS\\InnerClass');
  * ```
  *
  * @package ryunosuke\Functions\Package\misc
@@ -37,7 +37,7 @@ require_once __DIR__ . '/../misc/parse_namespace.php';
  * @param array $targets エイリアスタイプ（'const', 'function', 'alias' のいずれか）
  * @return string|null 完全修飾名。解決できなかった場合は null
  */
-function resolve_symbol(string $shortname, $nsfiles, $targets = ['const', 'function', 'alias'])
+function namespace_resolve(string $shortname, $nsfiles, $targets = ['const', 'function', 'alias'])
 {
     // 既に完全修飾されている場合は何もしない
     if (($shortname[0] ?? null) === '\\') {
@@ -55,7 +55,7 @@ function resolve_symbol(string $shortname, $nsfiles, $targets = ['const', 'funct
     $targets = (array) $targets;
     foreach ($nsfiles as $filename => $namespaces) {
         $namespaces = array_flip(array_map(fn($n) => trim($n, '\\'), (array) $namespaces));
-        foreach (parse_namespace($filename) as $namespace => $ns) {
+        foreach (namespace_parse($filename) as $namespace => $ns) {
             /** @noinspection PhpIllegalArrayKeyTypeInspection */
             if (!$namespaces || isset($namespaces[$namespace])) {
                 if (isset($ns['alias'][$prefix])) {

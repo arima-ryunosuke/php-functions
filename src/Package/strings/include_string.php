@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../outcontrol/ob_include.php';
-require_once __DIR__ . '/../stream/memory_path.php';
+require_once __DIR__ . '/../stream/memory_stream.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -19,7 +19,7 @@ require_once __DIR__ . '/../stream/memory_path.php';
 function include_string($template, $array = [])
 {
     // opcache が効かない気がする
-    $path = memory_path(__FUNCTION__);
+    $path = memory_stream(__FUNCTION__);
     file_put_contents($path, $template);
     $result = ob_include($path, $array);
     unlink($path);

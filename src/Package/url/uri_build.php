@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../strings/concat.php';
-require_once __DIR__ . '/../url/build_query.php';
+require_once __DIR__ . '/../url/query_build.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -17,7 +17,7 @@ require_once __DIR__ . '/../url/build_query.php';
  * Example:
  * ```php
  * // 完全指定
- * that(build_uri([
+ * that(uri_build([
  *     'scheme'   => 'http',
  *     'user'     => 'user',
  *     'pass'     => 'pass',
@@ -28,7 +28,7 @@ require_once __DIR__ . '/../url/build_query.php';
  *     'fragment' => 'hash',
  * ]))->isSame('http://user:pass@localhost:80/path/to/file?id=1#hash');
  * // 一部だけ指定
- * that(build_uri([
+ * that(uri_build([
  *     'scheme'   => 'http',
  *     'host'     => 'localhost',
  *     'path'     => '/path/to/file',
@@ -42,7 +42,7 @@ require_once __DIR__ . '/../url/build_query.php';
  * @param array $options オプション
  * @return string URI 文字列
  */
-function build_uri($parts, $options = [])
+function uri_build($parts, $options = [])
 {
     $parts += [
         'scheme'   => '',
@@ -67,7 +67,7 @@ function build_uri($parts, $options = [])
     $parts['host'] = filter_var($parts['host'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? "[{$parts['host']}]" : $parts['host'];
     $parts['path'] = ltrim($parts['path'], '/');
     if (is_array($parts['query'])) {
-        $parts['query'] = build_query(
+        $parts['query'] = query_build(
             $parts['query'],
             $options['query']['index'],
             $options['query']['separator'],

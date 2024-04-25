@@ -20,7 +20,7 @@ require_once __DIR__ . '/../syntax/throws.php';
  * // Example 用としてこのパッケージの Transporter を使用してみる
  * $dirname = dirname(class_loader()->findFile(\ryunosuke\Functions\Transporter::class));
  * // "$dirname/Hoge" の名前空間を推測して返す
- * that(detect_namespace("$dirname/Hoge"))->isSame("ryunosuke\\Functions\\Hoge");
+ * that(namespace_detect("$dirname/Hoge"))->isSame("ryunosuke\\Functions\\Hoge");
  * ```
  *
  * @package ryunosuke\Functions\Package\classobj
@@ -28,7 +28,7 @@ require_once __DIR__ . '/../syntax/throws.php';
  * @param string $location 配置パス。ファイル名を与えるとそのファイルを配置すべきクラス名を返す
  * @return string 名前空間
  */
-function detect_namespace($location)
+function namespace_detect($location)
 {
     // php をパースして名前空間部分を得るクロージャ
     $detectNS = function ($phpfile) {

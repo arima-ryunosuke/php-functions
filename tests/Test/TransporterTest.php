@@ -31,7 +31,7 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
     function test_exportDirectory()
     {
         that(Transporter::exportNamespace('', __DIR__ . '/Transporter/'))
-            ->stringContains('parse_uri')      // file1 が含まれている
+            ->stringContains('uri_parse')      // file1 が含まれている
             ->stringContains('sql_format')     // file2 が含まれている
             ->stringContains('preg_capture')   // file1 に依存している関数が含まれている
             ->stringContains('throws')         // file2 に依存している関数が含まれている
@@ -47,7 +47,7 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
             ->stringContains('static function date_timestamp')         // 依存している関数が含まれている
             ->stringContains('static function throws')                 // 依存が依存している関数が含まれている
             ->stringContains('name\\space\\ClassName::date_timestamp') // self::で修飾されている
-            ->stringNotContains('parse_uri')                           // 依存していない関数が含まれていない
+            ->stringNotContains('uri_parse')                           // 依存していない関数が含まれていない
         ;
     }
 

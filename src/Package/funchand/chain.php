@@ -5,8 +5,8 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/array_insert.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../array/next_key.php';
-require_once __DIR__ . '/../funchand/eval_func.php';
-require_once __DIR__ . '/../funchand/ope_func.php';
+require_once __DIR__ . '/../funchand/func_eval.php';
+require_once __DIR__ . '/../funchand/func_operator.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
 require_once __DIR__ . '/../utility/function_configure.php';
 require_once __DIR__ . '/../var/is_stringable.php';
@@ -149,7 +149,7 @@ function chain($source = null)
                             $offset = 0;
                             $expr = array_pop($arguments);
                             $expr = preg_match('#\$\d+#u', $expr) ? $expr : '$1 ' . $expr;
-                            $arguments[] = eval_func($expr, '_');
+                            $arguments[] = func_eval($expr, '_');
                         }
 
                         $this->data = $this->_apply($this->callback, $arguments, [$offset => $this->data]);
@@ -444,7 +444,7 @@ function chain($source = null)
                         if (!is_array($rand)) {
                             $rand = [$rand];
                         }
-                        $v = ope_func($ope)($v, ...$rand);
+                        $v = func_operator($ope)($v, ...$rand);
                     }
                     return $v;
                 };

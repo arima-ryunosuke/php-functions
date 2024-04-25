@@ -6,9 +6,10 @@ use ryunosuke\Functions\Utility;
 use function ryunosuke\Functions\Package\abind;
 use function ryunosuke\Functions\Package\call_safely;
 use function ryunosuke\Functions\Package\chain;
-use function ryunosuke\Functions\Package\eval_func;
+use function ryunosuke\Functions\Package\func_eval;
 use function ryunosuke\Functions\Package\func_method;
 use function ryunosuke\Functions\Package\func_new;
+use function ryunosuke\Functions\Package\func_operator;
 use function ryunosuke\Functions\Package\func_user_func_array;
 use function ryunosuke\Functions\Package\func_wiring;
 use function ryunosuke\Functions\Package\function_alias;
@@ -20,7 +21,6 @@ use function ryunosuke\Functions\Package\lbind;
 use function ryunosuke\Functions\Package\namedcallize;
 use function ryunosuke\Functions\Package\nbind;
 use function ryunosuke\Functions\Package\not_func;
-use function ryunosuke\Functions\Package\ope_func;
 use function ryunosuke\Functions\Package\parameter_length;
 use function ryunosuke\Functions\Package\rbind;
 
@@ -213,22 +213,22 @@ class funchandTest extends AbstractTestCase
         unset($restorer);
     }
 
-    function test_eval_func()
+    function test_func_eval()
     {
-        that(eval_func('4')())->is(4);
-        that(eval_func('$a + $b', 'a', 'b')(3, 4))->is(7);
-        that(eval_func('$1 + $2')(3, 4))->is(7);
+        that(func_eval('4')())->is(4);
+        that(func_eval('$a + $b', 'a', 'b')(3, 4))->is(7);
+        that(func_eval('$1 + $2')(3, 4))->is(7);
 
-        $a1 = eval_func('$a', 'a');
-        $a2 = eval_func('$a', 'a');
-        $x = eval_func('$x', 'x');
+        $a1 = func_eval('$a', 'a');
+        $a2 = func_eval('$a', 'a');
+        $x = func_eval('$x', 'x');
         that($a1 === $a2)->isTrue();
         that($a1 !== $x)->isTrue();
         that($a2 !== $x)->isTrue();
 
-        that(parameter_length(eval_func('$v')))->is(0);
-        that(parameter_length(eval_func('$v', 'a')))->is(1);
-        that(parameter_length(eval_func('$v', 'a', 'b')))->is(2);
+        that(parameter_length(func_eval('$v')))->is(0);
+        that(parameter_length(func_eval('$v', 'a')))->is(1);
+        that(parameter_length(func_eval('$v', 'a', 'b')))->is(2);
     }
 
     function test_func_method()
@@ -279,6 +279,87 @@ class funchandTest extends AbstractTestCase
         that($ex->getMessage())->is('hoge');
         $ex = $newException('fuga');
         that($ex->getMessage())->is('fuga');
+    }
+
+    function test_func_operator()
+    {
+        $operators = [
+            ''           => [[true], [false]],
+            '!'          => [[true], [false]],
+            '+'          => [[-1], [1], [-1, 1]],
+            '-'          => [[1], [-1, 1]],
+            '~'          => [[-1], [1]],
+            '++'         => [], // 直値の++はできないので個別にテストする
+            '--'         => [], // 直値の--はできないので個別にテストする
+            '?:'         => [[true, 'OK'], [false, 'NG'], [true, 'OK', 'NG'], [false, 'NG', 'OK']],
+            '??'         => [[true, 'OK'], [false, 'OK'], [null, 'NG']],
+            '=='         => [[1, 1], [1, '1'], [1, 2], [1, '2']],
+            '==='        => [[1, 1], [1, '1'], [1, 2], [1, '2']],
+            '!='         => [[1, 1], [1, '1'], [1, 2], [1, '2']],
+            '<>'         => [[1, 1], [1, '1'], [1, 2], [1, '2']],
+            '!=='        => [[1, 1], [1, '1'], [1, 2], [1, '2']],
+            '<'          => [[1, 1], [1, 2], [2, 1]],
+            '<='         => [[1, 1], [1, 2], [2, 1]],
+            '>'          => [[1, 1], [1, 2], [2, 1]],
+            '>='         => [[1, 1], [1, 2], [2, 1]],
+            '<=>'        => [[1, 1], [1, 2], [2, 1], ['aaa', 'bbb']],
+            '.'          => [['aaa', 'bbb']],
+            '*'          => [[-1, 1]],
+            '/'          => [[-1, 1]],
+            '%'          => [[-1, 1]],
+            '**'         => [[-1, 1]],
+            '^'          => [[-1, 1]],
+            '&'          => [[-1, 1]],
+            '|'          => [[-1, 1]],
+            '<<'         => [[-1, 1]],
+            '>>'         => [[-1, 1]],
+            '&&'         => [[false, false], [true, false], [false, true], [true, true]],
+            '||'         => [[false, false], [true, false], [false, true], [true, true]],
+            'or'         => [[false, false], [true, false], [false, true], [true, true]],
+            'and'        => [[false, false], [true, false], [false, true], [true, true]],
+            'xor'        => [[false, false], [true, false], [false, true], [true, true]],
+            'instanceof' => [], // 文字列化できないので個別にテストする
+            'new'        => [], // 文字列化できないので個別にテストする
+            'clone'      => [], // 文字列化できないので個別にテストする
+        ];
+        $ve = fn($v) => var_export($v, true);
+        foreach ($operators as $op => $argss) {
+            foreach ($argss as $args) {
+                $n = count($args);
+                $expression = null;
+                if ($n == 1) {
+                    $expression = "return $op{$ve($args[0])};";
+                }
+                elseif ($n == 2) {
+                    $expression = "return {$ve($args[0])} $op {$ve($args[1])};";
+                }
+                elseif ($n == 3) {
+                    // 3項演算子は定型的に eval 出来ないが1つしかないので直書きする
+                    $expression = "return {$ve($args[0])} ? {$ve($args[1])} : {$ve($args[2])};";
+                }
+                that(func_operator($op)(...$args))->as("$expression is failed.")->isSame(eval($expression));
+            }
+        }
+
+        // 一部 eval ではテスト出来ないので個別でテスト
+        $x = 99;
+        that(func_operator('++')($x))->isSame(100);
+        that($x)->isSame(100);
+        that(func_operator('--')($x))->isSame(99);
+        that($x)->isSame(99);
+        that(func_operator('instanceof')(new \stdClass(), \stdClass::class))->isTrue();
+        that(func_operator('instanceof')(new \stdClass(), \Exception::class))->isFalse();
+        $object = func_operator('new')(\Concrete::class, 'name');
+        that($object->getName())->is('name');
+        $object2 = func_operator('clone')($object);
+        that($object2->getName())->is('name');
+        that($object2)->isNotSame($object);
+
+        $p = [1, 1, 2, 4, 5, 6, 1, 3, 8, 4];
+        that(array_filter($p, func_operator('==', 5)))->isSame([4 => 5]);
+
+        // 例外系
+        that(self::resolveFunction('func_operator'))('hogera')->wasThrown('is not defined');
     }
 
     function test_func_user_func_array()
@@ -579,87 +660,6 @@ class funchandTest extends AbstractTestCase
         that($not_strlen(''))->isTrue();
 
         that(parameter_length(not_func('strlen')))->is(1);
-    }
-
-    function test_ope_func()
-    {
-        $operators = [
-            ''           => [[true], [false]],
-            '!'          => [[true], [false]],
-            '+'          => [[-1], [1], [-1, 1]],
-            '-'          => [[1], [-1, 1]],
-            '~'          => [[-1], [1]],
-            '++'         => [], // 直値の++はできないので個別にテストする
-            '--'         => [], // 直値の--はできないので個別にテストする
-            '?:'         => [[true, 'OK'], [false, 'NG'], [true, 'OK', 'NG'], [false, 'NG', 'OK']],
-            '??'         => [[true, 'OK'], [false, 'OK'], [null, 'NG']],
-            '=='         => [[1, 1], [1, '1'], [1, 2], [1, '2']],
-            '==='        => [[1, 1], [1, '1'], [1, 2], [1, '2']],
-            '!='         => [[1, 1], [1, '1'], [1, 2], [1, '2']],
-            '<>'         => [[1, 1], [1, '1'], [1, 2], [1, '2']],
-            '!=='        => [[1, 1], [1, '1'], [1, 2], [1, '2']],
-            '<'          => [[1, 1], [1, 2], [2, 1]],
-            '<='         => [[1, 1], [1, 2], [2, 1]],
-            '>'          => [[1, 1], [1, 2], [2, 1]],
-            '>='         => [[1, 1], [1, 2], [2, 1]],
-            '<=>'        => [[1, 1], [1, 2], [2, 1], ['aaa', 'bbb']],
-            '.'          => [['aaa', 'bbb']],
-            '*'          => [[-1, 1]],
-            '/'          => [[-1, 1]],
-            '%'          => [[-1, 1]],
-            '**'         => [[-1, 1]],
-            '^'          => [[-1, 1]],
-            '&'          => [[-1, 1]],
-            '|'          => [[-1, 1]],
-            '<<'         => [[-1, 1]],
-            '>>'         => [[-1, 1]],
-            '&&'         => [[false, false], [true, false], [false, true], [true, true]],
-            '||'         => [[false, false], [true, false], [false, true], [true, true]],
-            'or'         => [[false, false], [true, false], [false, true], [true, true]],
-            'and'        => [[false, false], [true, false], [false, true], [true, true]],
-            'xor'        => [[false, false], [true, false], [false, true], [true, true]],
-            'instanceof' => [], // 文字列化できないので個別にテストする
-            'new'        => [], // 文字列化できないので個別にテストする
-            'clone'      => [], // 文字列化できないので個別にテストする
-        ];
-        $ve = fn($v) => var_export($v, true);
-        foreach ($operators as $op => $argss) {
-            foreach ($argss as $args) {
-                $n = count($args);
-                $expression = null;
-                if ($n == 1) {
-                    $expression = "return $op{$ve($args[0])};";
-                }
-                elseif ($n == 2) {
-                    $expression = "return {$ve($args[0])} $op {$ve($args[1])};";
-                }
-                elseif ($n == 3) {
-                    // 3項演算子は定型的に eval 出来ないが1つしかないので直書きする
-                    $expression = "return {$ve($args[0])} ? {$ve($args[1])} : {$ve($args[2])};";
-                }
-                that(ope_func($op)(...$args))->as("$expression is failed.")->isSame(eval($expression));
-            }
-        }
-
-        // 一部 eval ではテスト出来ないので個別でテスト
-        $x = 99;
-        that(ope_func('++')($x))->isSame(100);
-        that($x)->isSame(100);
-        that(ope_func('--')($x))->isSame(99);
-        that($x)->isSame(99);
-        that(ope_func('instanceof')(new \stdClass(), \stdClass::class))->isTrue();
-        that(ope_func('instanceof')(new \stdClass(), \Exception::class))->isFalse();
-        $object = ope_func('new')(\Concrete::class, 'name');
-        that($object->getName())->is('name');
-        $object2 = ope_func('clone')($object);
-        that($object2->getName())->is('name');
-        that($object2)->isNotSame($object);
-
-        $p = [1, 1, 2, 4, 5, 6, 1, 3, 8, 4];
-        that(array_filter($p, ope_func('==', 5)))->isSame([4 => 5]);
-
-        // 例外系
-        that(self::resolveFunction('ope_func'))('hogera')->wasThrown('is not defined');
     }
 
     function test_rbind()

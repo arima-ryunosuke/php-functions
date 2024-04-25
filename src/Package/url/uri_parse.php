@@ -20,7 +20,7 @@ require_once __DIR__ . '/../strings/concat.php';
  * Example:
  * ```php
  * // 完全指定
- * that(parse_uri('http://user:pass@localhost:80/path/to/file?id=1#hash'))->is([
+ * that(uri_parse('http://user:pass@localhost:80/path/to/file?id=1#hash'))->is([
  *     'scheme'   => 'http',
  *     'user'     => 'user',
  *     'pass'     => 'pass',
@@ -31,7 +31,7 @@ require_once __DIR__ . '/../strings/concat.php';
  *     'fragment' => 'hash',
  * ]);
  * // デフォルト値つき
- * that(parse_uri('localhost/path/to/file', [
+ * that(uri_parse('localhost/path/to/file', [
  *     'scheme'   => 'http', // scheme のデフォルト値
  *     'user'     => 'user', // user のデフォルト値
  *     'port'     => '8080', // port のデフォルト値
@@ -54,7 +54,7 @@ require_once __DIR__ . '/../strings/concat.php';
  * @param array|string $default $uri に足りないパーツがあった場合のデフォルト値。文字列を与えた場合はそのパース結果がデフォルト値になる
  * @return array URI の各パーツ配列
  */
-function parse_uri($uri, $default = [])
+function uri_parse($uri, $default = [])
 {
     /** @noinspection RequiredAttributes */
     $regex = "

@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../misc/parse_php.php';
+require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../strings/strtr_escaped.php';
 require_once __DIR__ . '/../utility/cache.php';
 require_once __DIR__ . '/../var/attr_exists.php';
@@ -47,7 +47,7 @@ function render_template($template, $vars, $tag = null)
     };
 
     [$blocks, $stmts] = cache("template-$template", function () use ($template) {
-        $tokens = array_slice(parse_php("<<<PHPTEMPLATELITERAL\n" . $template . "\nPHPTEMPLATELITERAL;", [
+        $tokens = array_slice(php_parse("<<<PHPTEMPLATELITERAL\n" . $template . "\nPHPTEMPLATELITERAL;", [
             'backtick' => false,
         ]), 2, -2);
         $last = array_key_last($tokens);

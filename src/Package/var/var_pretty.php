@@ -8,7 +8,7 @@ require_once __DIR__ . '/../array/array_sprintf.php';
 require_once __DIR__ . '/../array/array_unset.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../array/last_key.php';
-require_once __DIR__ . '/../classobj/get_object_properties.php';
+require_once __DIR__ . '/../classobj/object_properties.php';
 require_once __DIR__ . '/../dataformat/markdown_table.php';
 require_once __DIR__ . '/../errorfunc/stacktrace.php';
 require_once __DIR__ . '/../info/ansi_colorize.php';
@@ -281,7 +281,7 @@ function var_pretty($value, $options = [])
                     }
                 }
                 else {
-                    $properties = get_object_properties($value);
+                    $properties = object_properties($value);
                 }
                 return $properties;
             }

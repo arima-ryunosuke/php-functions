@@ -14,12 +14,12 @@ namespace ryunosuke\Functions\Package;
  * mt_srand(4); // テストがコケるので種固定
  *
  * // 平均 100, 標準偏差 10 の正規乱数を得る
- * that(normal_rand(100, 10))->isSame(101.16879645296162);
- * that(normal_rand(100, 10))->isSame(96.49615862542069);
- * that(normal_rand(100, 10))->isSame(87.74557282679618);
- * that(normal_rand(100, 10))->isSame(117.93697951557125);
- * that(normal_rand(100, 10))->isSame(99.1917453115627);
- * that(normal_rand(100, 10))->isSame(96.74688207698713);
+ * that(random_normal(100, 10))->isSame(101.16879645296162);
+ * that(random_normal(100, 10))->isSame(96.49615862542069);
+ * that(random_normal(100, 10))->isSame(87.74557282679618);
+ * that(random_normal(100, 10))->isSame(117.93697951557125);
+ * that(random_normal(100, 10))->isSame(99.1917453115627);
+ * that(random_normal(100, 10))->isSame(96.74688207698713);
  * ```
  *
  * @package ryunosuke\Functions\Package\random
@@ -28,7 +28,7 @@ namespace ryunosuke\Functions\Package;
  * @param float $std_deviation 標準偏差
  * @return float 正規乱数
  */
-function normal_rand($average = 0.0, $std_deviation = 1.0)
+function random_normal($average = 0.0, $std_deviation = 1.0)
 {
     static $z2, $rand_max, $generate = true;
     $rand_max ??= mt_getrandmax();

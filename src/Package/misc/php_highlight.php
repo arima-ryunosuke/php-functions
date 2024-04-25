@@ -18,7 +18,7 @@ require_once __DIR__ . '/../info/is_ansi.php';
  * @param array|int $options オプション
  * @return string ハイライトされた php コード
  */
-function highlight_php($phpcode, $options = [])
+function php_highlight($phpcode, $options = [])
 {
     $options += [
         'context' => null,

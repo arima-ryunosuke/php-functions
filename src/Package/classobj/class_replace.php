@@ -4,7 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../classobj/class_loader.php';
 require_once __DIR__ . '/../misc/evaluate.php';
-require_once __DIR__ . '/../misc/parse_php.php';
+require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../pcre/preg_replaces.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
 require_once __DIR__ . '/../reflection/function_parameter.php';
@@ -144,14 +144,14 @@ function class_replace($class, $register)
     // 配列はメソッド定義のクロージャ配列とする
     if (is_array($newclass)) {
         $content = file_get_contents($fname);
-        $origspace = parse_php($content, [
+        $origspace = php_parse($content, [
             'begin' => T_NAMESPACE,
             'end'   => ';',
         ]);
         array_shift($origspace);
         array_pop($origspace);
 
-        $origclass = parse_php($content, [
+        $origclass = php_parse($content, [
             'begin'  => T_CLASS,
             'end'    => T_STRING,
             'offset' => count($origspace),

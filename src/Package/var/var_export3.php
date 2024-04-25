@@ -4,11 +4,11 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_all.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
-require_once __DIR__ . '/../classobj/get_object_properties.php';
+require_once __DIR__ . '/../classobj/object_properties.php';
 require_once __DIR__ . '/../funchand/is_bindable_closure.php';
-require_once __DIR__ . '/../misc/indent_php.php';
-require_once __DIR__ . '/../misc/parse_php.php';
-require_once __DIR__ . '/../misc/resolve_symbol.php';
+require_once __DIR__ . '/../misc/namespace_resolve.php';
+require_once __DIR__ . '/../misc/php_indent.php';
+require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
 require_once __DIR__ . '/../strings/starts_with.php';
 require_once __DIR__ . '/../var/is_primitive.php';
@@ -148,13 +148,13 @@ function var_export3($value, $return = false)
         $resolveSymbol = function ($token, $prev, $next, $ref) use ($var_export) {
             if ($token[0] === T_STRING) {
                 if ($prev[0] === T_NEW || $next[0] === T_DOUBLE_COLON || $next[0] === T_VARIABLE || $next[1] === '{') {
-                    $token[1] = resolve_symbol($token[1], $ref->getFileName(), 'alias') ?? $token[1];
+                    $token[1] = namespace_resolve($token[1], $ref->getFileName(), 'alias') ?? $token[1];
                 }
                 elseif ($next[1] === '(') {
-                    $token[1] = resolve_symbol($token[1], $ref->getFileName(), 'function') ?? $token[1];
+                    $token[1] = namespace_resolve($token[1], $ref->getFileName(), 'function') ?? $token[1];
                 }
                 else {
-                    $token[1] = resolve_symbol($token[1], $ref->getFileName(), 'const') ?? $token[1];
+                    $token[1] = namespace_resolve($token[1], $ref->getFileName(), 'const') ?? $token[1];
                 }
             }
 
@@ -243,7 +243,7 @@ function var_export3($value, $return = false)
 
             [$meta, $body] = callable_code($value);
             $arrow = starts_with($meta, 'fn') ? ' => ' : ' ';
-            $tokens = array_slice(parse_php("$meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
+            $tokens = array_slice(php_parse("$meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
 
             $uses = [];
             $context = [
@@ -290,7 +290,7 @@ function var_export3($value, $return = false)
                 $tokens[$n] = $resolveSymbol($token, $prev, $next, $ref);
             }
 
-            $code = indent_php(implode('', array_column($tokens, 1)), [
+            $code = php_indent(implode('', array_column($tokens, 1)), [
                 'indent'   => $spacer1,
                 'baseline' => -1,
             ]);
@@ -359,7 +359,7 @@ function var_export3($value, $return = false)
                 $fname = $ref->getFileName();
                 $sline = $ref->getStartLine();
                 $eline = $ref->getEndLine();
-                $tokens = parse_php(implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
+                $tokens = php_parse(implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
 
                 $block = [];
                 $starting = false;
@@ -413,7 +413,7 @@ function var_export3($value, $return = false)
                     }
                 }
 
-                $code = indent_php(implode('', array_column($block, 1)), [
+                $code = php_indent(implode('', array_column($block, 1)), [
                     'indent'   => $spacer1,
                     'baseline' => -1,
                 ]);
@@ -434,11 +434,11 @@ function var_export3($value, $return = false)
             }
             // __sleep があるならそれをプロパティとする
             elseif (method_exists($value, '__sleep')) {
-                $fields = array_intersect_key(get_object_properties($value, $privates), array_flip($value->__sleep()));
+                $fields = array_intersect_key(object_properties($value, $privates), array_flip($value->__sleep()));
             }
             // それ以外は適当に漁る
             else {
-                $fields = get_object_properties($value, $privates);
+                $fields = object_properties($value, $privates);
             }
 
             return "\$this->new(\$this->$vid, $classname, (function () {\n{$spacer1}return {$export([$fields, $privates], $nest + 1)};\n{$spacer0}}))";

@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_sprintf.php';
-require_once __DIR__ . '/../misc/parse_php.php';
+require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../constants.php';
 // @codeCoverageIgnoreEnd
 
@@ -17,12 +17,12 @@ require_once __DIR__ . '/../constants.php';
  *
  * Example:
  * ```php
- * $evalfunc = eval_func('$a + $b + $c', 'a', 'b', 'c');
- * that($evalfunc(1, 2, 3))->isSame(6);
+ * $func_eval = func_eval('$a + $b + $c', 'a', 'b', 'c');
+ * that($func_eval(1, 2, 3))->isSame(6);
  *
  * // $X による参照
- * $evalfunc = eval_func('$1 + $2 + $3');
- * that($evalfunc(1, 2, 3))->isSame(6);
+ * $func_eval = func_eval('$1 + $2 + $3');
+ * that($func_eval(1, 2, 3))->isSame(6);
  * ```
  *
  * @package ryunosuke\Functions\Package\funchand
@@ -31,14 +31,14 @@ require_once __DIR__ . '/../constants.php';
  * @param mixed ...$variadic 引数名（可変引数）
  * @return \Closure 新しいクロージャ
  */
-function eval_func($expression, ...$variadic)
+function func_eval($expression, ...$variadic)
 {
     static $cache = [];
 
     $args = array_sprintf($variadic, '$%s', ',');
     $cachekey = "$expression($args)";
     if (!isset($cache[$cachekey])) {
-        $tmp = parse_php($expression, TOKEN_NAME);
+        $tmp = php_parse($expression, TOKEN_NAME);
         array_shift($tmp);
         $stmt = '';
         for ($i = 0; $i < count($tmp); $i++) {

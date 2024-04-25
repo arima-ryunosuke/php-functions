@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../misc/strip_php.php';
+require_once __DIR__ . '/../misc/php_strip.php';
 require_once __DIR__ . '/../random/unique_string.php';
 // @codeCoverageIgnoreEnd
 
@@ -55,7 +55,7 @@ function html_strip($html, $options = [])
 
     if ($options['escape-phpcode']) {
         $mapping = [];
-        $html = strip_php($html, [
+        $html = php_strip($html, [
             'replacer'       => $preserving,
             'trailing_break' => false,
         ], $mapping);

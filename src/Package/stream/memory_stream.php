@@ -15,19 +15,19 @@ require_once __DIR__ . '/../utility/function_configure.php';
  * Example:
  * ```php
  * // ファイル名のように読み書きができるパスを返す（一時ファイルを使用するよりかなり高速に動作する）
- * $memory_path = memory_path('filename.txt');
+ * $memory_stream = memory_stream('filename.txt');
  * // 呼んだだけでは何もしないので存在しない
- * that(file_exists($memory_path))->isSame(false);
+ * that(file_exists($memory_stream))->isSame(false);
  * // file_put_contents が使える
- * that(file_put_contents($memory_path, 'Hello, World'))->isSame(12);
+ * that(file_put_contents($memory_stream, 'Hello, World'))->isSame(12);
  * // file_get_contents が使える
- * that(file_get_contents($memory_path))->isSame('Hello, World');
+ * that(file_get_contents($memory_stream))->isSame('Hello, World');
  * // 上記の操作で実体が存在している
- * that(file_exists($memory_path))->isSame(true);
+ * that(file_exists($memory_stream))->isSame(true);
  * // unlink が使える
- * that(unlink($memory_path))->isSame(true);
+ * that(unlink($memory_stream))->isSame(true);
  * // unlink したので存在しない
- * that(file_exists($memory_path))->isSame(false);
+ * that(file_exists($memory_stream))->isSame(false);
  * ```
  *
  * @package ryunosuke\Functions\Package\stream
@@ -35,7 +35,7 @@ require_once __DIR__ . '/../utility/function_configure.php';
  * @param string $path パス名（実質的に一意なファイル名）
  * @return string メモリ上のパス
  */
-function memory_path($path = '')
+function memory_stream($path = '')
 {
     static $STREAM_NAME, $registered = false;
     if (!$registered) {

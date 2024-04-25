@@ -20,7 +20,7 @@ namespace ryunosuke\Functions\Package;
  *     }
  * ';
  * // 数値指定は空白換算
- * that(indent_php($phpcode, 8))->isSame('
+ * that(php_indent($phpcode, 8))->isSame('
  *         echo 123;
  *
  *         if (true) {
@@ -28,7 +28,7 @@ namespace ryunosuke\Functions\Package;
  *         }
  * ');
  * // 文字列を指定すればそれが使用される
- * that(indent_php($phpcode, "  "))->isSame('
+ * that(php_indent($phpcode, "  "))->isSame('
  *   echo 123;
  *
  *   if (true) {
@@ -36,7 +36,7 @@ namespace ryunosuke\Functions\Package;
  *   }
  * ');
  * // オプション指定
- * that(indent_php($phpcode, [
+ * that(php_indent($phpcode, [
  *     'baseline'  => 1,    // 基準インデントの行番号（負数で下からの指定になる）
  *     'indent'    => 4,    // インデント指定（上記の数値・文字列指定はこれの糖衣構文）
  *     'trimempty' => true, // 空行を trim するか
@@ -56,7 +56,7 @@ namespace ryunosuke\Functions\Package;
  * @param array|int|string $options オプション
  * @return string インデントされた php コード
  */
-function indent_php($phpcode, $options = [])
+function php_indent($phpcode, $options = [])
 {
     if (!is_array($options)) {
         $options = ['indent' => $options];

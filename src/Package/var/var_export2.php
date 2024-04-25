@@ -4,7 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_all.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
-require_once __DIR__ . '/../classobj/get_object_properties.php';
+require_once __DIR__ . '/../classobj/object_properties.php';
 require_once __DIR__ . '/../var/is_primitive.php';
 // @codeCoverageIgnoreEnd
 
@@ -108,7 +108,7 @@ function var_export2($value, $return = false)
             if ($classname === \stdClass::class) {
                 return '(object) ' . $export((array) $value, $nest, $parents);
             }
-            return $classname . '::__set_state(' . $export(get_object_properties($value), $nest, $parents) . ')';
+            return $classname . '::__set_state(' . $export(object_properties($value), $nest, $parents) . ')';
         }
         // 文字列はダブルクオート
         elseif (is_string($value)) {

@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../dataformat/paml_import.php';
-require_once __DIR__ . '/../misc/resolve_symbol.php';
+require_once __DIR__ . '/../misc/namespace_resolve.php';
 require_once __DIR__ . '/../strings/quoteexplode.php';
 require_once __DIR__ . '/../strings/str_between.php';
 require_once __DIR__ . '/../strings/str_chop.php';
@@ -44,7 +44,7 @@ require_once __DIR__ . '/../strings/strpos_quoted.php';
  *
  * Example:
  * ```php
- * $annotations = parse_annotation('
+ * $annotations = annotation_parse('
  *
  * @noval
  * @single this is value
@@ -90,7 +90,7 @@ require_once __DIR__ . '/../strings/strpos_quoted.php';
  * @param string|array $nsfiles ファイル名 or [ファイル名 => 名前空間名]
  * @return array アノテーション配列
  */
-function parse_annotation($annotation, $schema = [], $nsfiles = [])
+function annotation_parse($annotation, $schema = [], $nsfiles = [])
 {
     if ($annotation instanceof \Reflector) {
         $reflector = $annotation;
@@ -176,7 +176,7 @@ function parse_annotation($annotation, $schema = [], $nsfiles = [])
                 $value = null;
             }
             elseif (in_array($value[0] ?? null, ['('], true)) {
-                $class = resolve_symbol($name, $nsfiles, 'alias') ?? $name;
+                $class = namespace_resolve($name, $nsfiles, 'alias') ?? $name;
                 $value = new $class(...paml_import(substr($value, 1, -1)));
             }
             elseif (in_array($value[0] ?? null, ['{', '['], true)) {

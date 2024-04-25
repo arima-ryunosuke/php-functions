@@ -5,7 +5,7 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/array_unset.php';
 require_once __DIR__ . '/../funchand/is_bindable_closure.php';
 require_once __DIR__ . '/../misc/evaluate.php';
-require_once __DIR__ . '/../misc/parse_php.php';
+require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
 require_once __DIR__ . '/../reflection/function_parameter.php';
 require_once __DIR__ . '/../reflection/reflect_types.php';
@@ -228,7 +228,7 @@ function class_extends($object, $methods, $fields = [], $implements = [])
         $rtype = $rtype ? ": $rtype" : '';
 
         [, $codeblock] = callable_code($override);
-        $tokens = parse_php($codeblock);
+        $tokens = php_parse($codeblock);
         array_shift($tokens);
         $parented = null;
         foreach ($tokens as $n => $token) {

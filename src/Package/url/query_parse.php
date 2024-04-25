@@ -15,12 +15,12 @@ require_once __DIR__ . '/../strings/multiexplode.php';
  * Example:
  * ```php
  * // 普通に使えばネイティブの返り値版
- * that(parse_query('a.b=ab&x[y][z]=xyz'))->is([
+ * that(query_parse('a.b=ab&x[y][z]=xyz'))->is([
  *     'a_b' => 'ab',
  *     'x'   => ['y' => ['z' => 'xyz']],
  * ]);
  * // パラメータを渡せば独自実装（& 以外を指定できたり . を維持できたりする）
- * that(parse_query('a.b=ab|x[y][z]=xyz', '|'))->is([
+ * that(query_parse('a.b=ab|x[y][z]=xyz', '|'))->is([
  *     'a.b' => 'ab',
  *     'x'   => ['y' => ['z' => 'xyz']],
  * ]);
@@ -33,7 +33,7 @@ require_once __DIR__ . '/../strings/multiexplode.php';
  * @param ?int $encoding_type クエリ文字列
  * @return array クエリのパース結果配列
  */
-function parse_query($query, $arg_separator = null, $encoding_type = null)
+function query_parse($query, $arg_separator = null, $encoding_type = null)
 {
     // 指定されていないなら php ネイティブ
     if ($arg_separator === null && $encoding_type === null) {

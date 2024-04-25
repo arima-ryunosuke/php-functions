@@ -7,7 +7,7 @@ require_once __DIR__ . '/../array/array_map_recursive.php';
 require_once __DIR__ . '/../array/array_pickup.php';
 require_once __DIR__ . '/../array/is_indexarray.php';
 require_once __DIR__ . '/../funchand/call_safely.php';
-require_once __DIR__ . '/../url/parse_query.php';
+require_once __DIR__ . '/../url/query_parse.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -138,7 +138,7 @@ function csv_import($csvstring, $options = [])
                     foreach ($headers as $i => $header) {
                         $query[] = rawurlencode($header) . "=" . rawurlencode($row[$i]);
                     }
-                    $row = parse_query(implode('&', $query), '&', PHP_QUERY_RFC3986);
+                    $row = query_parse(implode('&', $query), '&', PHP_QUERY_RFC3986);
                     // csv の仕様上、空文字を置かざるを得ないが、数値配列の場合は空にしたいことがある
                     $row = array_map_recursive($row, function ($v) {
                         if (is_array($v) && is_indexarray($v)) {

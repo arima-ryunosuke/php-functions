@@ -24,14 +24,14 @@ require_once __DIR__ . '/../constants.php';
  * }';
  *
  * // namespace ～ ; を取得
- * $part = parse_php($phpcode, [
+ * $part = php_parse($phpcode, [
  *     'begin' => T_NAMESPACE,
  *     'end'   => ';',
  * ]);
  * that(implode('', array_column($part, 1)))->isSame('namespace Hogera;');
  *
  * // class ～ { を取得
- * $part = parse_php($phpcode, [
+ * $part = php_parse($phpcode, [
  *     'begin' => T_CLASS,
  *     'end'   => '{',
  * ]);
@@ -44,7 +44,7 @@ require_once __DIR__ . '/../constants.php';
  * @param array|int $option パースオプション
  * @return array トークン配列
  */
-function parse_php($phpcode, $option = [])
+function php_parse($phpcode, $option = [])
 {
     if (is_int($option)) {
         $option = ['flags' => $option];

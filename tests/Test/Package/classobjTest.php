@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 use stdClass;
 use function ryunosuke\Functions\Package\auto_loader;
 use function ryunosuke\Functions\Package\class_aliases;
+use function ryunosuke\Functions\Package\class_constants;
 use function ryunosuke\Functions\Package\class_extends;
 use function ryunosuke\Functions\Package\class_loader;
 use function ryunosuke\Functions\Package\class_namespace;
@@ -12,11 +13,10 @@ use function ryunosuke\Functions\Package\class_replace;
 use function ryunosuke\Functions\Package\class_shorten;
 use function ryunosuke\Functions\Package\class_uses_all;
 use function ryunosuke\Functions\Package\const_exists;
-use function ryunosuke\Functions\Package\detect_namespace;
-use function ryunosuke\Functions\Package\get_class_constants;
-use function ryunosuke\Functions\Package\get_object_properties;
+use function ryunosuke\Functions\Package\namespace_detect;
 use function ryunosuke\Functions\Package\object_dive;
 use function ryunosuke\Functions\Package\object_id;
+use function ryunosuke\Functions\Package\object_properties;
 use function ryunosuke\Functions\Package\object_storage;
 use function ryunosuke\Functions\Package\optional;
 use function ryunosuke\Functions\Package\phpval;
@@ -56,6 +56,43 @@ class classobjTest extends AbstractTestCase
         ]);
         that(class_exists('Alias\\Alias2', false))->isFalse();
         that(class_exists('Alias\\Alias2', true))->isTrue();
+    }
+
+    function test_class_constants()
+    {
+        $concrete = new class('hoge') extends \Concrete {
+            private const /** @noinspection PhpUnusedPrivateFieldInspection */ PPP = 0;
+            protected const                                                    PP  = 1;
+            public const                                                       P   = 2;
+        };
+
+        that(class_constants($concrete))->is([
+            'PROTECTED_CONST' => null,
+            'PUBLIC_CONST'    => null,
+            'PPP'             => 0,
+            'PP'              => 1,
+            'P'               => 2,
+        ]);
+
+        that(class_constants($concrete, IS_OWNSELF | IS_PUBLIC | IS_PROTECTED | IS_PRIVATE))->is([
+            'PPP' => 0,
+            'PP'  => 1,
+            'P'   => 2,
+        ]);
+
+        that(class_constants($concrete, IS_OWNSELF | IS_PUBLIC | IS_PROTECTED))->is([
+            'PP' => 1,
+            'P'  => 2,
+        ]);
+
+        that(class_constants($concrete, IS_OWNSELF | IS_PUBLIC))->is([
+            'P' => 2,
+        ]);
+
+        that(class_constants($concrete, IS_PUBLIC))->is([
+            'P'            => 2,
+            'PUBLIC_CONST' => null,
+        ]);
     }
 
     function test_class_extends()
@@ -350,115 +387,15 @@ class classobjTest extends AbstractTestCase
         that(const_exists("UNDEFINED::UNDEFINED"))->isFalse();
     }
 
-    function test_detect_namespace()
+    function test_namespace_detect()
     {
-        that(detect_namespace(__DIR__))->is('ryunosuke\\Test\\Package');
-        that(detect_namespace(__DIR__ . '/files/classes'))->is('ryunosuke\\Test\\Package\\files\\classes');
-        that(detect_namespace(__DIR__ . '/files/classes/NS'))->is('ryunosuke\\Test\\Package\\files\\classes\\NS');
-        that(detect_namespace(__DIR__ . '/files/classes/NS/Valid'))->is('A\\B\\C');
-        that(detect_namespace(__DIR__ . '/files/classes/NS/Valid/Hoge.php'))->is('A\\B\\C\\Hoge');
-        that(detect_namespace(__DIR__ . '/../../../src/Package'))->is('ryunosuke\\Functions\\Package');
-        that(self::resolveFunction('detect_namespace'))('/a/b/c/d/e/f/g/h/i/j/k/l/m/n')->wasThrown('can not detect namespace');
-    }
-
-    function test_get_class_constants()
-    {
-        $concrete = new class('hoge') extends \Concrete {
-            private const /** @noinspection PhpUnusedPrivateFieldInspection */ PPP = 0;
-            protected const                                                    PP  = 1;
-            public const                                                       P   = 2;
-        };
-
-        that(get_class_constants($concrete))->is([
-            'PROTECTED_CONST' => null,
-            'PUBLIC_CONST'    => null,
-            'PPP'             => 0,
-            'PP'              => 1,
-            'P'               => 2,
-        ]);
-
-        that(get_class_constants($concrete, IS_OWNSELF | IS_PUBLIC | IS_PROTECTED | IS_PRIVATE))->is([
-            'PPP' => 0,
-            'PP'  => 1,
-            'P'   => 2,
-        ]);
-
-        that(get_class_constants($concrete, IS_OWNSELF | IS_PUBLIC | IS_PROTECTED))->is([
-            'PP' => 1,
-            'P'  => 2,
-        ]);
-
-        that(get_class_constants($concrete, IS_OWNSELF | IS_PUBLIC))->is([
-            'P' => 2,
-        ]);
-
-        that(get_class_constants($concrete, IS_PUBLIC))->is([
-            'P'            => 2,
-            'PUBLIC_CONST' => null,
-        ]);
-    }
-
-    function test_get_object_properties()
-    {
-        $concrete = new \Concrete('name');
-        $concrete->value = 'value';
-        $concrete->oreore = 'oreore';
-        $private = [];
-        that(get_object_properties($concrete, $private))->is([
-            'privateField'    => 'Concrete',
-            'proptectedField' => 3.14,
-            'value'           => 'value',
-            'name'            => 'name',
-            'oreore'          => 'oreore',
-        ]);
-        that($private)->is([
-            'AbstractConcrete' => [
-                'privateField' => 'AbstractConcrete',
-            ],
-        ]);
-
-        // 標準の var_export が親優先になっているのを変更しているテスト
-        $object = new \Nest3();
-        $object->set(999);
-
-        // 子が優先される
-        that((phpval(var_export2($object, true)))->get())->isSame(999);
-
-        // DateTime や ArrayObject はかなり特殊で、プロパティが標準の手段では取れない
-        that(get_object_properties(new \Datetime('2014/12/24 12:34:56', new \DateTimeZone('Asia/Tokyo'))))->isSame([
-            'date'          => '2014-12-24 12:34:56.000000',
-            'timezone_type' => 3,
-            'timezone'      => 'Asia/Tokyo',
-        ]);
-        that(get_object_properties(new \ArrayObject(['a' => 'A', 'b' => 'B'])))->isSame([
-            'a' => 'A',
-            'b' => 'B',
-        ]);
-
-        // 無名クラス命名規則が違うので別途やる
-        that(get_object_properties(new class {
-            private   $private   = 1;
-            protected $protected = 2;
-            public    $public    = 3;
-        }))->is([
-            'private'   => 1,
-            'protected' => 2,
-            'public'    => 3,
-        ]);
-
-        // クロージャは this と use 変数を返す
-        $a = 123;
-        $b = 456;
-        that(get_object_properties(fn() => $a + $b))->is([
-            'this' => $this,
-            'a'    => 123,
-            'b'    => 456,
-        ]);
-        that(get_object_properties(static fn() => $a + $b))->is([
-            'this' => null,
-            'a'    => 123,
-            'b'    => 456,
-        ]);
+        that(namespace_detect(__DIR__))->is('ryunosuke\\Test\\Package');
+        that(namespace_detect(__DIR__ . '/files/classes'))->is('ryunosuke\\Test\\Package\\files\\classes');
+        that(namespace_detect(__DIR__ . '/files/classes/NS'))->is('ryunosuke\\Test\\Package\\files\\classes\\NS');
+        that(namespace_detect(__DIR__ . '/files/classes/NS/Valid'))->is('A\\B\\C');
+        that(namespace_detect(__DIR__ . '/files/classes/NS/Valid/Hoge.php'))->is('A\\B\\C\\Hoge');
+        that(namespace_detect(__DIR__ . '/../../../src/Package'))->is('ryunosuke\\Functions\\Package');
+        that(self::resolveFunction('namespace_detect'))('/a/b/c/d/e/f/g/h/i/j/k/l/m/n')->wasThrown('can not detect namespace');
     }
 
     function test_object_dive()
@@ -520,6 +457,69 @@ class classobjTest extends AbstractTestCase
         // よく分からないID
         that(object_id(999))->isSame(null);
         that(object_id("999"))->isSame(null);
+    }
+
+    function test_object_properties()
+    {
+        $concrete = new \Concrete('name');
+        $concrete->value = 'value';
+        $concrete->oreore = 'oreore';
+        $private = [];
+        that(object_properties($concrete, $private))->is([
+            'privateField'    => 'Concrete',
+            'proptectedField' => 3.14,
+            'value'           => 'value',
+            'name'            => 'name',
+            'oreore'          => 'oreore',
+        ]);
+        that($private)->is([
+            'AbstractConcrete' => [
+                'privateField' => 'AbstractConcrete',
+            ],
+        ]);
+
+        // 標準の var_export が親優先になっているのを変更しているテスト
+        $object = new \Nest3();
+        $object->set(999);
+
+        // 子が優先される
+        that((phpval(var_export2($object, true)))->get())->isSame(999);
+
+        // DateTime や ArrayObject はかなり特殊で、プロパティが標準の手段では取れない
+        that(object_properties(new \Datetime('2014/12/24 12:34:56', new \DateTimeZone('Asia/Tokyo'))))->isSame([
+            'date'          => '2014-12-24 12:34:56.000000',
+            'timezone_type' => 3,
+            'timezone'      => 'Asia/Tokyo',
+        ]);
+        that(object_properties(new \ArrayObject(['a' => 'A', 'b' => 'B'])))->isSame([
+            'a' => 'A',
+            'b' => 'B',
+        ]);
+
+        // 無名クラス命名規則が違うので別途やる
+        that(object_properties(new class {
+            private   $private   = 1;
+            protected $protected = 2;
+            public    $public    = 3;
+        }))->is([
+            'private'   => 1,
+            'protected' => 2,
+            'public'    => 3,
+        ]);
+
+        // クロージャは this と use 変数を返す
+        $a = 123;
+        $b = 456;
+        that(object_properties(fn() => $a + $b))->is([
+            'this' => $this,
+            'a'    => 123,
+            'b'    => 456,
+        ]);
+        that(object_properties(static fn() => $a + $b))->is([
+            'this' => null,
+            'a'    => 123,
+            'b'    => 456,
+        ]);
     }
 
     function test_object_storage()

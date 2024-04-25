@@ -4,12 +4,12 @@ namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\base62_decode;
 use function ryunosuke\Functions\Package\base62_encode;
-use function ryunosuke\Functions\Package\build_query;
-use function ryunosuke\Functions\Package\build_uri;
 use function ryunosuke\Functions\Package\dataurl_decode;
 use function ryunosuke\Functions\Package\dataurl_encode;
-use function ryunosuke\Functions\Package\parse_query;
-use function ryunosuke\Functions\Package\parse_uri;
+use function ryunosuke\Functions\Package\query_build;
+use function ryunosuke\Functions\Package\query_parse;
+use function ryunosuke\Functions\Package\uri_build;
+use function ryunosuke\Functions\Package\uri_parse;
 
 class urlTest extends AbstractTestCase
 {
@@ -121,112 +121,6 @@ class urlTest extends AbstractTestCase
         }
     }
 
-    function test_build_query()
-    {
-        $data = [
-            'x' => [[1, 2]],
-        ];
-
-        that(build_query($data, 1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D=2');
-        that(parse_query($expected, '&'))->is(['x' => [[1, 2]]]);
-        that(build_query($data, 2))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
-        that(parse_query($expected, '&'))->is(['x' => [[1, 2]]]);
-        that(build_query($data, 9))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
-        that(parse_query($expected, '&'))->is(['x' => [[1, 2]]]);
-
-        that(build_query($data, 0))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
-        that(parse_query($expected, '&'))->is(['x' => [[1, 2]]]);
-        that(build_query($data, -1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D=2');
-        that(parse_query($expected, '&'))->is(['x' => [[1, 2]]]);
-        that(build_query($data, -2))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
-        that(parse_query($expected, '&'))->is(['x' => [[1], [2]]]);
-        that(build_query($data, -3))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
-        that(parse_query($expected, '&'))->is(['x' => [[1], [2]]]);
-        that(build_query($data, -9))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
-        that(parse_query($expected, '&'))->is(['x' => [[1], [2]]]);
-        that(build_query($data))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
-        that(parse_query($expected, '&'))->is(['x' => [[1], [2]]]);
-
-        $data = [
-            'x' => [[1, [2], [[3]]]],
-        ];
-
-        that(build_query($data, 1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D%5B%5D=2&x%5B0%5D%5B%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
-        that(build_query($data, 2))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
-        that(build_query($data, 9))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B0%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B0%5D=3');
-        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
-
-        that(build_query($data, 0))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B0%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B0%5D=3');
-        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
-        that(build_query($data, -1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B1%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B%5D=3');
-        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
-        that(build_query($data, -2))->is($expected = 'x%5B%5D%5B%5D=1&x%5B0%5D%5B%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
-        that(build_query($data, -3))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B0%5D%5B%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected, '&'))->is(['x' => [[1, [[3]]], [[2]]]]);
-        that(build_query($data, -9))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B%5D%5B%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected, '&'))->is(['x' => [[1], [[2]], [[[3]]]]]);
-        that(build_query($data))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B%5D%5B%5D%5B%5D%5B%5D=3');
-        that(parse_query($expected, '&'))->is(['x' => [[1], [[2]], [[[3]]]]]);
-
-        $data = [
-            'x' => ['y' => ['z' => '[]']],
-        ];
-
-        that(build_query($data, null, '&', PHP_QUERY_RFC1738, ['[', ']']))->is($expected = 'x[y][z]=%5B%5D');
-        that(parse_query($expected, '&'))->is(['x' => ['y' => ['z' => '[]']]]);
-        that(build_query($data, null, '&', PHP_QUERY_RFC1738, ['.', '']))->is($expected = 'x.y.z=%5B%5D');
-        that(parse_query($expected, '&'))->is(['x.y.z' => '[]']);
-        that(build_query($data, null, '&', PHP_QUERY_RFC1738, ['', '']))->is($expected = 'xyz=%5B%5D');
-        that(parse_query($expected, '&'))->is(['xyz' => '[]']);
-        that(build_query($data, null, '&', PHP_QUERY_RFC1738, '-'))->is($expected = 'x-y-z=%5B%5D');
-        that(parse_query($expected, '&'))->is(['x-y-z' => '[]']);
-
-        that(build_query(['x y z' => 'xyz'], null, '&', PHP_QUERY_RFC1738))->is($expected = 'x+y+z=xyz');
-        that(parse_query($expected, '&', PHP_QUERY_RFC1738))->is(['x y z' => 'xyz']);
-        that(build_query(['x y z' => 'xyz'], null, '&', PHP_QUERY_RFC3986))->is($expected = 'x%20y%20z=xyz');
-        that(parse_query($expected, '&', PHP_QUERY_RFC3986))->is(['x y z' => 'xyz']);
-
-        that(build_query([1, 2, 3], 'pre-'))->is('pre-0=1&pre-1=2&pre-2=3');
-    }
-
-    function test_build_uri()
-    {
-        foreach ($this->provideUri() as $title => $data) {
-            that(build_uri($data['parts']))->as($title)->is($data['uri']);
-        }
-
-        // options:query
-        $query = [
-            'a' => [
-                'b' => [
-                    'c' => ['[', ']'],
-                ],
-            ],
-        ];
-        that(build_uri([
-            'query' => $query,
-        ], [
-        ]))->is('?a%5Bb%5D%5Bc%5D%5B0%5D=%5B&a%5Bb%5D%5Bc%5D%5B1%5D=%5D');
-        that(build_uri([
-            'query' => $query,
-        ], [
-            'query' => [
-                'bracket' => ['[', ']'],
-            ],
-        ]))->is('?a[b][c][0]=%5B&a[b][c][1]=%5D');
-        that(build_uri([
-            'query' => $query,
-        ], [
-            'query' => [
-                'bracket' => ['[', ']'],
-                'index'   => null,
-            ],
-        ]))->is('?a[b][c][]=%5B&a[b][c][]=%5D');
-    }
-
     function test_dataurl()
     {
         $dataurl = dataurl_encode("hello, world");
@@ -283,9 +177,80 @@ class urlTest extends AbstractTestCase
         that(dataurl_decode('data:;base64,invalid & base64 & string'))->isNull();
     }
 
-    function test_parse_query()
+    function test_query()
     {
-        that(parse_query('a=1&b[]=2'))->is([
+        $data = [
+            'x' => [[1, 2]],
+        ];
+
+        that(query_build($data, 1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D=2');
+        that(query_parse($expected, '&'))->is(['x' => [[1, 2]]]);
+        that(query_build($data, 2))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
+        that(query_parse($expected, '&'))->is(['x' => [[1, 2]]]);
+        that(query_build($data, 9))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
+        that(query_parse($expected, '&'))->is(['x' => [[1, 2]]]);
+
+        that(query_build($data, 0))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D=2');
+        that(query_parse($expected, '&'))->is(['x' => [[1, 2]]]);
+        that(query_build($data, -1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D=2');
+        that(query_parse($expected, '&'))->is(['x' => [[1, 2]]]);
+        that(query_build($data, -2))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
+        that(query_parse($expected, '&'))->is(['x' => [[1], [2]]]);
+        that(query_build($data, -3))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
+        that(query_parse($expected, '&'))->is(['x' => [[1], [2]]]);
+        that(query_build($data, -9))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
+        that(query_parse($expected, '&'))->is(['x' => [[1], [2]]]);
+        that(query_build($data))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D=2');
+        that(query_parse($expected, '&'))->is(['x' => [[1], [2]]]);
+
+        $data = [
+            'x' => [[1, [2], [[3]]]],
+        ];
+
+        that(query_build($data, 1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B%5D%5B%5D=2&x%5B0%5D%5B%5D%5B%5D%5B%5D=3');
+        that(query_parse($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
+        that(query_build($data, 2))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B%5D%5B%5D=3');
+        that(query_parse($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
+        that(query_build($data, 9))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B0%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B0%5D=3');
+        that(query_parse($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
+
+        that(query_build($data, 0))->is($expected = 'x%5B0%5D%5B0%5D=1&x%5B0%5D%5B1%5D%5B0%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B0%5D=3');
+        that(query_parse($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
+        that(query_build($data, -1))->is($expected = 'x%5B0%5D%5B%5D=1&x%5B0%5D%5B1%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B0%5D%5B%5D=3');
+        that(query_parse($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
+        that(query_build($data, -2))->is($expected = 'x%5B%5D%5B%5D=1&x%5B0%5D%5B%5D%5B%5D=2&x%5B0%5D%5B2%5D%5B%5D%5B%5D=3');
+        that(query_parse($expected, '&'))->is(['x' => [[1, [2], [[3]]]]]);
+        that(query_build($data, -3))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B0%5D%5B%5D%5B%5D%5B%5D=3');
+        that(query_parse($expected, '&'))->is(['x' => [[1, [[3]]], [[2]]]]);
+        that(query_build($data, -9))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B%5D%5B%5D%5B%5D%5B%5D=3');
+        that(query_parse($expected, '&'))->is(['x' => [[1], [[2]], [[[3]]]]]);
+        that(query_build($data))->is($expected = 'x%5B%5D%5B%5D=1&x%5B%5D%5B%5D%5B%5D=2&x%5B%5D%5B%5D%5B%5D%5B%5D=3');
+        that(query_parse($expected, '&'))->is(['x' => [[1], [[2]], [[[3]]]]]);
+
+        $data = [
+            'x' => ['y' => ['z' => '[]']],
+        ];
+
+        that(query_build($data, null, '&', PHP_QUERY_RFC1738, ['[', ']']))->is($expected = 'x[y][z]=%5B%5D');
+        that(query_parse($expected, '&'))->is(['x' => ['y' => ['z' => '[]']]]);
+        that(query_build($data, null, '&', PHP_QUERY_RFC1738, ['.', '']))->is($expected = 'x.y.z=%5B%5D');
+        that(query_parse($expected, '&'))->is(['x.y.z' => '[]']);
+        that(query_build($data, null, '&', PHP_QUERY_RFC1738, ['', '']))->is($expected = 'xyz=%5B%5D');
+        that(query_parse($expected, '&'))->is(['xyz' => '[]']);
+        that(query_build($data, null, '&', PHP_QUERY_RFC1738, '-'))->is($expected = 'x-y-z=%5B%5D');
+        that(query_parse($expected, '&'))->is(['x-y-z' => '[]']);
+
+        that(query_build(['x y z' => 'xyz'], null, '&', PHP_QUERY_RFC1738))->is($expected = 'x+y+z=xyz');
+        that(query_parse($expected, '&', PHP_QUERY_RFC1738))->is(['x y z' => 'xyz']);
+        that(query_build(['x y z' => 'xyz'], null, '&', PHP_QUERY_RFC3986))->is($expected = 'x%20y%20z=xyz');
+        that(query_parse($expected, '&', PHP_QUERY_RFC3986))->is(['x y z' => 'xyz']);
+
+        that(query_build([1, 2, 3], 'pre-'))->is('pre-0=1&pre-1=2&pre-2=3');
+    }
+
+    function test_query_parse()
+    {
+        that(query_parse('a=1&b[]=2'))->is([
             'a' => 1,
             'b' => [2],
         ]);
@@ -308,7 +273,7 @@ class urlTest extends AbstractTestCase
             '&&&&&',
         ]);
         parse_str($query, $expected);
-        that(parse_query($query, '&'))->is($expected);
+        that(query_parse($query, '&'))->is($expected);
 
         $query = implode('&', [
             'plusmark=+',
@@ -319,7 +284,7 @@ class urlTest extends AbstractTestCase
             'space name1=1',
             'space%20name2=2',
         ]);
-        that(parse_query($query, '&', PHP_QUERY_RFC3986))->is([
+        that(query_parse($query, '&', PHP_QUERY_RFC3986))->is([
             "plusmark"    => "+",
             "atmark"      => "@",
             "@mark1"      => "@",
@@ -330,14 +295,49 @@ class urlTest extends AbstractTestCase
         ]);
     }
 
-    function test_parse_uri()
+    function test_uri()
     {
         foreach ($this->provideUri() as $title => $data) {
-            that(parse_uri($data['uri']))->as($title)->is($data['parts']);
+            that(uri_build($data['parts']))->as($title)->is($data['uri']);
+        }
+
+        // options:query
+        $query = [
+            'a' => [
+                'b' => [
+                    'c' => ['[', ']'],
+                ],
+            ],
+        ];
+        that(uri_build([
+            'query' => $query,
+        ], [
+        ]))->is('?a%5Bb%5D%5Bc%5D%5B0%5D=%5B&a%5Bb%5D%5Bc%5D%5B1%5D=%5D');
+        that(uri_build([
+            'query' => $query,
+        ], [
+            'query' => [
+                'bracket' => ['[', ']'],
+            ],
+        ]))->is('?a[b][c][0]=%5B&a[b][c][1]=%5D');
+        that(uri_build([
+            'query' => $query,
+        ], [
+            'query' => [
+                'bracket' => ['[', ']'],
+                'index'   => null,
+            ],
+        ]))->is('?a[b][c][]=%5B&a[b][c][]=%5D');
+    }
+
+    function test_uri_parse()
+    {
+        foreach ($this->provideUri() as $title => $data) {
+            that(uri_parse($data['uri']))->as($title)->is($data['parts']);
         }
 
         // default array
-        that(parse_uri('', [
+        that(uri_parse('', [
             'scheme'   => 'defscheme',
             'user'     => 'defuser',
             'pass'     => 'defpass',
@@ -358,7 +358,7 @@ class urlTest extends AbstractTestCase
         ]);
 
         // default string
-        that(parse_uri('', 'defscheme://defuser:defpass@defhost:12345/defpath?defquery#deffragment'))->is([
+        that(uri_parse('', 'defscheme://defuser:defpass@defhost:12345/defpath?defquery#deffragment'))->is([
             'scheme'   => 'defscheme',
             'user'     => 'defuser',
             'pass'     => 'defpass',
@@ -370,7 +370,7 @@ class urlTest extends AbstractTestCase
         ]);
 
         // keep null
-        that(parse_uri('', [
+        that(uri_parse('', [
             'scheme'   => null,
             'user'     => null,
             'pass'     => null,
@@ -391,10 +391,10 @@ class urlTest extends AbstractTestCase
         ]);
     }
 
-    function test_parse_uri_special()
+    function test_uri_parse_special()
     {
         // double slash
-        that(parse_uri('//user:pass@host/path/to/hoge?op1=1&op2=2#hash'))->is([
+        that(uri_parse('//user:pass@host/path/to/hoge?op1=1&op2=2#hash'))->is([
             'scheme'   => '',
             'user'     => 'user',
             'pass'     => 'pass',
@@ -406,7 +406,7 @@ class urlTest extends AbstractTestCase
         ]);
 
         // tripple slash
-        that(parse_uri('///path/to/hoge?op1=1&op2=2#hash'))->is([
+        that(uri_parse('///path/to/hoge?op1=1&op2=2#hash'))->is([
             'scheme'   => '',
             'user'     => '',
             'pass'     => '',
@@ -418,7 +418,7 @@ class urlTest extends AbstractTestCase
         ]);
 
         // no port value
-        that(parse_uri('scheme://user:pass@host:/path/to/hoge?op1=1&op2=2#hash'))->is([
+        that(uri_parse('scheme://user:pass@host:/path/to/hoge?op1=1&op2=2#hash'))->is([
             'scheme'   => 'scheme',
             'user'     => 'user',
             'pass'     => 'pass',
@@ -430,7 +430,7 @@ class urlTest extends AbstractTestCase
         ]);
 
         // no path value
-        that(parse_uri('scheme://user:pass@host?op1=1&op2=2#hash'))->is([
+        that(uri_parse('scheme://user:pass@host?op1=1&op2=2#hash'))->is([
             'scheme'   => 'scheme',
             'user'     => 'user',
             'pass'     => 'pass',
@@ -442,7 +442,7 @@ class urlTest extends AbstractTestCase
         ]);
 
         // no query value
-        that(parse_uri('scheme://user:pass@host/path/to/hoge?#hash'))->is([
+        that(uri_parse('scheme://user:pass@host/path/to/hoge?#hash'))->is([
             'scheme'   => 'scheme',
             'user'     => 'user',
             'pass'     => 'pass',
@@ -454,7 +454,7 @@ class urlTest extends AbstractTestCase
         ]);
 
         // no fragment value
-        that(parse_uri('scheme://user:pass@host/path/to/hoge?#'))->is([
+        that(uri_parse('scheme://user:pass@host/path/to/hoge?#'))->is([
             'scheme'   => 'scheme',
             'user'     => 'user',
             'pass'     => 'pass',

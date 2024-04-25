@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../misc/parse_php.php';
+require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../random/unique_string.php';
 // @codeCoverageIgnoreEnd
 
@@ -20,9 +20,9 @@ require_once __DIR__ . '/../random/unique_string.php';
  * ```php
  * $phtml = 'begin php code <?php echo 123 ?> end';
  * // php コードが消えている
- * that(strip_php($phtml))->is('begin php code  end');
+ * that(php_strip($phtml))->is('begin php code  end');
  * // $mapping を使用すると元の文字列に復元できる
- * $html = strip_php($phtml, [], $mapping);
+ * $html = php_strip($phtml, [], $mapping);
  * that(strtr($html, $mapping))->is($phtml);
  * ```
  *
@@ -33,7 +33,7 @@ require_once __DIR__ . '/../random/unique_string.php';
  * @param array $mapping 変換表が格納される参照変数
  * @return string php コードが除かれた文字列
  */
-function strip_php($phtml, $option = [], &$mapping = [])
+function php_strip($phtml, $option = [], &$mapping = [])
 {
     $option = array_replace([
         'short_open_tag' => true,
@@ -53,7 +53,7 @@ function strip_php($phtml, $option = [], &$mapping = [])
         $replacer = unique_string($phtml, 64);
     }
 
-    $tmp = parse_php($phtml, $option);
+    $tmp = php_parse($phtml, $option);
 
     if ($option['trailing_break']) {
         $tokens = $tmp;

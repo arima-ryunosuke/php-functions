@@ -21,17 +21,17 @@ require_once __DIR__ . '/../strings/concat.php';
  * ```php
  * // 単純文字列はただのタグを生成する
  * that(
- *     htmltag('a#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden]'))
+ *     html_tag('a#hoge.c1.c2[name=hoge\[\]][href="http://hoge"][hidden]'))
  *     ->isSame('<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden></a>'
  * );
  * // ペア配列を与えるとコンテント文字列になる
  * that(
- *     htmltag(['a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]' => "this is text's content"]))
+ *     html_tag(['a.c1#hoge.c2[name=hoge\[\]][href="http://hoge"][hidden]' => "this is text's content"]))
  *     ->isSame('<a id="hoge" class="c1 c2" name="hoge[]" href="http://hoge" hidden>this is text&#039;s content</a>'
  * );
  * // ネストした配列を与えると再帰される
  * that(
- *     htmltag([
+ *     html_tag([
  *         'div#wrapper' => [
  *             'b.class1' => [
  *                 '<plain>',
@@ -52,7 +52,7 @@ require_once __DIR__ . '/../strings/concat.php';
  * @param string|array $selector
  * @return string html 文字列
  */
-function htmltag($selector)
+function html_tag($selector)
 {
     if (!is_iterable($selector)) {
         $selector = [$selector => ''];
@@ -100,7 +100,7 @@ function htmltag($selector)
             $result .= $html($value);
         }
         elseif (is_iterable($value)) {
-            $result .= $build($key, htmltag($value), false);
+            $result .= $build($key, html_tag($value), false);
         }
         else {
             $result .= $build($key, $value, true);

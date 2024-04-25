@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/last_key.php';
-require_once __DIR__ . '/../misc/parse_php.php';
+require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
 // @codeCoverageIgnoreEnd
 
@@ -37,14 +37,14 @@ function callable_code($callable)
     $end = $ref->getEndLine();
     $codeblock = implode('', array_slice($contents, $start - 1, $end - $start + 1));
 
-    $meta = parse_php("<?php $codeblock", [
+    $meta = php_parse("<?php $codeblock", [
         'begin' => [T_FN, T_FUNCTION],
         'end'   => ['{', T_DOUBLE_ARROW],
     ]);
     $end = array_pop($meta);
 
     if ($end[0] === T_DOUBLE_ARROW) {
-        $body = parse_php("<?php $codeblock", [
+        $body = php_parse("<?php $codeblock", [
             'begin'  => T_DOUBLE_ARROW,
             'end'    => [';', ',', ')'],
             'offset' => last_key($meta),
@@ -53,7 +53,7 @@ function callable_code($callable)
         $body = array_slice($body, 1, -1);
     }
     else {
-        $body = parse_php("<?php $codeblock", [
+        $body = php_parse("<?php $codeblock", [
             'begin'  => '{',
             'end'    => '}',
             'offset' => last_key($meta),

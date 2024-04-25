@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../classobj/get_object_properties.php';
+require_once __DIR__ . '/../classobj/object_properties.php';
 require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
 
@@ -56,7 +56,7 @@ function var_html($value)
         }
         elseif (is_object($value)) {
             $parents[] = $value;
-            return get_class($value) . '::' . $export(get_object_properties($value), $parents);
+            return get_class($value) . '::' . $export(object_properties($value), $parents);
         }
         elseif (is_null($value)) {
             return 'null';

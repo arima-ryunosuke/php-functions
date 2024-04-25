@@ -13,18 +13,18 @@ require_once __DIR__ . '/../syntax/throws.php';
  *
  * Example:
  * ```php
- * $not = ope_func('!');    // 否定演算子クロージャ
+ * $not = func_operator('!');    // 否定演算子クロージャ
  * that(false)->isSame($not(true));
  *
- * $minus = ope_func('-'); // マイナス演算子クロージャ
+ * $minus = func_operator('-'); // マイナス演算子クロージャ
  * that($minus(2))->isSame(-2);       // 引数1つで呼ぶと1項演算子
  * that($minus(3, 2))->isSame(3 - 2); // 引数2つで呼ぶと2項演算子
  *
- * $cond = ope_func('?:'); // 条件演算子クロージャ
+ * $cond = func_operator('?:'); // 条件演算子クロージャ
  * that($cond('OK', 'NG'))->isSame('OK' ?: 'NG');               // 引数2つで呼ぶと2項演算子
  * that($cond(false, 'OK', 'NG'))->isSame(false ? 'OK' : 'NG'); // 引数3つで呼ぶと3項演算子
  *
- * $gt5 = ope_func('<=', 5); // 5以下を判定するクロージャ
+ * $gt5 = func_operator('<=', 5); // 5以下を判定するクロージャ
  * that(array_filter([1, 2, 3, 4, 5, 6, 7, 8, 9], $gt5))->isSame([1, 2, 3, 4, 5]);
  * ```
  *
@@ -34,7 +34,7 @@ require_once __DIR__ . '/../syntax/throws.php';
  * @param mixed ...$operands 右オペランド
  * @return \Closure 演算子のクロージャ
  */
-function ope_func($operator, ...$operands)
+function func_operator($operator, ...$operands)
 {
     static $operators = null;
     $operators = $operators ?: [

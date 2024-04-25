@@ -22,14 +22,14 @@ namespace ryunosuke\Functions\Package;
  * // var_dump((array) $object);
  *
  * // この関数を使えば不可視プロパティも取得できる
- * that(get_object_properties($object))->subsetEquals([
+ * that(object_properties($object))->subsetEquals([
  *     'message' => 'something',
  *     'code'    => 42,
  *     'oreore'  => 'oreore',
  * ]);
  *
  * // クロージャは this と use 変数を返す
- * that(get_object_properties(fn() => $object))->is([
+ * that(object_properties(fn() => $object))->is([
  *     'this'   => $this,
  *     'object' => $object,
  * ]);
@@ -41,7 +41,7 @@ namespace ryunosuke\Functions\Package;
  * @param array $privates 継承ツリー上の private が格納される
  * @return array 全プロパティの配列
  */
-function get_object_properties($object, &$privates = [])
+function object_properties($object, &$privates = [])
 {
     if ($object instanceof \Closure) {
         $ref = new \ReflectionFunction($object);

@@ -3,37 +3,17 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\mean;
-use function ryunosuke\Functions\Package\normal_rand;
 use function ryunosuke\Functions\Package\probability;
 use function ryunosuke\Functions\Package\probability_array;
 use function ryunosuke\Functions\Package\random_at;
 use function ryunosuke\Functions\Package\random_float;
+use function ryunosuke\Functions\Package\random_normal;
 use function ryunosuke\Functions\Package\random_range;
 use function ryunosuke\Functions\Package\random_string;
 use function ryunosuke\Functions\Package\unique_string;
 
 class randomTest extends AbstractTestCase
 {
-    function test_normal_rand()
-    {
-        mt_srand(234);
-
-        that(normal_rand(50, 5))->is(61.517088409096196);
-        that(normal_rand(50, 5))->is(47.46220149346318);
-        that(normal_rand(50, 5))->is(48.86526339618124);
-        that(normal_rand(50, 5))->is(55.70268085601572);
-        that(normal_rand(50, 5))->is(52.42643082618295);
-
-        $average = [
-            normal_rand(50, 5),
-            normal_rand(50, 5),
-            normal_rand(50, 5),
-            normal_rand(50, 5),
-            normal_rand(50, 5),
-        ];
-        that(array_sum($average) / count($average))->isBetween(45, 55);
-    }
-
     function test_probability()
     {
         mt_srand(123); // 時々変えた方がいい
@@ -193,6 +173,26 @@ class randomTest extends AbstractTestCase
         that(max($result))->isBetween(+1.299, +1.3);
 
         that(self::resolveFunction('random_float'))(3, 0)->wasThrown('Minimum value must be less than or equal to the maximum value');
+    }
+
+    function test_random_normal()
+    {
+        mt_srand(234);
+
+        that(random_normal(50, 5))->is(61.517088409096196);
+        that(random_normal(50, 5))->is(47.46220149346318);
+        that(random_normal(50, 5))->is(48.86526339618124);
+        that(random_normal(50, 5))->is(55.70268085601572);
+        that(random_normal(50, 5))->is(52.42643082618295);
+
+        $average = [
+            random_normal(50, 5),
+            random_normal(50, 5),
+            random_normal(50, 5),
+            random_normal(50, 5),
+            random_normal(50, 5),
+        ];
+        that(array_sum($average) / count($average))->isBetween(45, 55);
     }
 
     function test_random_range()

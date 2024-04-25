@@ -3,7 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\include_stream;
-use function ryunosuke\Functions\Package\memory_path;
+use function ryunosuke\Functions\Package\memory_stream;
 use function ryunosuke\Functions\Package\profiler;
 use function ryunosuke\Functions\Package\var_stream;
 
@@ -42,11 +42,11 @@ class streamTest extends AbstractTestCase
         $stream->restore();
     }
 
-    function test_memory_path()
+    function test_memory_stream()
     {
-        $hoge = memory_path('hoge');
-        $fuga = memory_path('fuga');
-        $piyo = memory_path('piyo');
+        $hoge = memory_stream('hoge');
+        $fuga = memory_stream('fuga');
+        $piyo = memory_stream('piyo');
 
         // f 系の一連の流れ
         $f = fopen($hoge, 'w+');
@@ -84,7 +84,7 @@ class streamTest extends AbstractTestCase
         that(chown($fuga, 'user'))->is(true);
         that(filemtime($fuga))->is(1234567890);
         that(unlink($fuga))->is(true);
-        that(unlink(memory_path('piyo')))->is(false);
+        that(unlink(memory_stream('piyo')))->is(false);
         that(file_exists($piyo))->is(false);
 
         that(rename($piyo, $fuga))->is(false);
@@ -97,15 +97,15 @@ class streamTest extends AbstractTestCase
      * @runInSeparateProcess
      * @preserveGlobalState disabled
      */
-    function test_memory_path_already()
+    function test_memory_stream_already()
     {
         stream_wrapper_register('MemoryStreamV010000', 'stdClass');
-        that(self::resolveFunction('memory_path'))('hoge')->wasThrown('is registered already');
+        that(self::resolveFunction('memory_stream'))('hoge')->wasThrown('is registered already');
     }
 
-    function test_memory_path_dir()
+    function test_memory_stream_dir()
     {
-        $dir1 = memory_path('root');
+        $dir1 = memory_stream('root');
 
         that(mkdir($dir1))->isTrue();
         that(mkdir($dir1))->isFalse();
@@ -140,9 +140,9 @@ class streamTest extends AbstractTestCase
         that(rmdir("$dir1/aaa/bbb/unknown"))->isFalse();
     }
 
-    function test_memory_path_leak()
+    function test_memory_stream_leak()
     {
-        $path = memory_path('path');
+        $path = memory_stream('path');
         $usage = memory_get_usage();
 
         file_put_contents($path, str_repeat('x', 4 * 1024 * 1024));
@@ -152,7 +152,7 @@ class streamTest extends AbstractTestCase
         that(memory_get_usage() - $usage)->lessThan(1024 * 1024);
     }
 
-    function test_memory_path_open()
+    function test_memory_stream_open()
     {
         $test = function ($expectedFile, $actualFile, $mode) {
             $expected = fopen($expectedFile, $mode);
@@ -172,7 +172,7 @@ class streamTest extends AbstractTestCase
 
         foreach (['r', 'r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'] as $mode) {
             @unlink($expectedFile = self::$TMPDIR . "/tmp$mode.txt");
-            @unlink($actualFile = memory_path("/tmp$mode.txt"));
+            @unlink($actualFile = memory_stream("/tmp$mode.txt"));
             if ($mode[0] !== 'x') {
                 file_put_contents($expectedFile, 'abcde');
                 file_put_contents($actualFile, 'abcde');
@@ -180,7 +180,7 @@ class streamTest extends AbstractTestCase
             $test($expectedFile, $actualFile, $mode);
         }
 
-        $path = memory_path(__FUNCTION__);
+        $path = memory_stream(__FUNCTION__);
         fopen($path, 'a');
         that(file_exists($path))->isTrue();
         unlink($path);
@@ -192,9 +192,9 @@ class streamTest extends AbstractTestCase
         that('fopen')($path, 'x')->wasThrown('is exist already');
     }
 
-    function test_memory_path_perm()
+    function test_memory_stream_perm()
     {
-        $path = memory_path('path');
+        $path = memory_stream('path');
 
         that(chmod($path, 0777))->is(false);
         that(chown($path, 48))->is(false);
@@ -223,7 +223,7 @@ class streamTest extends AbstractTestCase
         }
     }
 
-    function test_memory_path_seek()
+    function test_memory_stream_seek()
     {
         $test = function ($expectedFile, $actualFile) {
             $expected = fopen($expectedFile, 'w+');
@@ -249,7 +249,7 @@ class streamTest extends AbstractTestCase
             that(rewind($expected) === rewind($actual))->isTrue();
             that(fread($expected, 1000) === fread($actual, 1000))->isTrue();
         };
-        $test(self::$TMPDIR . '/tmp.txt', memory_path('tmp.txt'));
+        $test(self::$TMPDIR . '/tmp.txt', memory_stream('tmp.txt'));
     }
 
     function test_profiler()

@@ -1,0 +1,3 @@
+<?php
+
+uri_parse('');
