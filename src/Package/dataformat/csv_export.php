@@ -77,16 +77,15 @@ require_once __DIR__ . '/../strings/str_array.php';
 function csv_export($csvarrays, $options = [])
 {
     $options += [
-        'delimiter'       => ',',
-        'enclosure'       => '"',
-        'escape'          => '\\',
-        'encoding'        => mb_internal_encoding(),
-        'initial'         => '', // "\xEF\xBB\xBF"
-        'headers'         => null,
-        'structure'       => false,
-        'callback'        => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
-        'callback_header' => false, // callback に header 行も渡ってくるか？（互換性のためであり将来的に削除される）
-        'output'          => null,
+        'delimiter' => ',',
+        'enclosure' => '"',
+        'escape'    => '\\',
+        'encoding'  => mb_internal_encoding(),
+        'initial'   => '', // "\xEF\xBB\xBF"
+        'headers'   => null,
+        'structure' => false,
+        'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
+        'output'    => null,
     ];
 
     $output = $options['output'];
@@ -100,7 +99,7 @@ function csv_export($csvarrays, $options = [])
 
     $restore = set_error_exception_handler();
     try {
-        $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback, $callback_header) {
+        $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback) {
             $size = 0;
             $mb_internal_encoding = mb_internal_encoding();
 
@@ -155,7 +154,7 @@ function csv_export($csvarrays, $options = [])
                 $headers = array_combine($headers, $headers);
             }
             else {
-                if ($callback_header && $callback) {
+                if ($callback) {
                     if ($callback($headers, null) === false) {
                         goto BODY;
                     }
@@ -192,7 +191,7 @@ function csv_export($csvarrays, $options = [])
                 $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
             }
             return $size;
-        })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['structure'], $options['callback'], $options['callback_header']);
+        })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
         if ($output) {
             return $size;
         }

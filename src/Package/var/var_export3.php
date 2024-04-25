@@ -39,7 +39,6 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  * クラス名のエイリアスや use, $this バインドなど可能な限り復元するが、おそらくあまりに複雑なことをしてると失敗する。
  *
  * リソースはファイル的なリソースであればメタ情報を出力して復元時に再オープンする。
- * それ以外のリソースは null で出力される（将来的に例外にするかもしれない）。
  *
  * 軽くベンチを取ったところ、オブジェクトを含まない純粋な配列の場合、serialize の 200 倍くらいは速い（それでも var_export の方が速いが…）。
  * オブジェクトを含めば含むほど遅くなり、全要素がオブジェクトになると serialize と同程度になる。
@@ -447,7 +446,7 @@ function var_export3($value, $return = false)
             // スタンダードなリソースなら復元できないこともない
             $meta = stream_get_meta_data($value);
             if (!in_array(strtolower($meta['stream_type']), ['stdio', 'output'], true)) {
-                return 'null'; // for compatible. 例外にしたい
+                throw new \DomainException('resource is supported stream resource only.');
             }
             $meta['position'] = @ftell($value);
             $meta['context'] = stream_context_get_options($value);

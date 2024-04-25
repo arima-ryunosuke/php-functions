@@ -8,6 +8,7 @@ use function ryunosuke\Functions\Package\date_convert;
 use function ryunosuke\Functions\Package\date_fromto;
 use function ryunosuke\Functions\Package\date_interval;
 use function ryunosuke\Functions\Package\date_interval_second;
+use function ryunosuke\Functions\Package\date_interval_string;
 use function ryunosuke\Functions\Package\date_match;
 use function ryunosuke\Functions\Package\date_modulate;
 use function ryunosuke\Functions\Package\date_parse_format;
@@ -279,97 +280,7 @@ class datetimeTest extends AbstractTestCase
         that($base->add(date_interval('P-1Y13M')))->format('Y/m/d H:i:s.v')->is('2015/01/24 12:34:56.000');
         that($base->add(date_interval('P1Y-12MT-1.234S')))->format('Y/m/d H:i:s.v')->is('2014/12/24 12:34:54.766');
 
-        $HOUR_1 = 60 * 60;
-        $DAY_1 = $HOUR_1 * 24;
-        $MONTH_1 = $DAY_1 * (365 / 12);
-        $YEAR_1 = $DAY_1 * 365;
-        that(date_interval($DAY_1 * 364, '%Y/%M/%D'))->is('00/11/29');
-        that(date_interval($DAY_1 * 365, '%Y/%M/%D'))->is('01/00/00');
-        that(date_interval($DAY_1 * 366, '%Y/%M/%D'))->is('01/00/01');
-        that(date_interval($DAY_1 * 364 + $YEAR_1, '%Y/%M/%D'))->is('01/11/29');
-        that(date_interval($DAY_1 * 365 + $YEAR_1, '%Y/%M/%D'))->is('02/00/00');
-        that(date_interval($DAY_1 * 366 + $YEAR_1, '%Y/%M/%D'))->is('02/00/01');
-
-        that(date_interval($DAY_1 * 29, '%Y/%M/%D'))->is('00/00/29');
-        that(date_interval($DAY_1 * 30, '%Y/%M/%D'))->is('00/00/30');
-        that(date_interval($DAY_1 * 31, '%Y/%M/%D'))->is('00/01/00');
-        that(date_interval($DAY_1 * 29 + $MONTH_1, '%Y/%M/%D'))->is('00/01/29');
-        that(date_interval($DAY_1 * 30 + $MONTH_1, '%Y/%M/%D'))->is('00/01/30');
-        that(date_interval($DAY_1 * 31 + $MONTH_1, '%Y/%M/%D'))->is('00/02/00');
-
-        that(date_interval($DAY_1 - 1, '%Y/%M/%D'))->is('00/00/00');
-        that(date_interval($DAY_1 + 0, '%Y/%M/%D'))->is('00/00/01');
-        that(date_interval($DAY_1 + $DAY_1, '%Y/%M/%D'))->is('00/00/02');
-
-        that(date_interval($HOUR_1 - 1, '%H:%I:%S'))->is('00:59:59');
-        that(date_interval($HOUR_1 + 0, '%H:%I:%S'))->is('01:00:00');
-        that(date_interval($HOUR_1 + 1, '%H:%I:%S'))->is('01:00:01');
-
-        that(date_interval($YEAR_1 * 123 + 4.567, '%c century, %v millisecond', 'c'))->is('1 century, 567 millisecond');
-        that(date_interval($YEAR_1 * 123 + 4.567, '%%c century, %%v millisecond', 'c'))->is('%c century, %v millisecond');
-        that(date_interval($YEAR_1 * 123 + 4.567, '%%%c century, %%%v millisecond', 'c'))->is('%1 century, %567 millisecond');
-
-        that(date_interval($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'y'))->is('01/01/09 03:25:45.678');
-        that(date_interval($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'))->is('00/13/09 03:25:45.678');
-        that(date_interval($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'd'))->is('00/00/405 03:25:45.678');
-        that(date_interval($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'h'))->is('00/00/00 9723:25:45.678');
-        that(date_interval($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'i'))->is('00/00/00 00:583405:45.678');
-        that(date_interval($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 's'))->is('00/00/00 00:00:35004345.678');
-
-        that(date_interval(60 * 60 * 24 * 900 + 12345.678, fn() => implode(',', func_get_args()), 'c'))->is('678,45,25,3,18,5,2,0');
-
-        $format = [
-            'c' => ['%c century', ' '],
-            'y' => ['%y year', ' '],
-            'm' => ['%m month', ' '],
-            'd' => ['%d days', ' '],
-            'h' => ['%h hours', ' '],
-            'i' => ['%i minute', ' '],
-            's' => ['%s seconds', ''],
-        ];
-        that(date_interval(0, $format, 3))->is('0 hours 0 minute 0 seconds');
-        that(date_interval(60 - 1, $format, 3))->is('0 hours 0 minute 59 seconds');
-        that(date_interval(60 - 0, $format, 3))->is('0 hours 1 minute 0 seconds');
-        that(date_interval(60 * 60 - 1, $format, 3))->is('0 hours 59 minute 59 seconds');
-        that(date_interval(60 * 60 - 0, $format, 3))->is('1 hours 0 minute 0 seconds');
-        that(date_interval(60 * 60 * 24 - 1, $format, 3))->is('23 hours 59 minute 59 seconds');
-        that(date_interval(60 * 60 * 24 - 0, $format, 3))->is('1 days 0 hours 0 minute');
-        that(date_interval(60 * 60 * 24 * (365 / 12) - 1, $format, 3))->is('30 days 9 hours 59 minute');
-        that(date_interval(60 * 60 * 24 * 31, $format, 3))->is('1 month 0 days 0 hours');
-        that(date_interval(60 * 60 * 24 * 365 - 1, $format, 3))->is('11 month 30 days 23 hours');
-        that(date_interval(60 * 60 * 24 * 365 - 0, $format, 3))->is('1 year 0 month 0 days');
-        that(date_interval(60 * 60 * 24 * 365 * 100 - 1, $format, 3))->is('99 year 11 month 30 days');
-        that(date_interval(60 * 60 * 24 * 365 * 100 - 0, $format, 3))->is('1 century 0 year 0 month');
-
-        that(date_interval(59, $format, 1))->is('59 seconds');
-        that(date_interval($HOUR_1 - 1, $format, 1))->is('59 minute');
-        that(date_interval($DAY_1 - 1, $format, 1))->is('23 hours');
-        that(date_interval($MONTH_1 - 1, $format, 1))->is('30 days');
-        that(date_interval($YEAR_1 - 1, $format, 1))->is('11 month');
-        that(date_interval($YEAR_1, $format, 1))->is('1 year');
-        that(date_interval($YEAR_1 * 100, $format, 1))->is('1 century');
-
-        $format = [
-            'y' => ['%YY', '/'],
-            'm' => ['', '%mM', '/'],
-            'd' => ['%dD', '/'],
-            ' T ',
-            'h' => ['%HH', ':'],
-            'i' => ['%II', ':'],
-            's' => ['%SS'],
-        ];
-        that(date_interval($YEAR_1, $format))->is('01Y');
-        that(date_interval($YEAR_1 + $MONTH_1 - $HOUR_1 * 10, $format))->is('01Y/30D');
-        that(date_interval($YEAR_1 + $MONTH_1 + $DAY_1 - $HOUR_1 * 10, $format))->is('01Y/1M');
-        that(date_interval($YEAR_1 + $MONTH_1 + $DAY_1 + 123456, $format))->is('01Y/1M/2D T 20H:17I:36S');
-        that(date_interval(12345, $format))->is('03H:25I:45S');
-        that(date_interval(1234, $format))->is('20I:34S');
-        that(date_interval(12, $format))->is('12S');
-
-        that(date_interval(123.456))->isInstanceOf(\DateInterval::class);
-
-        that(self::resolveFunction('date_interval'))(0, '', 2)->wasThrown('$format must be array');
-        that(self::resolveFunction('date_interval'))(1, [], 2)->wasThrown('$format is empty');
+        that(self::resolveFunction('date_interval'))('hoge string')->wasThrown('invalid DateInterval');
     }
 
     function test_date_interval_second()
@@ -430,6 +341,100 @@ class datetimeTest extends AbstractTestCase
             30 * $D * 2,
             31 * $D * 2,
         ]));
+    }
+
+    function test_date_interval_string()
+    {
+        $HOUR_1 = 60 * 60;
+        $DAY_1 = $HOUR_1 * 24;
+        $MONTH_1 = $DAY_1 * (365 / 12);
+        $YEAR_1 = $DAY_1 * 365;
+        that(date_interval_string($DAY_1 * 364, '%Y/%M/%D'))->is('00/11/29');
+        that(date_interval_string($DAY_1 * 365, '%Y/%M/%D'))->is('01/00/00');
+        that(date_interval_string($DAY_1 * 366, '%Y/%M/%D'))->is('01/00/01');
+        that(date_interval_string($DAY_1 * 364 + $YEAR_1, '%Y/%M/%D'))->is('01/11/29');
+        that(date_interval_string($DAY_1 * 365 + $YEAR_1, '%Y/%M/%D'))->is('02/00/00');
+        that(date_interval_string($DAY_1 * 366 + $YEAR_1, '%Y/%M/%D'))->is('02/00/01');
+
+        that(date_interval_string($DAY_1 * 29, '%Y/%M/%D'))->is('00/00/29');
+        that(date_interval_string($DAY_1 * 30, '%Y/%M/%D'))->is('00/00/30');
+        that(date_interval_string($DAY_1 * 31, '%Y/%M/%D'))->is('00/01/00');
+        that(date_interval_string($DAY_1 * 29 + $MONTH_1, '%Y/%M/%D'))->is('00/01/29');
+        that(date_interval_string($DAY_1 * 30 + $MONTH_1, '%Y/%M/%D'))->is('00/01/30');
+        that(date_interval_string($DAY_1 * 31 + $MONTH_1, '%Y/%M/%D'))->is('00/02/00');
+
+        that(date_interval_string($DAY_1 - 1, '%Y/%M/%D'))->is('00/00/00');
+        that(date_interval_string($DAY_1 + 0, '%Y/%M/%D'))->is('00/00/01');
+        that(date_interval_string($DAY_1 + $DAY_1, '%Y/%M/%D'))->is('00/00/02');
+
+        that(date_interval_string($HOUR_1 - 1, '%H:%I:%S'))->is('00:59:59');
+        that(date_interval_string($HOUR_1 + 0, '%H:%I:%S'))->is('01:00:00');
+        that(date_interval_string($HOUR_1 + 1, '%H:%I:%S'))->is('01:00:01');
+
+        that(date_interval_string($YEAR_1 * 123 + 4.567, '%c century, %v millisecond', 'c'))->is('1 century, 567 millisecond');
+        that(date_interval_string($YEAR_1 * 123 + 4.567, '%%c century, %%v millisecond', 'c'))->is('%c century, %v millisecond');
+        that(date_interval_string($YEAR_1 * 123 + 4.567, '%%%c century, %%%v millisecond', 'c'))->is('%1 century, %567 millisecond');
+
+        that(date_interval_string($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'y'))->is('01/01/09 03:25:45.678');
+        that(date_interval_string($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'm'))->is('00/13/09 03:25:45.678');
+        that(date_interval_string($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'd'))->is('00/00/405 03:25:45.678');
+        that(date_interval_string($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'h'))->is('00/00/00 9723:25:45.678');
+        that(date_interval_string($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 'i'))->is('00/00/00 00:583405:45.678');
+        that(date_interval_string($YEAR_1 + $DAY_1 * 40 + 12345.678, '%Y/%M/%D %H:%I:%S.%v', 's'))->is('00/00/00 00:00:35004345.678');
+
+        that(date_interval_string(60 * 60 * 24 * 900 + 12345.678, fn() => implode(',', func_get_args()), 'c'))->is('678,45,25,3,18,5,2,0');
+
+        $format = [
+            'c' => ['%c century', ' '],
+            'y' => ['%y year', ' '],
+            'm' => ['%m month', ' '],
+            'd' => ['%d days', ' '],
+            'h' => ['%h hours', ' '],
+            'i' => ['%i minute', ' '],
+            's' => ['%s seconds', ''],
+        ];
+        that(date_interval_string(0, $format, 3))->is('0 hours 0 minute 0 seconds');
+        that(date_interval_string(60 - 1, $format, 3))->is('0 hours 0 minute 59 seconds');
+        that(date_interval_string(60 - 0, $format, 3))->is('0 hours 1 minute 0 seconds');
+        that(date_interval_string(60 * 60 - 1, $format, 3))->is('0 hours 59 minute 59 seconds');
+        that(date_interval_string(60 * 60 - 0, $format, 3))->is('1 hours 0 minute 0 seconds');
+        that(date_interval_string(60 * 60 * 24 - 1, $format, 3))->is('23 hours 59 minute 59 seconds');
+        that(date_interval_string(60 * 60 * 24 - 0, $format, 3))->is('1 days 0 hours 0 minute');
+        that(date_interval_string(60 * 60 * 24 * (365 / 12) - 1, $format, 3))->is('30 days 9 hours 59 minute');
+        that(date_interval_string(60 * 60 * 24 * 31, $format, 3))->is('1 month 0 days 0 hours');
+        that(date_interval_string(60 * 60 * 24 * 365 - 1, $format, 3))->is('11 month 30 days 23 hours');
+        that(date_interval_string(60 * 60 * 24 * 365 - 0, $format, 3))->is('1 year 0 month 0 days');
+        that(date_interval_string(60 * 60 * 24 * 365 * 100 - 1, $format, 3))->is('99 year 11 month 30 days');
+        that(date_interval_string(60 * 60 * 24 * 365 * 100 - 0, $format, 3))->is('1 century 0 year 0 month');
+
+        that(date_interval_string(59, $format, 1))->is('59 seconds');
+        that(date_interval_string($HOUR_1 - 1, $format, 1))->is('59 minute');
+        that(date_interval_string($DAY_1 - 1, $format, 1))->is('23 hours');
+        that(date_interval_string($MONTH_1 - 1, $format, 1))->is('30 days');
+        that(date_interval_string($YEAR_1 - 1, $format, 1))->is('11 month');
+        that(date_interval_string($YEAR_1, $format, 1))->is('1 year');
+        that(date_interval_string($YEAR_1 * 100, $format, 1))->is('1 century');
+
+        $format = [
+            'y' => ['%YY', '/'],
+            'm' => ['', '%mM', '/'],
+            'd' => ['%dD', '/'],
+            ' T ',
+            'h' => ['%HH', ':'],
+            'i' => ['%II', ':'],
+            's' => ['%SS'],
+        ];
+        that(date_interval_string($YEAR_1, $format))->is('01Y');
+        that(date_interval_string($YEAR_1 + $MONTH_1 - $HOUR_1 * 10, $format))->is('01Y/30D');
+        that(date_interval_string($YEAR_1 + $MONTH_1 + $DAY_1 - $HOUR_1 * 10, $format))->is('01Y/1M');
+        that(date_interval_string($YEAR_1 + $MONTH_1 + $DAY_1 + 123456, $format))->is('01Y/1M/2D T 20H:17I:36S');
+        that(date_interval_string(12345, $format))->is('03H:25I:45S');
+        that(date_interval_string(1234, $format))->is('20I:34S');
+        that(date_interval_string(12, $format))->is('12S');
+        that(date_interval_string(date_interval('P1Y2M3DT4H5M6S'), $format))->is('01Y/2M/1D T 04H:05I:06S');
+
+        that(self::resolveFunction('date_interval_string'))(0, '', 2)->wasThrown('$format must be array');
+        that(self::resolveFunction('date_interval_string'))(1, [], 2)->wasThrown('$format is empty');
     }
 
     function test_date_match()

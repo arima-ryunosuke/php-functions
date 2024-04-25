@@ -28,8 +28,8 @@ function path_relative($from, $to)
 {
     $DS = DIRECTORY_SEPARATOR;
 
-    $fa = array_filter(explode($DS, path_resolve($from)), 'strlen');
-    $ta = array_filter(explode($DS, path_resolve($to)), 'strlen');
+    $fa = array_filter(explode($DS, path_resolve($from) ?? $from), 'strlen');
+    $ta = array_filter(explode($DS, path_resolve($to) ?? $to), 'strlen');
 
     $compare = fn($a, $b) => $DS === '\\' ? strcasecmp($a, $b) : strcmp($a, $b);
     $ca = array_udiff_assoc($fa, $ta, $compare);

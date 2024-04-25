@@ -29,14 +29,7 @@ require_once __DIR__ . '/../var/cipher_metadata.php';
 function decrypt($cipherdata, $password, $ciphers = 'aes-256-cbc', $tag = '')
 {
     $version = $cipherdata[-1] ?? '';
-    // for compatible
-    if (!ctype_digit($version)) {
-        $version = '0';
-        $cipherdata = base64_decode(strtr($cipherdata, ['-' => '+', '_' => '/']));
-    }
-    else {
-        $cipherdata = base64_decode(strtr(substr($cipherdata, 0, -1), ['-' => '+', '_' => '/']));
-    }
+    $cipherdata = base64_decode(strtr(substr($cipherdata, 0, -1), ['-' => '+', '_' => '/']));
 
     if ($version === "4") {
         $cipher = 'aes-256-gcm';
@@ -83,7 +76,7 @@ function decrypt($cipherdata, $password, $ciphers = 'aes-256-cbc', $tag = '')
         $iv = substr($ivtagpayload, 0, $metadata['ivlen']);
         $tag = substr($ivtagpayload, $metadata['ivlen'], $metadata['taglen']);
         $payload = substr($ivtagpayload, $metadata['ivlen'] + $metadata['taglen']);
-        $tags = array_merge([$tag], (array) $ciphers); // for compatible
+        $tags = array_merge([$tag], (array) $ciphers);
         foreach ($tags as $tag) {
             if ($metadata['taglen'] === strlen($tag)) {
                 $decryptdata = openssl_decrypt($payload, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...$metadata['taglen'] ? [$tag] : []);
@@ -95,20 +88,20 @@ function decrypt($cipherdata, $password, $ciphers = 'aes-256-cbc', $tag = '')
         return null;
     }
 
-    foreach ((array) $ciphers as $c) {
-        $ivlen = openssl_cipher_iv_length($c);
-        if (strlen($cipherdata) <= $ivlen) {
-            continue;
-        }
-        $iv = substr($cipherdata, 0, $ivlen);
-        $payload = substr($cipherdata, $ivlen);
-
-        $decryptdata = openssl_decrypt($payload, $c, $password, OPENSSL_RAW_DATA, $iv, $tag);
-        if ($decryptdata !== false) {
-            if ($version === "1") {
-                $decryptdata = gzinflate($decryptdata);
+    if ($version === "1") {
+        foreach ((array) $ciphers as $c) {
+            $ivlen = openssl_cipher_iv_length($c);
+            if (strlen($cipherdata) <= $ivlen) {
+                continue;
             }
-            return json_decode($decryptdata, true);
+            $iv = substr($cipherdata, 0, $ivlen);
+            $payload = substr($cipherdata, $ivlen);
+
+            $decryptdata = openssl_decrypt($payload, $c, $password, OPENSSL_RAW_DATA, $iv, $tag);
+            if ($decryptdata !== false) {
+                $decryptdata = gzinflate($decryptdata);
+                return json_decode($decryptdata, true);
+            }
         }
     }
     return null;

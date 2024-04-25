@@ -1447,6 +1447,10 @@ class filesystemTest extends AbstractTestCase
 
     function test_path_resolve()
     {
+        chdir(sys_get_temp_dir());
+        file_set_contents(getcwd() . '/a/b/c', '');
+        file_set_contents(getcwd() . '/root/a/b/c', '');
+
         $DS = DIRECTORY_SEPARATOR;
         that(path_resolve('a/b/c'))->is(getcwd() . "{$DS}a{$DS}b{$DS}c");
         that(path_resolve('/a/b/c'))->is("{$DS}a{$DS}b{$DS}c");
@@ -1456,10 +1460,6 @@ class filesystemTest extends AbstractTestCase
         if ($DS === '\\') {
             that(path_resolve('C:\\a\\b\\c'))->is('C:\\a\\b\\c');
         }
-
-        that(path_resolve(basename(__FILE__), [__DIR__]))->is(__FILE__);
-        that(path_resolve(basename(__DIR__) . DIRECTORY_SEPARATOR . basename(__FILE__), [dirname(__DIR__)]))->is(__FILE__);
-        that(path_resolve('notfound', [__DIR__]))->isNull();
     }
 
     function test_rm_rf()

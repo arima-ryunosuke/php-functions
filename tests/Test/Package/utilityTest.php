@@ -8,7 +8,6 @@ use function ryunosuke\Functions\Package\benchmark;
 use function ryunosuke\Functions\Package\built_in_server;
 use function ryunosuke\Functions\Package\cache;
 use function ryunosuke\Functions\Package\cache_fetch;
-use function ryunosuke\Functions\Package\cachedir;
 use function ryunosuke\Functions\Package\cacheobject;
 use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\number_serial;
@@ -148,18 +147,6 @@ class utilityTest extends AbstractTestCase
         cache('key', fn() => $value, 'fuga');
         cache(null, null);
         that("$tmpdir/hoge.php-cache")->fileNotExists();
-    }
-
-    function test_cachedir()
-    {
-        $tmpdir = self::$TMPDIR . '/test';
-        rm_rf($tmpdir);
-        /** @noinspection PhpDeprecationInspection */
-        {
-            cachedir($tmpdir);
-            that(cachedir())->is(realpath($tmpdir));
-            that(cachedir(self::$TMPDIR))->is(realpath($tmpdir));
-        }
     }
 
     function test_cacheobject()

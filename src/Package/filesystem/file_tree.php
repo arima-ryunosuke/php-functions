@@ -40,9 +40,6 @@ require_once __DIR__ . '/../filesystem/path_normalize.php';
  */
 function file_tree($dirname, $filter_condition = [])
 {
-    // for compatible in future scope
-    //return file_list($dirname, ['nesting' => true] + $filter_condition);
-
     $dirname = path_normalize($dirname);
     if (!file_exists($dirname)) {
         return null;

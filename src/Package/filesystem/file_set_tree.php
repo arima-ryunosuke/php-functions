@@ -42,14 +42,6 @@ require_once __DIR__ . '/../filesystem/path_normalize.php';
  */
 function file_set_tree($contents_tree, $umask = null)
 {
-    // for compatible
-    // @codeCoverageIgnoreStart
-    if (is_string($contents_tree)) {
-        $contents_tree = [$contents_tree => $umask];
-        $umask = func_get_args()[2] ?? null;
-    }
-    // @codeCoverageIgnoreEnd
-
     $umask ??= umask();
 
     $main = function ($contents_tree, $parent) use (&$main, $umask) {

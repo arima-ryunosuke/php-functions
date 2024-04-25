@@ -23,9 +23,9 @@ function function_configure($option)
     $config['cachedir'] ??= sys_get_temp_dir() . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
     $config['storagedir'] ??= DIRECTORY_SEPARATOR === '/' ? '/var/tmp/rf' : (getenv('ALLUSERSPROFILE') ?: sys_get_temp_dir()) . '\\rf';
     $config['placeholder'] ??= '';
-    $config['var_stream'] ??= get_cfg_var('rfunc.var_stream') ?: 'VarStreamV010000';          // for compatible
-    $config['memory_stream'] ??= get_cfg_var('rfunc.memory_stream') ?: 'MemoryStreamV010000'; // for compatible
-    $config['chain.version'] ??= 1;
+    $config['var_stream'] ??= 'VarStreamV010000';
+    $config['memory_stream'] ??= 'MemoryStreamV010000';
+    $config['chain.version'] ??= 2;
     $config['chain.nullsafe'] ??= false;
     $config['process.autoload'] ??= [];
 

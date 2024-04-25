@@ -299,15 +299,6 @@ class varTest extends AbstractTestCase
 
         that(self::resolveFunction('encrypt'))('dummy', 'pass', 'unknown')->wasThrown('undefined cipher algorithm');
 
-        $v0 = "yl84hlOoK5fNFIVFyy2IQmCkqq7FEugiqf4VBW9gHLJVHmfFBR5sLulAYKloAAUYKEWNcDt-yPaQ_1_w0uJeYetvgPJUAA7175-VbXi5UaN2MSJAZN3IAhxVhyF7kc-s";
-        that(decrypt($v0, 'secret', 'aes-128-ecb'))->isSame($data);
-
-        $v0 = "yl84hlOoK5fNFIVFyy2IQmCkqq7FEugiqf4VBW9gHLJVHmfFBR5sLulAYKloAAUYKEWNcDt-yPaQ_1_w0uJeYetvgPJUAA7175-VbXi5UaN2MSJAZN3IAhxVhyF7kc-s=0";
-        that(decrypt($v0, 'secret', 'aes-128-ecb'))->isSame($data);
-
-        $v0 = "yl84hlOoK5fNFIVFyy2IQmCkqq7FEugiqf4VBW9gHLJVHmfFBR5sLulAYKloAAUYKEWNcDt-yPaQ_1_w0uJeYetvgPJUAA7175-VbXi5UaN2MSJAZN3IAhxVhyF7kc-s=99";
-        that(decrypt($v0, 'secret', 'aes-128-ecb'))->isSame($data);
-
         $v1 = "uuz9p1tBXG3jFKV_y2PN_23s549iyppC5TsUeC4uOe5vdDNkot8DjuXL9kWzmDUlmPH4k0VP05nlHazteEQndsClvXVt_LztaTFno0Y0tg8=1";
         that(decrypt($v1, 'secret', 'aes-128-ecb'))->isSame($data);
 
@@ -1224,7 +1215,6 @@ class varTest extends AbstractTestCase
             'file'   => $file,
             'stdout' => STDOUT,
             'output' => fopen('php://output', 'w'),
-            'http'   => fopen(TESTWEBSERVER, 'r'),
         ];
         $exported = var_export3($values, ['outmode' => 'eval']);
         $values2 = eval($exported);
@@ -1232,7 +1222,8 @@ class varTest extends AbstractTestCase
         that($values2['file'])->isResource();
         that($values2['stdout'])->isResource();
         that($values2['output'])->isResource();
-        that($values2['http'])->isNull();
+
+        that(self::resolveFunction('var_export3'))(fopen(TESTWEBSERVER, 'r'))->wasThrown('stream resource');
 
         // that(stream_context_get_options($values2['file']))->is(['file' => ['hoge' => 'HOGE']]);
         that(ftell($values2['file']))->is(5);
@@ -1678,11 +1669,10 @@ class varTest extends AbstractTestCase
 
     function test_var_type()
     {
-        that(var_type(null))->is('NULL');
-        that(var_type(false))->is('boolean');
-        that(var_type(true))->is('boolean');
-        that(var_type(123))->is('integer');
-        that(var_type(123.456))->is('double');
+        that(var_type(null))->is('null');
+        that(var_type(true))->is('bool');
+        that(var_type(123))->is('int');
+        that(var_type(123.456))->is('float');
         that(var_type('hoge'))->is('string');
         that(var_type(STDIN))->is('resource');
         that(var_type(['array']))->is('array');
@@ -1697,17 +1687,6 @@ class varTest extends AbstractTestCase
         }))->is('\JsonSerializable');
         that(var_type(new class extends \stdClass { }))->is('\stdClass');
         that(var_type(new class { }))->stringContains('anonymous');
-    }
-
-    function test_var_type_valid()
-    {
-        that(var_type(null, true))->is('null');
-        that(var_type(true, true))->is('bool');
-        that(var_type(123, true))->is('int');
-        that(var_type(123.456, true))->is('float');
-        that(var_type('hoge', true))->is('string');
-        that(var_type(STDIN, true))->is('resource');
-        that(var_type(['array'], true))->is('array');
     }
 
     function test_varcmp()

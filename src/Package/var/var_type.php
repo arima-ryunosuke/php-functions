@@ -2,26 +2,30 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
 
 /**
- * 値の型を取得する（gettype + get_class）
+ * 値の型を取得する
  *
- * プリミティブ型（gettype で得られるやつ）はそのまま、オブジェクトのときのみクラス名を返す。
- * ただし、オブジェクトの場合は先頭に '\\' が必ず付く。
- * また、 $valid_name を true にするとタイプヒントとして正当な名前を返す（integer -> int, double -> float など）。
- * 互換性のためデフォルト false になっているが、将来的にこの引数は削除されるかデフォルト true に変更される。
+ * get_debug_type を少しだけ特殊化したもの。
+ * 「デバッグ用の型」ではなく「コード化したときに埋め込みやすい型」が主目的。
+ *
+ * - object の場合は必ず \ が付く
+ * - resource の場合はカッコ書き無しで 'resource'
  *
  * 無名クラスの場合は extends, implements の優先順位でその名前を使う。
  * 継承も実装もされていない場合は標準の get_class の結果を返す。
  *
  * Example:
  * ```php
- * // プリミティブ型は gettype と同義
- * that(var_type(false))->isSame('boolean');
- * that(var_type(123))->isSame('integer');
- * that(var_type(3.14))->isSame('double');
+ * // プリミティブ型は get_debug_type と同義
+ * that(var_type(false))->isSame('bool');
+ * that(var_type(123))->isSame('int');
+ * that(var_type(3.14))->isSame('float');
  * that(var_type([1, 2, 3]))->isSame('array');
+ * // リソースはなんでも resource
+ * that(var_type(STDOUT))->isSame('resource');
  * // オブジェクトは型名を返す
  * that(var_type(new \stdClass))->isSame('\\stdClass');
  * that(var_type(new \Exception()))->isSame('\\Exception');
@@ -35,10 +39,9 @@ namespace ryunosuke\Functions\Package;
  * @package ryunosuke\Functions\Package\var
  *
  * @param mixed $var 型を取得する値
- * @param bool $valid_name タイプヒントとして有効な名前を返すか
  * @return string 型名
  */
-function var_type($var, $valid_name = false)
+function var_type($var)
 {
     if (is_object($var)) {
         $ref = new \ReflectionObject($var);
@@ -52,20 +55,9 @@ function var_type($var, $valid_name = false)
         }
         return '\\' . get_class($var);
     }
-    $type = gettype($var);
-    if (!$valid_name) {
-        return $type;
+    if (is_resourcable($var)) {
+        return 'resource';
     }
-    switch ($type) {
-        default:
-            return $type;
-        case 'NULL':
-            return 'null';
-        case 'boolean':
-            return 'bool';
-        case 'integer':
-            return 'int';
-        case 'double':
-            return 'float';
-    }
+
+    return get_debug_type($var);
 }
