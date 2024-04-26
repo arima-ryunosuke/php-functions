@@ -170,7 +170,7 @@ function date_match($datetime, $cronlike)
             return implode(',', range($n, 34, 7));
         }
         if ($w === 'LAST') {
-            $w = date('w', strtotime($firstdate));
+            $w = idate('w', strtotime($firstdate));
             $lasts = array_map(fn($v) => ($v - 29 + $w) % 7, $lastweekdays);
             return $n + (in_array($n, $lasts, true) ? 4 : 3) * 7;
         }

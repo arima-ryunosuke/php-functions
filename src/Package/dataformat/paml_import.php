@@ -135,7 +135,7 @@ function paml_import($pamlstring, $options = [])
                     return true;
                 }
             }
-            catch (\ParseError $e) {
+            catch (\ParseError) {
             }
         }
 

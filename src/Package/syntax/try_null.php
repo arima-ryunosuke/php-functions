@@ -30,7 +30,7 @@ function try_null($try, ...$variadic)
     try {
         return $try(...$variadic);
     }
-    catch (\Exception $tried_ex) {
+    catch (\Exception) {
         return null;
     }
 }

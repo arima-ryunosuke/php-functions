@@ -51,7 +51,7 @@ function const_exists($classname, $constname = '')
         }
         return $refclass->hasConstant($constname);
     }
-    catch (\Throwable $t) {
+    catch (\Throwable) {
         return false;
     }
 }

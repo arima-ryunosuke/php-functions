@@ -394,6 +394,7 @@ function str_diff($xstring, $ystring, $options = [])
                 if (isset($rule[$diff[0]])) {
                     $difftext = [];
                     foreach ($rule[$diff[0]][1] as $n => $sign) {
+                        /** @noinspection PhpIllegalArrayKeyTypeInspection */
                         $difftext[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
                     }
                     $result[] = "{$index($diff[1])}{$rule[$diff[0]][0]}{$index($diff[2])}";

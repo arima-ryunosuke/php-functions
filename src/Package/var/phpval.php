@@ -43,7 +43,7 @@ function phpval($var, $contextvars = [])
     try {
         return evaluate("return $var;", $contextvars);
     }
-    catch (\Throwable $t) {
+    catch (\Throwable) {
         return $var;
     }
     finally {

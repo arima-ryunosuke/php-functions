@@ -107,7 +107,7 @@ function ping($host, $port = null, $timeout = 1, &$errstr = '')
         }, $socket, $protocol, $host, $port, $timeout);
         return microtime(true) - $mtime;
     }
-    catch (\Throwable $t) {
+    catch (\Throwable) {
         $errno = socket_last_error($socket);
         // windows では到達できても socket_read がエラーを返すので errno で判断
         // 接続済みの呼び出し先が一定の時間を過ぎても正しく応答しなかったため、接続できませんでした。

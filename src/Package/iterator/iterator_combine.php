@@ -25,6 +25,8 @@ namespace ryunosuke\Functions\Package;
  */
 function iterator_combine($keys, $values)
 {
+    /** @var \Iterator $itK */
+    /** @var \Iterator $itV */
     $itK = is_array($keys) ? (fn() => yield from $keys)() : $keys;
     $itV = is_array($values) ? (fn() => yield from $values)() : $values;
 

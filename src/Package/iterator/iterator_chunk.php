@@ -87,6 +87,7 @@ function iterator_chunk($iterator, $length, $preserve_keys = false)
 
     // Generator は Iterator であるが Iterator は Generator ではないので変換する
     if (is_iterable($iterator)) {
+        /** @var \Iterator $iterator */
         $iterator = (fn() => yield from $iterator)();
     }
 

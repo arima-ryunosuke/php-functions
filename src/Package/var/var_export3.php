@@ -321,7 +321,7 @@ function var_export3($value, $return = false)
                             return "\$this->$vid = $declare()";
                         }
                     }
-                    catch (\Throwable $t) { // @codeCoverageIgnore
+                    catch (\Throwable) { // @codeCoverageIgnore
                         // through. treat regular object
                     }
                 }
@@ -349,7 +349,7 @@ function var_export3($value, $return = false)
                     serialize($value);
                 }
             }
-            catch (\Exception $e) {
+            catch (\Exception) {
                 return "\$this->$vid = new \\__PHP_Incomplete_Class()";
             }
 

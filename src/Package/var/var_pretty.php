@@ -231,7 +231,7 @@ function var_pretty($value, $options = [])
                         $eline = $ref->getExecutingLine();
                         return get_class($token) . "#" . spl_object_id($token) . "@$ename:$eline";
                     }
-                    catch (\ReflectionException $e) {
+                    catch (\ReflectionException) {
                         return get_class($token) . "#" . spl_object_id($token);
                     }
                 }

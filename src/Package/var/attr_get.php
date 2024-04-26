@@ -54,7 +54,7 @@ function attr_get($key, $value, $default = null)
             $result = @$value[$key];
             return error_get_last() ? $default : $result;
         }
-        catch (\Throwable $t) {
+        catch (\Throwable) {
             return $default;
         }
     }
@@ -69,7 +69,7 @@ function attr_get($key, $value, $default = null)
             $result = @$value->$key;
             return error_get_last() ? $default : $result;
         }
-        catch (\Throwable $t) {
+        catch (\Throwable) {
             return $default;
         }
     }

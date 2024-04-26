@@ -72,7 +72,7 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
             // @codeCoverageIgnoreEnd
             $closure = evaluate("declare(ticks=1);\n" . var_export3($caller, ['outmode' => 'eval']));
         }
-        catch (\Throwable $t) { // @codeCoverageIgnore
+        catch (\Throwable) { // @codeCoverageIgnore
             // do nothing
         }
         $benchset[$name] = $closure;
