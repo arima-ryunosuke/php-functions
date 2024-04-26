@@ -49,7 +49,7 @@ function array_merge2(...$arrays)
     $result = [];
     for ($i = 0; $i <= $max; $i++) {
         foreach ($arrays as $array) {
-            if (isset($array[$i]) && array_key_exists($i, $array)) {
+            if (isset($array[$i]) || array_key_exists($i, $array)) {
                 $result[$i] = $array[$i];
                 break;
             }

@@ -496,7 +496,7 @@ function var_export3($value, $return = false)
                         if (isset($privates[$parent->name][$name]) && !$privates[$parent->name][$name] instanceof \__PHP_Incomplete_Class) {
                             $property->setValue($object, $privates[$parent->name][$name]);
                         }
-                        if ((isset($fields[$name]) || array_key_exists($name, $fields))) {
+                        if (array_key_exists($name, $fields)) {
                             if (!$fields[$name] instanceof \__PHP_Incomplete_Class) {
                                 $property->setValue($object, $fields[$name]);
                             }

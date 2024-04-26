@@ -38,8 +38,7 @@ require_once __DIR__ . '/../var/var_type.php';
 function attr_get($key, $value, $default = null)
 {
     if (is_array($value)) {
-        // see https://www.php.net/manual/function.array-key-exists.php#107786
-        return isset($value[$key]) || array_key_exists($key, $value) ? $value[$key] : $default;
+        return array_key_exists($key, $value) ? $value[$key] : $default;
     }
 
     if ($value instanceof \ArrayAccess) {

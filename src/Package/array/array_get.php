@@ -48,8 +48,7 @@ function array_get($array, $key, $default = null)
     if (is_array($key)) {
         $result = [];
         foreach ($key as $k) {
-            // 深遠な事情で少しでも高速化したかったので isset || array_keys_exist にしてある
-            if (isset($array[$k]) || array_keys_exist($k, $array)) {
+            if (array_keys_exist($k, $array)) {
                 $result[$k] = $array[$k];
             }
         }
