@@ -37,13 +37,7 @@ require_once __DIR__ . '/../utility/function_configure.php';
  * ```php
  * // Y1 extends X1 だとしてクラス定義でオーバーライドする
  * class_replace('\\ryunosuke\\Test\\Package\\files\\classes\\X1', function () {
- *     // アンスコがついたクラスが定義されるのでそれを継承して定義する
- *     class X1d extends \ryunosuke\Test\Package\files\classes\X1_
- *     {
- *         function method(){return 'this is X1d';}
- *         function newmethod(){return 'this is newmethod';}
- *     }
- *     // このように匿名クラスを返しても良い。ただし、混在せずにどちらか一方にすること
+ *     // アンスコがついたクラスが定義されるので匿名クラスを返す
  *     return new class() extends \ryunosuke\Test\Package\files\classes\X1_
  *     {
  *         function method(){return 'this is X1d';}
@@ -108,7 +102,6 @@ function class_replace($class, $register)
     }
     require_once $fname;
 
-    $classess = get_declared_classes();
     if ($register instanceof \Closure) {
         $newclass = $register();
     }
@@ -129,15 +122,7 @@ function class_replace($class, $register)
         $newclass = $register;
     }
 
-    // クロージャ内部でクラス定義した場合（増えたクラスでエイリアスする）
-    if ($newclass === null) {
-        $classes = array_diff(get_declared_classes(), $classess);
-        if (count($classes) !== 1) {
-            throw new \DomainException('declared multi classes.' . implode(',', $classes));
-        }
-        $newclass = reset($classes);
-    }
-    // php7.0 から無名クラスが使えるのでそのクラス名でエイリアスする
+    // 無名クラス
     if (is_object($newclass)) {
         $newclass = get_class($newclass);
     }

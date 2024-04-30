@@ -206,18 +206,31 @@ class classobjTest extends AbstractTestCase
         that(class_namespace('\\vendor\\namespace\\ClassName'))->is('vendor\\namespace');
     }
 
+    /** @noinspection PhpUndefinedClassInspection */
     function test_class_replace()
     {
         that(self::resolveFunction('class_replace'))(__CLASS__, function () { })->wasThrown('already declared');
-        that(self::resolveFunction('class_replace'))('\\ryunosuke\\Test\\package\\files\\classes\\A', function () { require_once __DIR__ . '/files/classes/_.php'; })->wasThrown('multi classes');
 
         class_replace('\\ryunosuke\\Test\\package\\files\\classes\\A', function () {
-            require_once __DIR__ . '/files/classes/A_.php';
+            return new class extends \ryunosuke\Test\Package\files\classes\A_ {
+                function f()
+                {
+                    return ['this is exA'];
+                }
+            };
         });
 
         class_replace('\\ryunosuke\\Test\\package\\files\\classes\\B', function () {
-            require_once __DIR__ . '/files/classes/B_.php';
-            return new \B();
+            return new class extends \ryunosuke\Test\Package\files\classes\B_ {
+                /** @noinspection PhpUndefinedClassInspection */
+                function f()
+                {
+                    $result = parent::f();
+                    array_pop($result);
+                    $result[] = 'this is exB';
+                    return $result;
+                }
+            };
         });
 
         class_replace('\\ryunosuke\\Test\\package\\files\\classes\\C1', [
