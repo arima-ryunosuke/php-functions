@@ -20,7 +20,6 @@ use function ryunosuke\Functions\Package\process_parallel;
 use function ryunosuke\Functions\Package\rm_rf;
 use function ryunosuke\Functions\Package\unique_id;
 use function ryunosuke\Functions\Package\var_export2;
-use const ryunosuke\Functions\Package\TOKEN_NAME;
 
 class miscTest extends AbstractTestCase
 {
@@ -936,126 +935,132 @@ $colA
 
     function test_php_parse()
     {
-        $code = 'a(123);';
-        $tokens = php_parse($code, 2);
+        $code = '<?php a(123);';
+        $tokens = php_parse($code);
         that($tokens)->is([
-            [T_OPEN_TAG, '<?php ', 1, -6, 'T_OPEN_TAG'],
-            [T_STRING, 'a', 1, 0, 'T_STRING'],
-            [ord('('), '(', 1, 1, 'UNKNOWN'],
-            [T_LNUMBER, '123', 1, 2, 'T_LNUMBER'],
-            [ord(')'), ')', 1, 5, 'UNKNOWN'],
-            [ord(';'), ';', 1, 6, 'UNKNOWN'],
+            // @formatter:off
+            #             ID,           TOKEN,      L, C
+            new \PhpToken(T_OPEN_TAG,   '<?php ',   1, 0),
+            new \PhpToken(T_STRING,     'a',        1, 6),
+            new \PhpToken(ord('('),     '(',        1, 7),
+            new \PhpToken(T_LNUMBER,    '123',      1, 8),
+            new \PhpToken(ord(')'),     ')',        1, 11),
+            new \PhpToken(ord(';'),     ';',        1, 12),
+            // @formatter:on
         ]);
 
         $code = <<<'PHP'
+        <?php
         echo `this is backtick`;
         echo `this is $backtick`;
         PHP;
 
         that(php_parse($code, [
             'backtick' => false,
-            'flags'    => TOKEN_NAME,
         ]))->is([
-            [T_OPEN_TAG, "<?php ", 1, -6, "T_OPEN_TAG"],
-            [T_ECHO, "echo", 1, 0, "T_ECHO"],
-            [T_WHITESPACE, " ", 1, 4, "T_WHITESPACE"],
-            [ord('`'), "`this is backtick`", 1, 5, "T_BACKTICK"],
-            [ord(';'), ";", 1, 23, "UNKNOWN"],
-            [T_WHITESPACE, "\n", 1, 24, "T_WHITESPACE"],
-            [T_ECHO, "echo", 2, 25, "T_ECHO"],
-            [T_WHITESPACE, " ", 2, 29, "T_WHITESPACE"],
-            [ord('`'), "`this is \$backtick`", 2, 30, "T_BACKTICK"],
-            [ord(';'), ";", 2, 49, "UNKNOWN"],
+            // @formatter:off
+            #             ID,           TOKEN,                  L, C
+            new \PhpToken(T_OPEN_TAG,   "<?php\n",              1, 0),
+            new \PhpToken(T_ECHO,       "echo",                 2, 6),
+            new \PhpToken(T_WHITESPACE, " ",                    2, 10),
+            new \PhpToken(ord('`'),     "`this is backtick`",   2, 11),
+            new \PhpToken(ord(';'),     ";",                    2, 29),
+            new \PhpToken(T_WHITESPACE, "\n",                   2, 30),
+            new \PhpToken(T_ECHO,       "echo",                 3, 31),
+            new \PhpToken(T_WHITESPACE, " ",                    3, 35),
+            new \PhpToken(ord('`'),     "`this is \$backtick`", 3, 36),
+            new \PhpToken(ord(';'),     ";",                    3, 55),
+            // @formatter:on
         ]);
 
-        $code = '$c = function ($a = null) use ($x) {
+        $code = '<?php $c = function ($a = null) use ($x) {
     return $a + $x;
 };';
         $tokens = php_parse($code, [
             'line' => [2, 2],
         ]);
-        that(implode('', array_column($tokens, 1)))->is('return $a + $x;' . "\n");
+        that(implode('', array_column($tokens, 'text')))->is('return $a + $x;' . "\n");
         $tokens = php_parse($code, [
-            'position' => [37, 56],
+            'position' => [43, 62],
         ]);
-        that(implode('', array_column($tokens, 1)))->is('return $a + $x;' . "\n");
+        that(implode('', array_column($tokens, 'text')))->is('return $a + $x;' . "\n");
 
-        $tokens = php_parse($code, 4);
-        // @formatter:off
+        $tokens = php_parse($code);
         that($tokens)->is([
-            #ID, TOKEN,       L, C
-            [T_OPEN_TAG,   "<?php ",   1, -6],
-            [T_VARIABLE,   "\$c",      1, 0],
-            [T_WHITESPACE, " ",        1, 2],
-            [ord('='),     "=",        1, 3],
-            [T_WHITESPACE, " ",        1, 4],
-            [T_FUNCTION,   "function", 1, 5],
-            [T_WHITESPACE, " ",        1, 13],
-            [ord("("),     "(",        1, 14],
-            [T_VARIABLE,   "\$a",      1, 15],
-            [T_WHITESPACE, " ",        1, 17],
-            [ord('='),     "=",        1, 18],
-            [T_WHITESPACE, " ",        1, 19],
-            [T_STRING,     "null",     1, 20],
-            [ord(')'),     ")",        1, 24],
-            [T_WHITESPACE, " ",        1, 25],
-            [T_USE,        "use",      1, 26],
-            [T_WHITESPACE, " ",        1, 29],
-            [ord('('),     "(",        1, 30],
-            [T_VARIABLE,   "\$x",      1, 31],
-            [ord(')'),     ")",        1, 33],
-            [T_WHITESPACE, " ",        1, 34],
-            [ord('{'),     "{",        1, 35],
-            [T_WHITESPACE, "\n    ",   1, 36],
-            [T_RETURN,     "return",   2, 41],
-            [T_WHITESPACE, " ",        2, 47],
-            [T_VARIABLE,   "\$a",      2, 48],
-            [T_WHITESPACE, " ",        2, 50],
-            [ord('+'),     "+",        2, 51],
-            [T_WHITESPACE, " ",        2, 52],
-            [T_VARIABLE,   "\$x",      2, 53],
-            [ord(';'),     ";",        2, 55],
-            [T_WHITESPACE, "\n",       2, 56],
-            [ord('}'),     "}",        3, 57],
-            [ord(';'),     ";",        3, 58],
+            // @formatter:off
+            #             ID,           TOKEN,      L, C
+            new \PhpToken(T_OPEN_TAG,   "<?php ",   1, 0),
+            new \PhpToken(T_VARIABLE,   "\$c",      1, 6),
+            new \PhpToken(T_WHITESPACE, " ",        1, 8),
+            new \PhpToken(ord('='),     "=",        1, 9),
+            new \PhpToken(T_WHITESPACE, " ",        1, 10),
+            new \PhpToken(T_FUNCTION,   "function", 1, 11),
+            new \PhpToken(T_WHITESPACE, " ",        1, 19),
+            new \PhpToken(ord("("),     "(",        1, 20),
+            new \PhpToken(T_VARIABLE,   "\$a",      1, 21),
+            new \PhpToken(T_WHITESPACE, " ",        1, 23),
+            new \PhpToken(ord('='),     "=",        1, 24),
+            new \PhpToken(T_WHITESPACE, " ",        1, 25),
+            new \PhpToken(T_STRING,     "null",     1, 26),
+            new \PhpToken(ord(')'),     ")",        1, 30),
+            new \PhpToken(T_WHITESPACE, " ",        1, 31),
+            new \PhpToken(T_USE,        "use",      1, 32),
+            new \PhpToken(T_WHITESPACE, " ",        1, 35),
+            new \PhpToken(ord('('),     "(",        1, 36),
+            new \PhpToken(T_VARIABLE,   "\$x",      1, 37),
+            new \PhpToken(ord(')'),     ")",        1, 39),
+            new \PhpToken(T_WHITESPACE, " ",        1, 40),
+            new \PhpToken(ord('{'),     "{",        1, 41),
+            new \PhpToken(T_WHITESPACE, "\n    ",   1, 42),
+            new \PhpToken(T_RETURN,     "return",   2, 47),
+            new \PhpToken(T_WHITESPACE, " ",        2, 53),
+            new \PhpToken(T_VARIABLE,   "\$a",      2, 54),
+            new \PhpToken(T_WHITESPACE, " ",        2, 56),
+            new \PhpToken(ord('+'),     "+",        2, 57),
+            new \PhpToken(T_WHITESPACE, " ",        2, 58),
+            new \PhpToken(T_VARIABLE,   "\$x",      2, 59),
+            new \PhpToken(ord(';'),     ";",        2, 61),
+            new \PhpToken(T_WHITESPACE, "\n",       2, 62),
+            new \PhpToken(ord('}'),     "}",        3, 63),
+            new \PhpToken(ord(';'),     ";",        3, 64),
+            // @formatter:on
         ]);
-        // @formatter:on
 
-        $code = 'function($a,$b)use($usevar){if(false)return fn()=>[1,2,3];}';
+        $code = '<?php function($a,$b)use($usevar){if(false){return fn()=>[1,2,3];}}';
         $tokens = php_parse($code, [
             'begin' => T_FUNCTION,
             'end'   => ',',
         ]);
-        that(implode('', array_column($tokens, 1)))->is('function($a,$b)use($usevar){if(false)return fn()=>[1,2,3];}');
+        that(implode('', array_column($tokens, 'text')))->is('function($a,$b)use($usevar){if(false){return fn()=>[1,2,3];}}');
         $tokens = php_parse($code, [
             'begin'  => T_FUNCTION,
             'end'    => ')',
             'greedy' => true,
         ]);
-        that(implode('', array_column($tokens, 1)))->is('function($a,$b)use($usevar){if(false)return fn()=>[1,2,3];}');
+        that(implode('', array_column($tokens, 'text')))->is('function($a,$b)use($usevar){if(false){return fn()=>[1,2,3];}}');
         $tokens = php_parse($code, [
             'begin' => T_FUNCTION,
             'end'   => '{',
         ]);
-        that(implode('', array_column($tokens, 1)))->is('function($a,$b)use($usevar){');
+        that(implode('', array_column($tokens, 'text')))->is('function($a,$b)use($usevar){');
         $tokens = php_parse($code, [
             'begin'  => '{',
             'end'    => '}',
             'offset' => count($tokens),
         ]);
-        that(implode('', array_column($tokens, 1)))->is('{if(false)return fn()=>[1,2,3];}');
+        that(implode('', array_column($tokens, 'text')))->is('{if(false){return fn()=>[1,2,3];}}');
 
-        $code = 'namespace hoge\\fuga\\piyo;class C {function m(){if(false)return function(){};}}';
+        $code = '<?php namespace hoge\\fuga\\piyo;class C {function m(){if(false){return function(){};}}}';
         $tokens = php_parse($code, [
             'begin' => T_NAMESPACE,
             'end'   => ';',
         ]);
-        that(implode('', array_column($tokens, 1)))->is('namespace hoge\fuga\piyo;');
+        that(implode('', array_column($tokens, 'text')))->is('namespace hoge\fuga\piyo;');
         $tokens = php_parse($code, [
             'begin' => T_CLASS,
             'end'   => '}',
         ]);
-        that(implode('', array_column($tokens, 1)))->is('class C {function m(){if(false)return function(){};}}');
+        that(implode('', array_column($tokens, 'text')))->is('class C {function m(){if(false){return function(){};}}}');
     }
 
     function test_php_parse_short_open_tag()
@@ -1063,15 +1068,15 @@ $colA
         $providerExpected = function ($code, $short_open_tag) {
             $include = var_export(realpath(__DIR__ . '/../../../include/global.php'), true);
             $export = var_export($code, true);
-            $stdin = "<?php include($include);var_export(php_parse($export, TOKEN_NAME));";
+            $stdin = "<?php include($include);echo serialize(php_parse($export));";
             $stdout = '';
             process(PHP_BINARY, [
                 "-d short_open_tag=$short_open_tag",
             ], $stdin, $stdout);
-            return eval("return $stdout;");
+            return unserialize($stdout);
         };
 
-        $code = '?>
+        $code = '
 a<? echo 123 ?>
 plain text
 <? foreach ($array as $k => $v): ?>
@@ -1084,18 +1089,16 @@ plain text
 
         that(php_parse($code, [
             'short_open_tag' => true,
-            'flags'          => TOKEN_NAME,
         ]))->is($providerExpected($code, 1));
 
         that(php_parse($code, [
             'short_open_tag' => false,
-            'flags'          => TOKEN_NAME,
         ]))->is($providerExpected($code, 0));
     }
 
     function test_php_strip()
     {
-        $code = '?>
+        $code = '
 a<? echo 123 ?>
 plain text
 <? foreach ($array as $k => $v): ?>
@@ -1106,21 +1109,21 @@ plain text
 <? echo 789;
 ';
 
-        that(php_strip($code))->is('?>
+        that(php_strip($code))->is('
 aplain text
         plain text
      and ');
-        that(php_strip($code, ['replacer' => 'xxx']))->is('?>
+        that(php_strip($code, ['replacer' => 'xxx']))->is('
 axxx6plain text
 xxx5    xxx4    plain text
     xxx3 and xxx2xxx1xxx0');
-        that(php_strip($code, ['replacer' => fn($code, $n) => strpos($code, 'foreach') ? 'foreach' : $n . "th"]))->is('?>
+        that(php_strip($code, ['replacer' => fn($code, $n) => strpos($code, 'foreach') ? 'foreach' : $n . "th"]))->is('
 a6thplain text
 foreach    4th    plain text
     3th and 2thforeach0th');
         that(php_strip($code, [
             'trailing_break' => false,
-        ]))->is('?>
+        ]))->is('
 aplain text
         plain text
      and 

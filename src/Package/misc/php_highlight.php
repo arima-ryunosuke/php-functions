@@ -169,17 +169,13 @@ function php_highlight($phpcode, $options = [])
         T_DOC_COMMENT              => $comment,
     ];
 
-    $tokens = token_get_all($phpcode, TOKEN_PARSE);
+    $tokens = \PhpToken::tokenize($phpcode, TOKEN_PARSE);
     foreach ($tokens as $n => $token) {
-        if (is_string($token)) {
-            $token = [null, $token, null];
-        }
-
-        $style = $rules[strtolower($token[1])] ?? $rules[$token[0]] ?? null;
+        $style = $rules[strtolower($token->text)] ?? $rules[$token->id] ?? null;
         if ($style !== null) {
-            $token[1] = $colorize($token[1], $style);
+            $token->text = $colorize($token->text, $style);
         }
         $tokens[$n] = $token;
     }
-    return implode('', array_column($tokens, 1));
+    return implode('', array_column($tokens, 'text'));
 }

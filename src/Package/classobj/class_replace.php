@@ -158,8 +158,8 @@ function class_replace($class, $register)
         ]);
         array_shift($origclass);
 
-        $origspace = trim(implode('', array_column($origspace, 1)));
-        $origclass = trim(implode('', array_column($origclass, 1)));
+        $origspace = trim(implode('', array_column($origspace, 'text')));
+        $origclass = trim(implode('', array_column($origclass, 'text')));
 
         $classcode = '';
         foreach ($newclass as $name => $member) {

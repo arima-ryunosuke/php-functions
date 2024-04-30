@@ -31,26 +31,26 @@ function namespace_detect($location)
 {
     // php をパースして名前空間部分を得るクロージャ
     $detectNS = function ($phpfile) {
-        $tokens = token_get_all(file_get_contents($phpfile));
+        $tokens = \PhpToken::tokenize(file_get_contents($phpfile));
         $count = count($tokens);
 
         $namespace = [];
         foreach ($tokens as $n => $token) {
-            if (is_array($token) && $token[0] === T_NAMESPACE) {
+            if ($token->id === T_NAMESPACE) {
                 // T_NAMESPACE と T_WHITESPACE で最低でも2つは読み飛ばしてよい
                 for ($m = $n + 2; $m < $count; $m++) {
-                    if (is_array($tokens[$m]) && $tokens[$m][0] === T_NAME_QUALIFIED) {
-                        return $tokens[$m][1];
+                    if ($tokens[$m]->id === T_NAME_QUALIFIED) {
+                        return $tokens[$m]->text;
                     }
-                    if (is_array($tokens[$m]) && $tokens[$m][0] === T_NAME_FULLY_QUALIFIED) {
-                        $namespace[] = trim($tokens[$m][1], '\\');
+                    if ($tokens[$m]->id === T_NAME_FULLY_QUALIFIED) {
+                        $namespace[] = trim($tokens[$m]->text, '\\');
                     }
                     // よほどのことがないと T_NAMESPACE の次の T_STRING は名前空間の一部
-                    if (is_array($tokens[$m]) && $tokens[$m][0] === T_STRING) {
-                        $namespace[] = $tokens[$m][1];
+                    if ($tokens[$m]->id === T_STRING) {
+                        $namespace[] = $tokens[$m]->text;
                     }
                     // 終わりが来たら結合して返す
-                    if ($tokens[$m] === ';') {
+                    if ($tokens[$m]->text === ';') {
                         return implode('\\', $namespace);
                     }
                 }

@@ -47,20 +47,21 @@ function render_template($template, $vars, $tag = null)
     };
 
     [$blocks, $stmts] = cache("template-$template", function () use ($template) {
-        $tokens = array_slice(php_parse("<<<PHPTEMPLATELITERAL\n" . $template . "\nPHPTEMPLATELITERAL;", [
+        $tokens = array_slice(php_parse("<?php <<<PHPTEMPLATELITERAL\n" . $template . "\nPHPTEMPLATELITERAL;", [
             'backtick' => false,
         ]), 2, -2);
         $last = array_key_last($tokens);
-        if ($tokens[$last][0] === T_ENCAPSED_AND_WHITESPACE) {
-            $tokens[$last][1] = substr($tokens[$last][1], 0, -1);
+        if ($tokens[$last]->id === T_ENCAPSED_AND_WHITESPACE) {
+            $tokens[$last] = clone $tokens[$last];
+            $tokens[$last]->text = substr($tokens[$last]->text, 0, -1);
         }
 
         $blocks = [""];
         $stmts = [];
         for ($i = 0, $l = count($tokens); $i < $l; $i++) {
-            if ($tokens[$i][0] === T_DOLLAR_OPEN_CURLY_BRACES) {
+            if ($tokens[$i]->id === T_DOLLAR_OPEN_CURLY_BRACES) {
                 for ($j = $i + 1; $j < $l; $j++) {
-                    if ($tokens[$j][1] === '}') {
+                    if ($tokens[$j]->text === '}') {
                         $blocks[] = "";
                         $stmts[] = array_slice($tokens, $i + 1, $j - $i - 1, true);
                         $i = $j;
@@ -69,24 +70,25 @@ function render_template($template, $vars, $tag = null)
                 }
             }
             else {
-                $blocks[count($blocks) - 1] .= strtr_escaped($tokens[$i][1], ['\$' => '$']);
+                $blocks[count($blocks) - 1] .= strtr_escaped($tokens[$i]->text, ['\$' => '$']);
             }
         }
 
+        array_walk_recursive($stmts, fn(&$token) => $token = (array) $token);
         return [$blocks, $stmts];
     }, __FUNCTION__);
 
     $values = [];
     foreach ($stmts as $stmt) {
         foreach ($stmt as $n => $subtoken) {
-            if ($subtoken[0] === ord('`')) {
-                $stmt[$n][1] = var_export(render_template(substr($subtoken[1], 1, -1), $vars), true);
+            if ($subtoken['id'] === ord('`')) {
+                $stmt[$n]['text'] = var_export(render_template(substr($subtoken['text'], 1, -1), $vars), true);
             }
-            elseif (attr_exists($subtoken[1], $vars) && ($stmt[$n + 1][1] ?? '') !== '(') {
-                $stmt[$n][1] = '$' . $subtoken[1];
+            elseif (attr_exists($subtoken['text'], $vars) && ($stmt[$n + 1]['text'] ?? '') !== '(') {
+                $stmt[$n]['text'] = '$' . $subtoken['text'];
             }
         }
-        $values[] = phpval(implode('', array_column($stmt, 1)), (array) $vars);
+        $values[] = phpval(implode('', array_column($stmt, 'text')), (array) $vars);
     }
 
     return $tag($blocks, ...$values);

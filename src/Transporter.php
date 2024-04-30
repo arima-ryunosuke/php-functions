@@ -205,11 +205,11 @@ class Transporter
 
             $tokens = self::getDependentTokens($name);
             foreach ($tokens as $i => $token) {
-                if (isset($token['dependent'])) {
-                    $tokens[$i][1] = "\\$classname::" . $token[1];
+                if (isset($token->dependent)) {
+                    $tokens[$i]->text = "\\$classname::" . $token->text;
                 }
             }
-            $body = substr_replace(implode('', array_column($tokens, 1)), 'public static ', $function['funcstart'], 0);
+            $body = substr_replace(implode('', array_column($tokens, 'text')), 'public static ', $function['funcstart'], 0);
             $funcs[] = <<<FUNCTION
                 {$_(trim(php_indent("\n" . $body, ['baseline' => 0, 'indent' => 4])))}
             FUNCTION;
@@ -316,16 +316,16 @@ class Transporter
         $constants = self::getAllConstant();
         $functions = self::getAllFunction();
 
-        $tokens = token_get_all("<?php {$functions[$funcname]['codeblock']}");
+        $tokens = \PhpToken::tokenize("<?php {$functions[$funcname]['codeblock']}");
         array_shift($tokens);
         for ($i = 0; $i < count($tokens); $i++) {
-            $token = is_array($tokens[$i]) ? $tokens[$i] : [null, $tokens[$i], null];
-            if ($token[0] === T_STRING) {
-                if (isset($constants[$token[1]]) && ($tokens[$i - 1][0] ?? '') !== T_DOUBLE_COLON) {
-                    $token['dependent'] = 'constant';
+            $token = $tokens[$i];
+            if ($token->id === T_STRING) {
+                if (isset($constants[$token->text]) && ($tokens[$i - 1]->id ?? '') !== T_DOUBLE_COLON) {
+                    $token->dependent = 'constant';
                 }
-                if (isset($functions[$token[1]]) && ($tokens[$i - 2][0] ?? '') !== T_FUNCTION && ($tokens[$i + 1] ?? '') === '(') {
-                    $token['dependent'] = 'function';
+                if (isset($functions[$token->text]) && ($tokens[$i - 2]->id ?? '') !== T_FUNCTION && ($tokens[$i + 1]->text ?? '') === '(') {
+                    $token->dependent = 'function';
                 }
             }
             $tokens[$i] = $token;
@@ -347,8 +347,8 @@ class Transporter
                 $depends[$name] = array_fill_keys(['constant', 'function'], []);
                 $tokens = self::getDependentTokens($name);
                 foreach ($tokens as $token) {
-                    if (isset($token['dependent'])) {
-                        $depends[$name][$token['dependent']][$token[1]] = true;
+                    if (isset($token->dependent)) {
+                        $depends[$name][$token->dependent][$token->text] = true;
                     }
                 }
             }
@@ -388,13 +388,13 @@ class Transporter
             }
             // ファイルエントリなら php とみなしてトークンで検出する
             foreach ((array) $name as $file) {
-                $tokens = token_get_all(file_exists($file) ? file_get_contents($file) : "<?php $file;");
+                $tokens = \PhpToken::tokenize(file_exists($file) ? file_get_contents($file) : "<?php $file;");
                 foreach ($tokens as $token) {
-                    if ($token[0] === T_STRING && isset($depends[$token[1]])) {
-                        $main($token[1], $result);
+                    if ($token->id === T_STRING && isset($depends[$token->text])) {
+                        $main($token->text, $result);
                     }
-                    if (in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true)) {
-                        $parts = explode('\\', $token[1]);
+                    if (in_array($token->id, [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true)) {
+                        $parts = explode('\\', $token->text);
                         $main(array_pop($parts), $result);
                     }
                 }

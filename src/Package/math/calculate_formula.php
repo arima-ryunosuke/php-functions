@@ -30,8 +30,7 @@ function calculate_formula($formula)
 {
     // TOKEN_PARSE を渡せばシンタックスチェックも行ってくれる
     $tokens = php_parse("<?php ($formula);", [
-        'phptag' => false,
-        'flags'  => TOKEN_PARSE,
+        'flags' => TOKEN_PARSE,
     ]);
     array_shift($tokens);
     array_pop($tokens);
@@ -43,21 +42,21 @@ function calculate_formula($formula)
     $constant = '';
     $expression = '';
     foreach ($tokens as $token) {
-        if (in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+        if (in_array($token->id, [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
             continue;
         }
-        if (in_array($token[0], $constants, true)) {
-            $constant .= $token[1];
+        if (in_array($token->id, $constants, true)) {
+            $constant .= $token->text;
         }
-        elseif (in_array($token[0], $operands, true) || in_array($token[1], $operators, true)) {
+        elseif (in_array($token->id, $operands, true) || in_array($token->text, $operators, true)) {
             if (strlen($constant)) {
                 $expression .= constant($constant) + 0;
                 $constant = '';
             }
-            $expression .= $token[1];
+            $expression .= $token->text;
         }
         else {
-            throw new \ParseError(sprintf("syntax error, unexpected '%s' in  on line %d", $token[1], $token[2]));
+            throw new \ParseError(sprintf("syntax error, unexpected '%s' in  on line %d", $token->text, $token->line));
         }
     }
     return evaluate("return $expression;");

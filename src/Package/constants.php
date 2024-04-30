@@ -252,9 +252,6 @@ const JSON_TEMPLATE_LITERAL = -105;
 /** json_*** 関数で bare string を文字列として扱うか */
 const JSON_BARE_AS_STRING = -106;
 
-/** parse_php 関数でトークン名変換をするか */
-const TOKEN_NAME = 2;
-
 const SI_UNITS = [
     -8 => ["y"],
     -7 => ["z"],

@@ -43,27 +43,27 @@ function hashvar(...$vars)
 
         // php パーシング
         $starting = false;
-        $tokens = token_get_all('<?php ' . $target);
+        $tokens = \PhpToken::tokenize('<?php ' . $target);
         foreach ($tokens as $token) {
             // トークン配列の場合
-            if (is_array($token)) {
+            if ($token->id >= 255) {
                 // 自身の呼び出しが始まった
-                if (!$starting && $token[0] === T_STRING && $token[1] === $function) {
+                if (!$starting && $token->id === T_STRING && $token->text === $function) {
                     $starting = true;
                 }
                 // 呼び出し中でかつ変数トークンなら変数名を確保
-                elseif ($starting && $token[0] === T_VARIABLE) {
-                    $caller[] = ltrim($token[1], '$');
+                elseif ($starting && $token->id === T_VARIABLE) {
+                    $caller[] = ltrim($token->text, '$');
                 }
                 // 上記以外の呼び出し中のトークンは空白しか許されない
-                elseif ($starting && $token[0] !== T_WHITESPACE) {
+                elseif ($starting && $token->id !== T_WHITESPACE) {
                     throw new \UnexpectedValueException('argument allows variable only.');
                 }
             }
             // 1文字単位の文字列の場合
             else {
                 // 自身の呼び出しが終わった
-                if ($starting && $token === ')' && $caller) {
+                if ($starting && $token->text === ')' && $caller) {
                     $callers[] = $caller;
                     $caller = [];
                     $starting = false;

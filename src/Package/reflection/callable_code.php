@@ -43,7 +43,7 @@ function callable_code($callable)
     ]);
     $end = array_pop($meta);
 
-    if ($end[0] === T_DOUBLE_ARROW) {
+    if ($end->id === T_DOUBLE_ARROW) {
         $body = php_parse("<?php $codeblock", [
             'begin'  => T_DOUBLE_ARROW,
             'end'    => [';', ',', ')'],
@@ -60,5 +60,5 @@ function callable_code($callable)
         ]);
     }
 
-    return [trim(implode('', array_column($meta, 1))), trim(implode('', array_column($body, 1)))];
+    return [trim(implode('', array_column($meta, 'text'))), trim(implode('', array_column($body, 'text')))];
 }

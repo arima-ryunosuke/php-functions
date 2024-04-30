@@ -4,7 +4,6 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_sprintf.php';
 require_once __DIR__ . '/../misc/php_parse.php';
-require_once __DIR__ . '/../constants.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -38,17 +37,17 @@ function func_eval($expression, ...$variadic)
     $args = array_sprintf($variadic, '$%s', ',');
     $cachekey = "$expression($args)";
     if (!isset($cache[$cachekey])) {
-        $tmp = php_parse($expression, TOKEN_NAME);
+        $tmp = php_parse("<?php $expression");
         array_shift($tmp);
         $stmt = '';
         for ($i = 0; $i < count($tmp); $i++) {
-            if (($tmp[$i][1] ?? null) === '$' && $tmp[$i + 1][0] === T_LNUMBER) {
-                $n = $tmp[$i + 1][1] - 1;
+            if (($tmp[$i]->text ?? null) === '$' && $tmp[$i + 1]->id === T_LNUMBER) {
+                $n = $tmp[$i + 1]->text - 1;
                 $stmt .= "func_get_arg($n)";
                 $i++;
             }
             else {
-                $stmt .= $tmp[$i][1];
+                $stmt .= $tmp[$i]->text;
             }
         }
         $cache[$cachekey] = eval("return function($args) { return $stmt; };");

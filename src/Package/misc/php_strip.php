@@ -39,11 +39,7 @@ function php_strip($phtml, $option = [], &$mapping = [])
         'short_open_tag' => true,
         'trailing_break' => true,
         'replacer'       => func_num_args() === 3 ? null : '',
-    ], $option, [
-        //'flags'  => Syntax::TOKEN_NAME,
-        //'cache'  => false,
-        'phptag' => false,
-    ]);
+    ], $option);
 
     $replacer = $option['replacer'];
     if ($replacer === '') {
@@ -63,24 +59,24 @@ function php_strip($phtml, $option = [], &$mapping = [])
         $echoopen = false;
         $taglength = strlen('?>');
         foreach ($tmp as $token) {
-            if ($token[0] === T_OPEN_TAG_WITH_ECHO) {
+            if ($token->id === T_OPEN_TAG_WITH_ECHO) {
                 $echoopen = true;
             }
-            if ($echoopen && $token[0] === T_CLOSE_TAG && isset($token[1][$taglength])) {
+            if ($echoopen && $token->id === T_CLOSE_TAG && isset($token->text[$taglength])) {
                 $echoopen = false;
 
-                $tokens[] = [
-                    $token[0],
-                    rtrim($token[1]),
-                    $token[2],
-                    $token[3],
-                ];
-                $tokens[] = [
+                $tokens[] = new \PhpToken(
+                    $token->id,
+                    rtrim($token->text),
+                    $token->line,
+                    $token->pos,
+                );
+                $tokens[] = new \PhpToken(
                     T_INLINE_HTML,
-                    substr($token[1], $taglength),
-                    $token[2],
-                    $token[3] + $taglength,
-                ];
+                    substr($token->text, $taglength),
+                    $token->line,
+                    $token->pos + $taglength,
+                );
             }
             else {
                 $tokens[] = $token;
@@ -90,12 +86,12 @@ function php_strip($phtml, $option = [], &$mapping = [])
 
     $offsets = [];
     foreach ($tokens as $token) {
-        if ($token[0] === T_OPEN_TAG || $token[0] === T_OPEN_TAG_WITH_ECHO) {
-            $offsets[] = [$token[3], null];
+        if ($token->id === T_OPEN_TAG || $token->id === T_OPEN_TAG_WITH_ECHO) {
+            $offsets[] = [$token->pos, null];
         }
-        elseif ($token[0] === T_CLOSE_TAG) {
+        elseif ($token->id === T_CLOSE_TAG) {
             $lastkey = count($offsets) - 1;
-            $offsets[$lastkey][1] = $token[3] + strlen($token[1]) - $offsets[$lastkey][0];
+            $offsets[$lastkey][1] = $token->pos + strlen($token->text) - $offsets[$lastkey][0];
         }
     }
     if ($offsets) {

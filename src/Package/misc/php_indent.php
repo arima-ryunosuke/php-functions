@@ -79,60 +79,56 @@ function php_indent($phpcode, $options = [])
     preg_match('@^[ \t]*@u', $lines[$baseline] ?? '', $matches);
     $indent = $matches[0] ?? '';
 
-    $tmp = token_get_all("<?php $phpcode");
+    $tmp = \PhpToken::tokenize("<?php $phpcode");
     array_shift($tmp);
 
     // トークンの正規化
     $tokens = [];
     for ($i = 0; $i < count($tmp); $i++) {
-        if (is_string($tmp[$i])) {
-            $tmp[$i] = [-1, $tmp[$i], null];
-        }
-
         if ($options['heredoc']) {
             // 行コメントと同じ（T_START_HEREDOC には改行が含まれている）
-            if ($tmp[$i][0] === T_START_HEREDOC && preg_match('@^(<<<).*?(\\R)@um', $tmp[$i][1], $matches)) {
-                $tmp[$i][1] = trim($tmp[$i][1]);
-                if (($tmp[$i + 1][0] ?? null) === T_ENCAPSED_AND_WHITESPACE) {
-                    $tmp[$i + 1][1] = $matches[2] . $tmp[$i + 1][1];
+            if ($tmp[$i]->id === T_START_HEREDOC && preg_match('@^(<<<).*?(\\R)@um', $tmp[$i]->text, $matches)) {
+                $tmp[$i]->text = trim($tmp[$i]->text);
+                if (($tmp[$i + 1]->id ?? null) === T_ENCAPSED_AND_WHITESPACE) {
+                    $tmp[$i + 1]->text = $matches[2] . $tmp[$i + 1]->text;
                 }
                 else {
-                    array_splice($tmp, $i + 1, 0, [[T_ENCAPSED_AND_WHITESPACE, $matches[2], null]]);
+                    array_splice($tmp, $i + 1, 0, [new \PhpToken(T_ENCAPSED_AND_WHITESPACE, $matches[2])]);
                 }
             }
             // php 7.3 において T_END_HEREDOC は必ず単一行になる
-            if ($tmp[$i][0] === T_ENCAPSED_AND_WHITESPACE) {
-                if (($tmp[$i + 1][0] ?? null) === T_END_HEREDOC && preg_match('@^(\\s+)(.*)@um', $tmp[$i + 1][1], $matches)) {
-                    $tmp[$i][1] = $tmp[$i][1] . $matches[1];
-                    $tmp[$i + 1][1] = $matches[2];
+            if ($tmp[$i]->id === T_ENCAPSED_AND_WHITESPACE) {
+                if (($tmp[$i + 1]->id ?? null) === T_END_HEREDOC && preg_match('@^(\\s+)(.*)@um', $tmp[$i + 1]->text, $matches)) {
+                    $tmp[$i]->text = $tmp[$i]->text . $matches[1];
+                    $tmp[$i + 1]->text = $matches[2];
                 }
             }
         }
 
-        $tokens[] = $tmp[$i] + [3 => token_name($tmp[$i][0])];
+        $tokens[] = $tmp[$i];
     }
 
     // 改行を置換してインデント
     $hereing = false;
     foreach ($tokens as $i => $token) {
         if ($options['heredoc']) {
-            if ($token[0] === T_START_HEREDOC) {
+            if ($token->id === T_START_HEREDOC) {
                 $hereing = true;
             }
-            if ($token[0] === T_END_HEREDOC) {
+            if ($token->id === T_END_HEREDOC) {
                 $hereing = false;
             }
         }
-        if (in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true) || ($hereing && $token[0] === T_ENCAPSED_AND_WHITESPACE)) {
-            $token[1] = preg_replace("@(\\R)$indent@um", '$1' . $options['indent'], $token[1]);
+        if (in_array($token->id, [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true) || ($hereing && $token->id === T_ENCAPSED_AND_WHITESPACE)) {
+            $token->text = preg_replace("@(\\R)$indent@um", '$1' . $options['indent'], $token->text);
         }
         if ($options['trimempty']) {
-            if ($token[0] === T_WHITESPACE) {
-                $token[1] = preg_replace("@(\\R)[ \\t]+(\\R)@um", '$1$2', $token[1]);
+            if ($token->id === T_WHITESPACE) {
+                $token->text = preg_replace("@(\\R)[ \\t]+(\\R)@um", '$1$2', $token->text);
             }
         }
 
         $tokens[$i] = $token;
     }
-    return implode('', array_column($tokens, 1));
+    return implode('', array_column($tokens, 'text'));
 }

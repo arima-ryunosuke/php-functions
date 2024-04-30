@@ -139,33 +139,38 @@ function var_export3($value, $return = false)
         $var_export = fn($v) => var_export($v, true);
         $neighborToken = function ($n, $d, $tokens) {
             for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
-                if ($tokens[$i][0] !== T_WHITESPACE) {
+                if ($tokens[$i]->id !== T_WHITESPACE) {
                     return $tokens[$i];
                 }
             }
         };
         $resolveSymbol = function ($token, $prev, $next, $ref) use ($var_export) {
-            if ($token[0] === T_STRING) {
-                if ($prev[0] === T_NEW || $next[0] === T_DOUBLE_COLON || $next[0] === T_VARIABLE || $next[1] === '{') {
-                    $token[1] = namespace_resolve($token[1], $ref->getFileName(), 'alias') ?? $token[1];
+            $text = $token->text;
+            if ($token->id === T_STRING) {
+                if ($prev->id === T_NEW || $next->id === T_DOUBLE_COLON || $next->id === T_VARIABLE || $next->text === '{') {
+                    $text = namespace_resolve($text, $ref->getFileName(), 'alias') ?? $text;
                 }
-                elseif ($next[1] === '(') {
-                    $token[1] = namespace_resolve($token[1], $ref->getFileName(), 'function') ?? $token[1];
+                elseif ($next->text === '(') {
+                    $text = namespace_resolve($text, $ref->getFileName(), 'function') ?? $text;
                 }
                 else {
-                    $token[1] = namespace_resolve($token[1], $ref->getFileName(), 'const') ?? $token[1];
+                    $text = namespace_resolve($text, $ref->getFileName(), 'const') ?? $text;
                 }
             }
 
             // マジック定数の解決（__CLASS__, __TRAIT__ も書き換えなければならないが、非常に大変なので下記のみ）
-            if ($token[0] === T_FILE) {
-                $token[1] = $var_export($ref->getFileName());
+            if ($token->id === T_FILE) {
+                $text = $var_export($ref->getFileName());
             }
-            if ($token[0] === T_DIR) {
-                $token[1] = $var_export(dirname($ref->getFileName()));
+            if ($token->id === T_DIR) {
+                $text = $var_export(dirname($ref->getFileName()));
             }
-            if ($token[0] === T_NS_C) {
-                $token[1] = $var_export($ref->getNamespaceName());
+            if ($token->id === T_NS_C) {
+                $text = $var_export($ref->getNamespaceName());
+            }
+            if ($text !== null) {
+                $token = clone $token;
+                $token->text = $text;
             }
             return $token;
         };
@@ -242,7 +247,7 @@ function var_export3($value, $return = false)
 
             [$meta, $body] = callable_code($value);
             $arrow = starts_with($meta, 'fn') ? ' => ' : ' ';
-            $tokens = array_slice(php_parse("$meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
+            $tokens = array_slice(php_parse("<?php $meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
 
             $uses = [];
             $context = [
@@ -250,35 +255,35 @@ function var_export3($value, $return = false)
                 'brace' => 0,
             ];
             foreach ($tokens as $n => $token) {
-                $prev = $neighborToken($n, -1, $tokens) ?? [null, null, null];
-                $next = $neighborToken($n, +1, $tokens) ?? [null, null, null];
+                $prev = $neighborToken($n, -1, $tokens) ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                $next = $neighborToken($n, +1, $tokens) ?? (object) ['id' => null, 'text' => null, 'line' => null];
 
                 // クロージャは何でもかける（クロージャ・無名クラス・ジェネレータ etc）のでネスト（ブレース）レベルを記録しておく
-                if ($token[1] === '{') {
+                if ($token->text === '{') {
                     $context['brace']++;
                 }
-                if ($token[1] === '}') {
+                if ($token->text === '}') {
                     $context['brace']--;
                 }
 
                 // 無名クラスは色々厄介なので読み飛ばすために覚えておく
-                if ($prev[0] === T_NEW && $token[0] === T_CLASS) {
+                if ($prev->id === T_NEW && $token->id === T_CLASS) {
                     $context['class'] = $context['brace'];
                 }
                 // そして無名クラスは色々かける上に終了条件が自明ではない（シンタックスエラーでない限りは {} が一致するはず）
-                if ($token[1] === '}' && $context['class'] === $context['brace']) {
+                if ($token->text === '}' && $context['class'] === $context['brace']) {
                     $context['class'] = 0;
                 }
 
                 // fromCallable 由来だと名前がついてしまう
-                if (!$context['class'] && $prev[0] === T_FUNCTION && $token[0] === T_STRING) {
+                if (!$context['class'] && $prev->id === T_FUNCTION && $token->id === T_STRING) {
                     unset($tokens[$n]);
                     continue;
                 }
 
                 // use 変数の導出
-                if ($token[0] === T_VARIABLE) {
-                    $varname = substr($token[1], 1);
+                if ($token->id === T_VARIABLE) {
+                    $varname = substr($token->text, 1);
                     // クロージャ内クロージャの use に反応してしまうので存在するときのみとする
                     if (array_key_exists($varname, $statics) && !isset($uses[$varname])) {
                         $recurself = $statics[$varname] === $value ? '&' : '';
@@ -289,7 +294,7 @@ function var_export3($value, $return = false)
                 $tokens[$n] = $resolveSymbol($token, $prev, $next, $ref);
             }
 
-            $code = php_indent(implode('', array_column($tokens, 1)), [
+            $code = php_indent(implode('', array_column($tokens, 'text')), [
                 'indent'   => $spacer1,
                 'baseline' => -1,
             ]);
@@ -358,7 +363,7 @@ function var_export3($value, $return = false)
                 $fname = $ref->getFileName();
                 $sline = $ref->getStartLine();
                 $eline = $ref->getEndLine();
-                $tokens = php_parse(implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
+                $tokens = php_parse('<?php ' . implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
 
                 $block = [];
                 $starting = false;
@@ -369,7 +374,7 @@ function var_export3($value, $return = false)
                     $next = $neighborToken($n, +1, $tokens) ?? [null, null, null];
 
                     // 無名クラスは new class で始まるはず
-                    if ($token[0] === T_NEW && $next[0] === T_CLASS) {
+                    if ($token->id === T_NEW && $next->id === T_CLASS) {
                         $starting = true;
                     }
                     if (!$starting) {
@@ -378,10 +383,10 @@ function var_export3($value, $return = false)
 
                     // コンストラクタの呼び出し引数はスキップする
                     if ($constructing !== null) {
-                        if ($token[1] === '(') {
+                        if ($token->text === '(') {
                             $constructing++;
                         }
-                        if ($token[1] === ')') {
+                        if ($token->text === ')') {
                             $constructing--;
                             if ($constructing === 0) {
                                 $constructing = null;          // null を終了済みマークとして変数を再利用している
@@ -395,16 +400,17 @@ function var_export3($value, $return = false)
                     }
 
                     // 引数ありコンストラクタは呼ばないのでリネームしておく
-                    if ($token[1] === '__construct' && $ref->getConstructor() && $ref->getConstructor()->getNumberOfRequiredParameters()) {
-                        $token[1] = "replaced__construct";
+                    if ($token->text === '__construct' && $ref->getConstructor() && $ref->getConstructor()->getNumberOfRequiredParameters()) {
+                        $token = clone $token;
+                        $token->text = "replaced__construct";
                     }
 
                     $block[] = $resolveSymbol($token, $prev, $next, $ref);
 
-                    if ($token[1] === '{') {
+                    if ($token->text === '{') {
                         $nesting++;
                     }
-                    if ($token[1] === '}') {
+                    if ($token->text === '}') {
                         $nesting--;
                         if ($nesting === 0) {
                             break;
@@ -412,7 +418,7 @@ function var_export3($value, $return = false)
                     }
                 }
 
-                $code = php_indent(implode('', array_column($block, 1)), [
+                $code = php_indent(implode('', array_column($block, 'text')), [
                     'indent'   => $spacer1,
                     'baseline' => -1,
                 ]);

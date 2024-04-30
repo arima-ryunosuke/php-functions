@@ -92,10 +92,10 @@ function ob_stdout()
             $contents = preg_split('#\\R#u', $content);
 
             // 実行のたびに増えていくことになるので既存の出力コメントは捨てる
-            foreach (token_get_all($content) as $token) {
-                if (is_array($token) && $token[0] === T_COMMENT && strpos($token[1], "/*= ") === 0) {
-                    $comments = preg_split('#\\R#u', $token[1]);
-                    array_splice($contents, $token[2] - 1, count($comments), array_pad([], count($comments), null));
+            foreach (\PhpToken::tokenize($content) as $token) {
+                if ($token->id === T_COMMENT && strpos($token->text, "/*= ") === 0) {
+                    $comments = preg_split('#\\R#u', $token->text);
+                    array_splice($contents, $token->line - 1, count($comments), array_pad([], count($comments), null));
                 }
             }
 

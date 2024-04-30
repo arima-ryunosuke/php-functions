@@ -54,7 +54,7 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
     function test_getAllConstant()
     {
         that(Transporter::class)::getAllConstant(true)
-            ->arrayHasKey('TOKEN_NAME')
+            ->arrayHasKey('IS_OWNSELF')
             ->arrayHasKey('SORT_STRICT');
     }
 

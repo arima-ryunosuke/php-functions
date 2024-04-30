@@ -228,24 +228,25 @@ function class_extends($object, $methods, $fields = [], $implements = [])
         $rtype = $rtype ? ": $rtype" : '';
 
         [, $codeblock] = callable_code($override);
-        $tokens = php_parse($codeblock);
+        $tokens = php_parse('<?php ' . $codeblock);
         array_shift($tokens);
         $parented = null;
         foreach ($tokens as $n => $token) {
-            if ($token[0] !== T_WHITESPACE) {
-                if ($token[0] === T_STRING && $token[1] === 'parent') {
+            if ($token->id !== T_WHITESPACE) {
+                if ($token->id === T_STRING && $token->text === 'parent') {
                     $parented = $n;
                 }
-                elseif ($parented !== null && $token[0] === T_DOUBLE_COLON) {
+                elseif ($parented !== null && $token->id === T_DOUBLE_COLON) {
                     unset($tokens[$parented]);
-                    $tokens[$n][1] = $receiver;
+                    $tokens[$n] = clone $tokens[$n];
+                    $tokens[$n]->text = $receiver;
                 }
                 else {
                     $parented = null;
                 }
             }
         }
-        $codeblock = implode('', array_column($tokens, 1));
+        $codeblock = implode('', array_column($tokens, 'text'));
 
         $prms = implode(', ', $params);
         $declares .= "#[\ReturnTypeWillChange]\n$modifier function $ref$name($prms)$rtype $codeblock\n";

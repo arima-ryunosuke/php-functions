@@ -91,8 +91,8 @@ function namespace_parse($filename, $options = [])
     return cache($filename, function () use ($filename) {
         $stringify = function ($tokens) {
             return trim(implode('', array_column(array_filter($tokens, function ($token) {
-                return in_array($token[0], [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true);
-            }), 1)), '\\');
+                return in_array($token->id, [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true);
+            }), 'text')), '\\');
         };
 
         $keys = [
@@ -105,7 +105,7 @@ function namespace_parse($filename, $options = [])
             T_FUNCTION  => 'function',
         ];
 
-        $contents = "?>" . file_get_contents($filename);
+        $contents = file_get_contents($filename);
         $namespace = '';
         $tokens = [-1 => null];
         $result = [];
@@ -121,14 +121,14 @@ function namespace_parse($filename, $options = [])
             }
             $token = reset($tokens);
             // define は現在の名前空間とは無関係に名前空間定数を宣言することができる
-            if ($token[0] === T_STRING && $token[1] === "define") {
+            if ($token->id === T_STRING && $token->text === "define") {
                 $tokens = php_parse($contents, [
                     'flags'  => TOKEN_PARSE,
                     'begin'  => [T_CONSTANT_ENCAPSED_STRING],
                     'end'    => [T_CONSTANT_ENCAPSED_STRING],
                     'offset' => last_key($tokens),
                 ]);
-                $cname = substr(implode('', array_column($tokens, 1)), 1, -1);
+                $cname = substr(implode('', array_column($tokens, 'text')), 1, -1);
                 $define = trim(json_decode("\"$cname\""), '\\');
                 [$ns, $nm] = namespace_split($define);
                 if (!isset($result[$ns])) {
@@ -138,9 +138,9 @@ function namespace_parse($filename, $options = [])
                         'alias'    => [],
                     ];
                 }
-                $result[$ns][$keys[$token[0]]][$nm] = $define;
+                $result[$ns][$keys[$token->id]][$nm] = $define;
             }
-            switch ($token[0]) {
+            switch ($token->id) {
                 case T_NAMESPACE:
                     $namespace = $stringify($tokens);
                     $result[$namespace] = [
@@ -150,10 +150,10 @@ function namespace_parse($filename, $options = [])
                     ];
                     break;
                 case T_USE:
-                    $tokenCorF = array_find($tokens, fn($token) => ($token[0] === T_CONST || $token[0] === T_FUNCTION) ? $token[0] : 0, false);
+                    $tokenCorF = array_find($tokens, fn($token) => ($token->id === T_CONST || $token->id === T_FUNCTION) ? $token->id : 0, false);
 
                     $prefix = '';
-                    if (end($tokens)[1] === '{') {
+                    if (end($tokens)->text === '{') {
                         $prefix = $stringify($tokens);
                         $tokens = php_parse($contents, [
                             'flags'  => TOKEN_PARSE,
@@ -163,9 +163,9 @@ function namespace_parse($filename, $options = [])
                         ]);
                     }
 
-                    $multi = array_explode($tokens, fn($token) => $token[1] === ',');
+                    $multi = array_explode($tokens, fn($token) => $token->text === ',');
                     foreach ($multi as $ttt) {
-                        $as = array_explode($ttt, fn($token) => $token[0] === T_AS);
+                        $as = array_explode($ttt, fn($token) => $token->id === T_AS);
 
                         $alias = $stringify($as[0]);
                         if (isset($as[1])) {
@@ -183,10 +183,10 @@ function namespace_parse($filename, $options = [])
                 case T_TRAIT:
                     $alias = $stringify($tokens);
                     if (strlen($alias)) {
-                        $result[$namespace][$keys[$token[0]]][$alias] = concat($namespace, '\\') . $alias;
+                        $result[$namespace][$keys[$token->id]][$alias] = concat($namespace, '\\') . $alias;
                     }
                     // ブロック内に興味はないので進めておく（function 内 function などはあり得るが考慮しない）
-                    if ($token[0] !== T_CONST) {
+                    if ($token->id !== T_CONST) {
                         $tokens = php_parse($contents, [
                             'flags'  => TOKEN_PARSE,
                             'begin'  => ['{'],

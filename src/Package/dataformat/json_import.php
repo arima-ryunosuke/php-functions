@@ -98,7 +98,7 @@ function json_import($value, $options = [])
 
         public function __construct($json_string)
         {
-            $this->json_string = "[$json_string]";
+            $this->json_string = "<?php [$json_string]";
         }
 
         public function parse($options)
@@ -111,22 +111,22 @@ function json_import($value, $options = [])
             $braces = [];
             for ($i = 0; $i < count($tokens); $i++) {
                 $token = $tokens[$i];
-                if ($token[1] === '{' || $token[1] === '[') {
+                if ($token->text === '{' || $token->text === '[') {
                     if ($options[JSON_MAX_DEPTH] <= count($braces) + 1) {
                         throw $this->exception("Maximum stack depth exceeded", $token);
                     }
                     $braces[] = $i;
                 }
-                elseif ($token[1] === '}' || $token[1] === ']') {
+                elseif ($token->text === '}' || $token->text === ']') {
                     if (!$braces) {
                         throw $this->exception("Mismatch", $token);
                     }
                     $brace = array_pop($braces);
-                    if ($tokens[$brace][1] !== '{' && $token[1] === '}' || $tokens[$brace][1] !== '[' && $token[1] === ']') {
+                    if ($tokens[$brace]->text !== '{' && $token->text === '}' || $tokens[$brace]->text !== '[' && $token->text === ']') {
                         throw $this->exception("Mismatch", $token);
                     }
-                    $block = array_filter(array_slice(array_splice($tokens, $brace + 1, $i - $brace, []), 0, -1), fn($token) => !(is_array($token) && in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_BAD_CHARACTER], true)));
-                    $elements = array_explode($block, fn($token) => is_array($token) && $token[1] === ',');
+                    $block = array_filter(array_slice(array_splice($tokens, $brace + 1, $i - $brace, []), 0, -1), fn($token) => !(!$token instanceof $this && in_array($token->id, [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_BAD_CHARACTER], true)));
+                    $elements = array_explode($block, fn($token) => !$token instanceof $this && $token->text === ',');
                     // for trailing comma
                     if ($elements && !$elements[count($elements) - 1]) {
                         array_pop($elements);
@@ -136,44 +136,44 @@ function json_import($value, $options = [])
                         throw $this->exception("Missing element", $token);
                     }
                     $i = $brace;
-                    if ($token[1] === '}') {
-                        $object = $this->token('object', $tokens[$brace][3], $token[3] + strlen($token[1]));
+                    if ($token->text === '}') {
+                        $object = $this->token('object', $tokens[$brace]->pos, $token->pos + strlen($token->text));
                         foreach ($elements as $element) {
-                            $keyandval = array_explode($element, fn($token) => is_array($token) && $token[1] === ':');
+                            $keyandval = array_explode($element, fn($token) => !$token instanceof $this && $token->text === ':');
                             // check no colon (e.g. {123})
                             if (count($keyandval) !== 2) {
                                 throw $this->exception("Missing object key", first_value($keyandval[0]));
                             }
                             // check objective key (e.g. {[1]: 123})
-                            if (($k = array_find($keyandval[0], 'is_object')) !== null) {
+                            if (($k = array_find($keyandval[0], fn($v) => $v instanceof $this)) !== null) {
                                 throw $this->exception("Unexpected object key", $keyandval[0][$k]);
                             }
                             // check consecutive objective value (e.g. {k: 123 [1]})
-                            if (!(count($keyandval[1]) === 1 && count(array_filter($keyandval[1], 'is_object')) === 1 || count(array_filter($keyandval[1], 'is_array')) === count($keyandval[1]))) {
+                            if (!(count($keyandval[1]) === 1 && count(array_filter($keyandval[1], fn($v) => $v instanceof $this)) === 1 || count(array_filter($keyandval[1], fn($v) => !$v instanceof $this)) === count($keyandval[1]))) {
                                 throw $this->exception("Unexpected object value", $token);
                             }
                             $key = first_value($keyandval[0]);
                             $lastkey = last_value($keyandval[0]);
                             $val = first_value($keyandval[1]);
                             $lastval = last_value($keyandval[1]);
-                            if (!is_object($val)) {
-                                $val = $this->token('value', $val[3], $lastval[3] + strlen($lastval[1]));
+                            if (!$val instanceof $this) {
+                                $val = $this->token('value', $val->pos, $lastval->pos + strlen($lastval->text));
                             }
-                            $object->append($this->token('key', $key[3], $lastkey[3] + strlen($lastkey[1])), $val);
+                            $object->append($this->token('key', $key->pos, $lastkey->pos + strlen($lastkey->text)), $val);
                         }
                         $tokens[$brace] = $object;
                     }
-                    if ($token[1] === ']') {
-                        $array = $this->token('array', $tokens[$brace][3], $token[3] + strlen($token[1]));
+                    if ($token->text === ']') {
+                        $array = $this->token('array', $tokens[$brace]->pos, $token->pos + strlen($token->text));
                         foreach ($elements as $element) {
                             // check consecutive objective value (e.g. [123 [1]])
-                            if (!(count($element) === 1 && count(array_filter($element, 'is_object')) === 1 || count(array_filter($element, 'is_array')) === count($element))) {
+                            if (!(count($element) === 1 && count(array_filter($element, fn($v) => $v instanceof $this)) === 1 || count(array_filter($element, fn($v) => !$v instanceof $this)) === count($element))) {
                                 throw $this->exception("Unexpected array value", $token);
                             }
                             $val = first_value($element);
                             $lastval = last_value($element);
-                            if (!is_object($val)) {
-                                $val = $this->token('value', $val[3], $lastval[3] + strlen($lastval[1]));
+                            if (!$val instanceof $this) {
+                                $val = $this->token('value', $val->pos, $lastval->pos + strlen($lastval->text));
                             }
                             $array->append(null, $val);
                         }
@@ -336,16 +336,15 @@ function json_import($value, $options = [])
 
         private function exception($message, $token)
         {
-            $line = $column = $word = null;
-            if (is_array($token)) {
-                $line = $token[2];
-                $column = $token[3] - strrpos($this->json_string, "\n", $token[3] - strlen($this->json_string));
-                $word = $token[1];
-            }
-            if (is_object($token)) {
+            if ($token instanceof $this) {
                 $line = substr_count($token->json_string, "\n", 0, $token->begin_position) + 1;
                 $column = $token->begin_position - strrpos($token->json_string, "\n", $token->begin_position - strlen($token->json_string));
                 $word = substr($token->json_string, $token->begin_position, $token->end_position - $token->begin_position);
+            }
+            else {
+                $line = $token->line;
+                $column = $token->pos - strrpos($this->json_string, "\n", $token->pos - strlen($this->json_string));
+                $word = $token->text;
             }
             return new \ErrorException(sprintf("%s '%s' at line %d column %d of the JSON5 data", $message, $word, $line, $column));
         }

@@ -709,46 +709,41 @@ function sql_format($sql, $options = [])
     $tokens = [];
     $comment = '';
     $last = [];
-    foreach (token_get_all("<?php $sql") as $token) {
-        // トークンは配列だったり文字列だったりするので -1 トークンとして配列に正規化
-        if (is_string($token)) {
-            $token = [-1, $token];
-        }
-
+    foreach (\PhpToken::tokenize("<?php $sql") as $token) {
         // パースのために無理やり <?php を付けているので無視
-        if ($token[0] === T_OPEN_TAG) {
+        if ($token->id === T_OPEN_TAG) {
             continue;
         }
 
         // '--' は php ではデクリメントだが sql ではコメントなので特別扱いする
-        if ($token[0] === T_DEC) {
-            $comment = $token[1];
+        if ($token->id === T_DEC) {
+            $comment = $token->text;
         }
         // 改行は '--' コメントの終わり
-        elseif ($comment && in_array($token[0], [T_WHITESPACE, T_COMMENT], true) && strpos($token[1], "\n") !== false) {
-            $tokens[] = [T_COMMENT, $comment . $token[1]];
+        elseif ($comment && in_array($token->id, [T_WHITESPACE, T_COMMENT], true) && strpos($token->text, "\n") !== false) {
+            $tokens[] = new \PhpToken(T_COMMENT, $comment . $token->text);
             $comment = '';
         }
         // コメント中はコメントに格納する
         elseif ($comment) {
-            $comment .= $token[1];
+            $comment .= $token->text;
         }
         // END IF, END LOOP などは一つのトークンとする
-        elseif (strtoupper($last[1] ?? '') === 'END' && in_array(strtoupper($token[1]), ['CASE', 'IF', 'LOOP', 'REPEAT', 'WHILE'], true)) {
-            $tokens[array_key_last($tokens)][1] .= " " . $token[1];
+        elseif (strtoupper($last->text ?? '') === 'END' && in_array(strtoupper($token->text), ['CASE', 'IF', 'LOOP', 'REPEAT', 'WHILE'], true)) {
+            $tokens[array_key_last($tokens)]->text .= " " . $token->text;
         }
         // 上記以外はただのトークンとして格納する
         else {
             // `string` のような文字列は T_ENCAPSED_AND_WHITESPACE として得られる（ただし ` がついていないので付与）
-            if ($token[0] === T_ENCAPSED_AND_WHITESPACE) {
-                $tokens[] = [$token[0], "`{$token[1]}`"];
+            if ($token->id === T_ENCAPSED_AND_WHITESPACE) {
+                $tokens[] = new \PhpToken($token->id, "`{$token->text}`");
             }
-            elseif ($token[0] !== T_WHITESPACE && $token[1] !== '`') {
-                $tokens[] = [$token[0], $token[1]];
+            elseif ($token->id !== T_WHITESPACE && $token->text !== '`') {
+                $tokens[] = new \PhpToken($token->id, $token->text);
             }
         }
 
-        if ($token[0] !== T_WHITESPACE) {
+        if ($token->id !== T_WHITESPACE) {
             $last = $token;
         }
     }
@@ -762,11 +757,11 @@ function sql_format($sql, $options = [])
                 break;
             }
             $token = $tokens[$index];
-            if ($token[0] === T_COMMENT || $token[0] === T_DOC_COMMENT) {
-                $comments[] = trim($token[1]);
+            if ($token->id === T_COMMENT || $token->id === T_DOC_COMMENT) {
+                $comments[] = trim($token->text);
             }
             else {
-                return [$index, trim($token[1]), $comments];
+                return [$index, trim($token->text), $comments];
             }
         }
         return [$start, '', $comments];
@@ -782,9 +777,9 @@ function sql_format($sql, $options = [])
         $result = [];
         for ($token_length = count($tokens); $index < $token_length; $index++) {
             $token = $tokens[$index];
-            $ttype = $token[0];
+            $ttype = $token->id;
 
-            $rawtoken = trim($token[1]);
+            $rawtoken = trim($token->text);
             $virttoken = $options['syntaxer']($rawtoken, $ttype);
             $uppertoken = strtoupper($rawtoken);
 
