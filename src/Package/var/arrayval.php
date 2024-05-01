@@ -22,7 +22,7 @@ require_once __DIR__ . '/../var/is_primitive.php';
  * that(arrayval([123]))->isSame([123]); // 配列は配列のまま
  *
  * // $recursive = false にしない限り再帰的に適用される
- * $stdclass = stdclass(['key' => 'val']);
+ * $stdclass = (object) ['key' => 'val'];
  * that(arrayval([$stdclass], true))->isSame([['key' => 'val']]); // true なので中身も配列化される
  * that(arrayval([$stdclass], false))->isSame([$stdclass]);       // false なので中身は変わらない
  * ```

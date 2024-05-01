@@ -4,7 +4,6 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../pcre/preg_replaces.php';
 require_once __DIR__ . '/../random/unique_string.php';
-require_once __DIR__ . '/../syntax/throws.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -661,7 +660,7 @@ function sql_format($sql, $options = [])
                 'NUMBER'  => fn($token) => "<span style='color:#0000BB;'>" . htmlspecialchars($token, ENT_QUOTES) . "</span>",
             ],
         ];
-        $rule = $rules[$options['highlight']] ?? throws(new \InvalidArgumentException('highlight must be "cli" or "html".'));
+        $rule = $rules[$options['highlight']] ?? throw new \InvalidArgumentException('highlight must be "cli" or "html".');
         $options['highlight'] = function ($token, $ttype) use ($keywords, $rule) {
             switch (true) {
                 case isset($keywords[strtoupper($token)]):

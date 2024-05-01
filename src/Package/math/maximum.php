@@ -3,7 +3,6 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_flatten.php';
-require_once __DIR__ . '/../syntax/throws.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -24,6 +23,6 @@ require_once __DIR__ . '/../syntax/throws.php';
  */
 function maximum(...$variadic)
 {
-    $args = array_flatten($variadic) or throws(new \LengthException("argument's length is 0."));
+    $args = array_flatten($variadic) or throw new \LengthException("argument's length is 0.");
     return max($args);
 }

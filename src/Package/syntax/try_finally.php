@@ -2,7 +2,6 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../syntax/throws.php';
 require_once __DIR__ . '/../syntax/try_catch_finally.php';
 // @codeCoverageIgnoreEnd
 
@@ -34,5 +33,5 @@ require_once __DIR__ . '/../syntax/try_catch_finally.php';
  */
 function try_finally($try, $finally = null, ...$variadic)
 {
-    return try_catch_finally($try, fn(...$args) => throws(...$args), $finally, ...$variadic);
+    return try_catch_finally($try, fn($arg) => throw $arg, $finally, ...$variadic);
 }

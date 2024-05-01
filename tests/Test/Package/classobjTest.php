@@ -18,11 +18,9 @@ use function ryunosuke\Functions\Package\object_dive;
 use function ryunosuke\Functions\Package\object_id;
 use function ryunosuke\Functions\Package\object_properties;
 use function ryunosuke\Functions\Package\object_storage;
-use function ryunosuke\Functions\Package\optional;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\register_autoload_function;
 use function ryunosuke\Functions\Package\rm_rf;
-use function ryunosuke\Functions\Package\stdclass;
 use function ryunosuke\Functions\Package\type_exists;
 use function ryunosuke\Functions\Package\var_export2;
 use const ryunosuke\Functions\Package\IS_OWNSELF;
@@ -400,13 +398,13 @@ class classobjTest extends AbstractTestCase
 
     function test_object_dive()
     {
-        $class = stdclass([
-            'a' => stdclass([
-                'b' => stdclass([
+        $class = (object) [
+            'a' => (object) [
+                'b' => (object) [
                     'c' => 'abc',
-                ]),
-            ]),
-        ]);
+                ],
+            ],
+        ];
         that(object_dive($class, 'a.b.c'))->is('abc');
         that(object_dive($class, 'a.b.c.x', 'none'))->is('none');
         that(object_dive($class, 'a.b.X', 'none'))->is('none');
@@ -597,75 +595,6 @@ class classobjTest extends AbstractTestCase
         that($test_storage)->get('hoge')->wasThrown('supports only object or resource');
     }
 
-    function test_optional()
-    {
-        $o = new \Concrete('hoge');
-        $o->hoge = 'hoge';
-        $o->value = 'hoge';
-
-        // method
-        that(optional($o)->getName())->isSame('hoge');
-        // property
-        that(optional($o)->value)->isSame('hoge');
-        // __isset
-        that(isset(optional($o)->hoge))->isSame(true);
-        // __get
-        that(optional($o)->hoge)->isSame('hoge');
-        // __call
-        that(optional($o)->hoge())->isSame('hoge');
-        // __invoke
-        that(optional($o)())->isSame('Concrete::__invoke');
-        // __toString
-        that((string) optional($o))->isSame('hoge');
-        // offsetExists
-        that(empty(optional($o)['hoge']))->isSame(false);
-        // offsetGet
-        that(optional($o)['hoge'])->isSame('hoge');
-        // iterator
-        that(iterator_to_array(optional($o)))->isNotEmpty();
-        // count
-        that(count(optional($o)))->is(4);
-        // json
-        that(json_encode(optional($o)))->is("\"hoge\"");
-
-        $o = null;
-
-        // method
-        that(optional($o)->getName())->isSame(null);
-        // property
-        that(optional($o)->value)->isSame(null);
-        // __isset
-        that(isset(optional($o)->hoge))->isSame(false);
-        // __get
-        that(optional($o)->hoge)->isSame(null);
-        // __call
-        that(optional($o)->hoge())->isSame(null);
-        // __invoke
-        that(optional($o)())->isSame(null);
-        // __toString
-        that((string) optional($o))->isSame('');
-        // offsetExists
-        that(empty(optional($o)['hoge']))->isSame(true);
-        // offsetGet
-        that(optional($o)['hoge'])->isSame(null);
-        // iterator
-        that(iterator_to_array(optional($o)))->isEmpty();
-        // count
-        that(count(optional($o)))->is(0);
-        // json
-        that(json_encode(optional($o)))->is("{}");
-
-        // 型指定
-        that(optional(new \ArrayObject([1]))->count())->is(1);
-        that(optional(new \ArrayObject([1]), 'stdClass')->count())->is(0);
-
-        // 例外
-        that(optional(null))->try('__set', 'hoge', 'value')->wasThrown('called NullObject#');
-        that(optional(null))->try('__unset', 'hoge')->wasThrown('called NullObject#');
-        that(optional(null))->try('offsetSet', 'hoge', 'value')->wasThrown('called NullObject#');
-        that(optional(null))->try('offsetUnset', 'hoge')->wasThrown('called NullObject#');
-    }
-
     function test_register_autoload_function()
     {
         that(class_exists(\PHPUnit\Util\TestDox\TestDoxPrinter::class, false))->isFalse();
@@ -711,7 +640,7 @@ class classobjTest extends AbstractTestCase
     function test_stdclass()
     {
         $fields = ['a', 'b'];
-        $stdclass = stdclass($fields);
+        $stdclass = (object) $fields;
         that($stdclass)->isInstanceOf(stdClass::class);
         that($stdclass)->{0}->is('a');
         that($stdclass)->{1}->is('b');

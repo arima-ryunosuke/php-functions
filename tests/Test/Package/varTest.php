@@ -32,7 +32,6 @@ use function ryunosuke\Functions\Package\numval;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\si_prefix;
 use function ryunosuke\Functions\Package\si_unprefix;
-use function ryunosuke\Functions\Package\stdclass;
 use function ryunosuke\Functions\Package\stringify;
 use function ryunosuke\Functions\Package\var_apply;
 use function ryunosuke\Functions\Package\var_applys;
@@ -119,16 +118,16 @@ class varTest extends AbstractTestCase
             'ao' => $ao,
         ]);
 
-        $inner = stdclass([
+        $inner = (object) [
             'inner-scalar2',
-            stdclass([
+            (object) [
                 'lastleaf',
-            ]),
-        ]);
-        $stdclass = stdclass([
+            ],
+        ];
+        $stdclass = (object) [
             'key'   => 'inner-scalar1',
             'inner' => $inner,
-        ]);
+        ];
 
         that(arrayval($stdclass, true))->isSame([
             'key'   => 'inner-scalar1',
@@ -1297,11 +1296,11 @@ class varTest extends AbstractTestCase
         $closure = (fn() => $recur)->bindTo(new class ( ) { });
         $sclosure = static fn() => $recur;
         $value = [
-            stdclass([
-                'A' => stdclass([
+            (object) [
+                'A' => (object) [
                     'X' => new \stdClass(),
-                ]),
-            ]),
+                ],
+            ],
             'E'     => new \Concrete('hoge'),
             'A'     => ["str", 1, 2, 3, true, null],
             'H'     => ['a' => 'A', 'b' => 'B'],
@@ -1794,9 +1793,9 @@ class varTest extends AbstractTestCase
         that(varcmp($a, $x))->is(0);
 
         // object
-        $a = stdclass(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 9]);
-        $b = stdclass(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 0]);
-        $x = stdclass(['a' => 1, 'b' => 2, 'c' => 3, 'x' => 9]);
+        $a = (object) ['a' => 1, 'b' => 2, 'c' => 3, 'x' => 9];
+        $b = (object) ['a' => 1, 'b' => 2, 'c' => 3, 'x' => 0];
+        $x = (object) ['a' => 1, 'b' => 2, 'c' => 3, 'x' => 9];
         that(varcmp($a, $b))->greaterThan(0);
         that(varcmp($b, $a))->lessThan(0);
         that(varcmp($a, $x))->is(0);

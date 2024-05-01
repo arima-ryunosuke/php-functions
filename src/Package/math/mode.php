@@ -3,7 +3,6 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_flatten.php';
-require_once __DIR__ . '/../syntax/throws.php';
 require_once __DIR__ . '/../var/stringify.php';
 // @codeCoverageIgnoreEnd
 
@@ -27,7 +26,7 @@ require_once __DIR__ . '/../var/stringify.php';
  */
 function mode(...$variadic)
 {
-    $args = array_flatten($variadic) or throws(new \LengthException("argument's length is 0."));
+    $args = array_flatten($variadic) or throw new \LengthException("argument's length is 0.");
     $vals = array_map(function ($v) {
         if (is_object($v)) {
             // ここに特別扱いのオブジェクトを列挙していく

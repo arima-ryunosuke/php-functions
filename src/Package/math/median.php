@@ -3,7 +3,6 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_flatten.php';
-require_once __DIR__ . '/../syntax/throws.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -30,7 +29,7 @@ require_once __DIR__ . '/../syntax/throws.php';
  */
 function median(...$variadic)
 {
-    $args = array_flatten($variadic) or throws(new \LengthException("argument's length is 0."));
+    $args = array_flatten($variadic) or throw new \LengthException("argument's length is 0.");
     $count = count($args);
     $center = (int) ($count / 2);
     sort($args);

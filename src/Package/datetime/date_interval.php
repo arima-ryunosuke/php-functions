@@ -5,8 +5,6 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/array_pos_key.php';
 require_once __DIR__ . '/../array/arrayize.php';
 require_once __DIR__ . '/../strings/strtr_escaped.php';
-require_once __DIR__ . '/../syntax/switchs.php';
-require_once __DIR__ . '/../syntax/throws.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -122,7 +120,7 @@ function date_interval($sec, $format = null, $limit_type = 'y')
         }
     }
     else {
-        $limit = $map[$limit_type] ?? throws(new \InvalidArgumentException("limit_type:$limit_type is undefined."));
+        $limit = $map[$limit_type] ?? throw new \InvalidArgumentException("limit_type:$limit_type is undefined.");
     }
 
     // 各単位を導出
@@ -193,11 +191,11 @@ function date_interval($sec, $format = null, $limit_type = 'y')
                     continue;
                 }
                 $fmt = arrayize($fmt);
-                $fmt = switchs(count($fmt), [
-                    1 => static fn() => ['', $fmt[0], ''],
-                    2 => static fn() => ['', $fmt[0], $fmt[1]],
-                    3 => static fn() => array_values($fmt),
-                ]);
+                $fmt = match(count($fmt)) {
+                    1 => ['', $fmt[0], ''],
+                    2 => ['', $fmt[0], $fmt[1]],
+                    3 => array_values($fmt),
+                };
             }
             $tmp[] = $fmt;
         }

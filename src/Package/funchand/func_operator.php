@@ -2,7 +2,6 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../syntax/throws.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -77,7 +76,7 @@ function func_operator($operator, ...$operands)
         'clone'      => static fn($v1) => clone $v1,
     ];
 
-    $opefunc = $operators[trim($operator)] ?? throws(new \InvalidArgumentException("$operator is not defined Operator."));
+    $opefunc = $operators[trim($operator)] ?? throw new \InvalidArgumentException("$operator is not defined Operator.");
 
     if ($operands) {
         return static fn($v1) => $opefunc($v1, ...$operands);

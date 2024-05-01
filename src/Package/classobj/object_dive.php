@@ -11,13 +11,13 @@ namespace ryunosuke\Functions\Package;
  *
  * Example:
  * ```php
- * $class = stdclass([
- *     'a' => stdclass([
- *         'b' => stdclass([
+ * $class = (object) [
+ *     'a' => (object) [
+ *         'b' => (object) [
  *             'c' => 'vvv'
- *         ])
- *     ])
- * ]);
+ *         ]
+ *     ]
+ * ];
  * that(object_dive($class, 'a.b.c'))->isSame('vvv');
  * that(object_dive($class, 'a.b.x', 9))->isSame(9);
  * // 配列を与えても良い。その場合 $delimiter 引数は意味をなさない

@@ -93,7 +93,6 @@ use function ryunosuke\Functions\Package\lbind;
 use function ryunosuke\Functions\Package\next_key;
 use function ryunosuke\Functions\Package\not_func;
 use function ryunosuke\Functions\Package\prev_key;
-use function ryunosuke\Functions\Package\stdclass;
 
 class arrayTest extends AbstractTestCase
 {
@@ -1683,7 +1682,7 @@ class arrayTest extends AbstractTestCase
         that(array_lookup($arrays, 'name'))->isSame([11 => 'name1', 12 => 'name2', 13 => 'name3']);
         that(array_lookup($arrays, null))->isSame($arrays);
         // オブジェクトもOK
-        $objects = array_map(fn($v) => stdclass($v), $arrays);
+        $objects = array_map(fn($v) => (object) $v, $arrays);
         that(array_lookup($objects, 'name'))->isSame([11 => 'name1', 12 => 'name2', 13 => 'name3']);
         // クロージャもOK
         that(array_lookup($objects, 'name', fn($v, $k) => "$k-{$v->name}"))->isSame(["11-name1" => 'name1', "12-name2" => 'name2', "13-name3" => 'name3']);
@@ -2313,8 +2312,8 @@ class arrayTest extends AbstractTestCase
         that(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']))->isSame(['a' => 'A', 'c' => 'C']);
         that(array_pickup(['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']))->isSame(['c' => 'C', 'a' => 'A']);
 
-        that(array_pickup(stdclass(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']))->isSame(['a' => 'A', 'c' => 'C']);
-        that(array_pickup(stdclass(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']))->isSame(['c' => 'C', 'a' => 'A']);
+        that(array_pickup((object) ['a' => 'A', 'b' => 'B', 'c' => 'C'], ['a', 'c']))->isSame(['a' => 'A', 'c' => 'C']);
+        that(array_pickup((object) ['a' => 'A', 'b' => 'B', 'c' => 'C'], ['c', 'a']))->isSame(['c' => 'C', 'a' => 'A']);
 
         that(array_pickup(['a' => 'A', 'b' => ['b' => 'B']], ['a' => 'AAA']))->isSame(['AAA' => 'A']);
         that(array_pickup(['a' => 'A', 'b' => ['b' => 'B']], ['b' => 'BBB']))->isSame(['BBB' => ['b' => 'B']]);
@@ -2883,10 +2882,10 @@ class arrayTest extends AbstractTestCase
         that(array_shrink_key($array, $array1, $array2, $array3))->isSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3']);
 
         // オブジェクトも渡せる
-        $object = stdclass($array);
-        $object1 = stdclass($array1);
-        $object2 = stdclass($array2);
-        $object3 = stdclass($array3);
+        $object = (object) $array;
+        $object1 = (object) $array1;
+        $object2 = (object) $array2;
+        $object3 = (object) $array3;
         that(array_shrink_key($object, $object1, $object2, $object3))->isSame(['a' => 'A3', 'b' => 'B3', 'c' => 'C3']);
     }
 

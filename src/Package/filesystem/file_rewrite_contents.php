@@ -2,7 +2,6 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../syntax/throws.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -30,29 +29,29 @@ function file_rewrite_contents($filename, $callback, $operation = 0)
     /** @var resource $fp */
     try {
         // 開いて
-        $fp = fopen($filename, 'c+b') ?: throws(new \UnexpectedValueException('failed to fopen.'));
+        $fp = fopen($filename, 'c+b') ?: throw new \UnexpectedValueException('failed to fopen.');
         if ($operation) {
-            flock($fp, $operation) ?: throws(new \UnexpectedValueException('failed to flock.'));
+            flock($fp, $operation) ?: throw new \UnexpectedValueException('failed to flock.');
         }
 
         // 読み込んで
-        rewind($fp) ?: throws(new \UnexpectedValueException('failed to rewind.'));
-        $contents = false !== ($t = stream_get_contents($fp)) ? $t : throws(new \UnexpectedValueException('failed to stream_get_contents.'));
+        rewind($fp) ?: throw new \UnexpectedValueException('failed to rewind.');
+        $contents = false !== ($t = stream_get_contents($fp)) ? $t : throw new \UnexpectedValueException('failed to stream_get_contents.');
 
         // 変更して
-        rewind($fp) ?: throws(new \UnexpectedValueException('failed to rewind.'));
-        ftruncate($fp, 0) ?: throws(new \UnexpectedValueException('failed to ftruncate.'));
+        rewind($fp) ?: throw new \UnexpectedValueException('failed to rewind.');
+        ftruncate($fp, 0) ?: throw new \UnexpectedValueException('failed to ftruncate.');
         $contents = $callback($contents, $fp);
 
         // 書き込んで
-        $return = ($r = fwrite($fp, $contents)) !== false ? $r : throws(new \UnexpectedValueException('failed to fwrite.'));
-        fflush($fp) ?: throws(new \UnexpectedValueException('failed to fflush.'));
+        $return = ($r = fwrite($fp, $contents)) !== false ? $r : throw new \UnexpectedValueException('failed to fwrite.');
+        fflush($fp) ?: throw new \UnexpectedValueException('failed to fflush.');
 
         // 閉じて
         if ($operation) {
-            flock($fp, LOCK_UN) ?: throws(new \UnexpectedValueException('failed to flock.'));
+            flock($fp, LOCK_UN) ?: throw new \UnexpectedValueException('failed to flock.');
         }
-        fclose($fp) ?: throws(new \UnexpectedValueException('failed to fclose.'));
+        fclose($fp) ?: throw new \UnexpectedValueException('failed to fclose.');
 
         // 返す
         return $return;

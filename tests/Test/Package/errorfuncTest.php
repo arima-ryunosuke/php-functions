@@ -11,7 +11,6 @@ use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\reflect_callable;
 use function ryunosuke\Functions\Package\set_trace_logger;
 use function ryunosuke\Functions\Package\stacktrace;
-use function ryunosuke\Functions\Package\stdclass;
 use function ryunosuke\Functions\Package\str_exists;
 use function ryunosuke\Functions\Package\tmpname;
 
@@ -236,7 +235,7 @@ class errorfuncTest extends AbstractTestCase
                     123456789,
                     'stringarg',
                     'long string long string long string',
-                    stdclass(['name' => "fields"]),
+                    (object) ['name' => "fields"],
                     ['a', 'b', 'c'],
                     ['a' => 'A', 'b' => 'B', 'c' => 'C'],
                     ['n' => ['e' => ['s' => ['t' => 'X']]]],

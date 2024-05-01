@@ -3,7 +3,6 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../math/base_convert_array.php';
-require_once __DIR__ . '/../syntax/throws.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -37,7 +36,7 @@ function base62_decode($string)
     $basechars_assoc ??= array_flip(str_split('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'));
 
     $chars = str_split($string);
-    $base62 = array_map(fn($c) => $basechars_assoc[$c] ?? throws(new \InvalidArgumentException("string is not an base62")), $chars);
+    $base62 = array_map(fn($c) => $basechars_assoc[$c] ?? throw new \InvalidArgumentException("string is not an base62"), $chars);
     $bytes = base_convert_array($base62, 62, 256);
     return $zeroprefix . implode('', array_map('chr', $bytes));
 }

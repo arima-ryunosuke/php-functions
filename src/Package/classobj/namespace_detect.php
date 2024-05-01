@@ -3,7 +3,6 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../filesystem/dirname_r.php';
-require_once __DIR__ . '/../syntax/throws.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -71,5 +70,5 @@ function namespace_detect($location)
             }
         }
         $basenames[] = pathinfo($directory, PATHINFO_FILENAME);
-    }) ?: throws(new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.'));
+    }) ?: throw new \InvalidArgumentException('can not detect namespace. invalid output path or not specify namespace.');
 }

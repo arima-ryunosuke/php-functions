@@ -18,9 +18,7 @@ use function ryunosuke\Functions\Package\function_shorten;
 use function ryunosuke\Functions\Package\is_bindable_closure;
 use function ryunosuke\Functions\Package\is_callback;
 use function ryunosuke\Functions\Package\lbind;
-use function ryunosuke\Functions\Package\namedcallize;
 use function ryunosuke\Functions\Package\nbind;
-use function ryunosuke\Functions\Package\not_func;
 use function ryunosuke\Functions\Package\parameter_length;
 use function ryunosuke\Functions\Package\rbind;
 
@@ -547,72 +545,6 @@ class funchandTest extends AbstractTestCase
         that($arrayize_lXY(1, 2, 3, 4))->is(['X', 'Y', 1, 2, 3, 4]);
     }
 
-    function test_namedcallize()
-    {
-        $f1 = fn($x, $a = 1) => get_defined_vars();
-        $f2 = fn($x, ...$args) => get_defined_vars();
-
-        // 単純呼び出し
-        that(namedcallize($f1)(['x' => 0]))->is([
-            'x' => 0,
-            'a' => 1,
-        ]);
-        that(namedcallize($f1)(['x' => 0, 'a' => 9]))->is([
-            'x' => 0,
-            'a' => 9,
-        ]);
-
-        // コンストラクタ
-        /** @var \ArrayObject $arrayobject */
-        $arrayobject = namedcallize('\\ArrayObject::__construct')([[1, 2, 3], 'iteratorClass' => 'ArrayIterator', \ArrayObject::ARRAY_AS_PROPS]);
-        that($arrayobject)->getArrayCopy()->is([1, 2, 3]);
-        that($arrayobject)->getIteratorClass()->is('ArrayIterator');
-        that($arrayobject)->getFlags()->is(\ArrayObject::ARRAY_AS_PROPS);
-
-        // デフォルト
-        that(namedcallize($f1, [
-            'x' => 0,
-        ])())->is([
-            'x' => 0,
-            'a' => 1,
-        ]);
-        that(namedcallize($f1, [
-            'x' => 0,
-            'a' => 8,
-        ])(['x' => 9, 'a' => 8]))->is([
-            'x' => 9,
-            'a' => 8,
-        ]);
-        that(namedcallize($f1, [
-            'x' => 0,
-            1   => 8,
-        ])(['x' => 9,]))->is([
-            'x' => 9,
-            'a' => 8,
-        ]);
-        that(namedcallize($f1, [
-            'x' => 0,
-        ])(['x' => 9, 1 => 8]))->is([
-            'x' => 9,
-            'a' => 8,
-        ]);
-
-        // 可変引数
-        that(namedcallize($f2)(['x' => 0, 'args' => [1, 2]]))->is([
-            'x'    => 0,
-            'args' => [1, 2],
-        ]);
-        that(namedcallize($f2)(['x' => 0, 1 => [1, 2]]))->is([
-            'x'    => 0,
-            'args' => [1, 2],
-        ]);
-
-        // 例外系
-        $fx = namedcallize($f1);
-        that($fx)([])->wasThrown('required arguments');
-        that($fx)(['x' => null, 'unknown' => null])->wasThrown('undefined arguments');
-    }
-
     function test_nbind()
     {
         $arrayize_2X = nbind(self::resolveFunction('arrayize'), 2, 'X');
@@ -651,15 +583,6 @@ class funchandTest extends AbstractTestCase
         that($func5('A', 'B', 'C', 'D', 'E'))->is(['A', 'B', 'C', 'D', 'E', 'f', 'g']);
         that($func6('A', 'B', 'C', 'D', 'E', 'F'))->is(['A', 'B', 'C', 'D', 'E', 'F', 'g']);
         that($func7('A', 'B', 'C', 'D', 'E', 'F', 'G'))->is(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
-    }
-
-    function test_not_func()
-    {
-        $not_strlen = not_func('strlen');
-        that($not_strlen('hoge'))->isFalse();
-        that($not_strlen(''))->isTrue();
-
-        that(parameter_length(not_func('strlen')))->is(1);
     }
 
     function test_rbind()

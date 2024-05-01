@@ -5,10 +5,8 @@ namespace ryunosuke\Test\Package;
 use stdClass;
 use function ryunosuke\Functions\Package\blank_if;
 use function ryunosuke\Functions\Package\call_if;
+use function ryunosuke\Functions\Package\instance_of;
 use function ryunosuke\Functions\Package\rm_rf;
-use function ryunosuke\Functions\Package\switchs;
-use function ryunosuke\Functions\Package\throw_if;
-use function ryunosuke\Functions\Package\throws;
 use function ryunosuke\Functions\Package\try_catch;
 use function ryunosuke\Functions\Package\try_catch_finally;
 use function ryunosuke\Functions\Package\try_close;
@@ -88,36 +86,21 @@ class syntaxTest extends AbstractTestCase
         ]);
     }
 
-    function test_switchs()
+    function test_instance_of()
     {
-        $cases = [
-            1 => 'value is 1',
-            2 => fn() => 'value is 2',
-        ];
-        that(switchs(1, $cases, 'undefined'))->is('value is 1');
-        that(switchs(2, $cases, 'undefined'))->is('value is 2');
-        that(switchs(3, $cases, 'undefined'))->is('undefined');
-        that(self::resolveFunction('switchs'))(9, $cases)->wasThrown('is not defined in');
-    }
+        $ex = new \RuntimeException();
+        that(instance_of($ex, \LogicException::class))->isSame(null);
+        that(instance_of($ex, \Throwable::class))->isSame($ex);
+        that(instance_of($ex, \Exception::class))->isSame($ex);
+        that(instance_of($ex, \RuntimeException::class))->isSame($ex);
+        that(instance_of($ex, new \RuntimeException()))->isSame($ex);
 
-    function test_throw_if()
-    {
-        throw_if(false, new \Exception('message', 123));
-        that(self::resolveFunction('throw_if'))(true, new \Exception('message', 123))->wasThrown(new \Exception('message', 123));
-        that(self::resolveFunction('throw_if'))(true, \Exception::class, 'message', 123)->wasThrown(new \Exception('message', 123));
-    }
-
-    function test_throws()
-    {
-        // ユースケースとしては例えば or throw がしたいことがある
-        // 下記は出来ない
-        /*
-        @mkdir(__DIR__) or throw new \Exception('mkdir fail');
-        */
-
-        that(function () {
-            @mkdir(__DIR__) or throws(new \Exception('mkdir fail'));
-        })()->wasThrown(new \Exception('mkdir fail'));
+        // スカラー系
+        that(instance_of(null, stdClass::class))->isSame(null);
+        that(instance_of(true, stdClass::class))->isSame(null);
+        that(instance_of(0, stdClass::class))->isSame(null);
+        that(instance_of('string', stdClass::class))->isSame(null);
+        that(instance_of([], stdClass::class))->isSame(null);
     }
 
     function test_try_catch()

@@ -5,7 +5,6 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/array_find.php';
 require_once __DIR__ . '/../datetime/date_timestamp.php';
 require_once __DIR__ . '/../strings/strtr_escaped.php';
-require_once __DIR__ . '/../syntax/throws.php';
 require_once __DIR__ . '/../constants.php';
 // @codeCoverageIgnoreEnd
 
@@ -87,10 +86,10 @@ function date_convert($format, $datetimedata = null)
             }
         }, false);
         $format = strtr_escaped($format, [
-            'J' => fn() => $era ? $era['name'] : throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
-            'b' => fn() => $era ? $era['abbr'] : throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
-            'k' => fn() => $era ? $era['year'] : throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
-            'K' => fn() => $era ? $era['gann'] : throws(new \InvalidArgumentException("notfound JP_ERA '$datetimedata'")),
+            'J' => fn() => $era ? $era['name'] : throw new \InvalidArgumentException("notfound JP_ERA '$datetimedata'"),
+            'b' => fn() => $era ? $era['abbr'] : throw new \InvalidArgumentException("notfound JP_ERA '$datetimedata'"),
+            'k' => fn() => $era ? $era['year'] : throw new \InvalidArgumentException("notfound JP_ERA '$datetimedata'"),
+            'K' => fn() => $era ? $era['gann'] : throw new \InvalidArgumentException("notfound JP_ERA '$datetimedata'"),
             'x' => fn() => ['日', '月', '火', '水', '木', '金', '土'][idate('w', (int) $timestamp)],
             'Q' => fn() => idate('w', $timestamp) + intdiv(idate('j', $timestamp) - 1, 7) * 7,
         ], '\\');

@@ -34,7 +34,7 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
             ->stringContains('uri_parse')      // file1 が含まれている
             ->stringContains('sql_format')     // file2 が含まれている
             ->stringContains('preg_capture')   // file1 に依存している関数が含まれている
-            ->stringContains('throws')         // file2 に依存している関数が含まれている
+            ->stringContains('unique_string')  // file2 に依存している関数が含まれている
             ->stringNotContains('date_format') // 依存していない関数が含まれていない
         ;
     }
@@ -45,7 +45,7 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
             ->stringContains('public const JP_ERA')                    // 定数が含まれている
             ->stringContains('static function date_convert')           // 自身が含まれている
             ->stringContains('static function date_timestamp')         // 依存している関数が含まれている
-            ->stringContains('static function throws')                 // 依存が依存している関数が含まれている
+            ->stringContains('static function array_find')             // 依存が依存している関数が含まれている
             ->stringContains('name\\space\\ClassName::date_timestamp') // self::で修飾されている
             ->stringNotContains('uri_parse')                           // 依存していない関数が含まれていない
         ;
