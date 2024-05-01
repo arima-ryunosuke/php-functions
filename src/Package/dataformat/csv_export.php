@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/is_hasharray.php';
-require_once __DIR__ . '/../funchand/call_safely.php';
+require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
 require_once __DIR__ . '/../iterator/iterator_join.php';
 require_once __DIR__ . '/../iterator/iterator_split.php';
 require_once __DIR__ . '/../strings/starts_with.php';
@@ -97,8 +97,10 @@ function csv_export($csvarrays, $options = [])
     else {
         $fp = fopen('php://temp', 'rw+');
     }
+
+    $restore = set_error_exception_handler();
     try {
-        $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback, $callback_header) {
+        $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback, $callback_header) {
             $size = 0;
             $mb_internal_encoding = mb_internal_encoding();
 
@@ -190,7 +192,7 @@ function csv_export($csvarrays, $options = [])
                 $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
             }
             return $size;
-        }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['structure'], $options['callback'], $options['callback_header']);
+        })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['structure'], $options['callback'], $options['callback_header']);
         if ($output) {
             return $size;
         }
@@ -198,6 +200,7 @@ function csv_export($csvarrays, $options = [])
         return stream_get_contents($fp);
     }
     finally {
+        $restore();
         if (!$output) {
             fclose($fp);
         }

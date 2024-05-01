@@ -3,7 +3,6 @@
 namespace ryunosuke\Test\Package;
 
 use ryunosuke\Functions\Utility;
-use function ryunosuke\Functions\Package\call_safely;
 use function ryunosuke\Functions\Package\chain;
 use function ryunosuke\Functions\Package\func_eval;
 use function ryunosuke\Functions\Package\func_method;
@@ -47,30 +46,6 @@ class funchandTest extends AbstractTestCase
         that((fn() => $object->count())())->is(0);
 
         that(self::resolveFunction('by_builtin'))('', '')->wasThrown('backtrace');
-    }
-
-    function test_call_safely()
-    {
-        $h = fn() => null;
-        set_error_handler($h);
-
-        // 正常なら返り値を返す
-        that(call_safely(fn($v) => $v, 999))->is(999);
-
-        // エラーが出たら例外を投げる
-        that(self::resolveFunction('call_safely'))(fn() => (string) [])->wasThrown('Array to string conversion');
-
-        // @で抑制した場合は例外は飛ばない
-        that(call_safely(function () {
-            /** @noinspection PhpUndefinedVariableInspection */
-            return @$v;
-        }))->isSame(null);
-
-        // エラーハンドラが戻っている
-        that(set_error_handler(fn() => null))->isSame($h);
-        restore_error_handler();
-
-        restore_error_handler();
     }
 
     function test_chain()

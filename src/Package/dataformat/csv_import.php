@@ -6,7 +6,7 @@ require_once __DIR__ . '/../array/array_flatten.php';
 require_once __DIR__ . '/../array/array_map_recursive.php';
 require_once __DIR__ . '/../array/array_pickup.php';
 require_once __DIR__ . '/../array/is_indexarray.php';
-require_once __DIR__ . '/../funchand/call_safely.php';
+require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
 require_once __DIR__ . '/../url/query_parse.php';
 // @codeCoverageIgnoreEnd
 
@@ -115,8 +115,9 @@ function csv_import($csvstring, $options = [])
         rewind($fp);
     }
 
+    $restore = set_error_exception_handler();
     try {
-        return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $grouping, $callback) {
+        return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $grouping, $callback) {
             $mb_internal_encoding = mb_internal_encoding();
             $result = [];
             $n = -1;
@@ -185,9 +186,10 @@ function csv_import($csvstring, $options = [])
             }
 
             return $result;
-        }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
+        })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
     }
     finally {
+        $restore();
         fclose($fp);
     }
 }

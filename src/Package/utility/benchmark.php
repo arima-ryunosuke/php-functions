@@ -4,7 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/arrayize.php';
 require_once __DIR__ . '/../dataformat/markdown_table.php';
-require_once __DIR__ . '/../funchand/call_safely.php';
+require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
 require_once __DIR__ . '/../info/cpu_timer.php';
 require_once __DIR__ . '/../info/ini_sets.php';
 require_once __DIR__ . '/../info/is_ansi.php';
@@ -90,14 +90,13 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
     ]);
 
     // ウォームアップ兼検証（大量に実行してエラーの嵐になる可能性があるのでウォームアップの時点でエラーがないかチェックする）
-    $assertions = call_safely(function ($benchset, $args) {
-        $result = [];
+    $handler_restore = set_error_exception_handler();
+    $assertions = [];
+    foreach ($benchset as $name => $caller) {
         $args2 = $args;
-        foreach ($benchset as $name => $caller) {
-            $result[$name] = $caller(...$args2);
-        }
-        return $result;
-    }, $benchset, $args);
+        $assertions[$name] = $caller(...$args2);
+    }
+    $handler_restore();
 
     // 返り値の検証（ベンチマークという性質上、基本的に戻り値が一致しないのはおかしい）
     // rand/mt_rand, md5/sha1 のような例外はあるが、そんなのベンチしないし、クロージャでラップすればいいし、それでも邪魔なら @ で黙らせればいい

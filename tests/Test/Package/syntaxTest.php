@@ -4,7 +4,6 @@ namespace ryunosuke\Test\Package;
 
 use stdClass;
 use function ryunosuke\Functions\Package\blank_if;
-use function ryunosuke\Functions\Package\call_if;
 use function ryunosuke\Functions\Package\instance_of;
 use function ryunosuke\Functions\Package\rm_rf;
 use function ryunosuke\Functions\Package\try_catch;
@@ -51,39 +50,6 @@ class syntaxTest extends AbstractTestCase
         that(blank_if($stdclass, 'default'))->isSame($stdclass);
         that(blank_if($countableT, 'default'))->isSame($countableT);
         that(blank_if($stringableT, 'default'))->isSame($stringableT);
-    }
-
-    function test_call_if()
-    {
-        $receiver = [];
-        $callback = function ($name) use (&$receiver) {
-            $receiver[$name] = ($receiver[$name] ?? 0) + 1;
-            return $name;
-        };
-
-        that(call_if(true, $callback, 'true'))->is('true');
-        that(call_if(false, $callback, 'false'))->is(null);
-
-        that(call_if(fn() => true, $callback, 'closure_true'))->is('closure_true');
-        that(call_if(fn() => false, $callback, 'closure_false'))->is(null);
-
-        for ($i = 0; $i < 5; $i++) {
-            call_if(-2, $callback, 'number:-2');
-            call_if(-1, $callback, 'number:-1');
-            call_if(0, $callback, 'number: 0');
-            call_if(+1, $callback, 'number:+1');
-            call_if(+2, $callback, 'number:+2');
-        }
-
-        that($receiver)->is([
-            'true'         => 1,
-            'closure_true' => 1,
-            'number:-2'    => 3,
-            'number:-1'    => 4,
-            'number: 0'    => 5,
-            'number:+1'    => 1,
-            'number:+2'    => 1,
-        ]);
     }
 
     function test_instance_of()

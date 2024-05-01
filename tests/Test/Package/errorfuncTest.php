@@ -9,6 +9,7 @@ use function ryunosuke\Functions\Package\backtrace;
 use function ryunosuke\Functions\Package\error;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\reflect_callable;
+use function ryunosuke\Functions\Package\set_error_exception_handler;
 use function ryunosuke\Functions\Package\set_trace_logger;
 use function ryunosuke\Functions\Package\stacktrace;
 use function ryunosuke\Functions\Package\str_exists;
@@ -157,6 +158,31 @@ class errorfuncTest extends AbstractTestCase
         [$t]->isResource();
 
         that(self::resolveFunction('error'))('int', 1)->wasThrown('must be resource or string');
+    }
+
+    function test_set_error_exception_handler()
+    {
+        $restore = set_error_exception_handler();
+
+        // ErrorException になる
+        try {
+            $array = [];
+            $array['dummy'] = $array['undefined'];
+        }
+        catch (\Throwable $t) {
+            that($t)->isInstanceOf(\ErrorException::class);
+        }
+
+        // @付きは呼ばれない
+        try {
+            $array = [];
+            $array['dummy'] = @$array['undefined'];
+        }
+        catch (\Throwable $t) {
+            $this->fail($t);
+        }
+
+        unset($restore);
     }
 
     function test_set_trace_logger()

@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_depth.php';
-require_once __DIR__ . '/../funchand/call_safely.php';
+require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -39,20 +39,20 @@ require_once __DIR__ . '/../funchand/call_safely.php';
  */
 function str_putcsv($array, $delimiter = ',', $enclosure = '"', $escape = "\\")
 {
+    $restore = set_error_exception_handler();
     $fp = fopen('php://memory', 'rw+');
     try {
         if (is_array($array) && array_depth($array) === 1) {
             $array = [$array];
         }
-        return call_safely(function ($fp, $array, $delimiter, $enclosure, $escape) {
-            foreach ($array as $line) {
-                fputcsv($fp, $line, $delimiter, $enclosure, $escape);
-            }
-            rewind($fp);
-            return rtrim(stream_get_contents($fp), "\n");
-        }, $fp, $array, $delimiter, $enclosure, $escape);
+        foreach ($array as $line) {
+            fputcsv($fp, $line, $delimiter, $enclosure, $escape);
+        }
+        rewind($fp);
+        return rtrim(stream_get_contents($fp), "\n");
     }
     finally {
+        $restore();
         fclose($fp);
     }
 }

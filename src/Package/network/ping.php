@@ -2,8 +2,8 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
 require_once __DIR__ . '/../exec/process.php';
-require_once __DIR__ . '/../funchand/call_safely.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -79,32 +79,31 @@ function ping($host, $port = null, $timeout = 1, &$errstr = '')
         throw new \InvalidArgumentException("'$protocol' is not supported.");
     }
 
+    $restore = set_error_exception_handler();
     $mtime = microtime(true);
     try {
-        call_safely(function ($socket, $protocol, $host, $port, $timeout) {
-            socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, ['sec' => $timeout, 'usec' => 0]);
-            socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => 0]);
-            if (!socket_connect($socket, $host, $port)) {
-                throw new \RuntimeException(); // @codeCoverageIgnore
-            }
+        socket_set_option($socket, SOL_SOCKET, SO_SNDTIMEO, ['sec' => $timeout, 'usec' => 0]);
+        socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, ['sec' => $timeout, 'usec' => 0]);
+        if (!socket_connect($socket, $host, $port)) {
+            throw new \RuntimeException(); // @codeCoverageIgnore
+        }
 
-            // icmp は ping メッセージを送信
-            if ($protocol === 'icmp') {
-                $message = "\x08\x00\x7d\x4b\x00\x00\x00\x00PingHost";
-                socket_send($socket, $message, strlen($message), 0);
-                socket_read($socket, 255);
-            }
-            // tcp は接続自体ができれば OK
-            if ($protocol === 'tcp') {
-                assert(true); // PhpStatementHasEmptyBodyInspection
-            }
-            // udp は何か送ってみてその挙動で判断（=> catch 節）
-            if ($protocol === 'udp') {
-                $message = ""; // noop
-                socket_send($socket, $message, strlen($message), 0);
-                socket_read($socket, 255);
-            }
-        }, $socket, $protocol, $host, $port, $timeout);
+        // icmp は ping メッセージを送信
+        if ($protocol === 'icmp') {
+            $message = "\x08\x00\x7d\x4b\x00\x00\x00\x00PingHost";
+            socket_send($socket, $message, strlen($message), 0);
+            socket_read($socket, 255);
+        }
+        // tcp は接続自体ができれば OK
+        if ($protocol === 'tcp') {
+            assert(true); // PhpStatementHasEmptyBodyInspection
+        }
+        // udp は何か送ってみてその挙動で判断（=> catch 節）
+        if ($protocol === 'udp') {
+            $message = ""; // noop
+            socket_send($socket, $message, strlen($message), 0);
+            socket_read($socket, 255);
+        }
         return microtime(true) - $mtime;
     }
     catch (\Throwable) {
@@ -119,6 +118,7 @@ function ping($host, $port = null, $timeout = 1, &$errstr = '')
         return false;
     }
     finally {
+        $restore();
         socket_close($socket);
     }
 }

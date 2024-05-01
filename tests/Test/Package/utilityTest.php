@@ -13,7 +13,6 @@ use function ryunosuke\Functions\Package\cacheobject;
 use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\number_serial;
 use function ryunosuke\Functions\Package\rm_rf;
-use function ryunosuke\Functions\Package\timer;
 
 class utilityTest extends AbstractTestCase
 {
@@ -325,16 +324,5 @@ class utilityTest extends AbstractTestCase
         // null は要するに range で復元できる形式となる
         $array = [-9, -5, -4, -3, -1, 1, 3, 4, 5, 9];
         that(array_flatten(array_maps(number_serial($array), '...range')))->is($array);
-    }
-
-    function test_timer()
-    {
-        $time = timer(function () {
-            usleep(10 * 1000);
-        }, 10);
-        // 0.01 秒を 10 回回すので 0.1 秒は超えるはず
-        that($time)->greaterThan(0.1);
-
-        that(self::resolveFunction('timer'))(function () { }, 0)->wasThrown('must be greater than');
     }
 }
