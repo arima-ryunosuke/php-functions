@@ -82,8 +82,8 @@ class stringsTest extends AbstractTestCase
         that(concat('', 'middle', '-suffix'))->isSame('');
         that(concat('prefix-', '', '-suffix'))->isSame('');
         that(concat('prefix-', 'middle', ''))->isSame('');
-        that(concat('null', null))->isSame('');
-        that(concat(null, 'null'))->isSame('');
+        that(concat('null', null))->isSame(null);
+        that(concat(null, 'null'))->isSame(null);
     }
 
     function test_damerau_levenshtein()
