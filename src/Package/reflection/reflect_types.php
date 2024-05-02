@@ -125,7 +125,7 @@ function reflect_types($reflection_type = null)
             }
         }
 
-        public function __toString()
+        public function __toString(): string
         {
             return implode('|', $this->toStrings(true, true));
         }
@@ -194,7 +194,7 @@ function reflect_types($reflection_type = null)
             return $this->toStrings(true, true);
         }
 
-        public function getName()
+        public function getName(): string
         {
             $types = array_flip($this->toStrings(true, true));
             $nullable = false;
@@ -210,12 +210,12 @@ function reflect_types($reflection_type = null)
             return ($nullable ? '?' : '') . implode('|', $result);
         }
 
-        public function getTypes()
+        public function getTypes(): array
         {
             return (array) $this;
         }
 
-        public function allows($type, $strict = false)
+        public function allows($type, $strict = false): bool
         {
             $types = array_flip($this->toStrings(false, false));
 
@@ -250,7 +250,7 @@ function reflect_types($reflection_type = null)
             return false;
         }
 
-        private function toStrings($ignore_compatible = true, $sort = true)
+        private function toStrings($ignore_compatible = true, $sort = true): array
         {
             $types = [];
             foreach ($this->getTypes() as $type) {

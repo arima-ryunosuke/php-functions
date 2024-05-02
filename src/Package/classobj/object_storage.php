@@ -94,7 +94,7 @@ function object_storage($namespace = 'global')
             return $this->offsetExists($objectOrResource);
         }
 
-        public function get($objectOrResource, $default = null)
+        public function get($objectOrResource, $default = null): mixed
         {
             if ($this->has($objectOrResource)) {
                 return $this->offsetGet($objectOrResource);

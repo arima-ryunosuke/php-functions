@@ -139,19 +139,19 @@ function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stder
             return $this->result = $this->status['exitcode'];
         }
 
-        public function setDestructAction($action)
+        public function setDestructAction($action): self
         {
             $this->destructAction = $action;
             return $this;
         }
 
-        public function setCompleteAction($action)
+        public function setCompleteAction($action): self
         {
             $this->completeAction = $action;
             return $this;
         }
 
-        public function update()
+        public function update(): bool
         {
             if ($this->proc === null) {
                 return false;
@@ -221,12 +221,12 @@ function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stder
             return $this->status['running'];
         }
 
-        public function status()
+        public function status(): array
         {
             return $this->status ?? proc_get_status($this->proc);
         }
 
-        public function terminate()
+        public function terminate(): bool
         {
             if ($this->proc === null) {
                 return !$this->status['running'];

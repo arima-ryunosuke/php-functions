@@ -92,7 +92,7 @@ function cpu_timer()
             ];
         }
 
-        public function __invoke($callback)
+        public function __invoke($callback): array
         {
             $this->start();
 

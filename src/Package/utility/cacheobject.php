@@ -33,7 +33,7 @@ require_once __DIR__ . '/../var/var_export3.php';
  *
  * @param string $directory キャッシュ保存ディレクトリ
  * @param float $clean_probability 不要キャッシュの削除確率
- * @return \Psr16CacheInterface psr-16 実装オブジェクト
+ * @return \Cacheobject psr-16 実装オブジェクト
  */
 function cacheobject($directory, $clean_probability = 0)
 {
@@ -261,18 +261,18 @@ function cacheobject($directory, $clean_probability = 0)
         }
 
         // @formatter:off
-        public function clean()                                      { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function keys($pattern = null)                        { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function fetch($key, $provider, $ttl = null)          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function fetchMultiple($providers, $ttl = null)       { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function get($key, $default = null):mixed             { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function set($key, $value, $ttl = null):bool          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function delete($key):bool                            { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function clear():bool                                 { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function getMultiple($keys, $default = null):iterable { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function setMultiple($values, $ttl = null):bool       { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function deleteMultiple($keys):bool                   { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-        public function has($key):bool                               { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function clean()                                          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function keys($pattern = null): iterable                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function fetch($key, $provider, $ttl = null): mixed       { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function fetchMultiple($providers, $ttl = null): iterable { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function get($key, $default = null): mixed                { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function set($key, $value, $ttl = null): bool             { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function delete($key): bool                               { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function clear(): bool                                    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function getMultiple($keys, $default = null): iterable    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function setMultiple($values, $ttl = null): bool          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function deleteMultiple($keys): bool                      { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function has($key): bool                                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
         // @formatter:on
     };
 }

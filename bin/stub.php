@@ -13,11 +13,17 @@ $targetFunction = [
     'include_stream' => [],
     'object_storage' => [],
     'process_async'  => [PHP_BINARY, ['-v']],
+    'cacheobject'    => [__DIR__],
     'reflect_types'  => [],
 ];
 
 foreach ($targetFunction as $funcname => $args) {
-    $refobject = new \ReflectionObject($funcname(...$args));
+    $object = $funcname(...$args);
+    $refobject = new \ReflectionObject($object);
+
+    $extends = concat(" extends ", implode(', ', class_parents($object)));
+    $implements = concat(" implements ", implode(', ', class_implements($object)));
+    $uses = concat("\n    use ", implode(', ', class_uses($object)));
 
     $doccomment = preg_replace('#^/\*\*\s*|\s*\*/$#ums', '', $refobject->getDocComment() ?: '*');
     $doccomment = preg_replace('#\\R\s+#u', "\n ", $doccomment);
@@ -33,7 +39,8 @@ foreach ($targetFunction as $funcname => $args) {
         if ($method->isPublic() && !$method->isConstructor() && !$method->isDestructor()) {
             $doccomment = preg_replace('#\\R\s+#u', "\n ", $method->getDocComment());
             $doccomment = concat($doccomment, "\n");
-            return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public function " . $method->getName() . "(" . implode(", ", function_parameter($method)) . ") { }");
+            $return = $method->hasReturnType() ? ": {$method->getReturnType()}" : "";
+            return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public function " . $method->getName() . "(" . implode(", ", function_parameter($method)) . ")$return { }");
         }
     });
 
@@ -50,8 +57,8 @@ foreach ($targetFunction as $funcname => $args) {
      * @used-by \\ryunosuke\\Functions\\{$funcname}()
      * @used-by \\ryunosuke\\Functions\\Package\\{$funcname}()
      */
-    class $classname
-    {
+    class $classname$extends$implements
+    {{$uses}
     {$V(implode("\n", $properties))}
     
     {$V(implode("\n", $methods))}
