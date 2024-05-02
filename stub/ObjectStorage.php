@@ -10,18 +10,18 @@
  * @used-by \ryunosuke\Functions\object_storage()
  * @used-by \ryunosuke\Functions\Package\object_storage()
  */
-class ObjectStorage
+class ObjectStorage implements Countable, ArrayAccess, IteratorAggregate, Traversable
 {
 
 
-    public function has($objectOrResource) { }
-    public function get($objectOrResource, $default = null) { }
-    public function set($objectOrResource, $data) { }
-    public function clear() { }
-    public function offsetExists($offset) { }
-    public function offsetGet($offset) { }
-    public function offsetSet($offset, $value) { }
-    public function offsetUnset($offset) { }
-    public function count() { }
-    public function getIterator() { }
+    public function has($objectOrResource): bool { }
+    public function get($objectOrResource, $default = null): mixed { }
+    public function set($objectOrResource, $data): self { }
+    public function clear(): bool { }
+    public function offsetExists($offset): bool { }
+    public function offsetGet($offset): mixed { }
+    public function offsetSet($offset, $value): void { }
+    public function offsetUnset($offset): void { }
+    public function count(): int { }
+    public function getIterator(): Generator { }
 }

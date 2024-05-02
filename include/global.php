@@ -6749,7 +6749,7 @@ if (!function_exists('object_storage')) {
                 return $this->offsetExists($objectOrResource);
             }
 
-            public function get($objectOrResource, $default = null)
+            public function get($objectOrResource, $default = null): mixed
             {
                 if ($this->has($objectOrResource)) {
                     return $this->offsetGet($objectOrResource);
@@ -11824,19 +11824,7 @@ if (!function_exists('set_error_exception_handler')) {
             throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
         }, $error_levels);
 
-        return new class() {
-            private $restored = false;
-
-            public function __destruct() { $this->__invoke(); }
-
-            public function __invoke()
-            {
-                if (!$this->restored) {
-                    $this->restored = true;
-                    restore_error_handler();
-                }
-            }
-        };
+        return finalize('restore_error_handler');
     }
 }
 
@@ -12209,19 +12197,19 @@ if (!function_exists('process_async')) {
                 return $this->result = $this->status['exitcode'];
             }
 
-            public function setDestructAction($action)
+            public function setDestructAction($action): self
             {
                 $this->destructAction = $action;
                 return $this;
             }
 
-            public function setCompleteAction($action)
+            public function setCompleteAction($action): self
             {
                 $this->completeAction = $action;
                 return $this;
             }
 
-            public function update()
+            public function update(): bool
             {
                 if ($this->proc === null) {
                     return false;
@@ -12291,12 +12279,12 @@ if (!function_exists('process_async')) {
                 return $this->status['running'];
             }
 
-            public function status()
+            public function status(): array
             {
                 return $this->status ?? proc_get_status($this->proc);
             }
 
-            public function terminate()
+            public function terminate(): bool
             {
                 if ($this->proc === null) {
                     return !$this->status['running'];
@@ -16251,7 +16239,7 @@ if (!function_exists('cpu_timer')) {
                 ];
             }
 
-            public function __invoke($callback)
+            public function __invoke($callback): array
             {
                 $this->start();
 
@@ -16266,6 +16254,53 @@ if (!function_exists('cpu_timer')) {
                 $rusage['ru_utime'] = $rusage['ru_utime.tv_sec'] + $rusage['ru_utime.tv_usec'] / 1000 / 1000;
                 $rusage['ru_stime'] = $rusage['ru_stime.tv_sec'] + $rusage['ru_stime.tv_usec'] / 1000 / 1000;
                 return $rusage;
+            }
+        };
+    }
+}
+
+assert(!function_exists('finalize') || (new \ReflectionFunction('finalize'))->isUserDefined());
+if (!function_exists('finalize')) {
+    /**
+     * 自身が死ぬときに指定 callable を呼ぶオブジェクトを返す
+     *
+     * invoke を実装しているので明示的にも呼べる。
+     * 明示的だろうと暗黙的だろうと必ず1回しか呼ばれない。
+     *
+     * Example:
+     * ```php
+     * $called = 0;
+     * $finalizer = finalize(function()use(&$called){$called++;});
+     * that($called)->is(0); // まだ呼ばれていない
+     *
+     * // コールすると・・・
+     * $finalizer();
+     * that($called)->is(1); // 呼ばれている
+     *
+     * // unset（GC）でも呼ばれる
+     * unset($finalizer);
+     * that($called)->is(1); // が、一度しか呼ばれないので呼ばれない
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\info
+     *
+     * @param callable $finalizer 実行する php コード
+     * @return callable GC 時に $finalizer を実行する callable
+     */
+    function finalize(callable $finalizer)
+    {
+        return new class($finalizer) {
+            public function __construct(private $finalizer) { }
+
+            public function __destruct() { $this->__invoke(); }
+
+            public function __invoke()
+            {
+                if (isset($this->finalizer)) {
+                    ($this->finalizer)();
+                    unset($this->finalizer);
+                    gc_collect_cycles();
+                }
             }
         };
     }
@@ -16442,21 +16477,22 @@ if (!function_exists('ini_sets')) {
      * @package ryunosuke\Functions\Package\info
      *
      * @param array $values ini のエントリ名と値の配列
-     * @return callable ini を元に戻すクロージャ
+     * @return callable ini を元に戻す callable
      */
     function ini_sets($values)
     {
-        $currents = [];
-        foreach ($values as $name => $value) {
-            $current = ini_set($name, $value);
-            if ($current !== false) {
-                $currents[$name] = $current;
+        $main = static function ($values) {
+            $currents = [];
+            foreach ($values as $name => $value) {
+                $current = ini_set($name, $value);
+                if ($current !== false) {
+                    $currents[$name] = $current;
+                }
             }
-        }
-        return static function () use ($currents) {
-            ini_sets($currents);
             return $currents;
         };
+        $currents = $main($values);
+        return finalize(fn() => $main($currents));
     }
 }
 
@@ -21671,7 +21707,7 @@ if (!function_exists('reflect_types')) {
                 }
             }
 
-            public function __toString()
+            public function __toString(): string
             {
                 return implode('|', $this->toStrings(true, true));
             }
@@ -21740,7 +21776,7 @@ if (!function_exists('reflect_types')) {
                 return $this->toStrings(true, true);
             }
 
-            public function getName()
+            public function getName(): string
             {
                 $types = array_flip($this->toStrings(true, true));
                 $nullable = false;
@@ -21756,12 +21792,12 @@ if (!function_exists('reflect_types')) {
                 return ($nullable ? '?' : '') . implode('|', $result);
             }
 
-            public function getTypes()
+            public function getTypes(): array
             {
                 return (array) $this;
             }
 
-            public function allows($type, $strict = false)
+            public function allows($type, $strict = false): bool
             {
                 $types = array_flip($this->toStrings(false, false));
 
@@ -21796,7 +21832,7 @@ if (!function_exists('reflect_types')) {
                 return false;
             }
 
-            private function toStrings($ignore_compatible = true, $sort = true)
+            private function toStrings($ignore_compatible = true, $sort = true): array
             {
                 $types = [];
                 foreach ($this->getTypes() as $type) {
@@ -23341,59 +23377,34 @@ if (!function_exists('mb_ereg_options')) {
      */
     function mb_ereg_options($options)
     {
-        return new class($options) {
-            private $options, $backup;
-
-            private $settled = false;
-
-            public function __construct($options)
-            {
-                $this->options = [
-                    'internal_encoding'    => $options['internal_encoding'] ?? $options['encoding'] ?? null,
-                    'substitute_character' => $options['substitute_character'] ?? null,
-                    'regex_encoding'       => $options['regex_encoding'] ?? $options['encoding'] ?? null,
-                    'regex_options'        => $options['regex_options'] ?? null,
-                ];
-                $this->backup = [
-                    'internal_encoding'    => mb_internal_encoding(),
-                    'substitute_character' => mb_substitute_character(),
-                    'regex_encoding'       => mb_regex_encoding(),
-                    'regex_options'        => mb_regex_set_options(),
-                ];
-
-                $this->set($this->options, true);
+        $set = static function ($setting) {
+            if (strlen((string) $setting['internal_encoding'])) {
+                mb_internal_encoding($setting['internal_encoding']);
             }
-
-            public function __destruct()
-            {
-                $this();
+            if (strlen((string) $setting['substitute_character'])) {
+                mb_substitute_character($setting['substitute_character']);
             }
-
-            public function __invoke()
-            {
-                if ($this->settled) {
-                    $this->set($this->backup, false);
-                }
+            if (strlen((string) $setting['regex_encoding'])) {
+                mb_regex_encoding($setting['regex_encoding']);
             }
-
-            private function set($setting, $settled)
-            {
-                if (strlen((string) $setting['internal_encoding'])) {
-                    mb_internal_encoding($setting['internal_encoding']);
-                }
-                if (strlen((string) $setting['substitute_character'])) {
-                    mb_substitute_character($setting['substitute_character']);
-                }
-                if (strlen((string) $setting['regex_encoding'])) {
-                    mb_regex_encoding($setting['regex_encoding']);
-                }
-                if (strlen((string) $setting['regex_options'])) {
-                    mb_regex_set_options($setting['regex_options']);
-                }
-
-                $this->settled = $settled;
+            if (strlen((string) $setting['regex_options'])) {
+                mb_regex_set_options($setting['regex_options']);
             }
         };
+
+        $backup = [
+            'internal_encoding'    => mb_internal_encoding(),
+            'substitute_character' => mb_substitute_character(),
+            'regex_encoding'       => mb_regex_encoding(),
+            'regex_options'        => mb_regex_set_options(),
+        ];
+        $set([
+            'internal_encoding'    => $options['internal_encoding'] ?? $options['encoding'] ?? null,
+            'substitute_character' => $options['substitute_character'] ?? null,
+            'regex_encoding'       => $options['regex_encoding'] ?? $options['encoding'] ?? null,
+            'regex_options'        => $options['regex_options'] ?? null,
+        ]);
+        return finalize(fn() => $set($backup));
     }
 }
 
@@ -27854,7 +27865,7 @@ if (!function_exists('cacheobject')) {
      *
      * @param string $directory キャッシュ保存ディレクトリ
      * @param float $clean_probability 不要キャッシュの削除確率
-     * @return \Psr16CacheInterface psr-16 実装オブジェクト
+     * @return \Cacheobject psr-16 実装オブジェクト
      */
     function cacheobject($directory, $clean_probability = 0)
     {
@@ -28082,18 +28093,18 @@ if (!function_exists('cacheobject')) {
             }
 
             // @formatter:off
-            public function clean()                                      { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function keys($pattern = null)                        { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function fetch($key, $provider, $ttl = null)          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function fetchMultiple($providers, $ttl = null)       { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function get($key, $default = null):mixed             { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function set($key, $value, $ttl = null):bool          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function delete($key):bool                            { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function clear():bool                                 { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function getMultiple($keys, $default = null):iterable { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function setMultiple($values, $ttl = null):bool       { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function deleteMultiple($keys):bool                   { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function has($key):bool                               { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function clean()                                          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function keys($pattern = null): iterable                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function fetch($key, $provider, $ttl = null): mixed       { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function fetchMultiple($providers, $ttl = null): iterable { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function get($key, $default = null): mixed                { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function set($key, $value, $ttl = null): bool             { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function delete($key): bool                               { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function clear(): bool                                    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function getMultiple($keys, $default = null): iterable    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function setMultiple($values, $ttl = null): bool          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function deleteMultiple($keys): bool                      { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+            public function has($key): bool                                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
             // @formatter:on
         };
     }

@@ -13,19 +13,19 @@
  * @used-by \ryunosuke\Functions\reflect_types()
  * @used-by \ryunosuke\Functions\Package\reflect_types()
  */
-class ReflectTypes
+class ReflectTypes extends stdClass implements IteratorAggregate, ArrayAccess, Countable, JsonSerializable, Stringable, Traversable
 {
 
 
-    public function __toString() { }
-    public function getIterator() { }
-    public function offsetExists($offset) { }
-    public function offsetGet($offset) { }
-    public function offsetSet($offset, $value) { }
-    public function offsetUnset($offset) { }
-    public function count() { }
-    public function jsonSerialize() { }
-    public function getName() { }
-    public function getTypes() { }
-    public function allows($type, $strict = false) { }
+    public function __toString(): string { }
+    public function getIterator(): Traversable { }
+    public function offsetExists($offset): bool { }
+    public function offsetGet($offset): mixed { }
+    public function offsetSet($offset, $value): void { }
+    public function offsetUnset($offset): void { }
+    public function count(): int { }
+    public function jsonSerialize(): array { }
+    public function getName(): string { }
+    public function getTypes(): array { }
+    public function allows($type, $strict = false): bool { }
 }

@@ -16,9 +16,9 @@ class ProcessAsync
     public $stderr;
 
     public function __invoke() { }
-    public function setDestructAction($action) { }
-    public function setCompleteAction($action) { }
-    public function update() { }
-    public function status() { }
-    public function terminate() { }
+    public function setDestructAction($action): self { }
+    public function setCompleteAction($action): self { }
+    public function update(): bool { }
+    public function status(): array { }
+    public function terminate(): bool { }
 }

@@ -333,6 +333,11 @@ trait ChainObject8
     public function file_set_tree($contents_tree, $umask = null): self { }
     public function file_set_tree($umask = null): self { }
 
+    /** @see finalize() */
+    public self $finalize;
+    public function finalize(callable $finalizer): self { }
+    public function finalize(): self { }
+
     /** @see evaluate() */
     public self $evaluate;
     public function evaluate($phpcode, $contextvars = [], $cachesize = 256): self { }

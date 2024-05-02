@@ -27,8 +27,8 @@ class IncludeStream
     public function stream_eof() { }
     public function stream_read($count) { }
     public function stream_write(string $data) { }
-    public function stream_truncate(int $new_size) { }
-    public function stream_flush() { }
+    public function stream_truncate(int $new_size): bool { }
+    public function stream_flush(): bool { }
     public function stream_close() { }
     public function stream_stat() { }
     public function stream_set_option($option, $arg1, $arg2) { }

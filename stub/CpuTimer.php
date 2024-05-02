@@ -14,7 +14,7 @@ class CpuTimer
 {
 
 
-    public function start() { }
-    public function result() { }
-    public function __invoke($callback) { }
+    public function start(): void { }
+    public function result(): array { }
+    public function __invoke($callback): array { }
 }
