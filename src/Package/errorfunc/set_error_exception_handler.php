@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../info/finalize.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -44,17 +45,5 @@ function set_error_exception_handler($error_levels = \E_ALL, $handle_atmark_erro
         throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
     }, $error_levels);
 
-    return new class() {
-        private $restored = false;
-
-        public function __destruct() { $this->__invoke(); }
-
-        public function __invoke()
-        {
-            if (!$this->restored) {
-                $this->restored = true;
-                restore_error_handler();
-            }
-        }
-    };
+    return finalize('restore_error_handler');
 }

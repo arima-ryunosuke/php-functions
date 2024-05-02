@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../info/finalize.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -12,19 +13,20 @@ namespace ryunosuke\Functions\Package;
  * @package ryunosuke\Functions\Package\info
  *
  * @param array $values ini のエントリ名と値の配列
- * @return callable ini を元に戻すクロージャ
+ * @return callable ini を元に戻す callable
  */
 function ini_sets($values)
 {
-    $currents = [];
-    foreach ($values as $name => $value) {
-        $current = ini_set($name, $value);
-        if ($current !== false) {
-            $currents[$name] = $current;
+    $main = static function ($values) {
+        $currents = [];
+        foreach ($values as $name => $value) {
+            $current = ini_set($name, $value);
+            if ($current !== false) {
+                $currents[$name] = $current;
+            }
         }
-    }
-    return static function () use ($currents) {
-        ini_sets($currents);
         return $currents;
     };
+    $currents = $main($values);
+    return finalize(fn() => $main($currents));
 }

@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../info/finalize.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -34,57 +35,32 @@ namespace ryunosuke\Functions\Package;
  */
 function mb_ereg_options($options)
 {
-    return new class($options) {
-        private $options, $backup;
-
-        private $settled = false;
-
-        public function __construct($options)
-        {
-            $this->options = [
-                'internal_encoding'    => $options['internal_encoding'] ?? $options['encoding'] ?? null,
-                'substitute_character' => $options['substitute_character'] ?? null,
-                'regex_encoding'       => $options['regex_encoding'] ?? $options['encoding'] ?? null,
-                'regex_options'        => $options['regex_options'] ?? null,
-            ];
-            $this->backup = [
-                'internal_encoding'    => mb_internal_encoding(),
-                'substitute_character' => mb_substitute_character(),
-                'regex_encoding'       => mb_regex_encoding(),
-                'regex_options'        => mb_regex_set_options(),
-            ];
-
-            $this->set($this->options, true);
+    $set = static function ($setting) {
+        if (strlen((string) $setting['internal_encoding'])) {
+            mb_internal_encoding($setting['internal_encoding']);
         }
-
-        public function __destruct()
-        {
-            $this();
+        if (strlen((string) $setting['substitute_character'])) {
+            mb_substitute_character($setting['substitute_character']);
         }
-
-        public function __invoke()
-        {
-            if ($this->settled) {
-                $this->set($this->backup, false);
-            }
+        if (strlen((string) $setting['regex_encoding'])) {
+            mb_regex_encoding($setting['regex_encoding']);
         }
-
-        private function set($setting, $settled)
-        {
-            if (strlen((string) $setting['internal_encoding'])) {
-                mb_internal_encoding($setting['internal_encoding']);
-            }
-            if (strlen((string) $setting['substitute_character'])) {
-                mb_substitute_character($setting['substitute_character']);
-            }
-            if (strlen((string) $setting['regex_encoding'])) {
-                mb_regex_encoding($setting['regex_encoding']);
-            }
-            if (strlen((string) $setting['regex_options'])) {
-                mb_regex_set_options($setting['regex_options']);
-            }
-
-            $this->settled = $settled;
+        if (strlen((string) $setting['regex_options'])) {
+            mb_regex_set_options($setting['regex_options']);
         }
     };
+
+    $backup = [
+        'internal_encoding'    => mb_internal_encoding(),
+        'substitute_character' => mb_substitute_character(),
+        'regex_encoding'       => mb_regex_encoding(),
+        'regex_options'        => mb_regex_set_options(),
+    ];
+    $set([
+        'internal_encoding'    => $options['internal_encoding'] ?? $options['encoding'] ?? null,
+        'substitute_character' => $options['substitute_character'] ?? null,
+        'regex_encoding'       => $options['regex_encoding'] ?? $options['encoding'] ?? null,
+        'regex_options'        => $options['regex_options'] ?? null,
+    ]);
+    return finalize(fn() => $set($backup));
 }

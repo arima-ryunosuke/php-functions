@@ -7,6 +7,7 @@ use function ryunosuke\Functions\Package\ansi_strip;
 use function ryunosuke\Functions\Package\arguments;
 use function ryunosuke\Functions\Package\cpu_timer;
 use function ryunosuke\Functions\Package\file_set_contents;
+use function ryunosuke\Functions\Package\finalize;
 use function ryunosuke\Functions\Package\get_modified_files;
 use function ryunosuke\Functions\Package\get_uploaded_files;
 use function ryunosuke\Functions\Package\ini_sets;
@@ -237,6 +238,24 @@ class infoTest extends AbstractTestCase
         that($result['time'] + $result['idle'])->closesTo($result['real']);
         that($result['user%'] + $result['system%'])->closesTo(100.0);
         that($result['time%'] + $result['idle%'])->closesTo(100.0);
+    }
+
+    function test_finalize()
+    {
+        $called = 0;
+        $finalizer = finalize(function () use (&$called) { $called++; });
+
+        that($called)->is(0);
+
+        $finalizer();
+        that($called)->is(1);
+
+        unset($finalizer);
+        that($called)->is(1);
+
+        $finalizer = finalize(function () use (&$called) { $called++; });
+        unset($finalizer);
+        that($called)->is(2);
     }
 
     function test_get_modified_files()
