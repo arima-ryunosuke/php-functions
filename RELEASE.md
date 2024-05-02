@@ -11,6 +11,10 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.1
+
+- [feature] finalize を追加
+
 ## 2.0.0
 
 - [change] php>=8.0
