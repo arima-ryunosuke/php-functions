@@ -134,6 +134,7 @@ function var_pretty($value, $options = [])
 
             //$current = count($this->content) - 1;
             if ($this->options['maxcolumn'] !== null) {
+                $basecolumn = $this->column;
                 $breakpos = strrpos($value, "\n");
                 if ($breakpos === false) {
                     $this->column += $strlen;
@@ -141,10 +142,10 @@ function var_pretty($value, $options = [])
                 else {
                     $this->column = $strlen - $breakpos - 1;
                 }
-                if ($this->column >= $this->options['maxcolumn']) {
+                if ($basecolumn !== 0 && $this->column >= $this->options['maxcolumn']) {
                     preg_match('# +#', $this->content, $m, 0, strrpos($this->content, "\n"));
                     $this->column = 0;
-                    $this->content .= "\n\t" . $m[0];
+                    $this->content .= "\n\t" . ($m[0] ?? '');
                 }
             }
 
