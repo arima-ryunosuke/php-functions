@@ -3,13 +3,10 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_depth.php';
-require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
 // @codeCoverageIgnoreEnd
 
 /**
  * fputcsv の文字列版（str_getcsv の put 版）
- *
- * エラーは例外に変換される。
  *
  * 普通の配列を与えるとシンプルに "a,b,c" のような1行を返す。
  * 多次元配列（2次元のみを想定）や Traversable を与えるとループして "a,b,c\nd,e,f" のような複数行を返す。
@@ -39,20 +36,16 @@ require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
  */
 function str_putcsv($array, $delimiter = ',', $enclosure = '"', $escape = "\\")
 {
-    $restore = set_error_exception_handler();
-    $fp = fopen('php://memory', 'rw+');
-    try {
-        if (is_array($array) && array_depth($array) === 1) {
-            $array = [$array];
-        }
-        foreach ($array as $line) {
-            fputcsv($fp, $line, $delimiter, $enclosure, $escape);
-        }
-        rewind($fp);
-        return rtrim(stream_get_contents($fp), "\n");
+    static $fp = null;
+    $fp ??= fopen('php://memory', 'rw+');
+    rewind($fp);
+    ftruncate($fp, 0);
+    if (is_array($array) && array_depth($array, 2) === 1) {
+        $array = [$array];
     }
-    finally {
-        $restore();
-        fclose($fp);
+    foreach ($array as $line) {
+        fputcsv($fp, $line, $delimiter, $enclosure, $escape);
     }
+    rewind($fp);
+    return rtrim(stream_get_contents($fp), "\n");
 }

@@ -1564,8 +1564,6 @@ that is <del>a</del><ins>the</ins> pen
             yield [1, 2, 3];
             yield [4, 5, 6];
         })()))->is("1,2,3\n4,5,6");
-
-        that(self::resolveFunction('str_putcsv'))([], 'aa')->wasThrown('single character');
     }
 
     function test_str_submap()
