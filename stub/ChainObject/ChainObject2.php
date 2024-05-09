@@ -25,13 +25,13 @@ trait ChainObject2
 
     /** @see array_walk() */
     public self $array_walk;
-    public function array_walk(object|array &$array, callable $callback, mixed $arg): self { }
-    public function array_walk(callable $callback, mixed $arg): self { }
+    public function array_walk(object|array &$array, callable $callback, mixed $arg = null): self { }
+    public function array_walk(callable $callback, mixed $arg = null): self { }
 
     /** @see array_walk() */
     public self $walk;
-    public function walk(object|array &$array, callable $callback, mixed $arg): self { }
-    public function walk(callable $callback, mixed $arg): self { }
+    public function walk(object|array &$array, callable $callback, mixed $arg = null): self { }
+    public function walk(callable $callback, mixed $arg = null): self { }
 
     /** @see in_array() */
     public self $in_array;
@@ -270,13 +270,13 @@ trait ChainObject2
 
     /** @see rand() */
     public self $rand;
-    public function rand(int $min, int $max): self { }
-    public function rand(int $max): self { }
+    public function rand(int $min = null, int $max = null): self { }
+    public function rand(int $max = null): self { }
 
     /** @see mt_rand() */
     public self $mt_rand;
-    public function mt_rand(int $min, int $max): self { }
-    public function mt_rand(int $max): self { }
+    public function mt_rand(int $min = null, int $max = null): self { }
+    public function mt_rand(int $max = null): self { }
 
     /** @see strval() */
     public self $strval;

@@ -568,6 +568,11 @@ trait ChainObject9
     public function probability_array(iterable $array, $divisor = 100): self { }
     public function probability_array($divisor = 100): self { }
 
+    /** @see function_export_false2null() */
+    public self $function_export_false2null;
+    public function function_export_false2null(string $namespace, bool $false_only = true): self { }
+    public function function_export_false2null(bool $false_only = true): self { }
+
     /** @see mb_ereg_options() */
     public self $mb_ereg_options;
     public function mb_ereg_options($options): self { }

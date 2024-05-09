@@ -65,13 +65,13 @@ trait ChainObject6
 
     /** @see array_walk_recursive() */
     public self $array_walk_recursive;
-    public function array_walk_recursive(object|array &$array, callable $callback, mixed $arg): self { }
-    public function array_walk_recursive(callable $callback, mixed $arg): self { }
+    public function array_walk_recursive(object|array &$array, callable $callback, mixed $arg = null): self { }
+    public function array_walk_recursive(callable $callback, mixed $arg = null): self { }
 
     /** @see array_walk_recursive() */
     public self $walk_recursive;
-    public function walk_recursive(object|array &$array, callable $callback, mixed $arg): self { }
-    public function walk_recursive(callable $callback, mixed $arg): self { }
+    public function walk_recursive(object|array &$array, callable $callback, mixed $arg = null): self { }
+    public function walk_recursive(callable $callback, mixed $arg = null): self { }
 
     /** @see array_fill_keys() */
     public self $array_fill_keys;
@@ -547,6 +547,11 @@ trait ChainObject6
     public self $preg_matches;
     public function preg_matches($pattern, $subject, $flags = 0, $offset = 0): self { }
     public function preg_matches($subject, $flags = 0, $offset = 0): self { }
+
+    /** @see reflect_type_resolve() */
+    public self $reflect_type_resolve;
+    public function reflect_type_resolve(?string $type): self { }
+    public function reflect_type_resolve(): self { }
 
     /** @see chain_case() */
     public self $chain_case;

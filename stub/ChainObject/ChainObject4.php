@@ -45,13 +45,13 @@ trait ChainObject4
 
     /** @see array_keys() */
     public self $array_keys;
-    public function array_keys(array $array, mixed $filter_value, bool $strict = false): self { }
-    public function array_keys(mixed $filter_value, bool $strict = false): self { }
+    public function array_keys(array $array, mixed $filter_value = null, bool $strict = false): self { }
+    public function array_keys(mixed $filter_value = null, bool $strict = false): self { }
 
     /** @see array_keys() */
     public self $keys;
-    public function keys(array $array, mixed $filter_value, bool $strict = false): self { }
-    public function keys(mixed $filter_value, bool $strict = false): self { }
+    public function keys(array $array, mixed $filter_value = null, bool $strict = false): self { }
+    public function keys(mixed $filter_value = null, bool $strict = false): self { }
 
     /** @see key_exists() */
     public self $key_exists;

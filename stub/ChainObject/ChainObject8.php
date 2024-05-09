@@ -125,8 +125,8 @@ trait ChainObject8
 
     /** @see assert_options() */
     public self $assert_options;
-    public function assert_options(int $option, mixed $value): self { }
-    public function assert_options(mixed $value): self { }
+    public function assert_options(int $option, mixed $value = null): self { }
+    public function assert_options(mixed $value = null): self { }
 
     /** @see trim() */
     public self $trim;
