@@ -9,7 +9,7 @@ require_once __DIR__ . '/../pcre/preg_replaces.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
 require_once __DIR__ . '/../reflection/function_parameter.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
-require_once __DIR__ . '/../reflection/reflect_types.php';
+require_once __DIR__ . '/../reflection/reflect_type_resolve.php';
 require_once __DIR__ . '/../utility/function_configure.php';
 // @codeCoverageIgnoreEnd
 
@@ -167,7 +167,7 @@ function class_replace($class, $register)
                     }
                     // 同上。返り値版
                     if (!$refmember->hasReturnType() && $refmethod->hasReturnType()) {
-                        $declare .= ':' . reflect_types($refmethod->getReturnType())->getName();
+                        $declare .= ':' . reflect_type_resolve($refmethod->getReturnType());
                     }
                 }
                 $mname = preg_replaces('#function(\\s*)\\(#u', " $name", $declare);

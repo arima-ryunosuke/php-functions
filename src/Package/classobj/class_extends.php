@@ -8,7 +8,6 @@ require_once __DIR__ . '/../misc/evaluate.php';
 require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
 require_once __DIR__ . '/../reflection/function_parameter.php';
-require_once __DIR__ . '/../reflection/reflect_types.php';
 require_once __DIR__ . '/../utility/function_configure.php';
 // @codeCoverageIgnoreEnd
 
@@ -157,7 +156,7 @@ function class_extends($object, $methods, $fields = [], $implements = [])
         $prms = implode(', ', $params);
         $args = implode(', ', array_keys($params));
 
-        $rtype = reflect_types($reffunc->getReturnType())->getName();
+        $rtype = strval($reffunc->getReturnType());
         $return = $rtype === 'void' ? '' : 'return $return;';
         $rtype = $rtype ? ": $rtype" : '';
 
@@ -224,7 +223,7 @@ function class_extends($object, $methods, $fields = [], $implements = [])
         // シグネチャエラーが出てしまうので、指定がない場合は強制的に合わせる
         $refmember = new \ReflectionFunction($override);
         $params = function_parameter(!$refmember->getNumberOfParameters() && $method->getNumberOfParameters() ? $method : $override);
-        $rtype = reflect_types(!$refmember->hasReturnType() && $method->hasReturnType() ? $method : $refmember)->getName();
+        $rtype = strval((!$refmember->hasReturnType() && $method->hasReturnType() ? $method : $refmember)->getReturnType());
         $rtype = $rtype ? ": $rtype" : '';
 
         [, $codeblock] = callable_code($override);

@@ -2,8 +2,9 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../classobj/const_exists.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
-require_once __DIR__ . '/../reflection/reflect_types.php';
+require_once __DIR__ . '/../reflection/reflect_type_resolve.php';
 require_once __DIR__ . '/../var/var_export2.php';
 // @codeCoverageIgnoreEnd
 
@@ -28,7 +29,7 @@ function function_parameter($eitherReffuncOrCallable)
         $declare = '';
 
         if ($parameter->hasType()) {
-            $declare .= reflect_types($parameter->getType())->getName() . ' ';
+            $declare .= reflect_type_resolve($parameter->getType()) . ' ';
         }
 
         if ($parameter->isPassedByReference()) {
@@ -44,11 +45,16 @@ function function_parameter($eitherReffuncOrCallable)
         if ($parameter->isOptional()) {
             $defval = null;
 
-            // 組み込み関数のデフォルト値を取得することは出来ない（isDefaultValueAvailable も false を返す）
             if ($parameter->isDefaultValueAvailable()) {
                 // 修飾なしでデフォルト定数が使われているとその名前空間で解決してしまうので場合分けが必要
                 if ($parameter->isDefaultValueConstant() && strpos($parameter->getDefaultValueConstantName(), '\\') === false) {
-                    $defval = $parameter->getDefaultValueConstantName();
+                    // 存在チェック＋$dummy でグローバル定数を回避しているが、いっそのこと一律 \\ を付与してしまっても良いような気がする
+                    if (const_exists(...(explode('::', $parameter->getDefaultValueConstantName()) + [1 => '$dummy']))) {
+                        $defval = '\\' . $parameter->getDefaultValueConstantName();
+                    }
+                    else {
+                        $defval = $parameter->getDefaultValueConstantName();
+                    }
                 }
                 else {
                     $default = $parameter->getDefaultValue();

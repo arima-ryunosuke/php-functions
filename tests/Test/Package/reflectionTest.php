@@ -191,6 +191,10 @@ class reflectionTest extends AbstractTestCase
         that($params)->isSame([
             '$a' => '$a = PHP_SAPI',
         ]);
+        $params = function_parameter(function ($a = \ArrayObject::ARRAY_AS_PROPS) { });
+        that($params)->isSame([
+            '$a' => '$a = \\ArrayObject::ARRAY_AS_PROPS',
+        ]);
 
         // internal
         $params = function_parameter('strpos');

@@ -4,7 +4,6 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/arrayize.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
-require_once __DIR__ . '/../reflection/reflect_types.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -70,7 +69,7 @@ function parameter_wiring($callable, $dependency)
                 $result[$n] = $dependency[$pname];
             }
         }
-        elseif (($typename = (string) reflect_types($parameter->getType()))) {
+        elseif (($typename = strval($parameter->getType()))) {
             if (isset($dependency[$typename])) {
                 $result[$n] = $dependency[$typename];
             }
