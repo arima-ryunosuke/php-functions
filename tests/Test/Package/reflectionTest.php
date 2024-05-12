@@ -8,6 +8,7 @@ use function ryunosuke\Functions\Package\parameter_default;
 use function ryunosuke\Functions\Package\parameter_length;
 use function ryunosuke\Functions\Package\parameter_wiring;
 use function ryunosuke\Functions\Package\reflect_callable;
+use function ryunosuke\Functions\Package\reflect_type_resolve;
 use function ryunosuke\Functions\Package\reflect_types;
 
 class reflectionTest extends AbstractTestCase
@@ -303,6 +304,27 @@ class reflectionTest extends AbstractTestCase
 
         // そもそも形式がおかしい
         that(self::resolveFunction('reflect_callable'))([])->wasThrown('is not callable');
+    }
+
+    function test_reflect_type_resolve()
+    {
+        that(reflect_type_resolve(''))->isSame('');
+        that(reflect_type_resolve(null))->isSame(null);
+
+        // シンプル
+        that(reflect_type_resolve('stdClass'))->is('\\stdClass');
+        that(reflect_type_resolve('?stdClass'))->is('?\\stdClass');
+        that(reflect_type_resolve('?\\stdClass'))->is('?\\stdClass');
+
+        // union
+        that(reflect_type_resolve('stdClass|int'))->is('\\stdClass|int');
+        that(reflect_type_resolve('\\stdClass|int'))->is('\\stdClass|int');
+
+        // intersect
+        that(reflect_type_resolve('Countable&Traversable'))->is('\\Countable&\\Traversable');
+
+        // DNF
+        that(reflect_type_resolve('(Countable&Traversable)|object'))->is('(\\Countable&\\Traversable)|object');
     }
 
     function test_reflect_types()
