@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\callable_code;
+use function ryunosuke\Functions\Package\function_export_false2null;
 use function ryunosuke\Functions\Package\function_parameter;
 use function ryunosuke\Functions\Package\parameter_default;
 use function ryunosuke\Functions\Package\parameter_length;
@@ -119,6 +120,30 @@ class reflectionTest extends AbstractTestCase
             'fn($a, $b)',
             'new class ( $a, $b ) { public function __construct($a, $b) { } }',
         ]);
+    }
+
+    function test_function_export_false2null()
+    {
+        $exported = function_export_false2null('Exported', true);
+
+        that($exported)->contains('namespace Exported');
+        that($exported)->contains('strpos');
+        that($exported)->notContains('in_array');
+
+        $exported = function_export_false2null('Exported', false);
+
+        that($exported)->contains('namespace Exported');
+        that($exported)->contains('strpos');
+        that($exported)->contains('in_array');
+
+        // include してエラーにならないことと代表（strpos）で null が返ることが確認できればそれでよい
+
+        $file = self::$TMPDIR . '/nully.php';
+        file_put_contents($file, $exported);
+        include $file;
+
+        $funcname = '\\Exported\\strpos';
+        that($funcname('hoge', 'notfound'))->isNull();
     }
 
     function test_function_parameter()
