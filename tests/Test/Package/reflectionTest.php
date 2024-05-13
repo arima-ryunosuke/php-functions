@@ -173,6 +173,13 @@ class reflectionTest extends AbstractTestCase
             '$needle'   => 'string $needle',
             '$offset'   => 'int $offset = 0',
         ]);
+        $params = function_parameter('stream_filter_append');
+        that($params)->isSame([
+            '$stream'      => '$stream',
+            '$filter_name' => 'string $filter_name',
+            '$mode'        => 'int $mode = 0',
+            '$params'      => 'mixed $params = null',
+        ]);
     }
 
     function test_parameter_default()

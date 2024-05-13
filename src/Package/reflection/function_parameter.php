@@ -64,6 +64,12 @@ function function_parameter($eitherReffuncOrCallable)
                     }
                 }
             }
+            // isOptional だが isDefaultValueAvailable でないし isVariadic でもない（稀にある（stream_filter_append で確認））
+            elseif (!$parameter->isVariadic()) {
+                // Type に応じたデフォルト値が得られればベストだがそこまでする必要もない
+                // 少なくとも 8.0 時点では = null してしまえば型エラーも起きない（8.4 で非推奨になってるけど）
+                $defval = "null";
+            }
 
             if (isset($defval)) {
                 $declare .= ' = ' . $defval;
