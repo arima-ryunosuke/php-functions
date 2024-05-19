@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.2
+
+- [change] php8.0 になり ReflectionType の __toString が解放されたので無駄な処理の対応
+- [feature] function_export_false2null を追加
+- [feature] reflect_type_resolve を追加
+- [fixbug] function_parameter で稀に構文エラーが出る不具合を修正
+- [fixbug] var_pretty で maxcolumn 指定時に既存行がないにも関わらず改行されていた不具合を修正
+- [change] str_putcsv の改善
+
 ## 2.0.1
 
 - [feature] finalize を追加
