@@ -3165,6 +3165,7 @@ class arrayTest extends AbstractTestCase
         that(arrayize(['a' => 1], 2, 3))->isSame(['a' => 1, 2, 3]);
         that(arrayize([1 => 1], [2 => 2], [3 => 3]))->isSame([1 => 1, 2 => 2, 3 => 3]);
         that(arrayize([1 => 1], ['b' => 2], [3 => 3]))->isSame([1 => 1, 'b' => 2, 3 => 3]);
+        that(arrayize(0, [1, 2, 3], [4, 5, 6], ['a' => 'A1'], ['a' => 'A2']))->isSame([0, 1, 2, 3, 4, 5, 6, 'a' => 'A1']);
     }
 
     function test_arrays()
