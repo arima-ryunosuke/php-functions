@@ -1557,8 +1557,8 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
 
     function test_paml_import()
     {
-        that(paml_import('null:null,bool1: false, bool2:true , int: 123, double: 3.14, string1:xyz,string2:"[x, \"y\", \'z\']"'))->isSame([
-            "null"    => null,
+        that(paml_import('null1:null,bool1: false, bool2:true , int: 123, double: 3.14, string1:xyz,string2:"[x, \"y\", \'z\']"'))->isSame([
+            "null1"    => null,
             "bool1"   => false,
             "bool2"   => true,
             "int"     => 123,
@@ -1628,6 +1628,11 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
             "empty_array2"  => (object) [],
             "empty_string1" => '',
             "empty_string2" => '',
+        ]);
+
+        that(paml_import('"a":\'A\', "{b}":"B"'))->is([
+            'a'   => 'A',
+            '{b}' => 'B',
         ]);
 
         that(paml_import('`1 | 2 | 4 | 8`, x: `1 * 2 * 4 * 8`', [

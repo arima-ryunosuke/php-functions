@@ -83,7 +83,7 @@ function paml_import($pamlstring, $options = [])
         return $caches[$key] ??= paml_import($pamlstring, ['cache' => false] + $options);
     }
 
-    $resolve = function (&$value) use ($options) {
+    $resolve = function (&$value, $options) {
         $prefix = $value[0] ?? null;
         $suffix = $value[-1] ?? null;
 
@@ -95,8 +95,11 @@ function paml_import($pamlstring, $options = [])
 
         if ($prefix === '"' && $suffix === '"') {
             //$element = stripslashes(substr($element, 1, -1));
-            $value = json_decode($value);
-            return true;
+            $value2 = json_decode($value);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $value = $value2;
+                return true;
+            }
         }
         if ($prefix === "'" && $suffix === "'") {
             $value = substr($value, 1, -1);
@@ -150,11 +153,12 @@ function paml_import($pamlstring, $options = [])
     $result = [];
     foreach ($values as $value) {
         $key = null;
-        if (!$resolve($value)) {
+        if (!$resolve($value, $options)) {
             $kv = array_map('trim', quoteexplode(':', $value, 2, $options['escapers']));
             if (count($kv) === 2) {
                 [$key, $value] = $kv;
-                $resolve($value);
+                $resolve($key, ['expression' => false] + $options);
+                $resolve($value, $options);
             }
         }
 
