@@ -34,16 +34,20 @@ namespace ryunosuke\Functions\Package;
  * @param string|callable $replacement 置換文字列
  * @param string $subject 対象文字列
  * @param array $matches キャプチャ配列が格納される
+ * @param int $limit 置換回数
  * @return string 置換された文字列
  */
-function preg_splice($pattern, $replacement, $subject, &$matches = [])
+function preg_splice($pattern, $replacement, $subject, &$matches = [], $limit = -1)
 {
+    // for compatible. $limit => 1
+    // preg_match なので $matches は最初しか引っかからないにも関わらず $limit:-1 だとすべて置換されてしまう
+
     if (preg_match($pattern, $subject, $matches)) {
         if (!is_string($replacement) && is_callable($replacement)) {
-            $subject = preg_replace_callback($pattern, $replacement, $subject);
+            $subject = preg_replace_callback($pattern, $replacement, $subject, $limit);
         }
         else {
-            $subject = preg_replace($pattern, $replacement, $subject);
+            $subject = preg_replace($pattern, $replacement, $subject, $limit);
         }
     }
     return $subject;

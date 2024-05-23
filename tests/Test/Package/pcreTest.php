@@ -218,6 +218,8 @@ class pcreTest extends AbstractTestCase
         $m = [];
         that(preg_splice('#\d+#', '', 'abc123', $m))->is("abc");
         that($m)->is(['123']);
+        that(preg_splice('#\d+#', '', 'abc123xyz789', $m, 1))->is("abcxyz789");
+        that($m)->is(['123']);
         that(preg_splice('#([a-z]+)#', fn($m) => strtoupper($m[1]), 'abc123', $m))->is("ABC123");
         that($m)->is(['abc', 'abc']);
         that(preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m))->is('strtoupper123');
