@@ -659,6 +659,21 @@ This is VARIABLE.
             'a"bc "',
             '',
         ]);
+
+        $string = 'a,b.c---d:';
+        $actual = quoteexplode(['---', ',', '.', ':'], $string, options: ['delim-capture' => true]);
+        that($actual)->is([
+            "a",
+            ",",
+            "b",
+            ".",
+            "c",
+            "---",
+            "d",
+            ":",
+            "",
+        ]);
+        that(implode('', $actual))->is($string);
     }
 
     function test_render_file()

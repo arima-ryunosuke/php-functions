@@ -36,10 +36,15 @@ require_once __DIR__ . '/../strings/strpos_quoted.php';
  * @param ?int $limit 分割数。負数未対応
  * @param array|string $enclosures 囲い文字。 ["start" => "end"] で開始・終了が指定できる
  * @param string $escape エスケープ文字
+ * @param array $options オプション
  * @return array 分割された配列
  */
-function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = '\\')
+function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = '\\', $options = [])
 {
+    $options += [
+        'delim-capture' => false, // デリミタも結果に含まれるようになる
+    ];
+
     if ($limit === null) {
         $limit = PHP_INT_MAX;
     }
@@ -60,6 +65,9 @@ function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $
             $delimiterlen = strlen($delimiter);
             if (substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
                 $result[] = substr($string, $current, $i - $current);
+                if ($options['delim-capture']) {
+                    $result[] = $delimiter;
+                }
                 $current = $i + $delimiterlen;
                 $i += $delimiterlen - 1;
                 break;
