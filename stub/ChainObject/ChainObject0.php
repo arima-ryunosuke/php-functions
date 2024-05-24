@@ -468,6 +468,11 @@ trait ChainObject0
     public function base62_decode($string): self { }
     public function base62_decode(): self { }
 
+    /** @see base64url_decode() */
+    public self $base64url_decode;
+    public function base64url_decode($string): self { }
+    public function base64url_decode(): self { }
+
     /** @see query_parse() */
     public self $query_parse;
     public function query_parse($query, $arg_separator = null, $encoding_type = null): self { }

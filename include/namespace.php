@@ -4919,13 +4919,18 @@ if (!function_exists('ryunosuke\\Functions\\arrayize')) {
      * 引数の配列を生成する。
      *
      * 配列以外を渡すと配列化されて追加される。
-     * 連想配列は未対応。あくまで普通の配列化のみ。
+     * 配列を渡してもそのままだが、連番配列の場合はマージ、連想配列の場合は結合となる。
      * iterable や Traversable は考慮せずあくまで「配列」としてチェックする。
      *
      * Example:
      * ```php
+     * // 値は配列化される
      * that(arrayize(1, 2, 3))->isSame([1, 2, 3]);
+     * // 配列はそのまま
      * that(arrayize([1], [2], [3]))->isSame([1, 2, 3]);
+     * // 連想配列、連番配列の挙動
+     * that(arrayize([1, 2, 3], [4, 5, 6], ['a' => 'A1'], ['a' => 'A2']))->isSame([1, 2, 3, 4, 5, 6, 'a' => 'A1']);
+     * // stdClass は foreach 可能だがあくまで配列としてチェックする
      * $object = new \stdClass();
      * that(arrayize($object, false, [1, 2, 3]))->isSame([$object, false, 1, 2, 3]);
      * ```
@@ -4942,11 +4947,13 @@ if (!function_exists('ryunosuke\\Functions\\arrayize')) {
             if (!is_array($arg)) {
                 $result[] = $arg;
             }
-            elseif (!is_hasharray($arg)) {
+            elseif ($result && !is_hasharray($arg)) {
                 $result = array_merge($result, $arg);
             }
             else {
-                $result += $arg;
+                // array_merge に合わせるなら $result = $arg + $result で後方上書きの方がいいかも
+                // 些細な変更だけど後方互換性が完全に壊れるのでいったん保留（可変引数なんてほとんど使ってないと思うけど…）
+                $result += $arg; // for compatible
             }
         }
         return $result;
@@ -10270,7 +10277,7 @@ if (!function_exists('ryunosuke\\Functions\\paml_import')) {
             return $caches[$key] ??= paml_import($pamlstring, ['cache' => false] + $options);
         }
 
-        $resolve = function (&$value) use ($options) {
+        $resolve = function (&$value, $options) {
             $prefix = $value[0] ?? null;
             $suffix = $value[-1] ?? null;
 
@@ -10282,8 +10289,11 @@ if (!function_exists('ryunosuke\\Functions\\paml_import')) {
 
             if ($prefix === '"' && $suffix === '"') {
                 //$element = stripslashes(substr($element, 1, -1));
-                $value = json_decode($value);
-                return true;
+                $value2 = json_decode($value);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $value = $value2;
+                    return true;
+                }
             }
             if ($prefix === "'" && $suffix === "'") {
                 $value = substr($value, 1, -1);
@@ -10337,11 +10347,12 @@ if (!function_exists('ryunosuke\\Functions\\paml_import')) {
         $result = [];
         foreach ($values as $value) {
             $key = null;
-            if (!$resolve($value)) {
+            if (!$resolve($value, $options)) {
                 $kv = array_map('trim', quoteexplode(':', $value, 2, $options['escapers']));
                 if (count($kv) === 2) {
                     [$key, $value] = $kv;
-                    $resolve($value);
+                    $resolve($key, ['expression' => false] + $options);
+                    $resolve($value, $options);
                 }
             }
 
@@ -20815,16 +20826,20 @@ if (!function_exists('ryunosuke\\Functions\\preg_splice')) {
      * @param string|callable $replacement 置換文字列
      * @param string $subject 対象文字列
      * @param array $matches キャプチャ配列が格納される
+     * @param int $limit 置換回数
      * @return string 置換された文字列
      */
-    function preg_splice($pattern, $replacement, $subject, &$matches = [])
+    function preg_splice($pattern, $replacement, $subject, &$matches = [], $limit = -1)
     {
+        // for compatible. $limit => 1
+        // preg_match なので $matches は最初しか引っかからないにも関わらず $limit:-1 だとすべて置換されてしまう
+
         if (preg_match($pattern, $subject, $matches)) {
             if (!is_string($replacement) && is_callable($replacement)) {
-                $subject = preg_replace_callback($pattern, $replacement, $subject);
+                $subject = preg_replace_callback($pattern, $replacement, $subject, $limit);
             }
             else {
-                $subject = preg_replace($pattern, $replacement, $subject);
+                $subject = preg_replace($pattern, $replacement, $subject, $limit);
             }
         }
         return $subject;
@@ -24098,10 +24113,15 @@ if (!function_exists('ryunosuke\\Functions\\quoteexplode')) {
      * @param ?int $limit 分割数。負数未対応
      * @param array|string $enclosures 囲い文字。 ["start" => "end"] で開始・終了が指定できる
      * @param string $escape エスケープ文字
+     * @param array $options オプション
      * @return array 分割された配列
      */
-    function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = '\\')
+    function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = '\\', $options = [])
     {
+        $options += [
+            'delim-capture' => false, // デリミタも結果に含まれるようになる
+        ];
+
         if ($limit === null) {
             $limit = PHP_INT_MAX;
         }
@@ -24122,6 +24142,9 @@ if (!function_exists('ryunosuke\\Functions\\quoteexplode')) {
                 $delimiterlen = strlen($delimiter);
                 if (substr_compare($string, $delimiter, $i, $delimiterlen) === 0) {
                     $result[] = substr($string, $current, $i - $current);
+                    if ($options['delim-capture']) {
+                        $result[] = $delimiter;
+                    }
                     $current = $i + $delimiterlen;
                     $i += $delimiterlen - 1;
                     break;
@@ -27039,6 +27062,43 @@ if (!function_exists('ryunosuke\\Functions\\base62_encode')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\base64url_decode') || (new \ReflectionFunction('ryunosuke\\Functions\\base64url_decode'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\base64url_decode')) {
+    /**
+     * url safe な base64_decode
+     *
+     * 対で使うと思うので base64_encode を参照。
+     *
+     * @package ryunosuke\Functions\Package\url
+     *
+     * @param string $string base64url 文字列
+     * @return string 変換元文字列
+     */
+    function base64url_decode($string)
+    {
+        return base64_decode(strtr($string, ['-' => '+', '_' => '/']));
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\base64url_encode') || (new \ReflectionFunction('ryunosuke\\Functions\\base64url_encode'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\base64url_encode')) {
+    /**
+     * url safe な base64_encode
+     *
+     * れっきとした RFC があるのかは分からないが '+' => '-', '/' => '_' がデファクトだと思うのでそのようにしてある。
+     * パディングの = も外す。
+     *
+     * @package ryunosuke\Functions\Package\url
+     *
+     * @param string $string 変換元文字列
+     * @return string base64url 文字列
+     */
+    function base64url_encode($string)
+    {
+        return rtrim(strtr(base64_encode($string), ['+' => '-', '/' => '_']), '=');
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\dataurl_decode') || (new \ReflectionFunction('ryunosuke\\Functions\\dataurl_decode'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\dataurl_decode')) {
     /**
@@ -28793,7 +28853,7 @@ if (!function_exists('ryunosuke\\Functions\\decrypt')) {
     function decrypt($cipherdata, $password, $ciphers = 'aes-256-cbc', $tag = '')
     {
         $version = $cipherdata[-1] ?? '';
-        $cipherdata = base64_decode(strtr(substr($cipherdata, 0, -1), ['-' => '+', '_' => '/']));
+        $cipherdata = base64url_decode(substr($cipherdata, 0, -1));
 
         if ($version === "4") {
             $cipher = 'aes-256-gcm';
@@ -28944,10 +29004,10 @@ if (!function_exists('ryunosuke\\Functions\\encrypt')) {
         $payload = openssl_encrypt($zlibdata, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...$metadata['taglen'] ? [&$tag] : []);
 
         if ($original_cipher === null) {
-            return rtrim(strtr(base64_encode($payload . $tag . $iv), ['+' => '-', '/' => '_']), '=') . '4';
+            return base64url_encode($payload . $tag . $iv) . '4';
         }
         else {
-            return rtrim(strtr(base64_encode($tag . $iv . $payload . ':' . $cipher), ['+' => '-', '/' => '_']), '=') . '3';
+            return base64url_encode($tag . $iv . $payload . ':' . $cipher) . '3';
         }
     }
 }
@@ -30531,7 +30591,7 @@ if (!function_exists('ryunosuke\\Functions\\var_hash')) {
             return $hash;
         }
 
-        return rtrim(strtr(base64_encode($hash), ['+' => '-', '/' => '_']));
+        return base64url_encode($hash);
     }
 }
 

@@ -505,8 +505,8 @@ trait ChainObject5
 
     /** @see preg_splice() */
     public self $preg_splice;
-    public function preg_splice($pattern, $replacement, $subject, &$matches = []): self { }
-    public function preg_splice($replacement, $subject, &$matches = []): self { }
+    public function preg_splice($pattern, $replacement, $subject, &$matches = [], $limit = -1): self { }
+    public function preg_splice($replacement, $subject, &$matches = [], $limit = -1): self { }
 
     /** @see function_parameter() */
     public self $function_parameter;
@@ -535,8 +535,8 @@ trait ChainObject5
 
     /** @see quoteexplode() */
     public self $quoteexplode;
-    public function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = "\\"): self { }
-    public function quoteexplode($string, $limit = null, $enclosures = "'\"", $escape = "\\"): self { }
+    public function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = "\\", $options = []): self { }
+    public function quoteexplode($string, $limit = null, $enclosures = "'\"", $escape = "\\", $options = []): self { }
 
     /** @see render_file() */
     public self $render_file;
