@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../misc/unique_id.php';
+require_once __DIR__ . '/../url/base64url_encode.php';
 require_once __DIR__ . '/../var/cipher_metadata.php';
 // @codeCoverageIgnoreEnd
 
@@ -76,9 +77,9 @@ function encrypt($plaindata, $password, $cipher = null, &$tag = '')
     $payload = openssl_encrypt($zlibdata, $cipher, $password, OPENSSL_RAW_DATA, $iv, ...$metadata['taglen'] ? [&$tag] : []);
 
     if ($original_cipher === null) {
-        return rtrim(strtr(base64_encode($payload . $tag . $iv), ['+' => '-', '/' => '_']), '=') . '4';
+        return base64url_encode($payload . $tag . $iv) . '4';
     }
     else {
-        return rtrim(strtr(base64_encode($tag . $iv . $payload . ':' . $cipher), ['+' => '-', '/' => '_']), '=') . '3';
+        return base64url_encode($tag . $iv . $payload . ':' . $cipher) . '3';
     }
 }

@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../url/base64url_decode.php';
 require_once __DIR__ . '/../var/cipher_metadata.php';
 // @codeCoverageIgnoreEnd
 
@@ -29,7 +30,7 @@ require_once __DIR__ . '/../var/cipher_metadata.php';
 function decrypt($cipherdata, $password, $ciphers = 'aes-256-cbc', $tag = '')
 {
     $version = $cipherdata[-1] ?? '';
-    $cipherdata = base64_decode(strtr(substr($cipherdata, 0, -1), ['-' => '+', '_' => '/']));
+    $cipherdata = base64url_decode(substr($cipherdata, 0, -1));
 
     if ($version === "4") {
         $cipher = 'aes-256-gcm';

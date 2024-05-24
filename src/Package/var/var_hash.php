@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/arrayize.php';
+require_once __DIR__ . '/../url/base64url_encode.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -45,5 +46,5 @@ function var_hash($var, $algos = ['md5', 'sha1'], $base64 = true)
         return $hash;
     }
 
-    return rtrim(strtr(base64_encode($hash), ['+' => '-', '/' => '_']));
+    return base64url_encode($hash);
 }

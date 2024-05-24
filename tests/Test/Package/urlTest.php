@@ -4,6 +4,8 @@ namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\base62_decode;
 use function ryunosuke\Functions\Package\base62_encode;
+use function ryunosuke\Functions\Package\base64url_decode;
+use function ryunosuke\Functions\Package\base64url_encode;
 use function ryunosuke\Functions\Package\dataurl_decode;
 use function ryunosuke\Functions\Package\dataurl_encode;
 use function ryunosuke\Functions\Package\query_build;
@@ -119,6 +121,16 @@ class urlTest extends AbstractTestCase
             // invalid
             that(self::resolveFunction('base62_decode'))('a+z', $ext)->wasThrown('is not');
         }
+    }
+
+    function test_base64url()
+    {
+        // "-_" が現れていることと元に戻ることが担保できていれば十分
+        $string = sha1('foo', true);
+        $encoded = base64url_encode($string);
+        that($encoded)->is('C-7Hteo_D9vJXQ3UfzxbwnXaijM');
+        $decoded = base64url_decode($encoded);
+        that($decoded)->is($string);
     }
 
     function test_dataurl()
