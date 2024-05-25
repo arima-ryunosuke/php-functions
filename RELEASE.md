@@ -11,6 +11,14 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.3
+
+- [feature] base64url_encode/decode を追加
+- [feature] quoteexplode に区切り文字も返すオプションを追加
+- [fixbug] preg_splice で複数置換されてしまう不具合を修正
+- [fixbug] paml_import でキーにクオート文字を指定できない不具合を修正
+- [refactor] arrayize の改善
+
 ## 2.0.2
 
 - [change] php8.0 になり ReflectionType の __toString が解放されたので無駄な処理の対応
