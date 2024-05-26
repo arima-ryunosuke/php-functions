@@ -11,6 +11,10 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.4
+
+- [feature] php8.2 で最低限動くように対応
+
 ## 2.0.3
 
 - [feature] base64url_encode/decode を追加
