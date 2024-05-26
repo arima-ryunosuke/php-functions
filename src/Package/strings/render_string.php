@@ -23,8 +23,6 @@ namespace ryunosuke\Functions\Package;
  *
  * Example:
  * ```php
- * // 数値キーが参照できる
- * that(render_string('${0}', ['number']))->isSame('number');
  * // クロージャは呼び出し結果が埋め込まれる
  * that(render_string('$c', ['c' => fn($vars, $k) => $k . '-closure']))->isSame('c-closure');
  * // 引数をそのまま返すだけの特殊な変数 $_ が宣言される

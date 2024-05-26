@@ -11,6 +11,7 @@ class ParentClass
  * @property int $fuga
  * @method array hoge($arg)
  */
+#[\AllowDynamicProperties]
 class ClassExtends extends ParentClass
 {
     use Fields;

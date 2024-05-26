@@ -58,6 +58,8 @@ function var_stream(&$var, $initial = '')
             private $entry;
             private $position;
 
+            public $context;
+
             public static function create(string &$var): int
             {
                 self::$entries[++self::$ids] = &$var;

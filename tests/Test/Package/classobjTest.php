@@ -619,9 +619,11 @@ class classobjTest extends AbstractTestCase
             function ($classname, $filename, $contents) {
                 if ($classname === files\classes\InitializedClass::class) {
                     // この中でオートロードしても問題ないことを担保（php-parser とかで書き換える事が多いので）
-                    class_exists(\PHPUnit\Util\TestDox\TestDoxPrinter::class);
-                    class_exists(\PHPUnit\Util\TestDox\CliTestDoxPrinter::class);
-                    class_exists(\PHPUnit\Util\TestDox\XmlResultPrinter::class);
+                    if (version_compare(PHP_VERSION, 8.2) < 0) {
+                        class_exists(\PHPUnit\Util\TestDox\TestDoxPrinter::class);
+                        class_exists(\PHPUnit\Util\TestDox\CliTestDoxPrinter::class);
+                        class_exists(\PHPUnit\Util\TestDox\XmlResultPrinter::class);
+                    }
                     return strtr($contents ?? file_get_contents($filename), ['$initialized' => '$initialized2']);
                 }
             },

@@ -316,7 +316,8 @@ class Transporter
         $constants = self::getAllConstant();
         $functions = self::getAllFunction();
 
-        $tokens = \PhpToken::tokenize("<?php {$functions[$funcname]['codeblock']}");
+        $PhpToken = new #[\AllowDynamicProperties] class (0, "") extends \PhpToken { };
+        $tokens = $PhpToken::tokenize("<?php {$functions[$funcname]['codeblock']}");
         array_shift($tokens);
         for ($i = 0; $i < count($tokens); $i++) {
             $token = $tokens[$i];

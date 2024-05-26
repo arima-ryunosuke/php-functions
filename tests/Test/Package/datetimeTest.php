@@ -936,7 +936,7 @@ class datetimeTest extends AbstractTestCase
 
         // invalid
         that(date_validate('hogera'))->is(false);
-        that(error_get_last()['message'])->contains("Data missing");
+        that(error_get_last()['message'])->contains("four digit year could not be found");
 
         // invalid datetime
         that(date_validate('2014-12-24T12:34:56.78901X', 'Y-m-d\\TH:i:s.u'))->is(false);

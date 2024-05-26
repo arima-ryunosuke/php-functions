@@ -32,6 +32,7 @@ abstract class AbstractConcrete
 /**
  * 汎用テスト用クラス
  */
+#[\AllowDynamicProperties]
 class Concrete extends AbstractConcrete implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable
 {
     private $privateField = 'Concrete';
@@ -263,6 +264,7 @@ class Arrayable implements \ArrayAccess
     }
 }
 
+#[\AllowDynamicProperties]
 class SerialMethod
 {
     private $field = 123;

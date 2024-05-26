@@ -254,8 +254,10 @@ class reflectionTest extends AbstractTestCase
         that(parameter_length('Concrete::staticMethod', true))->is(0);
 
         // タイプ 5: 相対指定による静的クラスメソッドのコール (PHP 5.3.0 以降)
-        that(parameter_length(['Concrete', 'parent::staticMethod']))->is(1);
-        that(parameter_length(['Concrete', 'parent::staticMethod'], true))->is(0);
+        if (version_compare(PHP_VERSION, 8.2) < 0) {
+            that(parameter_length(['Concrete', 'parent::staticMethod']))->is(1);
+            that(parameter_length(['Concrete', 'parent::staticMethod'], true))->is(0);
+        }
 
         // タイプ 6: __invoke を実装したオブジェクトを callable として用いる (PHP 5.3 以降)
         that(parameter_length(new \Concrete('')))->is(1);

@@ -95,7 +95,9 @@ function date_interval_string($interval, $format = null, $limit_type = 'y')
     $centurys = $years / 100;
 
     // $limit に従って値を切り捨てて DateInterval を作成
-    $interval = new \DateInterval('PT1S');
+    // 「以下に示すプロパティが使えるかどうかは、 PHP のバージョンに依存します。 そして、readonly と見なすべきです」
+    // とのことで、今は動いているけどいずれ使えなくなると思う
+    $interval = new #[\AllowDynamicProperties] class ( 'PT1S' ) extends \DateInterval { };
     $interval->c = $limit < $map['c'] ? 0 : (int) $centurys % 1000;
     $interval->y = $limit < $map['y'] ? 0 : (int) ($limit === $map['y'] ? $years : (int) $years % 100);
     $interval->m = $limit < $map['m'] ? 0 : (int) ($limit === $map['m'] ? $months : (int) $months % 12);

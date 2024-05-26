@@ -373,8 +373,8 @@ function var_export3($value, $return = false)
                     $prev = $neighborToken($n, -1, $tokens) ?? [null, null, null];
                     $next = $neighborToken($n, +1, $tokens) ?? [null, null, null];
 
-                    // 無名クラスは new class で始まるはず
-                    if ($token->id === T_NEW && $next->id === T_CLASS) {
+                    // 無名クラスは new class か new #[Attribute] で始まるはず（new #[A] ClassName は許可されていない）
+                    if (($token->id === T_NEW && $next->id === T_CLASS) || ($token->id === T_NEW && $next->id === T_ATTRIBUTE)) {
                         $starting = true;
                     }
                     if (!$starting) {
@@ -473,7 +473,7 @@ function var_export3($value, $return = false)
     static $factory = null;
     if ($factory === null) {
         // @codeCoverageIgnoreStart
-        $factory = $export(new class() {
+        $factory = $export(new #[\AllowDynamicProperties] class() {
             public function new(&$object, $class, $provider)
             {
                 if ($class instanceof \Closure) {

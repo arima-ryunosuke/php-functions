@@ -12,7 +12,7 @@ namespace ryunosuke\Functions\Package;
  *
  * Example:
  * ```php
- * $object = new \Exception('something', 42);
+ * $object = new #[\AllowDynamicProperties] class('something', 42) extends \Exception{};
  * $object->oreore = 'oreore';
  *
  * // get_object_vars はそのスコープから見えないプロパティを取得できない

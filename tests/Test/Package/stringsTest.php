@@ -678,6 +678,12 @@ This is VARIABLE.
 
     function test_render_file()
     {
+        set_error_handler(function ($errno, $errmsg) {
+            if (str_contains($errmsg, '${expr}')) {
+                return null;
+            }
+            return false;
+        });
         $actual = render_file(__DIR__ . '/files/template/template.txt', [
             'zero',
             'string'  => 'string',
@@ -693,6 +699,12 @@ zero is index 0.
 
     function test_render_string()
     {
+        set_error_handler(function ($errno, $errmsg) {
+            if (str_contains($errmsg, '${expr}')) {
+                return null;
+            }
+            return false;
+        });
         // single
         $actual = render_string('int is $int' . "\n" . 'float is $float' . "\n" . 'string is $string', [
             'int'    => 12345,

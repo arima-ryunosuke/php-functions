@@ -31,10 +31,13 @@ function mb_compatible_encoding($from, $to)
     static $encmap = [];
     if (!$encmap) {
         foreach (mb_list_encodings() as $encoding) {
-            $encmap[strtolower($encoding)] = [
-                'aliases'  => array_flip(array_map('strtolower', mb_encoding_aliases($encoding))),
-                'mimename' => strtolower((string) @mb_preferred_mime_name($encoding)),
-            ];
+            // 非推奨を避ける
+            if (!in_array($encoding, ['BASE64', 'UUENCODE', 'HTML-ENTITIES', 'Quoted-Printable'], true)) {
+                $encmap[strtolower($encoding)] = [
+                    'aliases'  => array_flip(array_map('strtolower', mb_encoding_aliases($encoding))),
+                    'mimename' => strtolower((string) @mb_preferred_mime_name($encoding)),
+                ];
+            }
         }
     }
 

@@ -419,7 +419,7 @@ function rsync($src, $dst, $options = [])
             })($fullpath);
         }
 
-        private function format(string $mode, ?int $var): ?string
+        private function format(string $mode, null|int|float $var): ?string
         {
             if ($var === null) {
                 return null;

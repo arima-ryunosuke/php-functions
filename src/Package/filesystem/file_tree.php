@@ -53,7 +53,7 @@ function file_tree($dirname, $filter_condition = [])
     $basedir = basename($dirname);
 
     $result = [$basedir => []];
-    $items = iterator_to_array(new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS || \FilesystemIterator::CURRENT_AS_SELF));
+    $items = iterator_to_array(new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_FILEINFO));
     usort($items, function (\SplFileInfo $a, \SplFileInfo $b) {
         if ($a->isDir() xor $b->isDir()) {
             return $a->isDir() - $b->isDir();

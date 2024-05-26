@@ -234,6 +234,7 @@ class errorfuncTest extends AbstractTestCase
         }
 
         $mock = new class() {
+            public $that;
             static function sm($that) { return test_stacktrace($that); }
 
             function im() { return $this::sm($this); }

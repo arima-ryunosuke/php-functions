@@ -135,15 +135,15 @@ function date_match($datetime, $cronlike)
     $matches = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
 
     // 週の特殊処理
-    $matches['W'] = preg_replace_callback("!$dayofweek_pattern!u", fn($m) => $reverse_dayofweek[$m[0]], $matches['W']);
+    $matches['W'] = preg_replace_callback("!$dayofweek_pattern!u", fn($m) => $reverse_dayofweek[$m[0]], $matches['W'] ?? '');
 
     foreach ($matches as $key => &$match) {
         // 9, L 等の特殊処理
         if ($key === 'D') {
-            $match = preg_replace('!(L+|9{2,})!', $lastday, $match);
+            $match = preg_replace('!(L+|9{2,})!', $lastday, $match ?? '');
         }
         else {
-            $match = preg_replace('!(L+|9+)!', 'LAST', $match);
+            $match = preg_replace('!(L+|9+)!', 'LAST', $match ?? '');
         }
 
         // 1-4 などを 1,2,3,4 に展開

@@ -30,11 +30,11 @@ function console_log(...$values)
         // header_register_callback はグローバルで1度しか登録できないのでライブラリ内部で使うべきではない
         // ob_start にコールバックを渡すと ob_end～ の時に呼ばれるので、擬似的に header_register_callback 的なことができる
         ob_start(function () use (&$rows) {
-            $header = base64_encode(utf8_encode(json_encode([
+            $header = base64_encode(mb_convert_encoding(json_encode([
                 'version' => '1.0.0',
                 'columns' => ['log', 'backtrace', 'type'],
                 'rows'    => $rows,
-            ])));
+            ]), 'UTF-8', 'ISO-8859-1'));
             header('X-ChromeLogger-Data: ' . $header);
             return false;
         });

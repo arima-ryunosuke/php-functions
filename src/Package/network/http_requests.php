@@ -30,7 +30,7 @@ require_once __DIR__ . '/../network/http_request.php';
  *     // さらに、このような [URL => CURL オプション] 形式も許容される（あまり用途はないだろうが）
  *     'http://127.0.0.1' => [
  *         CURLOPT_TIMEOUT => 5,
- *         'callback'      => fn($key, $body) => strlen($body),
+ *         'callback'      => fn($key, $body) => $body,
  *     ],
  * ], [
  *     // 第2引数で各リクエストの共通オプションを指定できる（個別指定優先）
