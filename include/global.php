@@ -6596,7 +6596,7 @@ if (!function_exists('object_properties')) {
      *
      * Example:
      * ```php
-     * $object = new \Exception('something', 42);
+     * $object = new #[\AllowDynamicProperties] class('something', 42) extends \Exception{};
      * $object->oreore = 'oreore';
      *
      * // get_object_vars はそのスコープから見えないプロパティを取得できない
@@ -10065,7 +10065,7 @@ if (!function_exists('markdown_table')) {
             'stringify' => fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false]),
         ];
 
-        $stringify = fn($v) => strtr(trim(is_stringable($v) ? $v : $option['stringify']($v)), ["\t" => '    ']);
+        $stringify = fn($v) => strtr(trim((is_stringable($v) ? $v : $option['stringify']($v)) ?? ''), ["\t" => '    ']);
         $is_numeric = function ($v) {
             $v = trim($v);
             if (strlen($v) === 0) {
@@ -10779,7 +10779,9 @@ if (!function_exists('date_interval_string')) {
         $centurys = $years / 100;
 
         // $limit に従って値を切り捨てて DateInterval を作成
-        $interval = new \DateInterval('PT1S');
+        // 「以下に示すプロパティが使えるかどうかは、 PHP のバージョンに依存します。 そして、readonly と見なすべきです」
+        // とのことで、今は動いているけどいずれ使えなくなると思う
+        $interval = new #[\AllowDynamicProperties] class ( 'PT1S' ) extends \DateInterval { };
         $interval->c = $limit < $map['c'] ? 0 : (int) $centurys % 1000;
         $interval->y = $limit < $map['y'] ? 0 : (int) ($limit === $map['y'] ? $years : (int) $years % 100);
         $interval->m = $limit < $map['m'] ? 0 : (int) ($limit === $map['m'] ? $months : (int) $months % 12);
@@ -11018,15 +11020,15 @@ if (!function_exists('date_match')) {
         $matches = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
 
         // 週の特殊処理
-        $matches['W'] = preg_replace_callback("!$dayofweek_pattern!u", fn($m) => $reverse_dayofweek[$m[0]], $matches['W']);
+        $matches['W'] = preg_replace_callback("!$dayofweek_pattern!u", fn($m) => $reverse_dayofweek[$m[0]], $matches['W'] ?? '');
 
         foreach ($matches as $key => &$match) {
             // 9, L 等の特殊処理
             if ($key === 'D') {
-                $match = preg_replace('!(L+|9{2,})!', $lastday, $match);
+                $match = preg_replace('!(L+|9{2,})!', $lastday, $match ?? '');
             }
             else {
-                $match = preg_replace('!(L+|9+)!', 'LAST', $match);
+                $match = preg_replace('!(L+|9+)!', 'LAST', $match ?? '');
             }
 
             // 1-4 などを 1,2,3,4 に展開
@@ -13872,7 +13874,7 @@ if (!function_exists('file_tree')) {
         $basedir = basename($dirname);
 
         $result = [$basedir => []];
-        $items = iterator_to_array(new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS || \FilesystemIterator::CURRENT_AS_SELF));
+        $items = iterator_to_array(new \FilesystemIterator($dirname, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_FILEINFO));
         usort($items, function (\SplFileInfo $a, \SplFileInfo $b) {
             if ($a->isDir() xor $b->isDir()) {
                 return $a->isDir() - $b->isDir();
@@ -14853,7 +14855,7 @@ if (!function_exists('rsync')) {
                 })($fullpath);
             }
 
-            private function format(string $mode, ?int $var): ?string
+            private function format(string $mode, null|int|float $var): ?string
             {
                 if ($var === null) {
                     return null;
@@ -17742,11 +17744,11 @@ if (!function_exists('console_log')) {
             // header_register_callback はグローバルで1度しか登録できないのでライブラリ内部で使うべきではない
             // ob_start にコールバックを渡すと ob_end～ の時に呼ばれるので、擬似的に header_register_callback 的なことができる
             ob_start(function () use (&$rows) {
-                $header = base64_encode(utf8_encode(json_encode([
+                $header = base64_encode(mb_convert_encoding(json_encode([
                     'version' => '1.0.0',
                     'columns' => ['log', 'backtrace', 'type'],
                     'rows'    => $rows,
-                ])));
+                ]), 'UTF-8', 'ISO-8859-1'));
                 header('X-ChromeLogger-Data: ' . $header);
                 return false;
             });
@@ -19707,7 +19709,7 @@ if (!function_exists('http_requests')) {
      *     // さらに、このような [URL => CURL オプション] 形式も許容される（あまり用途はないだろうが）
      *     'http://127.0.0.1' => [
      *         CURLOPT_TIMEOUT => 5,
-     *         'callback'      => fn($key, $body) => strlen($body),
+     *         'callback'      => fn($key, $body) => $body,
      *     ],
      * ], [
      *     // 第2引数で各リクエストの共通オプションを指定できる（個別指定優先）
@@ -22941,6 +22943,8 @@ if (!function_exists('var_stream')) {
                 private $entry;
                 private $position;
 
+                public $context;
+
                 public static function create(string &$var): int
                 {
                     self::$entries[++self::$ids] = &$var;
@@ -23361,10 +23365,13 @@ if (!function_exists('mb_compatible_encoding')) {
         static $encmap = [];
         if (!$encmap) {
             foreach (mb_list_encodings() as $encoding) {
-                $encmap[strtolower($encoding)] = [
-                    'aliases'  => array_flip(array_map('strtolower', mb_encoding_aliases($encoding))),
-                    'mimename' => strtolower((string) @mb_preferred_mime_name($encoding)),
-                ];
+                // 非推奨を避ける
+                if (!in_array($encoding, ['BASE64', 'UUENCODE', 'HTML-ENTITIES', 'Quoted-Printable'], true)) {
+                    $encmap[strtolower($encoding)] = [
+                        'aliases'  => array_flip(array_map('strtolower', mb_encoding_aliases($encoding))),
+                        'mimename' => strtolower((string) @mb_preferred_mime_name($encoding)),
+                    ];
+                }
             }
         }
 
@@ -24194,8 +24201,6 @@ if (!function_exists('render_string')) {
      *
      * Example:
      * ```php
-     * // 数値キーが参照できる
-     * that(render_string('${0}', ['number']))->isSame('number');
      * // クロージャは呼び出し結果が埋め込まれる
      * that(render_string('$c', ['c' => fn($vars, $k) => $k . '-closure']))->isSame('c-closure');
      * // 引数をそのまま返すだけの特殊な変数 $_ が宣言される
@@ -30332,8 +30337,8 @@ if (!function_exists('var_export3')) {
                         $prev = $neighborToken($n, -1, $tokens) ?? [null, null, null];
                         $next = $neighborToken($n, +1, $tokens) ?? [null, null, null];
 
-                        // 無名クラスは new class で始まるはず
-                        if ($token->id === T_NEW && $next->id === T_CLASS) {
+                        // 無名クラスは new class か new #[Attribute] で始まるはず（new #[A] ClassName は許可されていない）
+                        if (($token->id === T_NEW && $next->id === T_CLASS) || ($token->id === T_NEW && $next->id === T_ATTRIBUTE)) {
                             $starting = true;
                         }
                         if (!$starting) {
@@ -30432,7 +30437,7 @@ if (!function_exists('var_export3')) {
         static $factory = null;
         if ($factory === null) {
             // @codeCoverageIgnoreStart
-            $factory = $export(new class() {
+            $factory = $export(new #[\AllowDynamicProperties] class() {
                 public function new(&$object, $class, $provider)
                 {
                     if ($class instanceof \Closure) {
