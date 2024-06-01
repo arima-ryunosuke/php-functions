@@ -408,6 +408,11 @@ trait ChainObject4
     public function strpos_array($haystack, $needles, $offset = 0): self { }
     public function strpos_array($needles, $offset = 0): self { }
 
+    /** @see cast() */
+    public self $cast;
+    public function cast($value, string $type, $default = null): self { }
+    public function cast(string $type, $default = null): self { }
+
     /** @see decrypt() */
     public self $decrypt;
     public function decrypt($cipherdata, $password, $ciphers = "aes-256-cbc", $tag = ""): self { }

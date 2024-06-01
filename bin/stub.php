@@ -9,19 +9,20 @@ rm_rf("$targetDirectory/ChainObject");
 mkdir("$targetDirectory/ChainObject");
 
 $targetFunction = [
-    'cpu_timer'      => [],
-    'include_stream' => [],
-    'object_storage' => [],
-    'process_async'  => [PHP_BINARY, ['-v']],
-    'cacheobject'    => [__DIR__],
-    'reflect_types'  => [],
+    'cpu_timer'        => [],
+    'include_stream'   => [],
+    'object_storage'   => [],
+    'process_async'    => [PHP_BINARY, ['-v']],
+    'cacheobject'      => [__DIR__],
+    'reflect_callable' => [function () { }],
+    'reflect_types'    => [],
 ];
 
 foreach ($targetFunction as $funcname => $args) {
     $object = $funcname(...$args);
     $refobject = new \ReflectionObject($object);
 
-    $extends = concat(" extends ", implode(', ', class_parents($object)));
+    $extends = concat(" extends ", get_parent_class($object));
     $implements = concat(" implements ", implode(', ', class_implements($object)));
     $uses = concat("\n    use ", implode(', ', class_uses($object)));
 

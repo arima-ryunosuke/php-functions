@@ -488,6 +488,11 @@ trait ChainObject0
     public function cipher_metadata($cipher): self { }
     public function cipher_metadata(): self { }
 
+    /** @see is_typeof() */
+    public self $is_typeof;
+    public function is_typeof($var, string $typestring, $context = null): self { }
+    public function is_typeof(string $typestring, $context = null): self { }
+
     /** @see numberify() */
     public self $numberify;
     public function numberify($var, $decimal = false): self { }
