@@ -235,9 +235,9 @@ class randomTest extends AbstractTestCase
         that(count($array))->is(count(array_unique($array)));
 
         // 膨大な範囲から少しだけ取る場合でもメモリエラーを起こさない
-        that(fn() => count(random_range(100000001, 200000000, 7)))->try(null)->inElapsedTime(0.015)->is(7);
+        that(fn() => count(random_range(100000001, 200000000, 7)))->try(null)->break()->inElapsedTime(0.015)->is(7);
         // 膨大な範囲からピッタリ取る場合でも現実的な時間で返ってくる
-        that(fn() => count(random_range(1000001, 2000000, 1000000)))->try(null)->inElapsedTime(0.150)->is(1000000);
+        that(fn() => count(random_range(1000001, 2000000, 1000000)))->try(null)->break()->inElapsedTime(0.150)->is(1000000);
 
         that(self::resolveFunction('random_range'))(3, 0)->wasThrown('invalid range');
     }

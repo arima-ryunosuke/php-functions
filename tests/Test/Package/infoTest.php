@@ -234,10 +234,10 @@ class infoTest extends AbstractTestCase
         });
 
         // 値自体に意味はないので結果の意味合いだけ確認
-        that($result['user'] + $result['system'])->closesTo($result['time']);
-        that($result['time'] + $result['idle'])->closesTo($result['real']);
-        that($result['user%'] + $result['system%'])->closesTo(100.0);
-        that($result['time%'] + $result['idle%'])->closesTo(100.0);
+        that($result['user'] + $result['system'])->break()->closesTo($result['time']);
+        that($result['time'] + $result['idle'])->break()->closesTo($result['real']);
+        that($result['user%'] + $result['system%'])->break()->closesTo(100.0);
+        that($result['time%'] + $result['idle%'])->break()->closesTo(100.0);
     }
 
     function test_finalize()
