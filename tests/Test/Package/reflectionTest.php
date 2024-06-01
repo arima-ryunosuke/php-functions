@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
+use Concrete;
 use function ryunosuke\Functions\Package\callable_code;
 use function ryunosuke\Functions\Package\function_export_false2null;
 use function ryunosuke\Functions\Package\function_parameter;
@@ -335,6 +336,57 @@ class reflectionTest extends AbstractTestCase
 
         // そもそも形式がおかしい
         that(self::resolveFunction('reflect_callable'))([])->wasThrown('is not callable');
+    }
+
+    function test_reflect_callable_instance()
+    {
+        $reffunc = reflect_callable('nullsafe_int_func');
+        that($reffunc->getDeclaration())->is('function nullsafe_int_func(int $x, int $y)');
+        that($reffunc->getCode())->contains('return $x - $y;');
+        that($reffunc(4, 1))->is(3);
+        that($reffunc(y: 1, x: 4))->is(3);
+
+        $reffunc = reflect_callable(function ($x) use (&$use): int { return $x + $use++; });
+        that($reffunc->getDeclaration())->is('function ($x) use (&$use): int');
+        that($reffunc->getCode())->contains('return $x + $use++;');
+        that($reffunc->getUsedVariables())->is(['use' => $use]);
+        that($reffunc->isStatic())->is(false);
+        that($reffunc->call($this, 1))->is(1);
+        that($reffunc(1))->is(2);
+        that($reffunc(x: 1))->is(3);
+
+        $reffunc = reflect_callable(static function ($x) use (&$use): int { return $x + $use++; });
+        that($reffunc->getDeclaration())->is('function ($x) use (&$use): int');
+        that($reffunc->getCode())->contains('return $x + $use++;');
+        that($reffunc->getUsedVariables())->is(['use' => $use]);
+        that($reffunc->isStatic())->is(true);
+        that($reffunc(1))->is(4);
+        that($reffunc(x: 1))->is(5);
+
+        $reffunc = reflect_callable([new Concrete('hoge'), 'getName']);
+        that($reffunc->getDeclaration())->is('function getName($prefix = \'\', $upper = false)');
+        that($reffunc->getCode())->contains('return $name;');
+        that($reffunc->call(new Concrete('fuga')))->is('fuga');
+        that($reffunc('p-'))->is('p-hoge');
+        that($reffunc(upper: true))->is('HOGE');
+
+        $reffunc = reflect_callable([new Concrete('hoge'), 'staticMethod']);
+        that($reffunc->getDeclaration())->is('function staticMethod($a = null)');
+        that($reffunc->getCode())->contains('return __METHOD__;');
+        that($reffunc->call(new Concrete('fuga')))->is('Concrete::staticMethod');
+        that($reffunc(a: 1))->is('Concrete::staticMethod');
+
+        $reffunc = reflect_callable([new Concrete('hoge'), 'hogera']);
+        that($reffunc->getDeclaration())->is('function __call($name, $arguments)');
+        that($reffunc->getCode())->contains('return $name;');
+        that($reffunc->call(new Concrete('fuga')))->is('hogera');
+        that($reffunc())->is('hogera');
+
+        $reffunc = reflect_callable([Concrete::class, 'hogera']);
+        that($reffunc->getDeclaration())->is('function __callStatic($name, $arguments)');
+        that($reffunc->getCode())->contains('return $name;');
+        that($reffunc->call(new Concrete('fuga')))->is('hogera');
+        that($reffunc())->is('hogera');
     }
 
     function test_reflect_type_resolve()
