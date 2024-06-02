@@ -11,6 +11,12 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.5
+
+- [feature] cast を追加
+- [feature] is_typeof を追加
+- [feature] reflect_callable の改善
+
 ## 2.0.4
 
 - [feature] php8.2 で最低限動くように対応
