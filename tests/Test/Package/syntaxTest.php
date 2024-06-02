@@ -4,6 +4,7 @@ namespace ryunosuke\Test\Package;
 
 use stdClass;
 use function ryunosuke\Functions\Package\blank_if;
+use function ryunosuke\Functions\Package\cast;
 use function ryunosuke\Functions\Package\instance_of;
 use function ryunosuke\Functions\Package\rm_rf;
 use function ryunosuke\Functions\Package\try_catch;
@@ -50,6 +51,41 @@ class syntaxTest extends AbstractTestCase
         that(blank_if($stdclass, 'default'))->isSame($stdclass);
         that(blank_if($countableT, 'default'))->isSame($countableT);
         that(blank_if($stringableT, 'default'))->isSame($stringableT);
+    }
+
+    function test_cast()
+    {
+        that(cast(0, 'bool'))->isSame(false);
+        that(cast(1, 'bool'))->isSame(true);
+        that(cast("0", 'bool'))->isSame(false);
+        that(cast("1", 'bool'))->isSame(true);
+        that(cast([], 'bool', 'errored'))->isSame('errored');
+
+        that(cast(1, 'int'))->isSame(1);
+        that(cast(1, 'string'))->isSame("1");
+        that(cast(1, 'int|string'))->isSame(1);
+        that(cast("1", 'int|string'))->isSame("1");
+        that(cast([], 'int|string', 'errored'))->isSame('errored');
+
+        that(cast([], 'array|int'))->isSame([]);
+        that(cast(1, 'array|int'))->isSame(1);
+        that(cast("s", 'array|int', 'errored'))->isSame('errored');
+
+        that(cast([], 'iterable'))->isSame([]);
+        that(cast($ao = new \ArrayObject(), 'iterable'))->isSame($ao);
+        that(cast('hoge', 'iterable', 'errored'))->isSame('errored');
+
+        that(cast("s", 'Stringable'))->isSame("s");
+        that(cast($ex = new \Exception(), 'Stringable'))->isSame($ex);
+        that(cast([], 'Stringable', 'errored'))->isSame('errored');
+
+        that(cast($ao = new \ArrayObject(), 'ArrayAccess&\\Countable'))->isSame($ao);
+        that(cast([], 'array|(ArrayAccess&Countable)'))->isSame([]);
+        that(cast([], 'ArrayAccess&Countable', 'errored'))->isSame('errored');
+
+        that(self::resolveFunction('cast'))(null, 'invalid $type')->wasThrown('illegal type');
+        that(self::resolveFunction('cast'))("hoge", 'iterable&countable')->wasThrown('must be of type');
+        that(self::resolveFunction('cast'))("hoge", 'int')->wasThrown('must be of type');
     }
 
     function test_instance_of()
