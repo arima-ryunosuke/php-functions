@@ -27,6 +27,7 @@ use function ryunosuke\Functions\Package\is_primitive;
 use function ryunosuke\Functions\Package\is_recursive;
 use function ryunosuke\Functions\Package\is_resourcable;
 use function ryunosuke\Functions\Package\is_stringable;
+use function ryunosuke\Functions\Package\is_typeof;
 use function ryunosuke\Functions\Package\numberify;
 use function ryunosuke\Functions\Package\numval;
 use function ryunosuke\Functions\Package\phpval;
@@ -551,6 +552,82 @@ class varTest extends AbstractTestCase
         that(is_stringable(['array']))->isFalse();
         that(is_stringable(new \stdClass()))->isFalse();
         that(is_stringable(new \Concrete('hoge')))->isTrue();
+    }
+
+    function test_is_typeof()
+    {
+        $typestring = 'null';
+        that(is_typeof(null, $typestring))->isTrue();
+        that(is_typeof(1, $typestring))->isFalse();
+
+        $typestring = 'false|true';
+        that(is_typeof(false, $typestring))->isTrue();
+        that(is_typeof(true, $typestring))->isTrue();
+        that(is_typeof(1, $typestring))->isFalse();
+
+        $typestring = '?int';
+        that(is_typeof(1, $typestring))->isTrue();
+        that(is_typeof('s', $typestring))->isFalse();
+        that(is_typeof(null, $typestring))->isTrue();
+
+        $typestring = 'string';
+        that(is_typeof('s', $typestring))->isTrue();
+        that(is_typeof(1, $typestring))->isFalse();
+        that(is_typeof(null, $typestring))->isFalse();
+
+        $typestring = 'null|int|string';
+        that(is_typeof(null, $typestring))->isTrue();
+        that(is_typeof(1, $typestring))->isTrue();
+        that(is_typeof('s', $typestring))->isTrue();
+        that(is_typeof([], $typestring))->isFalse();
+
+        $typestring = 'null|int|string';
+        that(is_typeof(null, $typestring))->isTrue();
+        that(is_typeof(1, $typestring))->isTrue();
+        that(is_typeof('s', $typestring))->isTrue();
+        that(is_typeof([], $typestring))->isFalse();
+
+        $typestring = 'countable';
+        that(is_typeof(new \ArrayObject(), $typestring))->isTrue();
+        that(is_typeof([], $typestring))->isTrue();
+        that(is_typeof('s', $typestring))->isFalse();
+
+        $typestring = 'Countable';
+        that(is_typeof(new \ArrayObject(), $typestring))->isTrue();
+        that(is_typeof([], $typestring))->isFalse();
+        that(is_typeof('s', $typestring))->isFalse();
+
+        $typestring = 'Exception|static';
+        that(is_typeof(new \RuntimeException(), $typestring))->isTrue();
+        that(is_typeof(new \Error(), $typestring, \Error::class))->isTrue();
+        that(is_typeof(new \Error(), $typestring))->isFalse();
+
+        $typestring = 'iterable&Countable';
+        that(is_typeof(new \ArrayObject(), $typestring))->isTrue();
+        that(is_typeof([], $typestring))->isFalse();
+        that(is_typeof(new \EmptyIterator(), $typestring))->isFalse();
+        that(is_typeof(new \stdClass(), $typestring))->isFalse();
+        that(is_typeof(null, $typestring))->isFalse();
+
+        $typestring = 'array|(iterable&Countable)';
+        that(is_typeof([], $typestring))->isTrue();
+        that(is_typeof(new \ArrayObject(), $typestring))->isTrue();
+        that(is_typeof(new \EmptyIterator(), $typestring))->isFalse();
+        that(is_typeof(new \stdClass(), $typestring))->isFalse();
+        that(is_typeof(null, $typestring))->isFalse();
+
+        // カバレッジ用とかの雑多なもの
+        that(is_typeof(STDOUT, 'mixed'))->isTrue();
+        that(is_typeof(3.14, 'mixed'))->isTrue();
+        that(is_typeof(new \stdClass(), 'mixed'))->isTrue();
+        that(is_typeof(fn() => null, 'callable'))->isTrue();
+        that(is_typeof('strlen', 'callable'))->isTrue();
+        that(is_typeof('undefined_function', 'callable'))->isFalse();
+        that(is_typeof(STDOUT, 'resource'))->isTrue();
+        that(is_typeof(new \stdClass(), 'object'))->isTrue();
+        that(is_typeof(3.14, 'float'))->isTrue();
+        that(is_typeof(new \RuntimeException(), 'Exception'))->isTrue();
+        that(is_typeof(new \DomainException(), 'RuntimeException'))->isFalse();
     }
 
     function test_numberize()
