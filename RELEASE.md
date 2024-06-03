@@ -11,6 +11,10 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.6
+
+- [fixbug] reflect_callable で意図せず __call になってしまう不具合を修正
+
 ## 2.0.5
 
 - [feature] cast を追加
