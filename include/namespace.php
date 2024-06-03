@@ -21786,7 +21786,7 @@ if (!function_exists('ryunosuke\\Functions\\reflect_callable')) {
             }
 
             $called_name = '';
-            if (!method_exists($class, $method)) {
+            if (!method_exists(is_array($callable) && is_object($callable[0]) ? $callable[0] : $class, $method)) {
                 $called_name = $method;
                 $method = is_array($callable) && is_object($callable[0]) ? '__call' : '__callStatic';
             }
