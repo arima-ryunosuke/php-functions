@@ -145,8 +145,14 @@ trait ChainObject5
 
     /** @see ucwords() */
     public self $ucwords;
-    public function ucwords(string $string, string $separators = " \t\r\n\f\v"): self { }
-    public function ucwords(string $separators = " \t\r\n\f\v"): self { }
+    public function ucwords(string $string, string $separators = <<<TEXT
+ 	
+
+TEXT): self { }
+    public function ucwords(string $separators = <<<TEXT
+ 	
+
+TEXT): self { }
 
     /** @see strrev() */
     public self $strrev;

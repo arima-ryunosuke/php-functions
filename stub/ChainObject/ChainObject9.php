@@ -373,6 +373,16 @@ trait ChainObject9
     public function find_recursive(iterable $array, callable $callback, $is_key = true): self { }
     public function find_recursive(callable $callback, $is_key = true): self { }
 
+    /** @see array_join() */
+    public self $array_join;
+    public function array_join($from, $join, $on, bool $outer = false): self { }
+    public function array_join($join, $on, bool $outer = false): self { }
+
+    /** @see array_join() */
+    public self $join;
+    public function join($from, $join, $on, bool $outer = false): self { }
+    public function join($join, $on, bool $outer = false): self { }
+
     /** @see array_merge2() */
     public self $array_merge2;
     public function array_merge2(iterable ...$arrays): self { }

@@ -130,8 +130,14 @@ trait ChainObject8
 
     /** @see trim() */
     public self $trim;
-    public function trim(string $string, string $characters = " \n\r\t\v\000"): self { }
-    public function trim(string $characters = " \n\r\t\v\000"): self { }
+    public function trim(string $string, string $characters = <<<TEXT
+ 
+	\0
+TEXT): self { }
+    public function trim(string $characters = <<<TEXT
+ 
+	\0
+TEXT): self { }
 
     /** @see explode() */
     public self $explode;
@@ -402,6 +408,11 @@ trait ChainObject8
     public self $embed;
     public function embed($string, $replacemap, $enclosure = "'\"", $escape = "\\", &$replaced = null): self { }
     public function embed($replacemap, $enclosure = "'\"", $escape = "\\", &$replaced = null): self { }
+
+    /** @see strpos_closest() */
+    public self $strpos_closest;
+    public function strpos_closest(string $haystack, string $needle, ?int $offset = null, int $nth = 1): self { }
+    public function strpos_closest(string $needle, ?int $offset = null, int $nth = 1): self { }
 
     /** @see strtr_escaped() */
     public self $strtr_escaped;

@@ -2294,6 +2294,127 @@ if (!function_exists('array_insert')) {
     }
 }
 
+assert(!function_exists('array_join') || (new \ReflectionFunction('array_join'))->isUserDefined());
+if (!function_exists('array_join')) {
+    /**
+     * 配列の SQL 的な JOIN を行う
+     *
+     * $from に対して $on を満たす $join の行を結合する。
+     * $from,$join は共にいわゆる「配列の配列」でなければならない。
+     *
+     * $on は各レコードが渡ってくるので、true を返せば結合、false を返せば結合されない。
+     * $on には配列も渡すことができ、配列を渡した場合は USING 的な動作になる。
+     * - キーが駆動表のカラム名、値が結合表のカラム名を表す
+     * - キーの値同士を json で判定する（厳密に言えば値を json キーにした一時配列で逆引きされる）
+     * - 複数指定時は AND になる
+     * 上記の前提・制約が許容できるなら配列指定の方が高速に動作する。
+     *
+     * join 後のキーは各キーを "+" で連結したものになるが、このキーは暫定的なもの。
+     *
+     * Example:
+     * ```php
+     * // t_article と t_comment の JOIN（のイメージ）
+     * $articles = [
+     *     2 => ['article_id' => 2, 'article_name' => 'hoge'],
+     *     4 => ['article_id' => 4, 'article_name' => 'fuga'],
+     *     5 => ['article_id' => 5, 'article_name' => 'piyo'],
+     * ];
+     * $comments = [
+     *     4 => ['comment_id' => 4, 'article_id' => 2, 'comment' => 'foo'],
+     *     6 => ['comment_id' => 6, 'article_id' => 4, 'comment' => 'bar'],
+     *     7 => ['comment_id' => 7, 'article_id' => 4, 'comment' => 'baz'],
+     *     9 => ['comment_id' => 9, 'article_id' => 9, 'comment' => 'dmy'],
+     * ];
+     * // INNER っぽい動き
+     * that(array_join($articles, $comments, fn($article, $comment) => $article['article_id'] === $comment['article_id'], false))->isSame([
+     *     '2+4' => ['article_id' => 2, 'article_name' => 'hoge', 'comment_id' => 4, 'comment' => 'foo'],
+     *     '4+6' => ['article_id' => 4, 'article_name' => 'fuga', 'comment_id' => 6, 'comment' => 'bar'],
+     *     '4+7' => ['article_id' => 4, 'article_name' => 'fuga', 'comment_id' => 7, 'comment' => 'baz'],
+     * ]);
+     * // LEFT っぽい動き
+     * that(array_join($articles, $comments, fn($article, $comment) => $article['article_id'] === $comment['article_id'], true))->isSame([
+     *     '2+4'    => ['article_id' => 2, 'article_name' => 'hoge', 'comment_id' => 4, 'comment' => 'foo'],
+     *     '4+6'    => ['article_id' => 4, 'article_name' => 'fuga', 'comment_id' => 6, 'comment' => 'bar'],
+     *     '4+7'    => ['article_id' => 4, 'article_name' => 'fuga', 'comment_id' => 7, 'comment' => 'baz'],
+     *     '5+null' => ['article_id' => 5, 'article_name' => 'piyo', 'comment_id' => null, 'comment' => null],
+     * ]);
+     * // ↑のような単純比較クロージャなら配列でも指定できる（そしてこの方がはるかに速い）
+     * that(array_join($articles, $comments, ['article_id' => 'article_id'], false))->isSame([
+     *     '2+4' => ['article_id' => 2, 'article_name' => 'hoge', 'comment_id' => 4, 'comment' => 'foo'],
+     *     '4+6' => ['article_id' => 4, 'article_name' => 'fuga', 'comment_id' => 6, 'comment' => 'bar'],
+     *     '4+7' => ['article_id' => 4, 'article_name' => 'fuga', 'comment_id' => 7, 'comment' => 'baz'],
+     * ]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\array
+     *
+     * @param array|iterable&\ArrayAccess<\ArrayAccess> $from 駆動表
+     * @param array|iterable&\ArrayAccess<\ArrayAccess> $join 結合表
+     * @param array|callable $on 結合条件。原則として callable で、ある程度の前提制約が置けるときのみ配列を指定する
+     * @param bool $outer true だと OUTER, false だと INNER 的挙動になる
+     * @return array JOIN された配列
+     */
+    function array_join($from, $join, $on, bool $outer = false): array
+    {
+        $arraymode = $on && is_array($on) && !is_callable($on);
+
+        if ($arraymode) {
+            // なぜ json でキーにするのか？ 個別インデックスや文字結合ではダメなのか？
+            // ダメ。null と空文字が区別できない
+
+            $left_cols = array_flip(array_keys($on));
+            $right_cols = array_flip(array_values($on));
+
+            // カラム値をキー、元キーを値としたいわゆるインデックスを作成しておく
+            $index = [];
+            foreach ($join as $j => $right) {
+                $rcols = array_pickup($right, $right_cols);
+                // 一つでも存在しないならマッチさせない
+                if (count($rcols) === count($right_cols)) {
+                    $index[json_encode($rcols)][] = $j;
+                }
+            }
+        }
+        else {
+            // 空配列（無条件結合）はこっちに流れてくる
+            $on = $on ?: fn() => true;
+        }
+
+        // $outer で未結合の時のデフォルト行をあらかじめ作っておく
+        if ($outer) {
+            $cols = [];
+            foreach ($join as $right) {
+                $cols += $right;
+            }
+            $nullrow = array_map(fn() => null, $cols);
+        }
+
+        $result = [];
+        foreach ($from as $i => $left) {
+            $matched_rows = [];
+
+            if ($arraymode) {
+                foreach ($index[json_encode(array_pickup($left, $left_cols))] ?? [] as $j) {
+                    $matched_rows["$i+$j"] = $left + $join[$j];
+                }
+            }
+            else {
+                foreach ($join as $j => $right) {
+                    if ($on($left, $right)) {
+                        $matched_rows["$i+$j"] = $left + $right;
+                    }
+                }
+            }
+
+            if ($outer && !$matched_rows) {
+                $matched_rows["$i+null"] = $left + $nullrow;
+            }
+            $result += $matched_rows;
+        }
+        return $result;
+    }
+}
+
 assert(!function_exists('array_keys_exist') || (new \ReflectionFunction('array_keys_exist'))->isUserDefined());
 if (!function_exists('array_keys_exist')) {
     /**
@@ -10183,7 +10304,7 @@ if (!function_exists('paml_export')) {
                 $v = 'true';
             }
             elseif (is_string($v)) {
-                $v = '"' . addcslashes($v, "\"\0\\") . '"';
+                $v = str_quote($v);
             }
 
             if ($k === $n++) {
@@ -11957,13 +12078,12 @@ if (!function_exists('stacktrace')) {
                     $parents[] = $value;
                     return get_class($value) . $export(object_properties($value), $nest, $parents);
                 }
-                // 文字列は改行削除
+                // 文字列はダブルクォート
                 elseif (is_string($value)) {
-                    $value = str_replace(["\r\n", "\r", "\n"], '\n', $value);
                     if (($strlen = strlen($value)) > $limit) {
                         $value = substr($value, 0, $limit) . sprintf('...(more %d length)', $strlen - $limit);
                     }
-                    return '"' . addcslashes($value, "\"\0\\") . '"';
+                    return str_quote($value);
                 }
                 // それ以外は stringify
                 else {
@@ -21194,14 +21314,16 @@ if (!function_exists('unique_string')) {
             shuffle($charlist);
             $result = implode('', array_slice($charlist, 0, $initial));
         }
-        elseif (is_stringable($initial)) {
+        elseif (is_null($initial)) {
+            $result .= $charlist[mt_rand(0, $charlength - 1)];
+        }
+        else {
             $result = $initial;
         }
 
-        $p = 0;
-        do {
+        while ((($p = strpos($source, $result, $p ?? 0)) !== false)) {
             $result .= $charlist[mt_rand(0, $charlength - 1)];
-        } while (($p = strpos($source, $result, $p)) !== false);
+        }
 
         return $result;
     }
@@ -21408,15 +21530,6 @@ if (!function_exists('function_parameter')) {
                     else {
                         $default = $parameter->getDefaultValue();
                         $defval = var_export2($default, true);
-                        if (is_string($default)) {
-                            $defval = strtr($defval, [
-                                "\r" => "\\r",
-                                "\n" => "\\n",
-                                "\t" => "\\t",
-                                "\f" => "\\f",
-                                "\v" => "\\v",
-                            ]);
-                        }
                     }
                 }
                 // isOptional だが isDefaultValueAvailable でないし isVariadic でもない（稀にある（stream_filter_append で確認））
@@ -24352,7 +24465,12 @@ if (!function_exists('render_string')) {
     function render_string($template, $array)
     {
         // eval 可能な形式に変換
-        $evalcode = 'return "' . addcslashes($template, "\"\\\0") . '";';
+        $evalcode = 'return ' . str_quote($template, [
+                'special-character' => [
+                    '\\' => '\\\\', // バックスラッシュ
+                    '"'  => '\\"',  // 二重引用符
+                ],
+            ]) . ';';
 
         // 利便性を高めるために変数配列を少しいじる
         $vars = [];
@@ -24939,6 +25057,85 @@ if (!function_exists('str_common_prefix')) {
             $result .= $c;
         }
         return $result;
+    }
+}
+
+assert(!function_exists('str_control_apply') || (new \ReflectionFunction('str_control_apply'))->isUserDefined());
+if (!function_exists('str_control_apply')) {
+    /**
+     * 制御文字を実際に適用させる
+     *
+     * とはいえ文字列として適用できる制御文字はそう多くはなく、実質的に \b くらいだろう。
+     *
+     * - \b: 前の1文字を消して自身も消える
+     * - \d: 次の\d以外の1文字を消して自身も消える
+     *   - 前方探索なので利便性のため「\d以外の」という条件がついている
+     * - \r: 直前の \n から直後の \n までを消す
+     *   - \r に「消す」という意味はないが、実用上はその方が便利なことが多い
+     *
+     * なお、 \b と書いてあるが php のエスケープシーケンスに \b は存在しないため \x08 と記述する必要がある（\d も同様）。
+     * それはそれで不便なので \b, \d は特別扱いとしてある（$characters のデフォルト値に潜ませてあるが、それを外せば特別扱いは無くなる）。
+     *
+     * Example:
+     * ```php
+     * // 最初の X は [BS] で消える・次の X は [DEL] で消える、XXX は [CR] で消える。結果 text\nzzz になる
+     * that(str_control_apply("X\b\dXtext\nXXX\rzzz"))->isSame("text\nzzz");
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param string $string 対象文字列
+     * @param string $characters 対象とする制御文字
+     * @return string 制御文字が適用された文字列
+     */
+    function str_control_apply(string $string, string $characters = "\b\x08\d\x7f\r"): string
+    {
+        $remap = [];
+        if (strpos_escaped($characters, "\b") !== null) {
+            $remap["\b"] = "\x08";
+        }
+        if (strpos_escaped($characters, "\d") !== null) {
+            $remap["\d"] = "\x7f";
+        }
+        $string = strtr_escaped($string, $remap);
+        $characters = strtr_escaped($characters, $remap);
+
+        $offset = 0;
+        while (true) {
+            $pos = strcspn($string, $characters, $offset) + $offset;
+            $control = $string[$pos] ?? null;
+            if ($control === null) {
+                break;
+            }
+            if ($control === "\x08") {
+                if ($pos === 0) {
+                    $string = substr_replace($string, '', $pos, 1);
+                    $offset = $pos;
+                }
+                else {
+                    $string = substr_replace($string, '', $pos - 1, 2);
+                    $offset = $pos - 1;
+                }
+            }
+            if ($control === "\x7f") {
+                $next = strspn($string, "\x7f", $pos) + $pos;
+                $string = substr_replace($string, '', $next, 1);
+                $string = substr_replace($string, '', $pos, 1);
+                $offset = $pos;
+            }
+            if ($control === "\x0d") {
+                $prev = strposr($string, "\x0a", $pos);
+                if ($prev === false) {
+                    $string = substr_replace($string, '', 0, $pos + 1);
+                    $offset = 0;
+                }
+                else {
+                    $string = substr_replace($string, '', $prev + 1, $pos - $prev);
+                    $offset = $prev + 1;
+                }
+            }
+        }
+        return $string;
     }
 }
 
@@ -26141,6 +26338,154 @@ if (!function_exists('str_putcsv')) {
     }
 }
 
+assert(!function_exists('str_quote') || (new \ReflectionFunction('str_quote'))->isUserDefined());
+if (!function_exists('str_quote')) {
+    /**
+     * 文字列をダブルクォート文字列に変換する
+     *
+     * 文字ではうまく表現できないが、例えば「本当の改行」が \n になり、「本当のタブ文字」が \t になる。
+     * コントロール文字は "\code" 形式のようになる。
+     * 「得られた文字列は eval すると元に戻る」とでも言えばいいか。
+     *
+     * 制御文字をそのまま出力するとまずい状況が稀によくある（特に行指向媒体への改行文字）。
+     * この関数を通せば php の文字列の体裁を保ったまま1行化できる。
+     * 端的に言えば var_export の文字列特化版。
+     *
+     * 挙動は $options である程度制御可能。
+     * 各 $options は原則的に文字のマップか true を渡す（true の場合はデフォルトが使用される）。
+     * 一部、それ以外の値・型に対応しているものもある。
+     *
+     * - escape-character: 制御文字のうち、明確なエスケープシーケンスが存在する場合はそれを使用する
+     *   - control-character にオーバーラップするがこちらが優先される
+     * - control-character: 00 ～ 1F+7F の制御文字を \code 形式にする
+     *   - 文字列で "oct", "hex", "HEX" も指定できる。その場合それぞれ \oct, \xhex, \xHEX 形式になる
+     * - special-character: ダブルクオート内の文字列が文字列であるための変換を行う
+     *   - 原則的にデフォルトに任せて指定すべきではない
+     *
+     * Example:
+     * ```php
+     * // （非常に分かりにくいが）下記のように変換される
+     * that(str_quote("\$a\nb\rc\x00"))->isSame("\"\\\$a\\nb\\rc\\0\"");
+     * // 文字としての意味は一緒であり要するに表現形式の違いなので、php の世界で eval すれば元の文字列に戻る
+     * that(eval('return ' . str_quote("\$a\nb\rc\x00") . ';'))->isSame("\$a\nb\rc\x00");
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param string $string 対象文字列
+     * @param array $options オプション配列
+     * @return string クォート文字列
+     */
+    function str_quote(string $string, array $options = []): string
+    {
+        $options += [
+            'escape-character'  => true,
+            'control-character' => true,
+            'special-character' => true,
+            'heredoc'           => '',
+            'nowdoc'            => '',
+            'indent'            => 0,
+        ];
+
+        assert(!($options['heredoc'] && $options['nowdoc']));
+
+        // nowdoc にエスケープは存在しないのでそのまま埋め込む（その結果壊れてもこの関数の責務ではない）
+        if (strlen($options['nowdoc'])) {
+            $indent = str_repeat(" ", $options['indent']);
+            $string = preg_replace('#(\R)#u', '$1' . $indent, $string);
+            return "<<<'{$options['nowdoc']}'\n{$indent}{$string}\n{$indent}{$options['nowdoc']}";
+        }
+
+        // @see https://www.php.net/manual/ja/language.types.string.php#language.types.string.syntax.double
+        $special_chars = [
+            '\\' => '\\\\', // バックスラッシュ
+            '"'  => '\\"',  // 二重引用符
+            '$'  => '\\$',  // ドル記号
+        ];
+        $escape_chars = [
+            "\11" => '\\t', // 水平タブ (HT またはアスキーの 0x09 (9))
+            "\12" => '\\n', // ラインフィード (LF またはアスキーの 0x0A (10))
+            "\13" => '\\v', // 垂直タブ (VT またはアスキーの 0x0B (11))
+            "\14" => '\\f', // フォームフィード (FF またはアスキーの 0x0C (12))
+            "\15" => '\\r', // キャリッジリターン (CR またはアスキーの 0x0D (13))
+            "\33" => '\\e', // エスケープ (ESC あるいはアスキーの 0x1B (27))
+        ];
+        $control_chars = [
+            "\0"   => "\\0",
+            "\1"   => "\\1",
+            "\2"   => "\\2",
+            "\3"   => "\\3",
+            "\4"   => "\\4",
+            "\5"   => "\\5",
+            "\6"   => "\\6",
+            "\7"   => "\\7",
+            "\10"  => "\\10",
+            "\11"  => "\\11",
+            "\12"  => "\\12",
+            "\13"  => "\\13",
+            "\14"  => "\\14",
+            "\15"  => "\\15",
+            "\16"  => "\\16",
+            "\17"  => "\\17",
+            "\20"  => "\\20",
+            "\21"  => "\\21",
+            "\22"  => "\\22",
+            "\23"  => "\\23",
+            "\24"  => "\\24",
+            "\25"  => "\\25",
+            "\26"  => "\\26",
+            "\27"  => "\\27",
+            "\30"  => "\\30",
+            "\31"  => "\\31",
+            "\32"  => "\\32",
+            "\33"  => "\\33",
+            "\34"  => "\\34",
+            "\35"  => "\\35",
+            "\36"  => "\\36",
+            "\37"  => "\\37",
+            "\177" => "\\177",
+        ];
+
+        // heredoc 用の特殊処理（タイプ可能な文字はエスケープしなくてもよいだろう）
+        if (strlen($options['heredoc'])) {
+            $control_chars = array_diff_key($control_chars, $escape_chars);
+            $escape_chars = [];
+            unset($special_chars['"']);
+        }
+
+        $charmap = [];
+        if ($options['special-character']) {
+            $charmap += is_array($options['special-character']) ? $options['special-character'] : $special_chars;
+        }
+        if ($options['escape-character']) {
+            $charmap += is_array($options['escape-character']) ? $options['escape-character'] : $escape_chars;
+        }
+        if ($options['control-character']) {
+            if ($options['control-character'] === 'oct') {
+                // デフォで oct にしてあるので変換不要
+                assert(end($control_chars) === "\\177");
+            }
+            if ($options['control-character'] === 'hex') {
+                $control_chars = array_map(fn($v) => sprintf('\\x%02x', octdec(trim($v, '\\'))), $control_chars);
+            }
+            if ($options['control-character'] === 'HEX') {
+                $control_chars = array_map(fn($v) => sprintf('\\x%02X', octdec(trim($v, '\\'))), $control_chars);
+            }
+            $charmap += is_array($options['control-character']) ? $options['control-character'] : $control_chars;
+        }
+
+        $string = strtr($string, $charmap);
+
+        if (strlen($options['heredoc'])) {
+            $indent = str_repeat(" ", $options['indent']);
+            $string = preg_replace('#(\R)#u', '$1' . $indent, $string);
+            return "<<<{$options['heredoc']}\n{$indent}{$string}\n{$indent}{$options['heredoc']}";
+        }
+
+        return '"' . $string . '"';
+    }
+}
+
 assert(!function_exists('str_rchop') || (new \ReflectionFunction('str_rchop'))->isUserDefined());
 if (!function_exists('str_rchop')) {
     /**
@@ -26420,6 +26765,95 @@ if (!function_exists('strpos_array')) {
     }
 }
 
+assert(!function_exists('strpos_closest') || (new \ReflectionFunction('strpos_closest'))->isUserDefined());
+if (!function_exists('strpos_closest')) {
+    /**
+     * 指定位置から左右どちらかの探索を行う
+     *
+     * 一つ前/後の指定文字の位置を返す
+     * 端的に言えば strpo/strposr の自動使い分け＋範囲外でもエラーにならない版。
+     *
+     * $nth は負数で左探索、正数で右探索だが、スキップ数も兼ねる。
+     *
+     * Example:
+     * ```php
+     * //        +0123456789A1234567
+     * //        -7654321A9876543210
+     * $string = 'hello hello hello';
+     *
+     * // 0文字目から右探索すれば0文字目が引っかかる
+     * that(strpos_closest($string, 'hello', 0, +1))->isSame(0);
+     * // ↑のスキップ（2つ目）版
+     * that(strpos_closest($string, 'hello', 0, +2))->isSame(6);
+     * // 5文字目から右探索すれば6文字目が引っかかる
+     * that(strpos_closest($string, 'hello', 5, +1))->isSame(6);
+     * // ↑のスキップ（2つ目）版
+     * that(strpos_closest($string, 'hello', 5, +2))->isSame(12);
+     * // 8文字目から右探索すれば12文字目が引っかかる（2個目の hello の途中なので3個目の hello から引っかかる）
+     * that(strpos_closest($string, 'hello', 8, +1))->isSame(12);
+     * // ↑のスキップ（2つ目）版
+     * that(strpos_closest($string, 'hello', 8, +2))->isSame(null);
+     *
+     * // 0文字目から左探索しても見つからない
+     * that(strpos_closest($string, 'hello', 0, -1))->isSame(null);
+     * // 5文字目から左探索すれば0文字目が引っかかる
+     * that(strpos_closest($string, 'hello', 5, -1))->isSame(0);
+     * // 8文字目から左探索すれば0文字目が引っかかる（2個目の hello の途中なので1個目の hello から引っかかる）
+     * that(strpos_closest($string, 'hello', 8, -1))->isSame(0);
+     * // 11文字目から左探索すれば6文字目が引っかかる
+     * that(strpos_closest($string, 'hello', 11, -1))->isSame(6);
+     * // ↑のスキップ（2つ目）版
+     * that(strpos_closest($string, 'hello', 11, -2))->isSame(0);
+     *
+     * // 範囲外でもエラーにならない
+     * that(strpos_closest($string, 'hello', -999, +1))->isSame(0);  // 「数直線のはるか左方から探索を始めて 0 文字目で見つかった」のようなイメージ
+     * that(strpos_closest($string, 'hello', +999, -1))->isSame(12); // 「数直線のはるか右方から探索を始めて 12 文字目で見つかった」のようなイメージ
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param string $haystack 対象文字列
+     * @param string $needle 位置を取得したい文字列
+     * @param ?int $offset 開始位置。 null を渡すと $nth の方向に応じて自動で定まる
+     * @param int $nth 左右指定兼スキップ数（正数で右探索、負数で左探索）
+     * @return ?int 見つかった位置
+     */
+    function strpos_closest(string $haystack, string $needle, ?int $offset = null, int $nth = 1): ?int
+    {
+        assert($nth !== 0);
+
+        $reverse = $nth < 0;
+        $nth = abs($nth);
+
+        $offset ??= $reverse ? strlen($haystack) : 0;
+
+        for ($i = 0; $i < $nth; $i++) {
+            if ($i > 0) {
+                $offset++;
+            }
+
+            if ($offset < -strlen($haystack)) {
+                $offset = -strlen($haystack);
+            }
+            if ($offset > strlen($haystack)) {
+                $offset = strlen($haystack);
+            }
+
+            if ($reverse) {
+                $offset = strposr($haystack, $needle, $offset);
+            }
+            else {
+                $offset = strpos($haystack, $needle, $offset);
+            }
+
+            if ($offset === false) {
+                return null;
+            }
+        }
+        return $offset;
+    }
+}
+
 assert(!function_exists('strpos_escaped') || (new \ReflectionFunction('strpos_escaped'))->isUserDefined());
 if (!function_exists('strpos_escaped')) {
     /**
@@ -26570,6 +27004,77 @@ if (!function_exists('strpos_quoted')) {
             }
         }
         return null;
+    }
+}
+
+assert(!function_exists('strposr') || (new \ReflectionFunction('strposr'))->isUserDefined());
+if (!function_exists('strposr')) {
+    /**
+     * デフォで左探索な strrpos
+     *
+     * 個人的に strrpos の offset の挙動が分かりにくい。
+     * - offset>=0: 先頭から offset スキップ＋**右探索**
+     * - offset< 0: 末尾から -offset スキップ＋**左探索**
+     *
+     * r と銘打っているんだから offset に依らずにデフォで左探索して欲しい。
+     * 特に offset 未指定だと 0 なので「先頭から末尾まで読んで最後に見つかった場所を返す」という非常に非効率的なことになっている（実際の実装は違うようだけど）。
+     * さらに「単純に50文字目から左探索したい」だけなのに offset が気持ち悪いことになる（50 - strlen($string)）。
+     * 要するに https://www.php.net/manual/ja/function.strrpos.php#76447 これ。
+     *
+     * offset で検索文字列の途中に飛び込んだ場合は見つからないとみなす（strrpos は見つかったとみなす）。
+     * この挙動は説明しにくいので Example を参照。
+     *
+     * Example:
+     * ```php
+     * //        +0123456789A1234567
+     * //        -7654321A9876543210
+     * $string = 'hello hello hello';
+     *
+     * // offset を省略すると末尾から左探索になる
+     * that(strposr($string, 'hello'))->isSame(12);
+     * // 標準の文字列関数のように負数で後ろからの探索になる
+     * that(strposr($string, 'hello', -1))->isSame(6);
+     * // 0文字目から左探索しても見つからない
+     * that(strposr($string, 'hello', 0))->isSame(false);
+     * // 5文字目から左探索すれば0文字目が引っかかる
+     * that(strposr($string, 'hello', 5))->isSame(0);
+     * // 13文字目から左探索すれば6文字目が引っかかる（13文字目は3個目の hello の途中なので2個目の hello から引っかかる）
+     * that(strposr($string, 'hello', 13))->isSame(6);
+     * // この動作は strrpos だと異なる（途中文字列も拾ってしまう）
+     * that(strrpos($string, 'hello', -4))->isSame(12);
+     * // そもそも strrpos は負数指定しないと右探索なので使いにくくてしょうがない
+     * that(strrpos($string, 'hello', 5))->isSame(12);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param string $haystack 対象文字列
+     * @param string $needle 位置を取得したい文字列
+     * @param ?int $offset 開始位置。 null を渡すと末尾からの探索になる
+     * @return int|false 見つかった位置
+     */
+    function strposr(string $haystack, string $needle, ?int $offset = null): int|false
+    {
+        $offset ??= strlen($haystack);
+
+        if ($offset < 0) {
+            $offset += strlen($haystack);
+        }
+
+        if (strlen($haystack) < $offset) {
+            throw new \ValueError('strposr(): Argument #3 ($offset) must be contained in argument #1 ($haystack)');
+        }
+
+        $result = strrpos($haystack, $needle, $offset - strlen($haystack));
+        // 仮に見つかってもオフセットを跨いでる場合は -1 して再検索
+        if ($result !== false && $result + strlen($needle) > $offset) {
+            // が、先頭文字の場合は -1 する意味もない（そもそもエラーになる）ので false で返してしまってよい
+            if ($result === 0) {
+                return false;
+            }
+            return strrpos($haystack, $needle, $result - 1 - strlen($haystack));
+        }
+        return $result;
     }
 }
 
@@ -30202,11 +30707,11 @@ if (!function_exists('var_export2')) {
         $INDENT = 4;
 
         // 再帰用クロージャ
-        $export = function ($value, $nest = 0, $parents = []) use (&$export, $INDENT) {
+        $export = function ($value, $context, $nest = 0, $parents = []) use (&$export, $INDENT) {
             // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
             foreach ($parents as $parent) {
                 if ($parent === $value) {
-                    return $export('*RECURSION*');
+                    return $export('*RECURSION*', 'recursion');
                 }
             }
             // 配列は連想判定したり再帰したり色々
@@ -30218,19 +30723,19 @@ if (!function_exists('var_export2')) {
 
                 // スカラー値のみで構成されているならシンプルな再帰
                 if (!$hashed && array_all($value, fn(...$args) => is_primitive(...$args))) {
-                    return '[' . implode(', ', array_map($export, $value)) . ']';
+                    return '[' . implode(', ', array_map(fn($v) => $export($v, 'array-value'), $value)) . ']';
                 }
 
                 // 連想配列はキーを含めて桁あわせ
                 if ($hashed) {
-                    $keys = array_map($export, array_combine($keys = array_keys($value), $keys));
+                    $keys = array_map(fn($v) => $export($v, 'array-key'), array_combine($keys = array_keys($value), $keys));
                     $maxlen = max(array_map('strlen', $keys));
                 }
                 $kvl = '';
                 $parents[] = $value;
                 foreach ($value as $k => $v) {
                     $keystr = $hashed ? $keys[$k] . str_repeat(' ', $maxlen - strlen($keys[$k])) . ' => ' : '';
-                    $kvl .= $spacer1 . $keystr . $export($v, $nest + 1, $parents) . ",\n";
+                    $kvl .= $spacer1 . $keystr . $export($v, 'array-value', $nest + 1, $parents) . ",\n";
                 }
                 return "[\n{$kvl}{$spacer2}]";
             }
@@ -30239,13 +30744,27 @@ if (!function_exists('var_export2')) {
                 $parents[] = $value;
                 $classname = get_class($value);
                 if ($classname === \stdClass::class) {
-                    return '(object) ' . $export((array) $value, $nest, $parents);
+                    return '(object) ' . $export((array) $value, 'object', $nest, $parents);
                 }
-                return $classname . '::__set_state(' . $export(object_properties($value), $nest, $parents) . ')';
+                return $classname . '::__set_state(' . $export(object_properties($value), 'object', $nest, $parents) . ')';
             }
-            // 文字列はダブルクオート
+            // 文字列はダブルクオート（場合によってはヒアドキュメント）
             elseif (is_string($value)) {
-                return '"' . addcslashes($value, "\$\"\0\\") . '"';
+                // 列揃えのため配列のキーは常にダブルクォート
+                if ($context === 'array-key') {
+                    return str_quote($value);
+                }
+                // 改行を含むならヒアドキュメント
+                if (str_exists($value, ["\r", "\n"])) {
+                    // ただし、改行文字だけの場合は除く（何らかの引数で改行文字だけを渡すシチュエーションはそれなりにあるのでヒアドキュメントだと冗長）
+                    if (trim($value, "\r\n") !== '') {
+                        return str_quote($value, [
+                            'heredoc' => unique_string($value, 'TEXT', '_'),
+                            'indent'  => $nest * $INDENT,
+                        ]);
+                    }
+                }
+                return str_quote($value);
             }
             // null は小文字で居て欲しい
             elseif (is_null($value)) {
@@ -30258,7 +30777,7 @@ if (!function_exists('var_export2')) {
         };
 
         // 結果を返したり出力したり
-        $result = $export($value);
+        $result = $export($value, null);
         if ($return) {
             return $result;
         }

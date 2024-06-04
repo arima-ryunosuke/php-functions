@@ -448,6 +448,11 @@ trait ChainObject0
     public function diff($xstring, $ystring, $options = []): self { }
     public function diff($ystring, $options = []): self { }
 
+    /** @see strposr() */
+    public self $strposr;
+    public function strposr(string $haystack, string $needle, ?int $offset = null): self { }
+    public function strposr(string $needle, ?int $offset = null): self { }
+
     /** @see strrstr() */
     public self $strrstr;
     public function strrstr($haystack, $needle, $after_needle = true): self { }

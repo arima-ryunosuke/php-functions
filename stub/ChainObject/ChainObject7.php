@@ -140,8 +140,14 @@ trait ChainObject7
 
     /** @see chop() */
     public self $chop;
-    public function chop(string $string, string $characters = " \n\r\t\v\000"): self { }
-    public function chop(string $characters = " \n\r\t\v\000"): self { }
+    public function chop(string $string, string $characters = <<<TEXT
+ 
+	\0
+TEXT): self { }
+    public function chop(string $characters = <<<TEXT
+ 
+	\0
+TEXT): self { }
 
     /** @see strtoupper() */
     public self $strtoupper;

@@ -105,13 +105,25 @@ trait ChainObject1
 
     /** @see rtrim() */
     public self $rtrim;
-    public function rtrim(string $string, string $characters = " \n\r\t\v\000"): self { }
-    public function rtrim(string $characters = " \n\r\t\v\000"): self { }
+    public function rtrim(string $string, string $characters = <<<TEXT
+ 
+	\0
+TEXT): self { }
+    public function rtrim(string $characters = <<<TEXT
+ 
+	\0
+TEXT): self { }
 
     /** @see ltrim() */
     public self $ltrim;
-    public function ltrim(string $string, string $characters = " \n\r\t\v\000"): self { }
-    public function ltrim(string $characters = " \n\r\t\v\000"): self { }
+    public function ltrim(string $string, string $characters = <<<TEXT
+ 
+	\0
+TEXT): self { }
+    public function ltrim(string $characters = <<<TEXT
+ 
+	\0
+TEXT): self { }
 
     /** @see wordwrap() */
     public self $wordwrap;

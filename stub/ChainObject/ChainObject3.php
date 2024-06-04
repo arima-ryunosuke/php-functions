@@ -583,6 +583,34 @@ trait ChainObject3
     public function pascal_case($string, $delimiter = "_"): self { }
     public function pascal_case($delimiter = "_"): self { }
 
+    /** @see str_control_apply() */
+    public self $str_control_apply;
+    public function str_control_apply(string $string, string $characters = <<<TEXT
+\\b\10\\d\177
+TEXT): self { }
+    public function str_control_apply(string $characters = <<<TEXT
+\\b\10\\d\177
+TEXT): self { }
+
+    /** @see str_control_apply() */
+    public self $control_apply;
+    public function control_apply(string $string, string $characters = <<<TEXT
+\\b\10\\d\177
+TEXT): self { }
+    public function control_apply(string $characters = <<<TEXT
+\\b\10\\d\177
+TEXT): self { }
+
+    /** @see str_quote() */
+    public self $str_quote;
+    public function str_quote(string $string, array $options = []): self { }
+    public function str_quote(array $options = []): self { }
+
+    /** @see str_quote() */
+    public self $quote;
+    public function quote(string $string, array $options = []): self { }
+    public function quote(array $options = []): self { }
+
     /** @see instance_of() */
     public self $instance_of;
     public function instance_of($object, $class): self { }
