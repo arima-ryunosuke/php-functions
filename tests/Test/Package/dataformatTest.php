@@ -691,7 +691,7 @@ line3
 
         that(ini_export($iniarray, ['process_sections' => false]))->is('simple[a] = "A"
 simple[b] = "B"
-simple[quote] = "\"\000\\\\\'"
+simple[quote] = "\"\\0\\\\\'"
 x[] = "A"
 x[] = "B"
 x[] = "C"
@@ -702,7 +702,7 @@ y[b] = "B"
         that(ini_export($iniarray, ['process_sections' => true]))->is('[simple]
 a = "A"
 b = "B"
-quote = "\"\000\\\\\'"
+quote = "\"\\0\\\\\'"
 
 [array]
 x[] = "A"
@@ -1684,10 +1684,8 @@ string',
 z',
             'quote2' => 'a\nz',
         ]);
-        that(paml_export($array))->isSame('text: "this is raw string", break: "this
-is
-break
-string", quote1: "a
-z", quote2: "a\\\\nz"');
+        $exported = paml_export($array);
+        that($exported)->isSame('text: "this is raw string", break: "this\nis\nbreak\nstring", quote1: "a\nz", quote2: "a\\\\nz"');
+        that(paml_import($exported))->isSame($array);
     }
 }

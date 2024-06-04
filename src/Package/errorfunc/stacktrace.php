@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../classobj/object_properties.php';
+require_once __DIR__ . '/../strings/str_quote.php';
 require_once __DIR__ . '/../var/stringify.php';
 // @codeCoverageIgnoreEnd
 
@@ -83,13 +84,12 @@ function stacktrace($traces = null, $option = [])
                 $parents[] = $value;
                 return get_class($value) . $export(object_properties($value), $nest, $parents);
             }
-            // 文字列は改行削除
+            // 文字列はダブルクォート
             elseif (is_string($value)) {
-                $value = str_replace(["\r\n", "\r", "\n"], '\n', $value);
                 if (($strlen = strlen($value)) > $limit) {
                     $value = substr($value, 0, $limit) . sprintf('...(more %d length)', $strlen - $limit);
                 }
-                return '"' . addcslashes($value, "\"\0\\") . '"';
+                return str_quote($value);
             }
             // それ以外は stringify
             else {

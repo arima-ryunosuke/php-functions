@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../strings/str_quote.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -41,7 +42,12 @@ namespace ryunosuke\Functions\Package;
 function render_string($template, $array)
 {
     // eval 可能な形式に変換
-    $evalcode = 'return "' . addcslashes($template, "\"\\\0") . '";';
+    $evalcode = 'return ' . str_quote($template, [
+            'special-character' => [
+                '\\' => '\\\\', // バックスラッシュ
+                '"'  => '\\"',  // 二重引用符
+            ],
+        ]) . ';';
 
     // 利便性を高めるために変数配列を少しいじる
     $vars = [];

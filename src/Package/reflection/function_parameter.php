@@ -59,15 +59,6 @@ function function_parameter($eitherReffuncOrCallable)
                 else {
                     $default = $parameter->getDefaultValue();
                     $defval = var_export2($default, true);
-                    if (is_string($default)) {
-                        $defval = strtr($defval, [
-                            "\r" => "\\r",
-                            "\n" => "\\n",
-                            "\t" => "\\t",
-                            "\f" => "\\f",
-                            "\v" => "\\v",
-                        ]);
-                    }
                 }
             }
             // isOptional だが isDefaultValueAvailable でないし isVariadic でもない（稀にある（stream_filter_append で確認））

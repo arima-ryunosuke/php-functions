@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/is_hasharray.php';
+require_once __DIR__ . '/../strings/str_quote.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -58,7 +59,7 @@ function paml_export($pamlarray, $options = [])
             $v = 'true';
         }
         elseif (is_string($v)) {
-            $v = '"' . addcslashes($v, "\"\0\\") . '"';
+            $v = str_quote($v);
         }
 
         if ($k === $n++) {

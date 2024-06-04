@@ -5,6 +5,9 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/array_all.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../classobj/object_properties.php';
+require_once __DIR__ . '/../random/unique_string.php';
+require_once __DIR__ . '/../strings/str_exists.php';
+require_once __DIR__ . '/../strings/str_quote.php';
 require_once __DIR__ . '/../var/is_primitive.php';
 // @codeCoverageIgnoreEnd
 
@@ -69,11 +72,11 @@ function var_export2($value, $return = false)
     $INDENT = 4;
 
     // 再帰用クロージャ
-    $export = function ($value, $nest = 0, $parents = []) use (&$export, $INDENT) {
+    $export = function ($value, $context, $nest = 0, $parents = []) use (&$export, $INDENT) {
         // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
         foreach ($parents as $parent) {
             if ($parent === $value) {
-                return $export('*RECURSION*');
+                return $export('*RECURSION*', 'recursion');
             }
         }
         // 配列は連想判定したり再帰したり色々
@@ -85,19 +88,19 @@ function var_export2($value, $return = false)
 
             // スカラー値のみで構成されているならシンプルな再帰
             if (!$hashed && array_all($value, fn(...$args) => is_primitive(...$args))) {
-                return '[' . implode(', ', array_map($export, $value)) . ']';
+                return '[' . implode(', ', array_map(fn($v) => $export($v, 'array-value'), $value)) . ']';
             }
 
             // 連想配列はキーを含めて桁あわせ
             if ($hashed) {
-                $keys = array_map($export, array_combine($keys = array_keys($value), $keys));
+                $keys = array_map(fn($v) => $export($v, 'array-key'), array_combine($keys = array_keys($value), $keys));
                 $maxlen = max(array_map('strlen', $keys));
             }
             $kvl = '';
             $parents[] = $value;
             foreach ($value as $k => $v) {
                 $keystr = $hashed ? $keys[$k] . str_repeat(' ', $maxlen - strlen($keys[$k])) . ' => ' : '';
-                $kvl .= $spacer1 . $keystr . $export($v, $nest + 1, $parents) . ",\n";
+                $kvl .= $spacer1 . $keystr . $export($v, 'array-value', $nest + 1, $parents) . ",\n";
             }
             return "[\n{$kvl}{$spacer2}]";
         }
@@ -106,13 +109,27 @@ function var_export2($value, $return = false)
             $parents[] = $value;
             $classname = get_class($value);
             if ($classname === \stdClass::class) {
-                return '(object) ' . $export((array) $value, $nest, $parents);
+                return '(object) ' . $export((array) $value, 'object', $nest, $parents);
             }
-            return $classname . '::__set_state(' . $export(object_properties($value), $nest, $parents) . ')';
+            return $classname . '::__set_state(' . $export(object_properties($value), 'object', $nest, $parents) . ')';
         }
-        // 文字列はダブルクオート
+        // 文字列はダブルクオート（場合によってはヒアドキュメント）
         elseif (is_string($value)) {
-            return '"' . addcslashes($value, "\$\"\0\\") . '"';
+            // 列揃えのため配列のキーは常にダブルクォート
+            if ($context === 'array-key') {
+                return str_quote($value);
+            }
+            // 改行を含むならヒアドキュメント
+            if (str_exists($value, ["\r", "\n"])) {
+                // ただし、改行文字だけの場合は除く（何らかの引数で改行文字だけを渡すシチュエーションはそれなりにあるのでヒアドキュメントだと冗長）
+                if (trim($value, "\r\n") !== '') {
+                    return str_quote($value, [
+                        'heredoc' => unique_string($value, 'TEXT', '_'),
+                        'indent'  => $nest * $INDENT,
+                    ]);
+                }
+            }
+            return str_quote($value);
         }
         // null は小文字で居て欲しい
         elseif (is_null($value)) {
@@ -125,7 +142,7 @@ function var_export2($value, $return = false)
     };
 
     // 結果を返したり出力したり
-    $result = $export($value);
+    $result = $export($value, null);
     if ($return) {
         return $result;
     }

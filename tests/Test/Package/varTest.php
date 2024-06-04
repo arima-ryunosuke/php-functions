@@ -842,7 +842,43 @@ class varTest extends AbstractTestCase
         that(phpval($a2))->is(phpval($a1));
 
         that(var_export2([
-            "'\0\""  => 123,
+            '$var'   => '$var',
+            '${var}' => '${var}',
+            '{$var}' => '{$var}',
+            "\n1"    => "\n1",
+            "\n2"    => "\nTEXT",
+            "\r\n"   => "\r\n",
+            "\\"     => "\\",
+            '"'      => '"',
+            'key'    => 456,
+            'null'   => null,
+            'nulls'  => [null],
+        ], true))->isSame(<<<'EXPECTED'
+        [
+            "\$var"   => "\$var",
+            "\${var}" => "\${var}",
+            "{\$var}" => "{\$var}",
+            "\n1"     => <<<TEXT
+            
+            1
+            TEXT,
+            "\n2"     => <<<TEXT_
+            
+            TEXT
+            TEXT_,
+            "\r\n"    => "\r\n",
+            "\\"      => "\\",
+            "\""      => "\"",
+            "key"     => 456,
+            "null"    => null,
+            "nulls"   => [null],
+        ]
+        EXPECTED
+        );
+        that(var_export2(["'\0\"" => "'\0\""], true))->isSame("[\n    \"'\\0\\\"\" => \"'\\0\\\"\",\n]");
+
+        $val = [
+            "'\0\""  => "'\0\"",
             '$var'   => '$var',
             '${var}' => '${var}',
             '{$var}' => '{$var}',
@@ -852,23 +888,8 @@ class varTest extends AbstractTestCase
             'key'    => 456,
             'null'   => null,
             'nulls'  => [null],
-        ], true))->isSame(<<<'EXPECTED'
-        [
-            "'\000\"" => 123,
-            "\$var"   => "\$var",
-            "\${var}" => "\${var}",
-            "{\$var}" => "{\$var}",
-            "
-        "       => "
-        ",
-            "\\"      => "\\",
-            "\""      => "\"",
-            "key"     => 456,
-            "null"    => null,
-            "nulls"   => [null],
-        ]
-        EXPECTED
-        );
+        ];
+        that(eval("return " . var_export2($val, true) . ";"))->isSame($val);
 
         that(self::resolveFunction('var_export2'))->fn('hoge')->outputMatches('#hoge#');
     }
