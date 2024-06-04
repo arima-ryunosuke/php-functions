@@ -47,6 +47,7 @@ use function ryunosuke\Functions\Package\str_guess;
 use function ryunosuke\Functions\Package\str_lchop;
 use function ryunosuke\Functions\Package\str_patch;
 use function ryunosuke\Functions\Package\str_putcsv;
+use function ryunosuke\Functions\Package\str_quote;
 use function ryunosuke\Functions\Package\str_rchop;
 use function ryunosuke\Functions\Package\str_submap;
 use function ryunosuke\Functions\Package\str_subreplace;
@@ -1591,6 +1592,43 @@ that is <del>a</del><ins>the</ins> pen
             yield [1, 2, 3];
             yield [4, 5, 6];
         })()))->is("1,2,3\n4,5,6");
+    }
+
+    function test_str_quote()
+    {
+        // 全アスキー & マルチバイトを混ぜたもの
+        $string = implode('あ', array_map(fn($n) => chr($n), range(0, 127)));
+
+        $encoded = str_quote($string);
+        that($encoded)->is(
+            "\"\\0あ\\1あ\\2あ\\3あ\\4あ\\5あ\\6あ\\7あ\\10あ\\tあ\\nあ\\vあ\\fあ\\rあ\\16あ\\17あ\\20あ\\21あ\\22あ\\23あ\\24あ\\25あ\\26あ\\27あ\\30あ\\31あ\\32あ\\eあ\\34あ\\35あ\\36あ\\37あ" .
+            " あ!あ\\\"あ#あ\\\$あ%あ&あ'あ(あ)あ*あ+あ,あ-あ.あ/" .
+            "あ0あ1あ2あ3あ4あ5あ6あ7あ8あ9あ" .
+            ":あ;あ<あ=あ>あ?あ@あ" .
+            "AあBあCあDあEあFあGあHあIあJあKあLあMあNあOあPあQあRあSあTあUあVあWあXあYあZあ" .
+            "[あ\\\\あ]あ^あ_あ`あ" .
+            "aあbあcあdあeあfあgあhあiあjあkあlあmあnあoあpあqあrあsあtあuあvあwあxあyあzあ{あ|あ}あ~あ\\177\"");
+        // eval すると元に戻る
+        that(eval("return $encoded;"))->is($string);
+
+        // heredoc でも同様
+        $encoded = str_quote($string, ['heredoc' => 'EOS']);
+        that($encoded)->contains("<<<EOS");
+        // eval すると元に戻る
+        that(eval("return $encoded;"))->is($string);
+
+        // nowdoc はちょっと特殊（タイプ可能文字しか書けない）
+        $encoded = str_quote("a\n\tb\r\tc", ['nowdoc' => 'EOS']);
+        that($encoded)->contains("<<<'EOS'");
+        // eval すると元に戻る
+        that(eval("return $encoded;"))->is("a\n\tb\r\tc");
+
+        // 雑多なオプション
+        that(str_quote("#a\nb\rc\tz", ['special-character' => ["#" => '\\#']]))->is("\"\#a\\nb\\rc\\tz\"");
+        that(str_quote("a\nb\rc\tz", ['escape-character' => ["\t" => 'X']]))->is("\"a\\12b\\15cXz\"");
+        that(str_quote("a\nb\rc\tz", ['escape-character' => [], 'control-character' => 'oct']))->is("\"a\\12b\\15c\\11z\"");
+        that(str_quote("a\nb\rc\tz", ['escape-character' => [], 'control-character' => 'hex']))->is("\"a\\x0ab\\x0dc\\x09z\"");
+        that(str_quote("a\nb\rc\tz", ['escape-character' => [], 'control-character' => 'HEX']))->is("\"a\\x0Ab\\x0Dc\\x09z\"");
     }
 
     function test_str_submap()
