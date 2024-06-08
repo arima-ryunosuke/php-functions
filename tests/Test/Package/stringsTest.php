@@ -53,6 +53,7 @@ use function ryunosuke\Functions\Package\str_submap;
 use function ryunosuke\Functions\Package\str_subreplace;
 use function ryunosuke\Functions\Package\strcat;
 use function ryunosuke\Functions\Package\strpos_array;
+use function ryunosuke\Functions\Package\strpos_closest;
 use function ryunosuke\Functions\Package\strpos_escaped;
 use function ryunosuke\Functions\Package\strpos_quoted;
 use function ryunosuke\Functions\Package\strposr;
@@ -1747,6 +1748,83 @@ that is <del>a</del><ins>the</ins> pen
             0 => 11,
             2 => 19,
         ]);
+    }
+
+    function test_strpos_closest()
+    {
+        //          +0123456789A123456789B123456789C123
+        //          -321C987654321B987654321A9876543210
+        $haystack = 'hello, hello, hello, hello, hello';
+
+        // 正数読み飛ばし
+        that(strpos_closest($haystack, 'hello', null, 1))->isSame(0);
+        that(strpos_closest($haystack, 'hello', null, 2))->isSame(7);
+        that(strpos_closest($haystack, 'hello', null, 3))->isSame(14);
+        that(strpos_closest($haystack, 'hello', null, 4))->isSame(21);
+        that(strpos_closest($haystack, 'hello', null, 5))->isSame(28);
+        that(strpos_closest($haystack, 'hello', null, 6))->isSame(null);
+
+        // 負数読み飛ばし
+        that(strpos_closest($haystack, 'hello', null, -1))->isSame(28);
+        that(strpos_closest($haystack, 'hello', null, -2))->isSame(21);
+        that(strpos_closest($haystack, 'hello', null, -3))->isSame(14);
+        that(strpos_closest($haystack, 'hello', null, -4))->isSame(7);
+        that(strpos_closest($haystack, 'hello', null, -5))->isSame(0);
+        that(strpos_closest($haystack, 'hello', null, -6))->isSame(null);
+
+        // 正数オフセット（右探索）
+        that(strpos_closest($haystack, 'hello', 0, 1))->isSame(0);
+        that(strpos_closest($haystack, 'hello', 1, 1))->isSame(7);
+        that(strpos_closest($haystack, 'hello', 7, 1))->isSame(7);
+        that(strpos_closest($haystack, 'hello', 8, 1))->isSame(14);
+        that(strpos_closest($haystack, 'hello', 14, 1))->isSame(14);
+        that(strpos_closest($haystack, 'hello', 15, 1))->isSame(21);
+        that(strpos_closest($haystack, 'hello', 21, 1))->isSame(21);
+        that(strpos_closest($haystack, 'hello', 22, 1))->isSame(28);
+        that(strpos_closest($haystack, 'hello', 28, 1))->isSame(28);
+        that(strpos_closest($haystack, 'hello', 29, 1))->isSame(null);
+        that(strpos_closest($haystack, 'hello', 99, 1))->isSame(null);
+
+        // 正数オフセット（左探索）
+        that(strpos_closest($haystack, 'hello', 0, -1))->isSame(null);
+        that(strpos_closest($haystack, 'hello', 4, -1))->isSame(null);
+        that(strpos_closest($haystack, 'hello', 5, -1))->isSame(0);
+        that(strpos_closest($haystack, 'hello', 11, -1))->isSame(0);
+        that(strpos_closest($haystack, 'hello', 12, -1))->isSame(7);
+        that(strpos_closest($haystack, 'hello', 18, -1))->isSame(7);
+        that(strpos_closest($haystack, 'hello', 19, -1))->isSame(14);
+        that(strpos_closest($haystack, 'hello', 25, -1))->isSame(14);
+        that(strpos_closest($haystack, 'hello', 26, -1))->isSame(21);
+        that(strpos_closest($haystack, 'hello', 32, -1))->isSame(21);
+        that(strpos_closest($haystack, 'hello', 33, -1))->isSame(28);
+        that(strpos_closest($haystack, 'hello', 99, -1))->isSame(28);
+
+        // 負数オフセット（右探索）
+        that(strpos_closest($haystack, 'hello', -1, 1))->isSame(null);
+        that(strpos_closest($haystack, 'hello', -4, 1))->isSame(null);
+        that(strpos_closest($haystack, 'hello', -5, 1))->isSame(28);
+        that(strpos_closest($haystack, 'hello', -11, 1))->isSame(28);
+        that(strpos_closest($haystack, 'hello', -12, 1))->isSame(21);
+        that(strpos_closest($haystack, 'hello', -18, 1))->isSame(21);
+        that(strpos_closest($haystack, 'hello', -19, 1))->isSame(14);
+        that(strpos_closest($haystack, 'hello', -25, 1))->isSame(14);
+        that(strpos_closest($haystack, 'hello', -26, 1))->isSame(7);
+        that(strpos_closest($haystack, 'hello', -32, 1))->isSame(7);
+        that(strpos_closest($haystack, 'hello', -33, 1))->isSame(0);
+        that(strpos_closest($haystack, 'hello', -99, 1))->isSame(0);
+
+        // 負数オフセット（左探索）
+        that(strpos_closest($haystack, 'hello', null, -1))->isSame(28);
+        that(strpos_closest($haystack, 'hello', -2, -1))->isSame(21);
+        that(strpos_closest($haystack, 'hello', -7, -1))->isSame(21);
+        that(strpos_closest($haystack, 'hello', -8, -1))->isSame(14);
+        that(strpos_closest($haystack, 'hello', -9, -1))->isSame(14);
+        that(strpos_closest($haystack, 'hello', -15, -1))->isSame(7);
+        that(strpos_closest($haystack, 'hello', -16, -1))->isSame(7);
+        that(strpos_closest($haystack, 'hello', -22, -1))->isSame(0);
+        that(strpos_closest($haystack, 'hello', -23, -1))->isSame(0);
+        that(strpos_closest($haystack, 'hello', -29, -1))->isSame(null);
+        that(strpos_closest($haystack, 'hello', -99, -1))->isSame(null);
     }
 
     function test_strpos_escaped()
