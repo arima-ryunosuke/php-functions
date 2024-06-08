@@ -55,6 +55,7 @@ use function ryunosuke\Functions\Package\strcat;
 use function ryunosuke\Functions\Package\strpos_array;
 use function ryunosuke\Functions\Package\strpos_escaped;
 use function ryunosuke\Functions\Package\strpos_quoted;
+use function ryunosuke\Functions\Package\strposr;
 use function ryunosuke\Functions\Package\strrstr;
 use function ryunosuke\Functions\Package\strtr_escaped;
 
@@ -1840,6 +1841,57 @@ that is <del>a</del><ins>the</ins> pen
         that($found)->is("word");
         that(strpos_quoted("this is a 'special word' that sPecial wOrd", ['word', 'special'], 0, "'", "\\", $found))->isSame(null);
         that($found)->isNull();
+    }
+
+    function test_strposr()
+    {
+        //          +0123456789A123456789
+        //          -987654321A9876543210
+        $haystack = 'hello, hello, hello';
+
+        that(strposr($haystack, 'hello', 0))->isSame(false);
+        that(strposr($haystack, 'hello', 1))->isSame(false);
+        that(strposr($haystack, 'hello', 2))->isSame(false);
+        that(strposr($haystack, 'hello', 3))->isSame(false);
+        that(strposr($haystack, 'hello', 4))->isSame(false);
+        that(strposr($haystack, 'hello', 5))->isSame(0);
+        that(strposr($haystack, 'hello', 6))->isSame(0);
+        that(strposr($haystack, 'hello', 7))->isSame(0);
+        that(strposr($haystack, 'hello', 8))->isSame(0);
+        that(strposr($haystack, 'hello', 9))->isSame(0);
+        that(strposr($haystack, 'hello', 10))->isSame(0);
+        that(strposr($haystack, 'hello', 11))->isSame(0);
+        that(strposr($haystack, 'hello', 12))->isSame(7);
+        that(strposr($haystack, 'hello', 13))->isSame(7);
+        that(strposr($haystack, 'hello', 14))->isSame(7);
+        that(strposr($haystack, 'hello', 15))->isSame(7);
+        that(strposr($haystack, 'hello', 16))->isSame(7);
+        that(strposr($haystack, 'hello', 17))->isSame(7);
+        that(strposr($haystack, 'hello', 18))->isSame(7);
+        that(strposr($haystack, 'hello', 19))->isSame(14);
+        that(self::resolveFunction('strposr'))($haystack, 'hello', 20)->wasThrown('must be contained in argument');
+
+        that(strposr($haystack, 'hello', null))->isSame(14);
+        that(strposr($haystack, 'hello', -1))->isSame(7);
+        that(strposr($haystack, 'hello', -2))->isSame(7);
+        that(strposr($haystack, 'hello', -3))->isSame(7);
+        that(strposr($haystack, 'hello', -4))->isSame(7);
+        that(strposr($haystack, 'hello', -5))->isSame(7);
+        that(strposr($haystack, 'hello', -6))->isSame(7);
+        that(strposr($haystack, 'hello', -7))->isSame(7);
+        that(strposr($haystack, 'hello', -8))->isSame(0);
+        that(strposr($haystack, 'hello', -9))->isSame(0);
+        that(strposr($haystack, 'hello', -10))->isSame(0);
+        that(strposr($haystack, 'hello', -11))->isSame(0);
+        that(strposr($haystack, 'hello', -12))->isSame(0);
+        that(strposr($haystack, 'hello', -13))->isSame(0);
+        that(strposr($haystack, 'hello', -14))->isSame(0);
+        that(strposr($haystack, 'hello', -15))->isSame(false);
+        that(strposr($haystack, 'hello', -16))->isSame(false);
+        that(strposr($haystack, 'hello', -17))->isSame(false);
+        that(strposr($haystack, 'hello', -18))->isSame(false);
+        that(strposr($haystack, 'hello', -19))->isSame(false);
+        that(self::resolveFunction('strposr'))($haystack, 'hello', -20)->wasThrown('must be contained in argument');
     }
 
     function test_strrstr()
