@@ -38,6 +38,7 @@ use function ryunosuke\Functions\Package\str_bytes;
 use function ryunosuke\Functions\Package\str_chop;
 use function ryunosuke\Functions\Package\str_chunk;
 use function ryunosuke\Functions\Package\str_common_prefix;
+use function ryunosuke\Functions\Package\str_control_apply;
 use function ryunosuke\Functions\Package\str_diff;
 use function ryunosuke\Functions\Package\str_ellipsis;
 use function ryunosuke\Functions\Package\str_embed;
@@ -1046,6 +1047,74 @@ zero is index 0.
 
         that(str_common_prefix('ん', 'あ', 'あい', 'あいう'))->isSame('');
         that(str_common_prefix('', 'あいう', 'あい', 'あ'))->isSame('');
+    }
+
+    function test_str_control_apply()
+    {
+        // BS
+        that(str_control_apply("a\bz"))->is("z");
+        that(str_control_apply("ab\b\bz"))->is("z");
+        that(str_control_apply("a\b\bz"))->is("z");
+        that(str_control_apply("\bz"))->is("z");
+        that(str_control_apply("aX\bbX\bcXX\b\b"))->is("abc");
+
+        // DEL
+        that(str_control_apply("a\dz"))->is("a");
+        that(str_control_apply("a\d\dyz"))->is("a");
+        that(str_control_apply("a\d\dz"))->is("a");
+        that(str_control_apply("a\d"))->is("a");
+        that(str_control_apply("a\dXb\dXc\d\dXX"))->is("abc");
+
+        // CR
+        that(str_control_apply("bbb\rzzzz"))->is("zzzz");
+        that(str_control_apply("\nbbb\rzzzz"))->is("\nzzzz");
+        that(str_control_apply("a\nbbb\rzzzz"))->is("a\nzzzz");
+        that(str_control_apply("a\nbbb\rcc\rzzzz"))->is("a\nzzzz");
+
+        // misc
+        that(str_control_apply("\b"))->is("");
+        that(str_control_apply("\d"))->is("");
+        that(str_control_apply("\r"))->is("");
+        that(str_control_apply(""))->is("");
+        that(str_control_apply("a\nb\r"))->is("a\n");
+        that(str_control_apply("a\nb\r\bc"))->is("ac");
+
+        $v = fn($v) => $v;
+        $consts = [
+            '    public const C1 = 1;',
+            '    public const C2 = 2;',
+        ];
+        $properties = [
+            '    public $property1 $p1 = 1;',
+            '    public $property1 $p2 = 2;',
+        ];
+        $methods = [
+            '    public function method1() {}',
+            '    public function method2() {}',
+        ];
+        $class = str_control_apply(<<<CLASS
+        class C
+        {
+            \r{$v(implode("\n", $consts) ?: "")}
+        
+            \r{$v($consts ? "" : "\b\b")}{$v(implode("\n", $properties))}
+        
+            \r{$v($properties ? "" : "\b\b")}{$v(implode("\n", $methods))}
+        }
+        CLASS,);
+        that($class)->is(<<<'CLASS'
+        class C
+        {
+            public const C1 = 1;
+            public const C2 = 2;
+        
+            public $property1 $p1 = 1;
+            public $property1 $p2 = 2;
+        
+            public function method1() {}
+            public function method2() {}
+        }
+        CLASS,);
     }
 
     function test_str_diff()
