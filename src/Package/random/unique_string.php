@@ -54,14 +54,16 @@ function unique_string($source, $initial = null, $charlist = '0123456789abcdefgh
         shuffle($charlist);
         $result = implode('', array_slice($charlist, 0, $initial));
     }
-    elseif (is_stringable($initial)) {
+    elseif (is_null($initial)) {
+        $result .= $charlist[mt_rand(0, $charlength - 1)];
+    }
+    else {
         $result = $initial;
     }
 
-    $p = 0;
-    do {
+    while ((($p = strpos($source, $result, $p ?? 0)) !== false)) {
         $result .= $charlist[mt_rand(0, $charlength - 1)];
-    } while (($p = strpos($source, $result, $p)) !== false);
+    }
 
     return $result;
 }

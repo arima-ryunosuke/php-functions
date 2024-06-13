@@ -254,9 +254,9 @@ class randomTest extends AbstractTestCase
 
     function test_unique_string()
     {
-        that(unique_string('hoge', 'xxx', 'X'))->is('xxxX');
+        that(unique_string('hoge', 'xxx', 'X'))->is('xxx');
         that(unique_string('hoge', null, 'o'))->stringLengthEquals(2);
-        that(unique_string('hoge', 10))->stringLengthEquals(11);
+        that(unique_string('hoge', 10))->stringLengthEquals(10);
         that(self::resolveFunction('unique_string'))('hoge', null, '')->wasThrown('empty');
 
         for ($i = 0; $i < 9999; $i++) {
