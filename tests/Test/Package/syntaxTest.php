@@ -170,7 +170,7 @@ class syntaxTest extends AbstractTestCase
                 rm_rf($workingdir);
             });
         }
-        catch (\Exception $ex) {
+        catch (\Exception) {
             // dummy
         }
         // finally が仕事をしてディレクトリが消えているはず
@@ -310,7 +310,7 @@ class syntaxTest extends AbstractTestCase
         try {
             try_finally($try2, $finally);
         }
-        catch (\Exception $ex) {
+        catch (\Exception) {
             // 握りつぶし
         }
         that($finally_count)->is(2);

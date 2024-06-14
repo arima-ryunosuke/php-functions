@@ -117,7 +117,7 @@ class utilityTest extends AbstractTestCase
 
     function test_cache_fetch()
     {
-        /** @var \Psr16CacheInterface $cache */
+        /** @var \Cacheobject $cache */
         $tmpdir = self::$TMPDIR . '/cache_fetch';
         rm_rf($tmpdir);
         $cache = cacheobject($tmpdir);
@@ -151,7 +151,7 @@ class utilityTest extends AbstractTestCase
 
     function test_cacheobject()
     {
-        /** @var \Psr16CacheInterface $cache */
+        /** @var \Cacheobject $cache */
         $tmpdir = self::$TMPDIR . '/cacheobject';
         rm_rf($tmpdir);
         $cache = cacheobject($tmpdir);
