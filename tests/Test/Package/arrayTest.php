@@ -32,6 +32,7 @@ use function ryunosuke\Functions\Package\array_grep_key;
 use function ryunosuke\Functions\Package\array_group;
 use function ryunosuke\Functions\Package\array_implode;
 use function ryunosuke\Functions\Package\array_insert;
+use function ryunosuke\Functions\Package\array_join;
 use function ryunosuke\Functions\Package\array_keys_exist;
 use function ryunosuke\Functions\Package\array_kvmap;
 use function ryunosuke\Functions\Package\array_limit;
@@ -1439,6 +1440,139 @@ class arrayTest extends AbstractTestCase
 
         // 連想配列もOK
         that(array_insert(['x' => 'X', 'y' => 'Y', 'z' => 'Z'], ['x1', 'n' => 'x2'], 1))->is(['x' => 'X', 'x1', 'n' => 'x2', 'y' => 'Y', 'z' => 'Z']);
+    }
+
+    function test_array_join()
+    {
+        $from = [
+            ['id' => 1, 'name' => 'a'],
+            ['id' => 2, 'name' => 'b'],
+            ['id' => 3, 'name' => 'c'],
+            ['id' => 99, 'name' => 'z'],
+            ['id' => null, 'name' => null],
+        ];
+        $join = [
+            ['id' => 1, 'parent_id' => 1, 'name2' => 'a'],
+            ['id' => 2, 'parent_id' => 1, 'name2' => 'a2'],
+            ['id' => 3, 'parent_id' => 2, 'name2' => 'b'],
+            ['id' => 4, 'parent_id' => 2, 'name2' => 'b2'],
+            ['id' => 5, 'parent_id' => 3, 'name2' => 'c'],
+            ['id' => 6, 'parent_id' => 3, 'name2' => 'c2'],
+            ['id' => 99, 'parent_id' => 9, 'name2' => 'z'],
+            ['id' => null, 'parent_id' => '', 'name2' => null],
+        ];
+
+        // INNER モード
+        that(array_join($from, [], fn($left, $right) => $left['id'] === $right['parent_id'], false))->is([]);
+        that(array_join($from, $join, fn($left, $right) => $left['id'] === $right['parent_id'], false))->is([
+            "0+0" => ["id" => 1, "name" => "a", "parent_id" => 1, "name2" => "a"],
+            "0+1" => ["id" => 1, "name" => "a", "parent_id" => 1, "name2" => "a2"],
+            "1+2" => ["id" => 2, "name" => "b", "parent_id" => 2, "name2" => "b"],
+            "1+3" => ["id" => 2, "name" => "b", "parent_id" => 2, "name2" => "b2"],
+            "2+4" => ["id" => 3, "name" => "c", "parent_id" => 3, "name2" => "c"],
+            "2+5" => ["id" => 3, "name" => "c", "parent_id" => 3, "name2" => "c2"],
+        ]);
+
+        // OUTER モード
+        that(array_join($from, [], fn($left, $right) => $left['id'] === $right['parent_id'], true))->is([
+            "0+null" => ["id" => 1, "name" => "a"],
+            "1+null" => ["id" => 2, "name" => "b"],
+            "2+null" => ["id" => 3, "name" => "c"],
+            "3+null" => ["id" => 99, "name" => "z"],
+            "4+null" => ["id" => null, "name" => null],
+        ]);
+        that(array_join($from, $join, fn($left, $right) => $left['id'] === $right['parent_id'], true))->is([
+            "0+0"    => ["id" => 1, "name" => "a", "parent_id" => 1, "name2" => "a"],
+            "0+1"    => ["id" => 1, "name" => "a", "parent_id" => 1, "name2" => "a2"],
+            "1+2"    => ["id" => 2, "name" => "b", "parent_id" => 2, "name2" => "b"],
+            "1+3"    => ["id" => 2, "name" => "b", "parent_id" => 2, "name2" => "b2"],
+            "2+4"    => ["id" => 3, "name" => "c", "parent_id" => 3, "name2" => "c"],
+            "2+5"    => ["id" => 3, "name" => "c", "parent_id" => 3, "name2" => "c2"],
+            "3+null" => ["id" => 99, "name" => "z", "parent_id" => null, "name2" => null],
+            "4+null" => ["id" => null, "name" => null, "parent_id" => null, "name2" => null],
+        ]);
+
+        // 完全不一致
+        that(array_join($from, $join, fn($left, $right) => false, false))->is([]);
+        that(array_join($from, $join, fn($left, $right) => false, true))->is([
+            "0+null" => ["id" => 1, "name" => "a", "parent_id" => null, "name2" => null],
+            "1+null" => ["id" => 2, "name" => "b", "parent_id" => null, "name2" => null],
+            "2+null" => ["id" => 3, "name" => "c", "parent_id" => null, "name2" => null],
+            "3+null" => ["id" => 99, "name" => "z", "parent_id" => null, "name2" => null],
+            "4+null" => ["id" => null, "name" => null, "parent_id" => null, "name2" => null],
+        ]);
+
+        // 完全無条件（CROSS JOIN）
+        that(array_join($from, ['x' => ['x' => 'X']], fn($left, $right) => true, false))->is([
+            "0+x" => ["id" => 1, "name" => "a", "x" => "X"],
+            "1+x" => ["id" => 2, "name" => "b", "x" => "X"],
+            "2+x" => ["id" => 3, "name" => "c", "x" => "X"],
+            "3+x" => ["id" => 99, "name" => "z", "x" => "X"],
+            "4+x" => ["id" => null, "name" => null, "x" => "X"],
+        ]);
+
+        // 配列指定（INNER）
+        that(array_join($from, [], ['id' => 'parent_id'], false))->is([]);
+        that(array_join($from, $join, ['id' => 'parent_id'], false))->is([
+            "0+0" => ["id" => 1, "name" => "a", "parent_id" => 1, "name2" => "a"],
+            "0+1" => ["id" => 1, "name" => "a", "parent_id" => 1, "name2" => "a2"],
+            "1+2" => ["id" => 2, "name" => "b", "parent_id" => 2, "name2" => "b"],
+            "1+3" => ["id" => 2, "name" => "b", "parent_id" => 2, "name2" => "b2"],
+            "2+4" => ["id" => 3, "name" => "c", "parent_id" => 3, "name2" => "c"],
+            "2+5" => ["id" => 3, "name" => "c", "parent_id" => 3, "name2" => "c2"],
+        ]);
+
+        // 配列指定（OUTER）
+        that(array_join($from, [], ['id' => 'parent_id'], true))->is([
+            "0+null" => ["id" => 1, "name" => "a"],
+            "1+null" => ["id" => 2, "name" => "b"],
+            "2+null" => ["id" => 3, "name" => "c"],
+            "3+null" => ["id" => 99, "name" => "z"],
+            "4+null" => ["id" => null, "name" => null],
+        ]);
+        that(array_join($from, $join, ['id' => 'parent_id'], true))->is([
+            "0+0"    => ["id" => 1, "name" => "a", "parent_id" => 1, "name2" => "a"],
+            "0+1"    => ["id" => 1, "name" => "a", "parent_id" => 1, "name2" => "a2"],
+            "1+2"    => ["id" => 2, "name" => "b", "parent_id" => 2, "name2" => "b"],
+            "1+3"    => ["id" => 2, "name" => "b", "parent_id" => 2, "name2" => "b2"],
+            "2+4"    => ["id" => 3, "name" => "c", "parent_id" => 3, "name2" => "c"],
+            "2+5"    => ["id" => 3, "name" => "c", "parent_id" => 3, "name2" => "c2"],
+            "3+null" => ["id" => 99, "name" => "z", "parent_id" => null, "name2" => null],
+            "4+null" => ["id" => null, "name" => null, "parent_id" => null, "name2" => null],
+        ]);
+
+        // 配列指定（完全不一致）
+        that(array_join($from, $join, ['name' => 'parent_id'], false))->is([]);
+        that(array_join($from, $join, ['name' => 'parent_id'], true))->is([
+            "0+null" => ["id" => 1, "name" => "a", "parent_id" => null, "name2" => null],
+            "1+null" => ["id" => 2, "name" => "b", "parent_id" => null, "name2" => null],
+            "2+null" => ["id" => 3, "name" => "c", "parent_id" => null, "name2" => null],
+            "3+null" => ["id" => 99, "name" => "z", "parent_id" => null, "name2" => null],
+            "4+null" => ["id" => null, "name" => null, "parent_id" => null, "name2" => null],
+        ]);
+
+        // 配列指定（完全無条件（CROSS JOIN））
+        that(array_join($from, ['x' => ['x' => 'X']], [], false))->is([
+            "0+x" => ["id" => 1, "name" => "a", "x" => "X"],
+            "1+x" => ["id" => 2, "name" => "b", "x" => "X"],
+            "2+x" => ["id" => 3, "name" => "c", "x" => "X"],
+            "3+x" => ["id" => 99, "name" => "z", "x" => "X"],
+            "4+x" => ["id" => null, "name" => null, "x" => "X"],
+        ]);
+
+        // 未定義
+        that(array_join($from, $join + ['x' => ['x' => 'X']], ['id' => 'parent_id', 'name' => 'name2'], false))->is([
+            "0+0" => ["id" => 1, "name" => "a", "parent_id" => 1, "name2" => "a"],
+            "1+2" => ["id" => 2, "name" => "b", "parent_id" => 2, "name2" => "b"],
+            "2+4" => ["id" => 3, "name" => "c", "parent_id" => 3, "name2" => "c"],
+        ]);
+
+        // 配列の複数指定は AND
+        that(array_join($from, $join, ['id' => 'parent_id', 'name' => 'name2'], false))->is([
+            "0+0" => ["id" => 1, "name" => "a", "parent_id" => 1, "name2" => "a"],
+            "1+2" => ["id" => 2, "name" => "b", "parent_id" => 2, "name2" => "b"],
+            "2+4" => ["id" => 3, "name" => "c", "parent_id" => 3, "name2" => "c"],
+        ]);
     }
 
     function test_array_keys_exist()
