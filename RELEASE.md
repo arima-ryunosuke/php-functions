@@ -11,6 +11,16 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.7
+
+- [feature] array_join を追加
+- [feature] str_control_apply を追加
+- [feature] str_closest を追加
+- [feature] strposr を追加
+- [fixbug] 一部の関数で文字が不正出力されていたのを修正
+- [change] unique_string で initial が与えられたとき初回は charlist でチャレンジしない
+- [feature] str_quote を追加
+
 ## 2.0.6
 
 - [fixbug] reflect_callable で意図せず __call になってしまう不具合を修正
