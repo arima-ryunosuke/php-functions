@@ -816,7 +816,7 @@ function sql_format($sql, $options = [])
                     // "columnname ," になってしまう
                     // mysql において関数呼び出し括弧の前に空白は許されない
                     // ただし、関数呼び出しではなく記号の場合はスペースを入れたい（ colname = (SELECT ～) など）
-                    if (!in_array($next[1], ['.', ',', '(', ';']) || ($next[1] === '(' && !preg_match('#^[a-z0-9_"\'`]+$#i', $rawtoken))) {
+                    if (!in_array($prev[1], [';']) && !in_array($next[1], ['.', ',', '(', ';']) || ($next[1] === '(' && !preg_match('#^[a-z0-9_"\'`]+$#i', $rawtoken))) {
                         $result[] = $MARK_SP;
                     }
                     break;
@@ -1021,6 +1021,11 @@ function sql_format($sql, $options = [])
                         $parts = preg_replace("#$MARK_BR#u", $MARK_BR . $MARK_NT, $parts, substr_count($parts, $MARK_BR) - 1);
                         $result[] = $MARK_BR . $virttoken . $MARK_BR . $MARK_NT . $parts;
                     }
+                    break;
+                case "COMMIT":
+                case "ROLLBACK":
+                    // begin は begin～end の一部の可能性があるが commit,rollback は俺の知る限りそのような構文はない
+                    $result[] = $virttoken;
                     break;
                 case "END":
                     if ($context === 'CASE') {

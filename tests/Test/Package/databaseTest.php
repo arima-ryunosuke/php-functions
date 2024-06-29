@@ -55,6 +55,39 @@ select
     function test_sql_format_comment()
     {
         that(sql_format("
+-- comment select
+select 1 from table_name;
+-- comment insert
+insert into table_name(name) values('hoge');
+-- comment update
+update table_name set name = 'hoge';
+-- comment delete
+delete from table_name where name = 'hoge';
+"))->IsEqualTrimming("
+-- comment select
+select
+  1
+from
+  table_name;
+  -- comment insert
+insert into
+  table_name(name)
+values
+  ('hoge');
+  -- comment update
+update
+  table_name
+set
+  name = 'hoge';
+  -- comment delete
+delete
+from
+  table_name
+where
+  name = 'hoge';
+");
+
+        that(sql_format("
 -- this is quoted `comment`
 select 
 -- a
