@@ -435,52 +435,52 @@ trait ChainObject2
 
     /** @see include_string() */
     public self $include_string;
-    public function include_string($template, iterable $array = []): self { }
+    public function include_string(?string $template, iterable $array = []): self { }
     public function include_string(iterable $array = []): self { }
 
     /** @see split_noempty() */
     public self $split_noempty;
-    public function split_noempty($delimiter, $string, $trimchars = true): self { }
-    public function split_noempty($string, $trimchars = true): self { }
+    public function split_noempty(?string $delimiter, ?string $string, $trimchars = true): self { }
+    public function split_noempty(?string $string, $trimchars = true): self { }
 
     /** @see str_chop() */
     public self $str_chop;
-    public function str_chop($string, $prefix = "", $suffix = "", $case_insensitivity = false): self { }
-    public function str_chop($prefix = "", $suffix = "", $case_insensitivity = false): self { }
+    public function str_chop(?string $string, ?string $prefix = "", ?string $suffix = "", $case_insensitivity = false): self { }
+    public function str_chop(?string $prefix = "", ?string $suffix = "", $case_insensitivity = false): self { }
 
     /** @see str_chop() */
     public self $chop;
-    public function chop($string, $prefix = "", $suffix = "", $case_insensitivity = false): self { }
-    public function chop($prefix = "", $suffix = "", $case_insensitivity = false): self { }
+    public function chop(?string $string, ?string $prefix = "", ?string $suffix = "", $case_insensitivity = false): self { }
+    public function chop(?string $prefix = "", ?string $suffix = "", $case_insensitivity = false): self { }
 
     /** @see str_ellipsis() */
     public self $str_ellipsis;
-    public function str_ellipsis($string, $width, $trimmarker = "...", $pos = null): self { }
+    public function str_ellipsis(?string $string, $width, $trimmarker = "...", $pos = null): self { }
     public function str_ellipsis($width, $trimmarker = "...", $pos = null): self { }
 
     /** @see str_ellipsis() */
     public self $ellipsis;
-    public function ellipsis($string, $width, $trimmarker = "...", $pos = null): self { }
+    public function ellipsis(?string $string, $width, $trimmarker = "...", $pos = null): self { }
     public function ellipsis($width, $trimmarker = "...", $pos = null): self { }
 
     /** @see str_rchop() */
     public self $str_rchop;
-    public function str_rchop($string, $suffix, $case_insensitivity = false): self { }
-    public function str_rchop($suffix, $case_insensitivity = false): self { }
+    public function str_rchop(?string $string, ?string $suffix, $case_insensitivity = false): self { }
+    public function str_rchop(?string $suffix, $case_insensitivity = false): self { }
 
     /** @see str_rchop() */
     public self $rchop;
-    public function rchop($string, $suffix, $case_insensitivity = false): self { }
-    public function rchop($suffix, $case_insensitivity = false): self { }
+    public function rchop(?string $string, ?string $suffix, $case_insensitivity = false): self { }
+    public function rchop(?string $suffix, $case_insensitivity = false): self { }
 
     /** @see str_submap() */
     public self $str_submap;
-    public function str_submap($subject, $replaces, $case_insensitivity = false): self { }
+    public function str_submap(?string $subject, $replaces, $case_insensitivity = false): self { }
     public function str_submap($replaces, $case_insensitivity = false): self { }
 
     /** @see str_submap() */
     public self $submap;
-    public function submap($subject, $replaces, $case_insensitivity = false): self { }
+    public function submap(?string $subject, $replaces, $case_insensitivity = false): self { }
     public function submap($replaces, $case_insensitivity = false): self { }
 
     /** @see blank_if() */

@@ -536,42 +536,42 @@ TEXT): self { }
 
     /** @see kvsprintf() */
     public self $kvsprintf;
-    public function kvsprintf($format, array $array): self { }
+    public function kvsprintf(?string $format, array $array): self { }
     public function kvsprintf(array $array): self { }
 
     /** @see quoteexplode() */
     public self $quoteexplode;
-    public function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = "\\", $options = []): self { }
-    public function quoteexplode($string, $limit = null, $enclosures = "'\"", $escape = "\\", $options = []): self { }
+    public function quoteexplode($delimiter, ?string $string, $limit = null, $enclosures = "'\"", $escape = "\\", $options = []): self { }
+    public function quoteexplode(?string $string, $limit = null, $enclosures = "'\"", $escape = "\\", $options = []): self { }
 
     /** @see render_file() */
     public self $render_file;
-    public function render_file($template_file, iterable $array): self { }
+    public function render_file(?string $template_file, iterable $array): self { }
     public function render_file(iterable $array): self { }
 
     /** @see render_template() */
     public self $render_template;
-    public function render_template($template, $vars, $tag = null): self { }
+    public function render_template(?string $template, $vars, $tag = null): self { }
     public function render_template($vars, $tag = null): self { }
 
     /** @see str_bytes() */
     public self $str_bytes;
-    public function str_bytes($string, $base = 10): self { }
+    public function str_bytes(?string $string, $base = 10): self { }
     public function str_bytes($base = 10): self { }
 
     /** @see str_bytes() */
     public self $bytes;
-    public function bytes($string, $base = 10): self { }
+    public function bytes(?string $string, $base = 10): self { }
     public function bytes($base = 10): self { }
 
     /** @see str_exists() */
     public self $str_exists;
-    public function str_exists($haystack, $needle, $case_insensitivity = false, $and_flag = false): self { }
+    public function str_exists(?string $haystack, $needle, $case_insensitivity = false, $and_flag = false): self { }
     public function str_exists($needle, $case_insensitivity = false, $and_flag = false): self { }
 
     /** @see str_exists() */
     public self $exists;
-    public function exists($haystack, $needle, $case_insensitivity = false, $and_flag = false): self { }
+    public function exists(?string $haystack, $needle, $case_insensitivity = false, $and_flag = false): self { }
     public function exists($needle, $case_insensitivity = false, $and_flag = false): self { }
 
     /** @see try_finally() */

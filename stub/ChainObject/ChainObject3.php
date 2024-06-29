@@ -575,13 +575,13 @@ trait ChainObject3
 
     /** @see namespace_split() */
     public self $namespace_split;
-    public function namespace_split($string): self { }
+    public function namespace_split(?string $string): self { }
     public function namespace_split(): self { }
 
     /** @see pascal_case() */
     public self $pascal_case;
-    public function pascal_case($string, $delimiter = "_"): self { }
-    public function pascal_case($delimiter = "_"): self { }
+    public function pascal_case(?string $string, ?string $delimiter = "_"): self { }
+    public function pascal_case(?string $delimiter = "_"): self { }
 
     /** @see str_control_apply() */
     public self $str_control_apply;

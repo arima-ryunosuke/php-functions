@@ -420,22 +420,22 @@ trait ChainObject0
 
     /** @see ends_with() */
     public self $ends_with;
-    public function ends_with($string, $with, $case_insensitivity = false): self { }
+    public function ends_with(?string $string, $with, $case_insensitivity = false): self { }
     public function ends_with($with, $case_insensitivity = false): self { }
 
     /** @see mb_compatible_encoding() */
     public self $mb_compatible_encoding;
-    public function mb_compatible_encoding($from, $to): self { }
-    public function mb_compatible_encoding($to): self { }
+    public function mb_compatible_encoding(?string $from, ?string $to): self { }
+    public function mb_compatible_encoding(?string $to): self { }
 
     /** @see str_anyof() */
     public self $str_anyof;
-    public function str_anyof($needle, $haystack, $case_insensitivity = false): self { }
+    public function str_anyof(?string $needle, $haystack, $case_insensitivity = false): self { }
     public function str_anyof($haystack, $case_insensitivity = false): self { }
 
     /** @see str_anyof() */
     public self $anyof;
-    public function anyof($needle, $haystack, $case_insensitivity = false): self { }
+    public function anyof(?string $needle, $haystack, $case_insensitivity = false): self { }
     public function anyof($haystack, $case_insensitivity = false): self { }
 
     /** @see str_diff() */
@@ -455,8 +455,8 @@ trait ChainObject0
 
     /** @see strrstr() */
     public self $strrstr;
-    public function strrstr($haystack, $needle, $after_needle = true): self { }
-    public function strrstr($needle, $after_needle = true): self { }
+    public function strrstr(?string $haystack, ?string $needle, $after_needle = true): self { }
+    public function strrstr(?string $needle, $after_needle = true): self { }
 
     /** @see try_catch_finally() */
     public self $try_catch_finally;

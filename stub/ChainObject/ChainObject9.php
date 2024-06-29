@@ -590,22 +590,22 @@ trait ChainObject9
 
     /** @see mb_trim() */
     public self $mb_trim;
-    public function mb_trim($string): self { }
+    public function mb_trim(?string $string): self { }
     public function mb_trim(): self { }
 
     /** @see render_string() */
     public self $render_string;
-    public function render_string($template, iterable $array): self { }
+    public function render_string(?string $template, iterable $array): self { }
     public function render_string(iterable $array): self { }
 
     /** @see str_common_prefix() */
     public self $str_common_prefix;
-    public function str_common_prefix(...$strings): self { }
+    public function str_common_prefix(?string ...$strings): self { }
     public function str_common_prefix(): self { }
 
     /** @see str_common_prefix() */
     public self $common_prefix;
-    public function common_prefix(...$strings): self { }
+    public function common_prefix(?string ...$strings): self { }
     public function common_prefix(): self { }
 
     /** @see str_equals() */
@@ -620,13 +620,13 @@ trait ChainObject9
 
     /** @see str_patch() */
     public self $str_patch;
-    public function str_patch($string, $patch, $options = []): self { }
-    public function str_patch($patch, $options = []): self { }
+    public function str_patch(?string $string, ?string $patch, $options = []): self { }
+    public function str_patch(?string $patch, $options = []): self { }
 
     /** @see str_patch() */
     public self $patch;
-    public function patch($string, $patch, $options = []): self { }
-    public function patch($patch, $options = []): self { }
+    public function patch(?string $string, ?string $patch, $options = []): self { }
+    public function patch(?string $patch, $options = []): self { }
 
     /** @see try_catch() */
     public self $try_catch;

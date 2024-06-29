@@ -517,33 +517,33 @@ TEXT): self { }
 
     /** @see ngram() */
     public self $ngram;
-    public function ngram($string, $N, $encoding = "UTF-8"): self { }
+    public function ngram(?string $string, $N, $encoding = "UTF-8"): self { }
     public function ngram($N, $encoding = "UTF-8"): self { }
 
     /** @see snake_case() */
     public self $snake_case;
-    public function snake_case($string, $delimiter = "_", $keep_abbr = false): self { }
-    public function snake_case($delimiter = "_", $keep_abbr = false): self { }
+    public function snake_case(?string $string, ?string $delimiter = "_", $keep_abbr = false): self { }
+    public function snake_case(?string $delimiter = "_", $keep_abbr = false): self { }
 
     /** @see str_lchop() */
     public self $str_lchop;
-    public function str_lchop($string, $prefix, $case_insensitivity = false): self { }
-    public function str_lchop($prefix, $case_insensitivity = false): self { }
+    public function str_lchop(?string $string, ?string $prefix, $case_insensitivity = false): self { }
+    public function str_lchop(?string $prefix, $case_insensitivity = false): self { }
 
     /** @see str_lchop() */
     public self $lchop;
-    public function lchop($string, $prefix, $case_insensitivity = false): self { }
-    public function lchop($prefix, $case_insensitivity = false): self { }
+    public function lchop(?string $string, ?string $prefix, $case_insensitivity = false): self { }
+    public function lchop(?string $prefix, $case_insensitivity = false): self { }
 
     /** @see str_subreplace() */
     public self $str_subreplace;
-    public function str_subreplace($subject, $search, $replaces, $case_insensitivity = false): self { }
-    public function str_subreplace($search, $replaces, $case_insensitivity = false): self { }
+    public function str_subreplace(?string $subject, ?string $search, $replaces, $case_insensitivity = false): self { }
+    public function str_subreplace(?string $search, $replaces, $case_insensitivity = false): self { }
 
     /** @see str_subreplace() */
     public self $subreplace;
-    public function subreplace($subject, $search, $replaces, $case_insensitivity = false): self { }
-    public function subreplace($search, $replaces, $case_insensitivity = false): self { }
+    public function subreplace(?string $subject, ?string $search, $replaces, $case_insensitivity = false): self { }
+    public function subreplace(?string $search, $replaces, $case_insensitivity = false): self { }
 
     /** @see dataurl_decode() */
     public self $dataurl_decode;

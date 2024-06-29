@@ -365,32 +365,32 @@ trait ChainObject4
 
     /** @see mb_monospace() */
     public self $mb_monospace;
-    public function mb_monospace($string, $codepoints = []): self { }
+    public function mb_monospace(?string $string, $codepoints = []): self { }
     public function mb_monospace($codepoints = []): self { }
 
     /** @see mb_str_pad() */
     public self $mb_str_pad;
-    public function mb_str_pad($string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
+    public function mb_str_pad(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
     public function mb_str_pad($width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
 
     /** @see str_chunk() */
     public self $str_chunk;
-    public function str_chunk($string, ...$chunks): self { }
+    public function str_chunk(?string $string, ...$chunks): self { }
     public function str_chunk(...$chunks): self { }
 
     /** @see str_chunk() */
     public self $chunk;
-    public function chunk($string, ...$chunks): self { }
+    public function chunk(?string $string, ...$chunks): self { }
     public function chunk(...$chunks): self { }
 
     /** @see str_guess() */
     public self $str_guess;
-    public function str_guess($string, $candidates, &$percent = null): self { }
+    public function str_guess(?string $string, $candidates, &$percent = null): self { }
     public function str_guess($candidates, &$percent = null): self { }
 
     /** @see str_guess() */
     public self $guess;
-    public function guess($string, $candidates, &$percent = null): self { }
+    public function guess(?string $string, $candidates, &$percent = null): self { }
     public function guess($candidates, &$percent = null): self { }
 
     /** @see str_putcsv() */
@@ -405,7 +405,7 @@ trait ChainObject4
 
     /** @see strpos_array() */
     public self $strpos_array;
-    public function strpos_array($haystack, $needles, $offset = 0): self { }
+    public function strpos_array(?string $haystack, $needles, $offset = 0): self { }
     public function strpos_array($needles, $offset = 0): self { }
 
     /** @see cast() */

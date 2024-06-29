@@ -416,12 +416,12 @@ TEXT): self { }
 
     /** @see strpos_escaped() */
     public self $strpos_escaped;
-    public function strpos_escaped($haystack, $needle, $offset = 0, $escape = "\\", &$found = null): self { }
+    public function strpos_escaped(?string $haystack, $needle, $offset = 0, $escape = "\\", &$found = null): self { }
     public function strpos_escaped($needle, $offset = 0, $escape = "\\", &$found = null): self { }
 
     /** @see strpos_quoted() */
     public self $strpos_quoted;
-    public function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
+    public function strpos_quoted(?string $haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
     public function strpos_quoted($needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
 
     /** @see benchmark() */

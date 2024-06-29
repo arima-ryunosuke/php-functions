@@ -386,27 +386,27 @@ TEXT): self { }
 
     /** @see camel_case() */
     public self $camel_case;
-    public function camel_case($string, $delimiter = "_"): self { }
-    public function camel_case($delimiter = "_"): self { }
+    public function camel_case(?string $string, ?string $delimiter = "_"): self { }
+    public function camel_case(?string $delimiter = "_"): self { }
 
     /** @see mb_ellipsis() */
     public self $mb_ellipsis;
-    public function mb_ellipsis($string, $width, $trimmarker = "...", $pos = null): self { }
+    public function mb_ellipsis(?string $string, $width, $trimmarker = "...", $pos = null): self { }
     public function mb_ellipsis($width, $trimmarker = "...", $pos = null): self { }
 
     /** @see starts_with() */
     public self $starts_with;
-    public function starts_with($string, $with, $case_insensitivity = false): self { }
+    public function starts_with(?string $string, $with, $case_insensitivity = false): self { }
     public function starts_with($with, $case_insensitivity = false): self { }
 
     /** @see str_embed() */
     public self $str_embed;
-    public function str_embed($string, $replacemap, $enclosure = "'\"", $escape = "\\", &$replaced = null): self { }
+    public function str_embed(?string $string, $replacemap, $enclosure = "'\"", $escape = "\\", &$replaced = null): self { }
     public function str_embed($replacemap, $enclosure = "'\"", $escape = "\\", &$replaced = null): self { }
 
     /** @see str_embed() */
     public self $embed;
-    public function embed($string, $replacemap, $enclosure = "'\"", $escape = "\\", &$replaced = null): self { }
+    public function embed(?string $string, $replacemap, $enclosure = "'\"", $escape = "\\", &$replaced = null): self { }
     public function embed($replacemap, $enclosure = "'\"", $escape = "\\", &$replaced = null): self { }
 
     /** @see strpos_closest() */
@@ -416,7 +416,7 @@ TEXT): self { }
 
     /** @see strtr_escaped() */
     public self $strtr_escaped;
-    public function strtr_escaped($string, $replace_pairs, $escape = "\\"): self { }
+    public function strtr_escaped(?string $string, $replace_pairs, $escape = "\\"): self { }
     public function strtr_escaped($replace_pairs, $escape = "\\"): self { }
 
     /** @see base64url_encode() */

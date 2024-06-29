@@ -555,52 +555,52 @@ trait ChainObject6
 
     /** @see chain_case() */
     public self $chain_case;
-    public function chain_case($string, $delimiter = "-"): self { }
-    public function chain_case($delimiter = "-"): self { }
+    public function chain_case(?string $string, ?string $delimiter = "-"): self { }
+    public function chain_case(?string $delimiter = "-"): self { }
 
     /** @see mb_ereg_split() */
     public self $mb_ereg_split;
-    public function mb_ereg_split($pattern, $subject, $limit = -1, $flags = 0): self { }
-    public function mb_ereg_split($subject, $limit = -1, $flags = 0): self { }
+    public function mb_ereg_split(?string $pattern, ?string $subject, $limit = -1, $flags = 0): self { }
+    public function mb_ereg_split(?string $subject, $limit = -1, $flags = 0): self { }
 
     /** @see mb_substr_replace() */
     public self $mb_substr_replace;
-    public function mb_substr_replace($string, $replacement, $start, $length = null): self { }
-    public function mb_substr_replace($replacement, $start, $length = null): self { }
+    public function mb_substr_replace(?string $string, ?string $replacement, $start, $length = null): self { }
+    public function mb_substr_replace(?string $replacement, $start, $length = null): self { }
 
     /** @see mb_wordwrap() */
     public self $mb_wordwrap;
-    public function mb_wordwrap($string, $width, $break = "\n"): self { }
+    public function mb_wordwrap(?string $string, $width, $break = "\n"): self { }
     public function mb_wordwrap($width, $break = "\n"): self { }
 
     /** @see multiexplode() */
     public self $multiexplode;
-    public function multiexplode($delimiter, $string, $limit = PHP_INT_MAX): self { }
-    public function multiexplode($string, $limit = PHP_INT_MAX): self { }
+    public function multiexplode($delimiter, ?string $string, $limit = PHP_INT_MAX): self { }
+    public function multiexplode(?string $string, $limit = PHP_INT_MAX): self { }
 
     /** @see str_array() */
     public self $str_array;
-    public function str_array($string, $delimiter, $hashmode): self { }
-    public function str_array($delimiter, $hashmode): self { }
+    public function str_array($string, ?string $delimiter, $hashmode): self { }
+    public function str_array(?string $delimiter, $hashmode): self { }
 
     /** @see str_array() */
     public self $array;
-    public function array($string, $delimiter, $hashmode): self { }
-    public function array($delimiter, $hashmode): self { }
+    public function array($string, ?string $delimiter, $hashmode): self { }
+    public function array(?string $delimiter, $hashmode): self { }
 
     /** @see str_between() */
     public self $str_between;
-    public function str_between($string, $from, $to, &$position = 0, $enclosure = "'\"", $escape = "\\"): self { }
-    public function str_between($from, $to, &$position = 0, $enclosure = "'\"", $escape = "\\"): self { }
+    public function str_between(?string $string, ?string $from, ?string $to, &$position = 0, $enclosure = "'\"", $escape = "\\"): self { }
+    public function str_between(?string $from, ?string $to, &$position = 0, $enclosure = "'\"", $escape = "\\"): self { }
 
     /** @see str_between() */
     public self $between;
-    public function between($string, $from, $to, &$position = 0, $enclosure = "'\"", $escape = "\\"): self { }
-    public function between($from, $to, &$position = 0, $enclosure = "'\"", $escape = "\\"): self { }
+    public function between(?string $string, ?string $from, ?string $to, &$position = 0, $enclosure = "'\"", $escape = "\\"): self { }
+    public function between(?string $from, ?string $to, &$position = 0, $enclosure = "'\"", $escape = "\\"): self { }
 
     /** @see strcat() */
     public self $strcat;
-    public function strcat(...$variadic): self { }
+    public function strcat(?string ...$variadic): self { }
     public function strcat(): self { }
 
     /** @see try_return() */
