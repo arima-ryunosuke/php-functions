@@ -11,6 +11,11 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.8
+
+- [fixbug] sql_format でコメントの後に謎の空白が入る不具合
+- [change] タイプヒント第1弾
+
 ## 2.0.7
 
 - [feature] array_join を追加
