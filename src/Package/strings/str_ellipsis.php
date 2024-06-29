@@ -30,10 +30,8 @@ require_once __DIR__ . '/../strings/mb_substr_replace.php';
  * @param int|null $pos 省略記号の差し込み位置
  * @return string 丸められた文字列
  */
-function str_ellipsis($string, $width, $trimmarker = '...', $pos = null)
+function str_ellipsis(?string $string, $width, $trimmarker = '...', $pos = null)
 {
-    $string = (string) $string;
-
     $strlen = mb_strlen($string);
     if ($strlen <= $width) {
         return $string;

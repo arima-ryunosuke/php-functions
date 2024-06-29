@@ -32,10 +32,8 @@ require_once __DIR__ . '/../strings/mb_monospace.php';
  * @param int|null $pos 省略記号の差し込み位置
  * @return string 丸められた文字列
  */
-function mb_ellipsis($string, $width, $trimmarker = '...', $pos = null)
+function mb_ellipsis(?string $string, $width, $trimmarker = '...', $pos = null)
 {
-    $string = (string) $string;
-
     $strwidth = mb_monospace($string);
     if ($strwidth <= $width) {
         return $string;

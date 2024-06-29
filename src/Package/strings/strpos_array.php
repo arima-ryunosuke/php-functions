@@ -31,7 +31,7 @@ require_once __DIR__ . '/../var/arrayval.php';
  * @param int $offset 開始位置
  * @return array $needles それぞれの位置配列
  */
-function strpos_array($haystack, $needles, $offset = 0)
+function strpos_array(?string $haystack, $needles, $offset = 0)
 {
     if ($offset < 0) {
         $offset += strlen($haystack);

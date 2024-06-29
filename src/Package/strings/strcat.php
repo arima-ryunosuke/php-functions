@@ -17,7 +17,7 @@ namespace ryunosuke\Functions\Package;
  * @param mixed ...$variadic 結合する文字列（可変引数）
  * @return string 結合した文字列
  */
-function strcat(...$variadic)
+function strcat(?string ...$variadic)
 {
     return implode('', $variadic);
 }

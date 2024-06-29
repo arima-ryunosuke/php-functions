@@ -22,7 +22,7 @@ require_once __DIR__ . '/../strings/str_chop.php';
  * @param bool $case_insensitivity 大文字小文字を無視するか
  * @return string 削ぎ落とした文字列
  */
-function str_lchop($string, $prefix, $case_insensitivity = false)
+function str_lchop(?string $string, ?string $prefix, $case_insensitivity = false)
 {
     return str_chop($string, $prefix, '', $case_insensitivity);
 }

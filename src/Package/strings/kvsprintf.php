@@ -20,7 +20,7 @@ namespace ryunosuke\Functions\Package;
  * @param array $array フォーマット引数
  * @return string フォーマットされた文字列
  */
-function kvsprintf($format, array $array)
+function kvsprintf(?string $format, array $array)
 {
     $keys = array_flip(array_keys($array));
     $vals = array_values($array);

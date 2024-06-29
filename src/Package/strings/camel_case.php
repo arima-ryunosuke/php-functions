@@ -19,7 +19,7 @@ require_once __DIR__ . '/../strings/pascal_case.php';
  * @param string $delimiter デリミタ
  * @return string 変換した文字列
  */
-function camel_case($string, $delimiter = '_')
+function camel_case(?string $string, ?string $delimiter = '_')
 {
     return lcfirst(pascal_case($string, $delimiter));
 }

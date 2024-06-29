@@ -39,7 +39,7 @@ require_once __DIR__ . '/../strings/mb_ereg_split.php';
  * @param array $options オプション配列
  * @return string パッチ適用結果
  */
-function str_patch($string, $patch, $options = [])
+function str_patch(?string $string, ?string $patch, $options = [])
 {
     $options += [
         'encoding' => null,

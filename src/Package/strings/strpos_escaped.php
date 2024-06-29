@@ -49,7 +49,7 @@ require_once __DIR__ . '/../var/is_stringable.php';
  * @param ?string $found 見つかった文字が格納される
  * @return ?int 見つかった位置
  */
-function strpos_escaped($haystack, $needle, $offset = 0, $escape = '\\', &$found = null)
+function strpos_escaped(?string $haystack, $needle, $offset = 0, $escape = '\\', &$found = null)
 {
     $q_escape = preg_quote($escape, '#');
     if (is_stringable($needle)) {

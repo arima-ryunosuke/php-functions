@@ -34,7 +34,7 @@ require_once __DIR__ . '/../strings/mb_monospace.php';
  * @param int $pad_type 埋める位置
  * @return string 指定文字で埋められた文字列
  */
-function mb_str_pad($string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT)
+function mb_str_pad(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT)
 {
     assert(in_array($pad_type, [STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH]));
 

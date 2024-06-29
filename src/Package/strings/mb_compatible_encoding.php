@@ -26,7 +26,7 @@ namespace ryunosuke\Functions\Package;
  * @param string $to 変換先エンコーディング
  * @return ?bool from が to に対して互換性があるなら true（8bit binary の時のみ例外的に null を返す）
  */
-function mb_compatible_encoding($from, $to)
+function mb_compatible_encoding(?string $from, ?string $to)
 {
     static $encmap = [];
     if (!$encmap) {

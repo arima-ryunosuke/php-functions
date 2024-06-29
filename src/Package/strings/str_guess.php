@@ -49,7 +49,7 @@ require_once __DIR__ . '/../var/arrayval.php';
  * @param ?float $percent マッチ度（％）を受ける変数
  * @return string|array 候補の中で最も近い文字列
  */
-function str_guess($string, $candidates, &$percent = null)
+function str_guess(?string $string, $candidates, &$percent = null)
 {
     $candidates = array_filter(arrayval($candidates, false), 'strlen');
     if (!$candidates) {

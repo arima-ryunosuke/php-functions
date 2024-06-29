@@ -30,7 +30,7 @@ require_once __DIR__ . '/../array/arrayize.php';
  * @param int $limit 分割数
  * @return array 分割された配列
  */
-function multiexplode($delimiter, $string, $limit = \PHP_INT_MAX)
+function multiexplode($delimiter, ?string $string, $limit = \PHP_INT_MAX)
 {
     $limit = (int) $limit;
     if ($limit < 0) {

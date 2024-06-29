@@ -33,7 +33,7 @@ require_once __DIR__ . '/../var/phpval.php';
  * @param callable $tag ブロックと変数値が渡ってくるクロージャ（タグ付きテンプレートリテラルのようなもの）
  * @return string レンダリングされた文字列
  */
-function render_template($template, $vars, $tag = null)
+function render_template(?string $template, $vars, $tag = null)
 {
     assert(is_arrayable($vars) || is_array($vars));
 

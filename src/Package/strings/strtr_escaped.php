@@ -35,7 +35,7 @@ require_once __DIR__ . '/../strings/strpos_escaped.php';
  * @param string $escape エスケープ文字
  * @return string 置換された文字列
  */
-function strtr_escaped($string, $replace_pairs, $escape = '\\')
+function strtr_escaped(?string $string, $replace_pairs, $escape = '\\')
 {
     uksort($replace_pairs, fn($a, $b) => strlen($b) - strlen($a));
     $froms = array_keys($replace_pairs);

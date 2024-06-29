@@ -16,7 +16,7 @@ require_once __DIR__ . '/../stream/memory_stream.php';
  * @param array $array extract される連想変数
  * @return string レンダリングされた文字列
  */
-function include_string($template, $array = [])
+function include_string(?string $template, $array = [])
 {
     // opcache が効かない気がする
     $path = memory_stream(__FUNCTION__);

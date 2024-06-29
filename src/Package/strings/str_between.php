@@ -38,7 +38,7 @@ require_once __DIR__ . '/../strings/strpos_quoted.php';
  * @param string $escape エスケープ文字。この文字が前にある $from, $to 文字は走査外になる
  * @return ?string $from, $to で囲まれた文字。見つからなかった場合は null
  */
-function str_between($string, $from, $to, &$position = 0, $enclosure = '\'"', $escape = '\\')
+function str_between(?string $string, ?string $from, ?string $to, &$position = 0, $enclosure = '\'"', $escape = '\\')
 {
     $strlen = strlen($string);
     $fromlen = strlen($from);

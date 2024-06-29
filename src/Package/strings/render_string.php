@@ -39,7 +39,7 @@ require_once __DIR__ . '/../strings/str_quote.php';
  * @param array $array レンダリング変数
  * @return string レンダリングされた文字列
  */
-function render_string($template, $array)
+function render_string(?string $template, $array)
 {
     // eval 可能な形式に変換
     $evalcode = 'return ' . str_quote($template, [

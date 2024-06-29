@@ -23,14 +23,12 @@ namespace ryunosuke\Functions\Package;
  * @param bool $and_flag すべて含む場合に true を返すか
  * @return bool $needle を含むなら true
  */
-function str_exists($haystack, $needle, $case_insensitivity = false, $and_flag = false)
+function str_exists(?string $haystack, $needle, $case_insensitivity = false, $and_flag = false)
 {
     if (!is_array($needle)) {
         $needle = [$needle];
     }
 
-    // あくまで文字列としての判定に徹する（strpos の第2引数は闇が深い気がする）
-    $haystack = (string) $haystack;
     $needle = array_map('strval', $needle);
 
     foreach ($needle as $str) {

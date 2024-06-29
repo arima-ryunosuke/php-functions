@@ -52,11 +52,9 @@ require_once __DIR__ . '/../var/arrayval.php';
  * @param ?array $replaced 置換されたペアがタプルで格納される
  * @return string 置換された文字列
  */
-function str_embed($string, $replacemap, $enclosure = "'\"", $escape = '\\', &$replaced = null)
+function str_embed(?string $string, $replacemap, $enclosure = "'\"", $escape = '\\', &$replaced = null)
 {
     assert(is_iterable($replacemap));
-
-    $string = (string) $string;
 
     // 長いキーから処理するためソートしておく
     $replacemap = arrayval($replacemap, false);

@@ -17,7 +17,7 @@ namespace ryunosuke\Functions\Package;
  * @param string $string 対象文字列
  * @return string trim した文字列
  */
-function mb_trim($string)
+function mb_trim(?string $string)
 {
     return preg_replace('/\A[\p{C}\p{Z}]++|[\p{C}\p{Z}]++\z/u', '', $string);
 }

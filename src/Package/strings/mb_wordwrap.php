@@ -33,9 +33,9 @@ require_once __DIR__ . '/../strings/mb_monospace.php';
  * @param ?string $break 分割文字
  * @return string|array 指定幅で改行が差し込まれた文字列
  */
-function mb_wordwrap($string, $width, $break = "\n")
+function mb_wordwrap(?string $string, $width, $break = "\n")
 {
-    $lines = mb_split('\\R', (string) $string);
+    $lines = mb_split('\\R', $string);
 
     $result = [];
     foreach ($lines as $line) {

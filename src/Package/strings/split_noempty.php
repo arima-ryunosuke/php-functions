@@ -27,7 +27,7 @@ namespace ryunosuke\Functions\Package;
  * @param string|bool $trimchars 指定した文字を trim する。true を指定すると trim する
  * @return array 指定文字で分割して空文字を除いた配列
  */
-function split_noempty($delimiter, $string, $trimchars = true)
+function split_noempty(?string $delimiter, ?string $string, $trimchars = true)
 {
     // trim しないなら preg_split(PREG_SPLIT_NO_EMPTY) で十分
     if (strlen($trimchars) === 0) {

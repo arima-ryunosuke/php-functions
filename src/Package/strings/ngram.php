@@ -24,7 +24,7 @@ namespace ryunosuke\Functions\Package;
  * @param string $encoding マルチバイトエンコーディング
  * @return array N-gram 配列
  */
-function ngram($string, $N, $encoding = 'UTF-8')
+function ngram(?string $string, $N, $encoding = 'UTF-8')
 {
     if (func_num_args() < 3) {
         $encoding = mb_internal_encoding();

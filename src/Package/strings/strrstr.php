@@ -33,7 +33,7 @@ namespace ryunosuke\Functions\Package;
  * @param bool $after_needle $needle より後ろを返すか
  * @return ?string
  */
-function strrstr($haystack, $needle, $after_needle = true)
+function strrstr(?string $haystack, ?string $needle, $after_needle = true)
 {
     // return strrev(strstr(strrev($haystack), strrev($needle), $after_needle));
 

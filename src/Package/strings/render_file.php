@@ -15,7 +15,7 @@ require_once __DIR__ . '/../strings/render_string.php';
  * @param array $array レンダリング変数
  * @return string レンダリングされた文字列
  */
-function render_file($template_file, $array)
+function render_file(?string $template_file, $array)
 {
     return render_string(file_get_contents($template_file), $array);
 }

@@ -39,7 +39,7 @@ require_once __DIR__ . '/../strings/strpos_quoted.php';
  * @param array $options オプション
  * @return array 分割された配列
  */
-function quoteexplode($delimiter, $string, $limit = null, $enclosures = "'\"", $escape = '\\', $options = [])
+function quoteexplode($delimiter, ?string $string, $limit = null, $enclosures = "'\"", $escape = '\\', $options = [])
 {
     $options += [
         'delim-capture' => false, // デリミタも結果に含まれるようになる

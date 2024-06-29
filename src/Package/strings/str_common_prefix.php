@@ -27,7 +27,7 @@ namespace ryunosuke\Functions\Package;
  * @param string[] $strings
  * @return ?string 共通部分（共通がない場合は空文字）
  */
-function str_common_prefix(...$strings)
+function str_common_prefix(?string ...$strings)
 {
     if (count($strings) < 2) {
         return null;

@@ -40,7 +40,7 @@ require_once __DIR__ . '/../var/is_empty.php';
  * @param bool $case_insensitivity 大文字小文字を無視するか
  * @return string 置換された文字列
  */
-function str_subreplace($subject, $search, $replaces, $case_insensitivity = false)
+function str_subreplace(?string $subject, ?string $search, $replaces, $case_insensitivity = false)
 {
     $replaces = is_iterable($replaces) ? $replaces : [$replaces];
 

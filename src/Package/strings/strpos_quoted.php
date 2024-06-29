@@ -26,7 +26,7 @@ require_once __DIR__ . '/../var/arrayval.php';
  * @param ?string $found $needle の内、見つかった文字列が格納される
  * @return ?int $needle の位置
  */
-function strpos_quoted($haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = '\\', &$found = null)
+function strpos_quoted(?string $haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = '\\', &$found = null)
 {
     if (is_string($enclosure)) {
         if (strlen($enclosure)) {

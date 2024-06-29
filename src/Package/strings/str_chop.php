@@ -22,7 +22,7 @@ namespace ryunosuke\Functions\Package;
  * @param bool $case_insensitivity 大文字小文字を無視するか
  * @return string 削ぎ落とした文字列
  */
-function str_chop($string, $prefix = '', $suffix = '', $case_insensitivity = false)
+function str_chop(?string $string, ?string $prefix = '', ?string $suffix = '', $case_insensitivity = false)
 {
     $pattern = [];
     if (strlen($prefix)) {

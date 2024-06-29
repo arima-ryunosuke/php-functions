@@ -31,7 +31,7 @@ namespace ryunosuke\Functions\Package;
  * @param array $codepoints コードポイント配列
  * @return int 等幅の文字幅
  */
-function mb_monospace($string, $codepoints = [])
+function mb_monospace(?string $string, $codepoints = [])
 {
     $widthmap = [];
     foreach ($codepoints as $codepoint => $width) {

@@ -23,10 +23,8 @@ namespace ryunosuke\Functions\Package;
  * @param ?int $length 置換長
  * @return string 置換した文字列
  */
-function mb_substr_replace($string, $replacement, $start, $length = null)
+function mb_substr_replace(?string $string, ?string $replacement, $start, $length = null)
 {
-    $string = (string) $string;
-
     $strlen = mb_strlen($string);
     if ($start < 0) {
         $start += $strlen;

@@ -118,7 +118,7 @@ function str_diff($xstring, $ystring, $options = [])
         public function __invoke($xstring, $ystring)
         {
             $arrayize = function ($string) {
-                $binary_check = function ($string) {
+                $binary_check = function (?string $string) {
                     if ($this->options['allow-binary'] === true || !preg_match('#\0#', $string)) {
                         return $string;
                     }

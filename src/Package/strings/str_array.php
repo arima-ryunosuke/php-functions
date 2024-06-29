@@ -59,7 +59,7 @@ require_once __DIR__ . '/../var/is_stringable.php';
  * @param bool $hashmode 連想配列モードか
  * @return array 配列
  */
-function str_array($string, $delimiter, $hashmode)
+function str_array($string, ?string $delimiter, $hashmode)
 {
     $array = $string;
     if (is_stringable($string)) {

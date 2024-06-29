@@ -19,7 +19,7 @@ require_once __DIR__ . '/../strings/snake_case.php';
  * @param string $delimiter デリミタ
  * @return string 変換した文字列
  */
-function chain_case($string, $delimiter = '-')
+function chain_case(?string $string, ?string $delimiter = '-')
 {
     return snake_case($string, $delimiter);
 }

@@ -28,7 +28,7 @@ namespace ryunosuke\Functions\Package;
  * @param string $string 対象文字列
  * @return array [namespace, localname]
  */
-function namespace_split($string)
+function namespace_split(?string $string)
 {
     $pos = strrpos($string, '\\');
     if ($pos === false) {

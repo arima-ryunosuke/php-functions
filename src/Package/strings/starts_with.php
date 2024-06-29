@@ -3,7 +3,6 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../strings/str_equals.php';
-require_once __DIR__ . '/../var/is_stringable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -27,10 +26,8 @@ require_once __DIR__ . '/../var/is_stringable.php';
  * @param bool $case_insensitivity 大文字小文字を無視するか
  * @return bool 指定文字列で始まるなら true を返す
  */
-function starts_with($string, $with, $case_insensitivity = false)
+function starts_with(?string $string, $with, $case_insensitivity = false)
 {
-    assert(is_stringable($string));
-
     foreach ((array) $with as $w) {
         assert(strlen($w));
 

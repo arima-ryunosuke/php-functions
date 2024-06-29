@@ -27,7 +27,7 @@ namespace ryunosuke\Functions\Package;
  * @param int ...$chunks 分割の各文字数（可変引数）
  * @return string[] 分割された文字列配列
  */
-function str_chunk($string, ...$chunks)
+function str_chunk(?string $string, ...$chunks)
 {
     $offset = 0;
     $length = strlen($string);
@@ -39,6 +39,6 @@ function str_chunk($string, ...$chunks)
         $result[] = substr($string, $offset, $chunk);
         $offset += $chunk;
     }
-    $result[] = (string) substr($string, $offset);
+    $result[] = substr($string, $offset);
     return $result;
 }

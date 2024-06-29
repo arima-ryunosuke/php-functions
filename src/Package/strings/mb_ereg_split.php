@@ -33,7 +33,7 @@ namespace ryunosuke\Functions\Package;
  * @param int $flags フラグ
  * @return ?array 分割された文字列
  */
-function mb_ereg_split($pattern, $subject, $limit = -1, $flags = 0)
+function mb_ereg_split(?string $pattern, ?string $subject, $limit = -1, $flags = 0)
 {
     // 是正（奇妙だが preg_split は 0, -1 以外は特別扱いしないようだ（個数が負数になることはないので実質的に 1 指定と同じ））
     if (-1 <= $limit && $limit <= 0) {

@@ -25,7 +25,7 @@ namespace ryunosuke\Functions\Package;
  * @param int $base 基数
  * @return array 文字のバイト配列
  */
-function str_bytes($string, $base = 10)
+function str_bytes(?string $string, $base = 10)
 {
     // return array_values(unpack('C*', $string));
 
