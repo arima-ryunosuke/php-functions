@@ -16,6 +16,7 @@ use function ryunosuke\Functions\Package\file_matcher;
 use function ryunosuke\Functions\Package\file_mimetype;
 use function ryunosuke\Functions\Package\file_pos;
 use function ryunosuke\Functions\Package\file_rewrite_contents;
+use function ryunosuke\Functions\Package\file_rotate;
 use function ryunosuke\Functions\Package\file_set_contents;
 use function ryunosuke\Functions\Package\file_set_tree;
 use function ryunosuke\Functions\Package\file_slice;
@@ -816,6 +817,70 @@ class filesystemTest extends AbstractTestCase
         @that(self::resolveFunction('file_rewrite_contents'))($testpath, fn() => null, LOCK_EX | LOCK_NB)->wasThrown('failed to flock');
         flock($fp, LOCK_UN);
         fclose($fp);
+    }
+
+    function test_file_rotate()
+    {
+        $dir = self::$TMPDIR . '/logs';
+        rm_rf($dir);
+
+        that(file_rotate("$dir/notfound.txt"))->is(null);
+
+        file_set_contents("$dir/hoge.txt", '');
+        that(file_rotate("$dir/hoge.txt"))->is(null);
+
+        that(file_rotate("$dir/hoge.txt", ifempty: true, dateformat: '-1'))->is([
+            realpath("$dir/hoge-1.txt"),
+        ]);
+        that(file_rotate("$dir/hoge.txt", ifempty: true, dateformat: '-2', copytruncate: true))->is([
+            realpath("$dir/hoge-2.txt"),
+            realpath("$dir/hoge-1.txt"),
+        ]);
+
+        file_set_contents("$dir/hoge.txt", 'content1');
+        that(file_rotate("$dir/hoge.txt", ifempty: true, dateformat: '-3', append: true))->is([
+            realpath("$dir/hoge-3.txt"),
+            realpath("$dir/hoge-2.txt"),
+            realpath("$dir/hoge-1.txt"),
+        ]);
+        that(file_get_contents("$dir/hoge-3.txt"))->is("content1");
+        file_set_contents("$dir/hoge.txt", 'content2');
+        that(file_rotate("$dir/hoge.txt", ifempty: true, dateformat: '-3', append: true))->is([
+            realpath("$dir/hoge-3.txt"),
+            realpath("$dir/hoge-2.txt"),
+            realpath("$dir/hoge-1.txt"),
+        ]);
+        that(file_get_contents("$dir/hoge-3.txt"))->is("content1content2");
+
+        that(file_rotate("$dir/hoge.txt", ifempty: true, dateformat: '-4', rotate: 2))->is([
+            realpath("$dir/hoge-4.txt"),
+            realpath("$dir/hoge-3.txt"),
+        ]);
+        that(file_rotate("$dir/hoge.txt", ifempty: true, dateformat: '-5', rotate: 2))->is([
+            realpath("$dir/hoge-5.txt"),
+            realpath("$dir/hoge-4.txt"),
+        ]);
+
+        that(file_rotate("$dir/hoge.txt", ifempty: true, dateformat: '-6', rotate: 2, compress: 1))->is([
+            realpath("$dir/hoge-6.txt"),
+            realpath("$dir/hoge-5.txt.gz"),
+        ]);
+
+        that(file_rotate("$dir/hoge.txt", ifempty: true, dateformat: '-7', rotate: 2, compress: 1, olddir: 'olds'))->is([
+            realpath("$dir/olds/hoge-7.txt"),
+        ]);
+        that(file_rotate("$dir/hoge.txt", ifempty: true, dateformat: '-8', rotate: 2, compress: 1, olddir: 'olds'))->is([
+            realpath("$dir/olds/hoge-8.txt"),
+            realpath("$dir/olds/hoge-7.txt.gz"),
+        ]);
+
+        touch("$dir/dir");
+        that(self::resolveFunction('file_rotate'))("$dir/hoge.txt", ifempty: true, olddir: 'dir')->wasThrown('failed to mkdir');
+
+        mkdir("$dir/hoge-99.txt");
+        that(self::resolveFunction('file_rotate'))("$dir/hoge.txt", ifempty: true, dateformat: '-99')->wasThrown('failed to rename');
+        that(self::resolveFunction('file_rotate'))("$dir/hoge.txt", ifempty: true, dateformat: '-99', copytruncate: true)->wasThrown('failed to copy');
+        that(self::resolveFunction('file_rotate'))("$dir/hoge.txt", ifempty: true, dateformat: '-99', append: true)->wasThrown('failed to file_put_contents');
     }
 
     function test_file_set_contents()
