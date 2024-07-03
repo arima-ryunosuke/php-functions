@@ -409,6 +409,11 @@ TEXT): self { }
     public function preg_replaces($pattern, $replacements, $subject, $limit = -1, &$count = null): self { }
     public function preg_replaces($replacements, $subject, $limit = -1, &$count = null): self { }
 
+    /** @see function_doccomments() */
+    public self $function_doccomments;
+    public function function_doccomments(\ReflectionFunctionAbstract|callable $callable): self { }
+    public function function_doccomments(): self { }
+
     /** @see reflect_types() */
     public self $reflect_types;
     public function reflect_types($reflection_type = null): self { }

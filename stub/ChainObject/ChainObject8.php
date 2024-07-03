@@ -371,8 +371,8 @@ TEXT): self { }
 
     /** @see callable_code() */
     public self $callable_code;
-    public function callable_code(callable $callable): self { }
-    public function callable_code(): self { }
+    public function callable_code(callable $callable, bool $return_token = false): self { }
+    public function callable_code(bool $return_token = false): self { }
 
     /** @see memory_stream() */
     public self $memory_stream;

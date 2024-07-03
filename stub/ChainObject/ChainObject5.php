@@ -464,6 +464,11 @@ TEXT): self { }
     public function date_convert($format, $datetimedata = null): self { }
     public function date_convert($datetimedata = null): self { }
 
+    /** @see file_rotate() */
+    public self $file_rotate;
+    public function file_rotate(string $filename, bool $ifempty = false, bool $copytruncate = false, bool $append = false, ?string $olddir = null, ?string $dateformat = null, ?int $rotate = null, ?int $compress = null): self { }
+    public function file_rotate(bool $ifempty = false, bool $copytruncate = false, bool $append = false, ?string $olddir = null, ?string $dateformat = null, ?int $rotate = null, ?int $compress = null): self { }
+
     /** @see file_set_contents() */
     public self $file_set_contents;
     public function file_set_contents($filename, $data, $umask = 2): self { }
@@ -611,7 +616,7 @@ TEXT): self { }
 
     /** @see var_export2() */
     public self $var_export2;
-    public function var_export2($value, $return = false): self { }
-    public function var_export2($return = false): self { }
+    public function var_export2($value, $options = []): self { }
+    public function var_export2($options = []): self { }
 
 }
