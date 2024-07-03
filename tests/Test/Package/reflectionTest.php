@@ -4,6 +4,7 @@ namespace ryunosuke\Test\Package;
 
 use Concrete;
 use function ryunosuke\Functions\Package\callable_code;
+use function ryunosuke\Functions\Package\function_doccomments;
 use function ryunosuke\Functions\Package\function_export_false2null;
 use function ryunosuke\Functions\Package\function_parameter;
 use function ryunosuke\Functions\Package\parameter_default;
@@ -125,6 +126,36 @@ class reflectionTest extends AbstractTestCase
         $code = callable_code($fn, true);
         that($code[0])->isArray();
         that($code[1])->isArray();
+    }
+
+    function test_function_doccomments()
+    {
+        that(function_doccomments(function ($none): ?int { }))->is([]);
+        that(function_doccomments(function ($none) /** no return type */ { }))->is([-1 => "/** no return type */"]);
+
+        that(function_doccomments(/** 本体 */ function (
+            /** 型無し */
+            $notype,
+            /** 型有り */
+            ?int $typed,
+            /** 属性付き */
+            #[\Attr(1, 2, c: 3)] int $attred,
+            // doccomment 無し
+            $none,
+            /** 参照 */
+            &$ref,
+            /** 可変 */
+            ...$args
+        ): /** 返り値 */ ?int {
+        }))->is([
+            "" => "/** 本体 */",
+            0  => "/** 型無し */",
+            1  => "/** 型有り */",
+            2  => "/** 属性付き */",
+            4  => "/** 参照 */",
+            5  => "/** 可変 */",
+            -1 => "/** 返り値 */",
+        ]);
     }
 
     function test_function_export_false2null()
