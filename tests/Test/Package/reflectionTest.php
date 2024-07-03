@@ -121,6 +121,10 @@ class reflectionTest extends AbstractTestCase
             'fn($a, $b)',
             'new class ( $a, $b ) { public function __construct($a, $b) { } }',
         ]);
+
+        $code = callable_code($fn, true);
+        that($code[0])->isArray();
+        that($code[1])->isArray();
     }
 
     function test_function_export_false2null()

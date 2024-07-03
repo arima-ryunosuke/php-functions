@@ -27,9 +27,10 @@ require_once __DIR__ . '/../reflection/reflect_callable.php';
  * @package ryunosuke\Functions\Package\reflection
  *
  * @param callable|\ReflectionFunctionAbstract $callable コードを取得する callable
+ * @param bool $return_token true にすると生のトークン配列で返す
  * @return array ['定義部分', '{処理コード}']
  */
-function callable_code($callable)
+function callable_code($callable, bool $return_token = false)
 {
     $ref = $callable instanceof \ReflectionFunctionAbstract ? $callable : reflect_callable($callable);
     $contents = file($ref->getFileName());
@@ -58,6 +59,10 @@ function callable_code($callable)
             'end'    => '}',
             'offset' => last_key($meta),
         ]);
+    }
+
+    if ($return_token) {
+        return [$meta, $body];
     }
 
     return [trim(implode('', array_column($meta, 'text'))), trim(implode('', array_column($body, 'text')))];
