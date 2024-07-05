@@ -17,7 +17,6 @@ require_once __DIR__ . '/../var/is_primitive.php';
  * 下記の点が異なる。
  *
  * - 配列は 5.4 以降のショートシンタックス（[]）で出力
- * - インデントは 4 固定
  * - ただの配列は1行（[1, 2, 3]）でケツカンマなし、連想配列は桁合わせインデントでケツカンマあり
  * - 文字列はダブルクオート
  * - null は null（小文字）
@@ -63,32 +62,45 @@ require_once __DIR__ . '/../var/is_primitive.php';
  * @package ryunosuke\Functions\Package\var
  *
  * @param mixed $value 出力する値
- * @param bool $return 返すなら true 出すなら false
+ * @param bool|array $options オプション配列（var_export に寄せるため bool も受け付ける）
  * @return string|null $return=true の場合は出力せず結果を返す
  */
-function var_export2($value, $return = false)
+function var_export2($value, $options = [])
 {
-    // インデントの空白数
-    $INDENT = 4;
+    if (!is_array($options)) {
+        $options = [
+            'return' => !!$options,
+        ];
+    }
+
+    $options += [
+        'minify' => false, // 短縮形で返す（実質的には情報を減らして1行で返す）
+        'indent' => 4,     // インデントの空白数
+        'return' => false, // 値を戻すか出力するか
+    ];
 
     // 再帰用クロージャ
-    $export = function ($value, $context, $nest = 0, $parents = []) use (&$export, $INDENT) {
+    $export = function ($value, $context, $nest = 0, $parents = []) use (&$export, $options) {
         // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
         foreach ($parents as $parent) {
             if ($parent === $value) {
                 return $export('*RECURSION*', 'recursion');
             }
         }
+
+        $space = $options['minify'] ? "" : " ";
+        $break = $options['minify'] ? "" : "\n";
+
         // 配列は連想判定したり再帰したり色々
         if (is_array($value)) {
-            $spacer1 = str_repeat(' ', ($nest + 1) * $INDENT);
-            $spacer2 = str_repeat(' ', $nest * $INDENT);
+            $spacer1 = str_repeat($space, ($nest + 1) * $options['indent']);
+            $spacer2 = str_repeat($space, $nest * $options['indent']);
 
             $hashed = is_hasharray($value);
 
             // スカラー値のみで構成されているならシンプルな再帰
             if (!$hashed && array_all($value, fn(...$args) => is_primitive(...$args))) {
-                return '[' . implode(', ', array_map(fn($v) => $export($v, 'array-value'), $value)) . ']';
+                return '[' . implode(",$space", array_map(fn($v) => $export($v, 'array-value'), $value)) . ']';
             }
 
             // 連想配列はキーを含めて桁あわせ
@@ -97,19 +109,20 @@ function var_export2($value, $return = false)
                 $maxlen = max(array_map('strlen', $keys));
             }
             $kvl = '';
+            $lastkey = array_key_last($value);
             $parents[] = $value;
             foreach ($value as $k => $v) {
-                $keystr = $hashed ? $keys[$k] . str_repeat(' ', $maxlen - strlen($keys[$k])) . ' => ' : '';
-                $kvl .= $spacer1 . $keystr . $export($v, 'array-value', $nest + 1, $parents) . ",\n";
+                $keystr = $hashed ? $keys[$k] . str_repeat($space, $maxlen - strlen($keys[$k])) . "$space=>$space" : '';
+                $kvl .= $spacer1 . $keystr . $export($v, 'array-value', $nest + 1, $parents) . ($k === $lastkey && $options['minify'] ? "" : ",") . "$break";
             }
-            return "[\n{$kvl}{$spacer2}]";
+            return "[$break{$kvl}{$spacer2}]";
         }
         // オブジェクトは単にプロパティを __set_state する文字列を出力する
         elseif (is_object($value)) {
             $parents[] = $value;
             $classname = get_class($value);
             if ($classname === \stdClass::class) {
-                return '(object) ' . $export((array) $value, 'object', $nest, $parents);
+                return "(object)$space" . $export((array) $value, 'object', $nest, $parents);
             }
             return $classname . '::__set_state(' . $export(object_properties($value), 'object', $nest, $parents) . ')';
         }
@@ -120,12 +133,12 @@ function var_export2($value, $return = false)
                 return str_quote($value);
             }
             // 改行を含むならヒアドキュメント
-            if (str_exists($value, ["\r", "\n"])) {
+            if (!$options['minify'] && str_exists($value, ["\r", "\n"])) {
                 // ただし、改行文字だけの場合は除く（何らかの引数で改行文字だけを渡すシチュエーションはそれなりにあるのでヒアドキュメントだと冗長）
                 if (trim($value, "\r\n") !== '') {
                     return str_quote($value, [
                         'heredoc' => unique_string($value, 'TEXT', '_'),
-                        'indent'  => $nest * $INDENT,
+                        'indent'  => $nest * $options['indent'],
                     ]);
                 }
             }
@@ -143,7 +156,7 @@ function var_export2($value, $return = false)
 
     // 結果を返したり出力したり
     $result = $export($value, null);
-    if ($return) {
+    if ($options['return']) {
         return $result;
     }
     echo $result, "\n";

@@ -834,12 +834,28 @@ class varTest extends AbstractTestCase
             ],
             'null'        => null,
             'int'         => 123,
-            'string'      => 'ABC',
+            'string'      => "ABC\nXYZ",
             'object'      => new \Concrete('hoge'),
         ];
         $a1 = var_export($value, true);
         $a2 = var_export2($value, true);
         that(phpval($a2))->is(phpval($a1));
+
+        $a2 = var_export2($value, ['return' => true, 'minify' => true]);
+        that(phpval($a2))->is(phpval($a1));
+        that($a2)->is('[' . implode(',', [
+                '"array"=>[1,2,3]',
+                '"hash"=>["a"=>"A","b"=>"B"]',
+                '"empty"=>[]',
+                '"emptyempty"=>[[]]',
+                '"emptyempty1"=>[[[1]]]',
+                '"nest"=>["hash"=>["a"=>"A","b"=>"B","hash"=>["x"=>"X"]]',
+                '"array"=>[[1,2,3,["X"]]]]',
+                '"null"=>null',
+                '"int"=>123',
+                '"string"=>"ABC\nXYZ"',
+                '"object"=>Concrete::__set_state(["value"=>null,"proptectedField"=>3.14,"privateField"=>"Concrete","name"=>"hoge"])',
+            ]) . ']');
 
         that(var_export2([
             '$var'   => '$var',
