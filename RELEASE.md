@@ -11,6 +11,13 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.9
+
+- [feature] var_export2 にオプション引数を導入
+- [feature] file_rotate を追加
+- [feature] function_doccomments を追加
+- [feature] callable_code に生のトークンを返すフラグ引数を追加
+
 ## 2.0.8
 
 - [fixbug] sql_format でコメントの後に謎の空白が入る不具合
