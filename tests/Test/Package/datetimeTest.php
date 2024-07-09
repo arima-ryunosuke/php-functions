@@ -280,6 +280,14 @@ class datetimeTest extends AbstractTestCase
         that($base->add(date_interval('P-1Y13M')))->format('Y/m/d H:i:s.v')->is('2015/01/24 12:34:56.000');
         that($base->add(date_interval('P1Y-12MT-1.234S')))->format('Y/m/d H:i:s.v')->is('2014/12/24 12:34:54.766');
 
+        // 相対モード
+        that(date_interval('-1year 11month'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('-01--11-00T00:00:00.0');
+        that(date_interval('-1year 13month'))->format('%R%Y-%M-%DT%H:%I:%S.%f')->is('+-1-13-00T00:00:00.0');
+        $base = new \DateTimeImmutable('2014/12/24 12:34:56');
+        that($base->add(date_interval('-1year 11month')))->format('Y/m/d H:i:s.v')->is('2014/11/24 12:34:56.000');
+        that($base->add(date_interval('-1year 13month')))->format('Y/m/d H:i:s.v')->is('2015/01/24 12:34:56.000');
+        that($base->add(date_interval('1 year -12month -1second')))->format('Y/m/d H:i:s.v')->is('2014/12/24 12:34:55');
+
         that(self::resolveFunction('date_interval'))('hoge string')->wasThrown('invalid DateInterval');
     }
 
@@ -312,6 +320,11 @@ class datetimeTest extends AbstractTestCase
         that(date_interval_second('PT20.123S', 3600))->is(20.123, 0.00001);
         that(date_interval_second('-PT20.123S'))->is(-20.123, 0.00001);
         that(date_interval_second('-PT20.123S', 3600))->is(-20.123, 0.00001);
+
+        that(date_interval_second('1minute 1second'))->is(61);
+        that(date_interval_second('1minute -59second'))->is(1);
+        that(date_interval_second('1month', '2014/11/24'))->is($D * 30);
+        that(date_interval_second('1month', '2014/12/24'))->is($D * 31);
 
         that(date_interval_second('P24M', '1970/01/01 00:00:00'))->is(array_sum([
             31 * $D * 2,

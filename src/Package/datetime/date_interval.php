@@ -22,32 +22,43 @@ namespace ryunosuke\Functions\Package;
  *
  * @package ryunosuke\Functions\Package\datetime
  *
- * @param string $interval ISO8601継続時間文字列
+ * @param string $interval ISO8601継続時間文字列か相対表記
  * @return \DateInterval DateInterval オブジェクト
  */
 function date_interval($interval)
 {
-    if (!preg_match('#^(?P<S>[\-+])?P((?P<Y>-?\d+)Y)?((?P<M>-?\d+)M)?((?P<D>-?\d+)D)?(T((?P<h>-?\d+)H)?((?P<m>-?\d+)M)?((?P<s>-?\d+(\.\d+)?)S)?)?$#', $interval, $matches, PREG_UNMATCHED_AS_NULL)) {
-        throw new \InvalidArgumentException("$interval is invalid DateInterval string");
+    if (preg_match('#^(?P<S>[\-+])?P((?P<Y>-?\d+)Y)?((?P<M>-?\d+)M)?((?P<D>-?\d+)D)?(T((?P<h>-?\d+)H)?((?P<m>-?\d+)M)?((?P<s>-?\d+(\.\d+)?)S)?)?$#', $interval, $matches, PREG_UNMATCHED_AS_NULL)) {
+        $interval = new \DateInterval('P0Y');
+        $interval->y = (int) $matches['Y'];
+        $interval->m = (int) $matches['M'];
+        $interval->d = (int) $matches['D'];
+        $interval->h = (int) $matches['h'];
+        $interval->i = (int) $matches['m'];
+        $interval->s = (int) $matches['s'];
+        $interval->f = (float) $matches['s'] - $interval->s;
+
+        if ($matches['S'] === '-') {
+            $interval->y = -$interval->y;
+            $interval->m = -$interval->m;
+            $interval->d = -$interval->d;
+            $interval->h = -$interval->h;
+            $interval->i = -$interval->i;
+            $interval->s = -$interval->s;
+            $interval->f = -$interval->f;
+        }
     }
-
-    $interval = new \DateInterval('P0Y');
-    $interval->y = (int) $matches['Y'];
-    $interval->m = (int) $matches['M'];
-    $interval->d = (int) $matches['D'];
-    $interval->h = (int) $matches['h'];
-    $interval->i = (int) $matches['m'];
-    $interval->s = (int) $matches['s'];
-    $interval->f = (float) $matches['s'] - $interval->s;
-
-    if ($matches['S'] === '-') {
-        $interval->y = -$interval->y;
-        $interval->m = -$interval->m;
-        $interval->d = -$interval->d;
-        $interval->h = -$interval->h;
-        $interval->i = -$interval->i;
-        $interval->s = -$interval->s;
-        $interval->f = -$interval->f;
+    else {
+        $parsed = date_parse($interval);
+        if ($parsed['errors'] || !$parsed['relative']) {
+            throw new \InvalidArgumentException("$interval is invalid DateInterval string");
+        }
+        $interval = new \DateInterval('P0Y');
+        $interval->y = $parsed['relative']['year'];
+        $interval->m = $parsed['relative']['month'];
+        $interval->d = $parsed['relative']['day'];
+        $interval->h = $parsed['relative']['hour'];
+        $interval->i = $parsed['relative']['minute'];
+        $interval->s = $parsed['relative']['second'];
     }
 
     $now = new \DateTimeImmutable();
