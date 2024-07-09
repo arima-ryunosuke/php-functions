@@ -8,6 +8,7 @@ use function ryunosuke\Functions\Package\class_aliases;
 use function ryunosuke\Functions\Package\class_constants;
 use function ryunosuke\Functions\Package\class_extends;
 use function ryunosuke\Functions\Package\class_loader;
+use function ryunosuke\Functions\Package\class_map;
 use function ryunosuke\Functions\Package\class_namespace;
 use function ryunosuke\Functions\Package\class_replace;
 use function ryunosuke\Functions\Package\class_shorten;
@@ -195,6 +196,53 @@ class classobjTest extends AbstractTestCase
     {
         that(class_loader())->isObject();
         that(self::resolveFunction('class_loader'))('/notfounddir')->wasThrown('not found');
+    }
+
+    function test_class_map()
+    {
+        $loader = new class() {
+            function getFallbackDirs()
+            {
+                return [
+                    __DIR__ . '/files/classes/psr-fallback/psr0',
+                ];
+            }
+
+            function getFallbackDirsPsr4()
+            {
+                return [
+                    __DIR__ . '/files/classes/psr-fallback/psr4',
+                ];
+            }
+
+            function getPrefixes()
+            {
+                return [
+                    'ns1\\ns2\\ns3\\' => [__DIR__ . '/files/classes/psr0'],
+                ];
+            }
+
+            function getPrefixesPsr4()
+            {
+                return [
+                    'ns5\\ns6\\ns7\\' => [__DIR__ . '/files/classes/psr4'],
+                ];
+            }
+
+            function getClassMap()
+            {
+                return [
+                    'hoge'     => "files/classes/classmap/hoge.php",
+                ];
+            }
+        };
+        that(class_map($loader, __DIR__, false))->is([
+            "ns1\\ns2\\ns3\A" => realpath(__DIR__ . "/files/classes/psr0/ns1/ns2/ns3/A.php"),
+            "ns5\\ns6\\ns7\A" => realpath(__DIR__ . "/files/classes/psr4/A.php"),
+            "ns0\\X"          => realpath(__DIR__ . "/files/classes/psr-fallback/psr0/ns0/X.php"),
+            "ns4\\X"          => realpath(__DIR__ . "/files/classes/psr-fallback/psr4/ns4/X.php"),
+            "hoge"            => realpath(__DIR__ . "/files/classes/classmap/hoge.php"),
+        ]);
     }
 
     function test_class_namespace()
