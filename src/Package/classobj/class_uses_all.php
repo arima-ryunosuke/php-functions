@@ -15,9 +15,9 @@ namespace ryunosuke\Functions\Package;
  * trait T2{use T1;}
  * trait T3{use T2;}
  * that(class_uses_all(new class{use T3;}))->isSame([
- *     'Example\\T3', // クラスが直接 use している
- *     'Example\\T2', // T3 が use している
- *     'Example\\T1', // T2 が use している
+ *     'Example\\T3' => 'Example\\T3', // クラスが直接 use している
+ *     'Example\\T2' => 'Example\\T2', // T3 が use している
+ *     'Example\\T1' => 'Example\\T1', // T2 が use している
  * ]);
  * ```
  *
@@ -29,6 +29,14 @@ namespace ryunosuke\Functions\Package;
  */
 function class_uses_all($class, $autoload = true)
 {
+    static $cache = [];
+
+    $cachekey = ltrim(is_object($class) ? get_class($class) : $class, '\\');
+
+    if (isset($cache[$cachekey])) {
+        return $cache[$cachekey];
+    }
+
     // まずはクラス階層から取得
     $traits = [];
     do {
@@ -51,5 +59,7 @@ function class_uses_all($class, $autoload = true)
         }
         $count = count($traits);
     }
-    return array_keys($traits);
+
+    $names = array_keys($traits);
+    return $cache[$cachekey] = array_combine($names, $names);
 }

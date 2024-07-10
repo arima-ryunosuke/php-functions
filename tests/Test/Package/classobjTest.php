@@ -344,20 +344,21 @@ class classobjTest extends AbstractTestCase
         }
         that(class_uses_all(new class {
             use /** @noinspection PhpUndefinedClassInspection */ \T1;
-        }))->is(['T1']);
+        }))->is(['T1' => 'T1']);
         that(class_uses_all(new class {
             use /** @noinspection PhpUndefinedClassInspection */ \T2;
-        }))->is(['T2', 'T1']);
+        }))->is(['T2' => 'T2', 'T1' => 'T1']);
         that(class_uses_all(new class {
             use /** @noinspection PhpUndefinedClassInspection */ \T3;
-        }))->is(['T3', 'T2', 'T1']);
+        }))->is(['T3' => 'T3', 'T2' => 'T2', 'T1' => 'T1']);
         that(class_uses_all(get_class(new class {
             use /** @noinspection PhpUndefinedClassInspection */ \T1;
             use /** @noinspection PhpUndefinedClassInspection */ \T2;
             use /** @noinspection PhpUndefinedClassInspection */ \T3;
-        })))->is(['T1', 'T2', 'T3']);
+        })))->is(['T3' => 'T3', 'T2' => 'T2', 'T1' => 'T1']);
 
-        that(class_uses_all(new stdClass()))->is([]);
+        that(class_uses_all(stdclass::class))->is([]);
+        that(class_uses_all(stdclass::class))->is([]); // cache coverage
     }
 
     function test_const_exists()
