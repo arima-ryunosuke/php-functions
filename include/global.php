@@ -6182,6 +6182,113 @@ if (!function_exists('class_loader')) {
     }
 }
 
+assert(!function_exists('class_map') || (new \ReflectionFunction('class_map'))->isUserDefined());
+if (!function_exists('class_map')) {
+    /**
+     * 指定クラスローダで読み込まれるであろう class => file を返す
+     *
+     * 実質的には composer で読み込まれるクラスマップを返す。
+     * つまり `dump-autoload -o` したときの getClassMap 相当を返す。
+     *
+     * ファイル名からクラス名を逆引きする都合上、猛烈に遅いので注意。
+     *
+     * @package ryunosuke\Functions\Package\classobj
+     */
+    function class_map(
+        /** @var ?\Composer\Autoload\ClassLoader オートローダオブジェクト */
+        ?object $loader = null,
+        /** パスが相対パスだった場合の基底ディレクトリ */
+        ?string $basePath = null,
+        /** キャッシュを使用するか */
+        bool $cache = true,
+    ): /** [class => file] の配列 */ array
+    {
+        $loader ??= class_loader();
+        $basePath ??= dirname((new \ReflectionClass($loader))->getFileName(), 3);
+        $cachekey = json_encode([spl_object_id($loader), $basePath]);
+        if (!$cache) {
+            cache($cachekey, null, __FUNCTION__);
+        }
+        return cache($cachekey, function () use ($loader, $basePath) {
+            $result = [];
+
+            // psr0+4
+            foreach ([
+                0 => $loader->getPrefixes() + ["" => $loader->getFallbackDirs()],
+                4 => $loader->getPrefixesPsr4() + ["" => $loader->getFallbackDirsPsr4()],
+            ] as $level => $psr) {
+                foreach ($psr as $prefix => $dirs) {
+                    foreach ($dirs as $dir) {
+                        $dir = path_normalize(path_is_absolute($dir) ? $dir : "$basePath/$dir");
+                        foreach (file_list($dir, ['name' => '#^[a-z_\x80-\xff][a-z0-9_\x80-\xff]*\.php$#ui']) ?? [] as $file) {
+                            if ($level === 0) {
+                                $class = strtr(substr($file, strlen($dir) + 1, -4), [DIRECTORY_SEPARATOR => '\\']);
+                                if (!isset($result[$class]) && str_starts_with($class, $prefix)) {
+                                    $result[$class] = $file;
+                                }
+                            }
+                            elseif ($level === 4) {
+                                $class = strtr($prefix . substr($file, strlen($dir) + 1, -4), [DIRECTORY_SEPARATOR => '\\']);
+                                if (!isset($result[$class])) {
+                                    $result[$class] = $file;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // クラスファイル名が見つかったからといってクラス定義ファイルとは限らないので中身を見なければならない
+            $result = array_filter($result, function ($file, $class) {
+                try {
+                    [$N, $C] = namespace_split($class);
+                    $tokens = \PhpToken::tokenize(file_get_contents($file), TOKEN_PARSE);
+                    $namespace = '';
+                    $namespacing = false;
+                    foreach ($tokens as $n => $token) {
+                        switch (true) {
+                            case $token->is(T_NAMESPACE):
+                                $namespacing = true;
+                                $namespace = '';
+                                break;
+                            case $token->is([';', '{']):
+                                $namespacing = false;
+                                break;
+                            // namespace の文脈で T_NAME_FULLY_QUALIFIED は流れてこないが \\ がないと T_STRING で流れてくる
+                            case $token->is([T_NAME_QUALIFIED, T_STRING]):
+                                if ($namespacing) {
+                                    $namespace .= $token->text;
+                                }
+                                break;
+                            case $token->is([T_CLASS, T_INTERFACE, T_TRAIT, /*T_ENUM:*/]):
+                                // ある程度で区切らないと無名クラス（new class() { }）や class 定数（Hoge::class）で最後まで読んでしまい、極端に遅くなる
+                                // class/interface/trait/enum キーワードとクラス名が16トークンも離れてることはまずないだろう
+                                for ($i = $n + 1, $l = min($n + 16, count($tokens)); $i < $l; $i++) {
+                                    if ($tokens[$i]->is(T_STRING) && $namespace === $N && $tokens[$i]->is($C)) {
+                                        return true;
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                }
+                catch (\ParseError) {
+                    // TOKEN_PARSE で tokenize するとパースエラーが発生するが、パースエラーになるファイルでクラス定義がされるわけないのでスルーでよい
+                }
+                return false;
+            }, ARRAY_FILTER_USE_BOTH);
+
+            // classmap は composer が生成するかユーザーが明示的に設定するので↑のような漁る処理は必要ない
+            // ただしパスの正規化は行わなければならない
+            foreach ($loader->getClassMap() as $class => $file) {
+                $result[$class] ??= path_normalize(path_is_absolute($file) ? $file : "$basePath/$file");
+            }
+
+            return $result;
+        }, __FUNCTION__);
+    }
+}
+
 assert(!function_exists('class_namespace') || (new \ReflectionFunction('class_namespace'))->isUserDefined());
 if (!function_exists('class_namespace')) {
     /**
@@ -6420,9 +6527,9 @@ if (!function_exists('class_uses_all')) {
      * trait T2{use T1;}
      * trait T3{use T2;}
      * that(class_uses_all(new class{use T3;}))->isSame([
-     *     'Example\\T3', // クラスが直接 use している
-     *     'Example\\T2', // T3 が use している
-     *     'Example\\T1', // T2 が use している
+     *     'Example\\T3' => 'Example\\T3', // クラスが直接 use している
+     *     'Example\\T2' => 'Example\\T2', // T3 が use している
+     *     'Example\\T1' => 'Example\\T1', // T2 が use している
      * ]);
      * ```
      *
@@ -6434,6 +6541,14 @@ if (!function_exists('class_uses_all')) {
      */
     function class_uses_all($class, $autoload = true)
     {
+        static $cache = [];
+
+        $cachekey = ltrim(is_object($class) ? get_class($class) : $class, '\\');
+
+        if (isset($cache[$cachekey])) {
+            return $cache[$cachekey];
+        }
+
         // まずはクラス階層から取得
         $traits = [];
         do {
@@ -6456,7 +6571,9 @@ if (!function_exists('class_uses_all')) {
             }
             $count = count($traits);
         }
-        return array_keys($traits);
+
+        $names = array_keys($traits);
+        return $cache[$cachekey] = array_combine($names, $names);
     }
 }
 
@@ -10724,32 +10841,43 @@ if (!function_exists('date_interval')) {
      *
      * @package ryunosuke\Functions\Package\datetime
      *
-     * @param string $interval ISO8601継続時間文字列
+     * @param string $interval ISO8601継続時間文字列か相対表記
      * @return \DateInterval DateInterval オブジェクト
      */
     function date_interval($interval)
     {
-        if (!preg_match('#^(?P<S>[\-+])?P((?P<Y>-?\d+)Y)?((?P<M>-?\d+)M)?((?P<D>-?\d+)D)?(T((?P<h>-?\d+)H)?((?P<m>-?\d+)M)?((?P<s>-?\d+(\.\d+)?)S)?)?$#', $interval, $matches, PREG_UNMATCHED_AS_NULL)) {
-            throw new \InvalidArgumentException("$interval is invalid DateInterval string");
+        if (preg_match('#^(?P<S>[\-+])?P((?P<Y>-?\d+)Y)?((?P<M>-?\d+)M)?((?P<D>-?\d+)D)?(T((?P<h>-?\d+)H)?((?P<m>-?\d+)M)?((?P<s>-?\d+(\.\d+)?)S)?)?$#', $interval, $matches, PREG_UNMATCHED_AS_NULL)) {
+            $interval = new \DateInterval('P0Y');
+            $interval->y = (int) $matches['Y'];
+            $interval->m = (int) $matches['M'];
+            $interval->d = (int) $matches['D'];
+            $interval->h = (int) $matches['h'];
+            $interval->i = (int) $matches['m'];
+            $interval->s = (int) $matches['s'];
+            $interval->f = (float) $matches['s'] - $interval->s;
+
+            if ($matches['S'] === '-') {
+                $interval->y = -$interval->y;
+                $interval->m = -$interval->m;
+                $interval->d = -$interval->d;
+                $interval->h = -$interval->h;
+                $interval->i = -$interval->i;
+                $interval->s = -$interval->s;
+                $interval->f = -$interval->f;
+            }
         }
-
-        $interval = new \DateInterval('P0Y');
-        $interval->y = (int) $matches['Y'];
-        $interval->m = (int) $matches['M'];
-        $interval->d = (int) $matches['D'];
-        $interval->h = (int) $matches['h'];
-        $interval->i = (int) $matches['m'];
-        $interval->s = (int) $matches['s'];
-        $interval->f = (float) $matches['s'] - $interval->s;
-
-        if ($matches['S'] === '-') {
-            $interval->y = -$interval->y;
-            $interval->m = -$interval->m;
-            $interval->d = -$interval->d;
-            $interval->h = -$interval->h;
-            $interval->i = -$interval->i;
-            $interval->s = -$interval->s;
-            $interval->f = -$interval->f;
+        else {
+            $parsed = date_parse($interval);
+            if ($parsed['errors'] || !$parsed['relative']) {
+                throw new \InvalidArgumentException("$interval is invalid DateInterval string");
+            }
+            $interval = new \DateInterval('P0Y');
+            $interval->y = $parsed['relative']['year'];
+            $interval->m = $parsed['relative']['month'];
+            $interval->d = $parsed['relative']['day'];
+            $interval->h = $parsed['relative']['hour'];
+            $interval->i = $parsed['relative']['minute'];
+            $interval->s = $parsed['relative']['second'];
         }
 
         $now = new \DateTimeImmutable();
@@ -11921,6 +12049,96 @@ if (!function_exists('error')) {
     }
 }
 
+assert(!function_exists('set_all_error_handler') || (new \ReflectionFunction('set_all_error_handler'))->isUserDefined());
+if (!function_exists('set_all_error_handler')) {
+    /**
+     * あらゆるエラーをハンドルする
+     *
+     * 実質的には set_error_handler+set_exception_handler+register_shutdown_function してるだけ。
+     * ハンドラの引数は Throwable 固定（エラーの場合は ErrorException に変換されてコールされる）。
+     * ハンドラが true/null を返すと設定前（ない場合は標準）のハンドラがコールされる。
+     * 実用上は「ログるかログらないか」くらいの差でしかない。
+     *
+     * @package ryunosuke\Functions\Package\errorfunc
+     * @codeCoverageIgnore カバレッジ不可
+     */
+    function set_all_error_handler(
+        /** 実行されるクロージャ */ \Closure $handler,
+        /** エラー抑制演算子をハンドリングするか */ bool $atmark_error = false,
+        /** fatal 用に予約するサイズ */ int $reserved_byte = 0,
+    ): /** キャンセルする callable */ callable
+    {
+        return new class($handler, $atmark_error, $reserved_byte) {
+            private static array  $instances         = [];
+            private static string $reservedMemory    = '';
+            private static bool   $regsteredShutdown = false;
+
+            private $handler;
+            private $error_handler;
+            private $exception_handler;
+
+            public function __construct(\Closure $handler, bool $atmark_error, int $reserved_byte)
+            {
+                self::$instances[spl_object_id($this)] = $this;
+                if (strlen(self::$reservedMemory) < $reserved_byte) {
+                    self::$reservedMemory = str_repeat('x', $reserved_byte);
+                }
+
+                $this->handler = $handler;
+
+                $this->error_handler = set_error_handler(function ($errno, $errstr, $errfile, $errline) use ($atmark_error) {
+                    if (!$atmark_error && !(error_reporting() & $errno)) {
+                        return false;
+                    }
+
+                    $default = ($this->handler)(new \ErrorException($errstr, 0, $errno, $errfile, $errline)) ?? true;
+                    if ($default) {
+                        return ($this->error_handler)($errno, $errstr, $errfile, $errline);
+                    }
+                }) ?? fn() => false;
+
+                $this->exception_handler = set_exception_handler(function (\Throwable $t) {
+                    $default = ($this->handler)($t) ?? true;
+                    if ($default) {
+                        return ($this->exception_handler)($t);
+                    }
+                }) ?? fn($t) => throw $t;
+
+                if (!self::$regsteredShutdown) {
+                    self::$regsteredShutdown = true;
+                    register_shutdown_function(function () {
+                        self::$reservedMemory = '';
+                        // php は循環参照を片付けずに memory size エラーを飛ばすのでやっておく意味はある
+                        gc_collect_cycles();
+                        foreach (self::$instances as $instance) {
+                            // 通常の実行時エラーは set_error_handler でハンドリングされているが
+                            // - 実行時ではないコンパイル時エラー
+                            // - エラーハンドラが呼ばれない実行時エラー（実行メモリ/時間など）
+                            // が存在するので個別にハンドリングしないと呼ばれる機会が失われる
+                            if (($error = error_get_last()) !== null) {
+                                if (false
+                                    || in_array($error['type'], [E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)
+                                    || strpos($error['message'], 'Allowed memory size') === 0
+                                    || strpos($error['message'], 'Maximum execution time') === 0
+                                ) {
+                                    ($instance->handler)(new \ErrorException($error['message'], 1, $error['type'], $error['file'], $error['line']));
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            public function __invoke()
+            {
+                restore_error_handler();
+                restore_exception_handler();
+                unset(self::$instances[spl_object_id($this)]);
+            }
+        };
+    }
+}
+
 assert(!function_exists('set_error_exception_handler') || (new \ReflectionFunction('set_error_exception_handler'))->isUserDefined());
 if (!function_exists('set_error_exception_handler')) {
     /**
@@ -12521,7 +12739,22 @@ if (!function_exists('process_closure')) {
         file_put_contents($mainscript = sys_get_temp_dir() . '/process-' . sha1($maincode) . '.php', $maincode);
 
         $return = tempnam($workdir, 'return');
-        $process = process_async(php_binary(), [$mainscript, $return], var_export3(arrayize($args), ["outmode" => "eval"]), $stdout, $stderr, $workdir, $env, $options);
+
+        $options ??= [];
+        $ini = arrayize($options['ini'] ?? []);
+        unset($options['ini']);
+
+        $ini_args = [];
+        foreach ($ini as $key => $value) {
+            if (is_int($key)) {
+                $ini_args[] = "-d$value";
+            }
+            else {
+                $ini_args[] = "-d$key=$value";
+            }
+        }
+
+        $process = process_async(php_binary(), [...$ini_args, $mainscript, $return], var_export3(arrayize($args), ["outmode" => "eval"]), $stdout, $stderr, $workdir, $env, $options);
         $process->setDestructAction('terminate');
         $process->setCompleteAction(function () use ($throw, $return) {
             /** @var $this \ProcessAsync */

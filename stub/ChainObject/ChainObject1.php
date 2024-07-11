@@ -445,6 +445,11 @@ TEXT): self { }
     public function now($persistence = true): self { }
     public function now(): self { }
 
+    /** @see set_all_error_handler() */
+    public self $set_all_error_handler;
+    public function set_all_error_handler(\Closure $handler, bool $atmark_error = false, int $reserved_byte = 0): self { }
+    public function set_all_error_handler(bool $atmark_error = false, int $reserved_byte = 0): self { }
+
     /** @see process_parallel() */
     public self $process_parallel;
     public function process_parallel($tasks, $args = [], $autoload = null, $workdir = null, $env = null, $options = null): self { }

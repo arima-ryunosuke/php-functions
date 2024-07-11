@@ -483,6 +483,11 @@ trait ChainObject6
     public function is_hasharray(array $array): self { }
     public function is_hasharray(): self { }
 
+    /** @see class_map() */
+    public self $class_map;
+    public function class_map(?object $loader = null, ?string $basePath = null, bool $cache = true): self { }
+    public function class_map(?string $basePath = null, bool $cache = true): self { }
+
     /** @see object_properties() */
     public self $object_properties;
     public function object_properties($object, &$privates = []): self { }
