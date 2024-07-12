@@ -11,6 +11,14 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.10
+
+- [feature] set_all_error_handler を追加
+- [feature] class_map を追加
+- [feature] date_interval の相対日時対応
+- [fixbug] class_uses_all の形式が class_uses と揃っていない不具合
+- [fixbug] cache で特定文字があるとキャッシュが使われない不具合
+
 ## 2.0.9
 
 - [feature] var_export2 にオプション引数を導入
