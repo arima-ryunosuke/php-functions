@@ -8,7 +8,9 @@ use function ryunosuke\Functions\Package\add_error_handler;
 use function ryunosuke\Functions\Package\backtrace;
 use function ryunosuke\Functions\Package\error;
 use function ryunosuke\Functions\Package\phpval;
+use function ryunosuke\Functions\Package\process_parallel;
 use function ryunosuke\Functions\Package\reflect_callable;
+use function ryunosuke\Functions\Package\set_all_error_handler;
 use function ryunosuke\Functions\Package\set_error_exception_handler;
 use function ryunosuke\Functions\Package\set_trace_logger;
 use function ryunosuke\Functions\Package\stacktrace;
@@ -160,6 +162,125 @@ class errorfuncTest extends AbstractTestCase
         that(self::resolveFunction('error'))('int', 1)->wasThrown('must be resource or string');
     }
 
+    function test_set_all_error_handler()
+    {
+        $log = [];
+        $restrer1 = set_all_error_handler(function ($t) use (&$log) {
+            $log[] = 'l1 ' . $t->getMessage();
+            return false;
+        }, false);
+        $restrer2 = set_all_error_handler(function ($t) use (&$log) {
+            $log[] = 'l2 ' . $t->getMessage();
+            return true;
+        }, true);
+
+        echo []['undefined-key'];
+
+        $restrer2();
+        $restrer1();
+
+        that($log)->is([
+            'l2 Undefined array key "undefined-key"',
+            'l1 Undefined array key "undefined-key"',
+        ]);
+
+        $result = process_parallel([
+            'warning:false'   => static function () {
+                set_all_error_handler(function (\Throwable $t) {
+                    fwrite(STDOUT, $t->getMessage());
+                    return false;
+                });
+
+                return []['undefined'];
+            },
+            'warning:true'    => static function () {
+                set_all_error_handler(function (\Throwable $t) {
+                    fwrite(STDOUT, $t->getMessage());
+                    return true;
+                });
+
+                return []['undefined-key'];
+            },
+            'error:false'     => static function () {
+                set_all_error_handler(function (\Throwable $t) {
+                    fwrite(STDOUT, $t->getMessage());
+                    return false;
+                });
+
+                return 'undefined-function'();
+            },
+            'error:true'      => static function () {
+                set_all_error_handler(function (\Throwable $t) {
+                    fwrite(STDOUT, $t->getMessage());
+                    return true;
+                });
+
+                return 'undefined-function'();
+            },
+            'exception:false' => static function () {
+                set_all_error_handler(function (\Throwable $t) {
+                    fwrite(STDOUT, $t);
+                    return false;
+                });
+
+                throw new \Exception('exception');
+            },
+            'exception:true'  => static function () {
+                set_all_error_handler(function (\Throwable $t) {
+                    fwrite(STDOUT, $t);
+                    return true;
+                });
+
+                throw new \Exception('exception');
+            },
+            'fatal:compile'   => static function () {
+                set_all_error_handler(function (\Throwable $t) {
+                    fwrite(STDOUT, $t->getMessage());
+                });
+
+                eval('function dummy_function(){}');
+                eval('function dummy_function(){}');
+            },
+            'fatal:memory'    => static function () {
+                set_all_error_handler(function (\Throwable $t) {
+                    fwrite(STDOUT, $t->getMessage());
+                });
+
+                return str_repeat('x', 1024 * 1024 * 32);
+            },
+        ], options: [
+            'ini' => [
+                'display_errors' => 'stderr',
+                'log_errors'     => 'off',
+                'memory_limit'   => '16M',
+            ],
+        ]);
+
+        that($result['warning:false']['stdout'])->contains('Undefined array key');
+        that($result['warning:false']['stderr'])->isEmpty();
+
+        that($result['warning:true']['stdout'])->contains('Undefined array key');
+        that($result['warning:true']['stderr'])->contains('Warning:');
+
+        that($result['error:false']['stdout'])->contains('Call to undefined function');
+        that($result['error:false']['stderr'])->isEmpty();
+
+        that($result['error:true']['stdout'])->contains('Call to undefined function');
+        that($result['error:true']['stderr'])->contains('Call to undefined function');
+
+        that($result['exception:false']['stdout'])->contains('exception');
+        that($result['exception:false']['stderr'])->isEmpty();
+
+        that($result['exception:true']['stdout'])->contains('exception');
+        that($result['exception:true']['stderr'])->contains('Fatal error: Uncaught Exception');
+
+        that($result['fatal:compile']['stdout'])->contains('Cannot redeclare');
+        that($result['fatal:compile']['stderr'])->contains('Fatal error: Cannot redeclare');
+
+        that($result['fatal:memory']['stdout'])->contains('Allowed memory size');
+        that($result['fatal:memory']['stderr'])->contains('Fatal error: Allowed memory size');
+    }
+
     function test_set_error_exception_handler()
     {
         $restore = set_error_exception_handler();
@@ -235,6 +356,7 @@ class errorfuncTest extends AbstractTestCase
 
         $mock = new class() {
             public $that;
+
             static function sm($that) { return test_stacktrace($that); }
 
             function im() { return $this::sm($this); }
