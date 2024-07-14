@@ -151,6 +151,18 @@ class execTest extends AbstractTestCase
 
     function test_process_closure()
     {
+        $closure = static function () {
+            return [
+                'hoge' => get_cfg_var('hoge'),
+                'fuga' => get_cfg_var('fuga'),
+            ];
+        };
+        $process = process_closure($closure, options: ['ini' => ['hoge' => 123, 'fuga=456']]);
+        that($process())->is([
+            'hoge' => 123,
+            'fuga' => 456,
+        ]);
+
         $closure = static function ($sleep) {
             sleep($sleep);
             return $sleep * 1000;

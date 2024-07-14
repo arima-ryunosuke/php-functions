@@ -84,7 +84,22 @@ function process_closure($closure, $args = [], $throw = true, $autoload = null, 
     file_put_contents($mainscript = sys_get_temp_dir() . '/process-' . sha1($maincode) . '.php', $maincode);
 
     $return = tempnam($workdir, 'return');
-    $process = process_async(php_binary(), [$mainscript, $return], var_export3(arrayize($args), ["outmode" => "eval"]), $stdout, $stderr, $workdir, $env, $options);
+
+    $options ??= [];
+    $ini = arrayize($options['ini'] ?? []);
+    unset($options['ini']);
+
+    $ini_args = [];
+    foreach ($ini as $key => $value) {
+        if (is_int($key)) {
+            $ini_args[] = "-d$value";
+        }
+        else {
+            $ini_args[] = "-d$key=$value";
+        }
+    }
+
+    $process = process_async(php_binary(), [...$ini_args, $mainscript, $return], var_export3(arrayize($args), ["outmode" => "eval"]), $stdout, $stderr, $workdir, $env, $options);
     $process->setDestructAction('terminate');
     $process->setCompleteAction(function () use ($throw, $return) {
         /** @var $this \ProcessAsync */
