@@ -160,6 +160,31 @@
     - build_uri: uri_build
     - parse_uri: uri_parse
 
+## 1.6.20
+
+- [fixbug] cache で特定文字があるとキャッシュが使われない不具合
+
+## 1.6.19
+
+- [change] (en|de)crypt の v4 を実装
+- [feature] probability_array を追加
+- [feature] rsync を追加
+- [feature] try_close を追加
+- [feature] array_distinct のシュワルツ対応
+- [feature] php_binary を追加
+- [feature] php_opcode を追加
+- [feature] built_in_server を追加
+- [feature] process 周りを改善
+- [feature] process_closure を追加
+- [feature] function_configure に process 系で自動で読み込むファイル群のエントリを追加
+- [feature] file_mimetype で読み込まずに拡張子で判定する機能を追加
+- [refactor] exportClass した Utility をテストしたいことがある
+- [refactor] formmater が off になっていたので修正
+- [fixbug] 「最悪読めなくても構わない」シチュエーションで読めないときに即死していた不具合を修正
+- [fixbug] 別ディレクトリの constant.php を読んでしまう不具合を修正
+- [fixbug] exportClass 時に使用定数の判定に誤りがあったので修正
+- [fixbug] exportClass 時に public static にならない不具合を修正
+
 ## 1.6.18
 
 - [feature] function_configure の項目に storagedir を追加
