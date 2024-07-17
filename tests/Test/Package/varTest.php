@@ -23,6 +23,7 @@ use function ryunosuke\Functions\Package\hashvar;
 use function ryunosuke\Functions\Package\is_arrayable;
 use function ryunosuke\Functions\Package\is_decimal;
 use function ryunosuke\Functions\Package\is_empty;
+use function ryunosuke\Functions\Package\is_exportable;
 use function ryunosuke\Functions\Package\is_primitive;
 use function ryunosuke\Functions\Package\is_recursive;
 use function ryunosuke\Functions\Package\is_resourcable;
@@ -467,6 +468,54 @@ class varTest extends AbstractTestCase
         // 自明だが継承して空でなければ空ではない
         $stdClassEx->hoge = 123;
         that(is_empty($stdClassEx, true))->isFalse();
+    }
+
+    function test_is_exportable()
+    {
+        // scalar
+        that(is_exportable(null))->isTrue();
+        that(is_exportable(false))->isTrue();
+        that(is_exportable(123))->isTrue();
+        that(is_exportable(3.14))->isTrue();
+        that(is_exportable('string'))->isTrue();
+
+        // resource
+        $resource = tmpfile();
+        that(is_exportable($resource))->isFalse();
+        fclose($resource);
+        that(is_exportable($resource))->isFalse();
+
+        // recursive
+        $array = [];
+        $array['recur'] = &$array;
+        that(is_exportable($array))->isFalse();
+        $object = new \stdClass();
+        $object->recur = $object;
+        that(is_exportable($object))->isFalse();
+
+        // array
+        that(is_exportable([]))->isTrue();
+        that(is_exportable([null, false, 123, 3.14, 'string']))->isTrue();
+        that(is_exportable([null, false, 123, 3.14, $resource]))->isFalse();
+        that(is_exportable([[[[[null, false, 123, 3.14, 'string']]]]]))->isTrue();
+        that(is_exportable([[[[$resource]]]]))->isFalse();
+
+        // object
+        that(is_exportable(new \DateTime()))->isTrue();
+        that(is_exportable(new \stdClass()))->isTrue();
+        that(is_exportable(curl_init()))->isFalse();
+        that(is_exportable(new class() {
+            public static function __set_state(array $an_array): object
+            {
+                return new static();
+            }
+        }))->isFalse();
+        that(is_exportable(function () { }))->isFalse();
+        that(is_exportable((function () { yield 1; })()))->isFalse();
+        if (version_compare(PHP_VERSION, 8.1) < 0) {
+            that(is_exportable(IntEnum::Case1()))->isTrue();
+            that(is_exportable(StringEnum::CaseHoge()))->isTrue();
+        }
     }
 
     function test_is_primitive()
@@ -1217,7 +1266,7 @@ class varTest extends AbstractTestCase
 
     function test_var_export3_enum()
     {
-        if (version_compare(PHP_VERSION, 8.2) < 0) {
+        if (version_compare(PHP_VERSION, 8.1) < 0) {
             $values = [
                 'int-enum'    => IntEnum::Case1(),
                 'string-enum' => StringEnum::CaseHoge(),
