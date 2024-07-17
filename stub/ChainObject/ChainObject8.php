@@ -436,7 +436,7 @@ TEXT): self { }
 
     /** @see cacheobject() */
     public self $cacheobject;
-    public function cacheobject($directory, $clean_probability = 0): self { }
+    public function cacheobject($directory = null, $clean_probability = 0): self { }
     public function cacheobject($clean_probability = 0): self { }
 
     /** @see number_serial() */

@@ -323,6 +323,16 @@ trait ChainObject2
     public function depth(iterable $array, $max_depth = null): self { }
     public function depth($max_depth = null): self { }
 
+    /** @see array_filter_recursive() */
+    public self $array_filter_recursive;
+    public function array_filter_recursive(iterable $array, callable $callback, bool $unset_empty = true): self { }
+    public function array_filter_recursive(callable $callback, bool $unset_empty = true): self { }
+
+    /** @see array_filter_recursive() */
+    public self $filter_recursive;
+    public function filter_recursive(iterable $array, callable $callback, bool $unset_empty = true): self { }
+    public function filter_recursive(callable $callback, bool $unset_empty = true): self { }
+
     /** @see array_shuffle() */
     public self $array_shuffle;
     public function array_shuffle(iterable $array): self { }

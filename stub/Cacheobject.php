@@ -22,6 +22,7 @@ class Cacheobject
     public function get($key, $default = null) { }
     public function set($key, $value, $ttl = null) { }
     public function delete($key) { }
+    public function provide($provider, ...$args) { }
     public function clear() { }
     public function getMultiple($keys, $default = null) { }
     public function setMultiple($values, $ttl = null) { }

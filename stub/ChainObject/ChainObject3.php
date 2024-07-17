@@ -636,6 +636,11 @@ TEXT): self { }
     public function is_decimal($var, $allow_float = true): self { }
     public function is_decimal($allow_float = true): self { }
 
+    /** @see is_exportable() */
+    public self $is_exportable;
+    public function is_exportable($var): self { }
+    public function is_exportable(): self { }
+
     /** @see is_stringable() */
     public self $is_stringable;
     public function is_stringable($var): self { }
