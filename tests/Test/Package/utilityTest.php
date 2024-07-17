@@ -156,6 +156,16 @@ class utilityTest extends AbstractTestCase
         rm_rf($tmpdir);
         $cache = cacheobject($tmpdir);
 
+        /// same object
+        $obj1 = that($cache)->var('cacheobject');
+        $obj2 = that(cacheobject($tmpdir))->var('cacheobject');
+        that($obj1)->isSame($obj2);
+
+        /// var_export3
+
+        $cache->set('closure', static fn() => null);
+        that($cache->get('closure'))->isInstanceOf(\Closure::class);
+
         /// single
 
         that($cache->get('hoge', 'notfound'))->isSame('notfound');
@@ -244,6 +254,19 @@ class utilityTest extends AbstractTestCase
             'fetchM' => 'okM2',
         ]);
 
+        // provide
+        srand(123);
+        $provider = fn($min, $max) => rand($min, $max);
+        that($cache->provide($provider, 100, 200))->isSame(128);
+        that($cache->provide($provider, 100, 200))->isSame(128);
+        that($cache->provide($provider, 100, 200))->isSame(128);
+        that($cache->provide(fn($min, $max) => rand($min, $max), 100, 200))->isSame(172);
+        that($cache->provide($provider, 200, 300))->isSame(291);
+        that($cache->provide($provider, 200, 300))->isSame(291);
+        that($cache->provide($provider, 200, 300))->isSame(291);
+        that($cache->provide(fn($min, $max) => rand($min, $max), 200, 300))->isSame(229);
+        that($cache->provide(fn() => null))->isSame(null);
+
         /// misc
 
         that($cache->set('path.to.dir', 'value'))->isTrue();
@@ -258,6 +281,8 @@ class utilityTest extends AbstractTestCase
         that($cache)->getMultiple(new \ArrayObject(['']))->wasThrown('empty string');
         that($cache)->set('ttl', 'value', 'hoge')->wasThrown('ttl must be');
 
+        that($cache)->cacheobject->_getMetadata('notfound')->is(null);
+
         $debugString = print_r($cache, true);
         that($debugString)->contains($tmpdir);
         that($debugString)->contains('path.to.dir');
@@ -266,17 +291,17 @@ class utilityTest extends AbstractTestCase
 
         that($cache->set('dir.expired', 'value', 1))->isTrue();
         sleep(2);
-        that("$tmpdir/dir/expired.php")->fileExists();
+        that("$tmpdir/dir/expired.php-cache")->fileExists();
         $cache = cacheobject($tmpdir, 1);
-        that("$tmpdir/dir/expired.php")->fileNotExists();
+        that("$tmpdir/dir/expired.php-cache")->fileNotExists();
         that("$tmpdir/dir")->directoryNotExists();
         that($cache->has('expired'))->isFalse();
 
         that($cache->keys('fetch*'))->hasKeyAll(['fetch', 'fetchM']);
 
-        touch("$tmpdir/dummy.php");
+        touch("$tmpdir/dummy.php-cache");
         $cache->clean();
-        that("$tmpdir/dummy.php")->fileExists();
+        that("$tmpdir/dummy.php-cache")->fileExists();
     }
 
     function test_function_configure()

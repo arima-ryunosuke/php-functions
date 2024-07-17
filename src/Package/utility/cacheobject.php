@@ -5,7 +5,8 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/array_each.php';
 require_once __DIR__ . '/../filesystem/file_list.php';
 require_once __DIR__ . '/../filesystem/file_set_contents.php';
-require_once __DIR__ . '/../filesystem/rm_rf.php';
+require_once __DIR__ . '/../utility/function_configure.php';
+require_once __DIR__ . '/../var/is_exportable.php';
 require_once __DIR__ . '/../var/var_export3.php';
 // @codeCoverageIgnoreEnd
 
@@ -17,8 +18,7 @@ require_once __DIR__ . '/../var/var_export3.php';
  * - キャッシュはファイルシステムに保存される
  * - キャッシュキーの . はディレクトリ区切りとして使用される
  * - TTL を指定しなかったときのデフォルト値は約100年（実質無期限だろう）
- * - clear するとディレクトリ自体を吹き飛ばすのでそのディレクトリはキャッシュ以外の用途に使用してはならない
- * - psr-16 にはない getOrSet が生えている（利便性が非常に高く使用頻度が多いため）
+ * - psr-16 にはない getOrSet(fetch) が生えている（利便性が非常に高く使用頻度が多いため）
  *
  * 性質上、参照されない期限切れキャッシュが溜まり続けるが $clean_probability を渡すと一定確率で削除される。
  * $clean_probability は 1 が 100%（必ず削除）、 0 が 0%（削除しない）である。
@@ -31,13 +31,16 @@ require_once __DIR__ . '/../var/var_export3.php';
  *
  * @package ryunosuke\Functions\Package\utility
  *
- * @param string $directory キャッシュ保存ディレクトリ
+ * @param ?string $directory キャッシュ保存ディレクトリ
  * @param float $clean_probability 不要キャッシュの削除確率
  * @return \Cacheobject psr-16 実装オブジェクト
  */
-function cacheobject($directory, $clean_probability = 0)
+function cacheobject($directory = null, $clean_probability = 0)
 {
-    $cacheobject = new class($directory) {
+    static $cacheobjects = [];
+
+    $directory ??= function_configure('cachedir');
+    $cacheobject = $cacheobjects[$directory] ??= new class($directory) {
         private $directory;
         private $entries = [];
 
@@ -93,14 +96,22 @@ function cacheobject($directory, $clean_probability = 0)
 
         private function _getFilename(string $key): string
         {
-            return $this->directory . DIRECTORY_SEPARATOR . strtr(rawurlencode($key), ['.' => DIRECTORY_SEPARATOR]) . ".php";
+            return $this->directory . DIRECTORY_SEPARATOR . strtr(rawurlencode($key), ['.' => DIRECTORY_SEPARATOR]) . ".php-cache";
+        }
+
+        private function _getCacheFilenames(): array
+        {
+            return file_list($this->directory, [
+                '!type'     => ['dir', 'link'],
+                'extension' => ['php-cache'],
+            ]);
         }
 
         private function _getMetadata(string $filename): ?array
         {
-            $fp = fopen($filename, "r");
+            $fp = @fopen($filename, "r");
             if ($fp === false) {
-                return null; // @codeCoverageIgnore
+                return null;
             }
             try {
                 $first = fgets($fp);
@@ -114,9 +125,7 @@ function cacheobject($directory, $clean_probability = 0)
 
         public function keys(?string $pattern = null)
         {
-            $files = file_list($this->directory, [
-                '!type' => ['dir', 'link'],
-            ]);
+            $files = $this->_getCacheFilenames();
 
             $now = time();
             $result = [];
@@ -198,8 +207,16 @@ function cacheobject($directory, $clean_probability = 0)
             $expire = time() + $ttl;
             $this->entries[$key] = [$expire, $value];
             $meta = json_encode(['key' => $key, 'expire' => $expire]);
-            $code = var_export3($this->entries[$key], ['outmode' => 'eval']);
-            return !!file_set_contents($this->_getFilename($key), "<?php # $meta\n$code\n");
+            // var_export3 はあらゆる出力を可能にしているので **読み込み時** のオーバーヘッドがでかく、もし var_export が使えるならその方が格段に速い
+            // しかし要素を再帰的に全舐め（is_exportable）しないと「var_export できるか？」は分からないというジレンマがある
+            // このコンテキストは「キャッシュ」なので書き込み時のオーバーヘッドよりも読み込み時のオーバーヘッドを優先して判定を行っている
+            if (is_exportable($this->entries[$key])) {
+                $code = var_export($this->entries[$key], true);
+            }
+            else {
+                $code = var_export3($this->entries[$key], true);
+            }
+            return !!file_set_contents($this->_getFilename($key), "<?php # $meta\nreturn $code;\n");
         }
 
         public function delete($key)
@@ -210,10 +227,30 @@ function cacheobject($directory, $clean_probability = 0)
             return @unlink($this->_getFilename($key));
         }
 
+        public function provide($provider, ...$args)
+        {
+            $provider_hash = (string) new \ReflectionFunction($provider);
+            $cacheid = "autoprovide." . hash('fnv164', $provider_hash);
+            $key = $provider_hash . '@' . serialize($args);
+
+            $cache = $this->get($cacheid) ?? [];
+            if (!array_key_exists($key, $cache)) {
+                $result = $provider(...$args);
+                if ($result === null) {
+                    return null;
+                }
+                $cache[$key] = $result;
+                $this->set($cacheid, $cache);
+            }
+            return $cache[$key];
+        }
+
         public function clear()
         {
             $this->entries = [];
-            return rm_rf($this->directory, false);
+
+            $files = $this->_getCacheFilenames();
+            return count($files) === count(array_filter(array_map('unlink', $files)));
         }
 
         public function getMultiple($keys, $default = null)
@@ -268,6 +305,7 @@ function cacheobject($directory, $clean_probability = 0)
         public function get($key, $default = null): mixed                { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
         public function set($key, $value, $ttl = null): bool             { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
         public function delete($key): bool                               { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+        public function provide($provider, ...$args): mixed              { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
         public function clear(): bool                                    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
         public function getMultiple($keys, $default = null): iterable    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
         public function setMultiple($values, $ttl = null): bool          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
