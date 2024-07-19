@@ -22,6 +22,7 @@ use function ryunosuke\Functions\Package\array_extend;
 use function ryunosuke\Functions\Package\array_fill_callback;
 use function ryunosuke\Functions\Package\array_fill_gap;
 use function ryunosuke\Functions\Package\array_filter_map;
+use function ryunosuke\Functions\Package\array_filter_recursive;
 use function ryunosuke\Functions\Package\array_filters;
 use function ryunosuke\Functions\Package\array_find;
 use function ryunosuke\Functions\Package\array_find_last;
@@ -1130,6 +1131,105 @@ class arrayTest extends AbstractTestCase
 
         // prefix とキーを付与して返す。ただし null は除外する
         that(array_filter_map([null, 'hoge', 'fuga', null, 'piyo'], fn(&$v, $k) => $v !== null ? $v = "prefix-$k:$v" : false))->is([1 => 'prefix-1:hoge', 2 => 'prefix-2:fuga', 4 => 'prefix-4:piyo']);
+    }
+
+    function test_array_filter_recursive()
+    {
+        $array = [
+            'a'  => 'A', // 生き残る
+            'e'  => '',  // 生き残らない
+            'a1' => [
+                // A がいるため $unset_empty は無関係に a1 自体も生き残る
+                'A', // 生き残る
+                '',  // 生き残らない
+            ],
+            'a2' => [
+                // 生き残りが居ないため $unset_empty:true だと a2 自体も生き残らない
+                '',  // 生き残らない
+                '',  // 生き残らない
+            ],
+            'b1' => [
+                // a1 のネスト版
+                'a' => [
+                    'a' => 'A',
+                    'e' => '',
+                ],
+            ],
+            'b2' => [
+                // a2 のネスト版
+                'a' => [
+                    'a' => '',
+                    'e' => '',
+                ],
+            ],
+        ];
+
+        // 親を伏せない版
+        that(array_filter_recursive($array, fn($v, $k, $parents) => strlen($v ?? ''), false))->isSame([
+            "a"  => "A",
+            "a1" => ["A"],
+            "a2" => [],
+            "b1" => [
+                "a" => [
+                    "a" => "A",
+                ],
+            ],
+            "b2" => [
+                "a" => [],
+            ],
+        ]);
+
+        // 親を伏せる版
+        $history = [];
+        that(array_filter_recursive($array, function ($v, $k, $parents) use (&$history) {
+            $history[] = array_merge($parents, [$k]);
+            return strlen($v ?? '');
+        }))->isSame([
+            "a"  => "A",
+            "a1" => ["A"],
+            "b1" => [
+                "a" => [
+                    "a" => "A",
+                ],
+            ],
+        ]);
+        that($history)->is([
+            ["a"],
+            ["e"],
+            ["a1", 0],
+            ["a1", 1],
+            ["a2", 0],
+            ["a2", 1],
+            ["b1", "a", "a"],
+            ["b1", "a", "e"],
+            ["b2", "a", "a"],
+            ["b2", "a", "e"],
+        ]);
+
+        // オブジェクトも維持される
+        $ao = array_map_recursive($array, fn($v) => is_array($v) ? new \ArrayObject($v) : $v, true, true);
+        $history = [];
+        that(array_filter_recursive($ao, function ($v, $k, $parents) use (&$history) {
+            $history[] = array_merge($parents, [$k]);
+            return strlen($v ?? '');
+        }))->isSame($ao);
+        that(isset($ao['e']))->isFalse();
+        that(isset($ao['a1'][1]))->isFalse();
+        that(isset($ao['a2']))->isFalse();
+        that(isset($ao['b1']['a']['e']))->isFalse();
+        that(isset($ao['b2']))->isFalse();
+        that($history)->is([
+            ["a"],
+            ["e"],
+            ["a1", 0],
+            ["a1", 1],
+            ["a2", 0],
+            ["a2", 1],
+            ["b1", "a", "a"],
+            ["b1", "a", "e"],
+            ["b2", "a", "a"],
+            ["b2", "a", "e"],
+        ]);
     }
 
     function test_array_filters()
