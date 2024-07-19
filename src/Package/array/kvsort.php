@@ -112,25 +112,25 @@ function kvsort($array, $comparator = null, $schwartzians = [])
 
     // 一時配列の準備
     $n = 0;
-    $tmp = [];
+    $virtuals = [];
+    $result = [];
     foreach ($array as $k => $v) {
-        $virtuals = [];
         if ($is_array) {
             foreach ($schwartzians as $s => $schwartzian) {
-                $virtuals[$s] = $schwartzian($v, $k, $n);
+                $virtuals[$k][$s] = $schwartzian($v, $k, $n);
             }
         }
         else {
-            $virtuals = $schwartzians[0]($v, $k, $n);
+            $virtuals[$k] = $schwartzians[0]($v, $k, $n);
         }
-        $tmp[] = [$n++, $k, $v, $virtuals];
+        $result[$k] = $v;
     }
+    uksort($result, function ($keyA, $keyB) use ($result, $comparator, $virtuals) {
+        $a = $result[$keyA];
+        $b = $result[$keyB];
 
-    // ソートしてから元の配列の体裁で返す
-    usort($tmp, function ($a, $b) use ($comparator, $schwartzians) {
-        $virtuals = $schwartzians ? [$a[3], $b[3]] : [];
-        $com = $comparator(...$virtuals, ...[$a[2], $b[2], $a[1], $b[1]]);
-        return $com !== 0 ? $com : ($a[0] - $b[0]);
+        $virtual = $virtuals ? [$virtuals[$keyA], $virtuals[$keyB]] : [];
+        return $comparator(...$virtual, ...[$a, $b, $keyA, $keyB]);
     });
-    return array_column($tmp, 2, 1);
+    return $result;
 }
