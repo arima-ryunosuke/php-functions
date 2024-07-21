@@ -8,6 +8,8 @@ namespace ryunosuke\Functions\Package;
  * あらゆるエラーをハンドルする
  *
  * 実質的には set_error_handler+set_exception_handler+register_shutdown_function してるだけ。
+ * あと小細工して初動エラーも拾うがあまり気にしなくてよい。
+ *
  * ハンドラの引数は Throwable 固定（エラーの場合は ErrorException に変換されてコールされる）。
  * ハンドラが true/null を返すと設定前（ない場合は標準）のハンドラがコールされる。
  * 実用上は「ログるかログらないか」くらいの差でしかない。
@@ -21,6 +23,16 @@ function set_all_error_handler(
     /** fatal 用に予約するサイズ */ int $reserved_byte = 0,
 ): /** キャンセルする callable */ callable
 {
+    // 初動エラーが error_get_last() で取得できることがある
+    if (($error = error_get_last()) !== null) {
+        // 初動エラーはスクリプト無関係なので line:0 で発生される
+        if ($error['line'] === 0) {
+            $handler(new \ErrorException($error['message'], -1, $error['type'], $error['file'], $error['line']));
+            // 以後一度もエラーがないと shutdown で引っかかってしまう
+            error_clear_last();
+        }
+    }
+
     return new class($handler, $atmark_error, $reserved_byte) {
         private static array  $instances         = [];
         private static string $reservedMemory    = '';
@@ -70,7 +82,7 @@ function set_all_error_handler(
                         // が存在するので個別にハンドリングしないと呼ばれる機会が失われる
                         if (($error = error_get_last()) !== null) {
                             if (false
-                                || in_array($error['type'], [E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)
+                                || in_array($error['type'], [E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_CORE_WARNING, E_COMPILE_WARNING], true)
                                 || strpos($error['message'], 'Allowed memory size') === 0
                                 || strpos($error['message'], 'Maximum execution time') === 0
                             ) {
