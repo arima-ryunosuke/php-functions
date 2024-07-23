@@ -11,6 +11,14 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.11
+
+- [feature] array_filter_recursive を追加
+- [feature] cacheobject の改善
+- [feature] is_exportable を追加
+- [feature] set_all_error_handler の改善
+- [refactor] kvsort の改善
+
 ## 2.0.10
 
 - [feature] set_all_error_handler を追加
