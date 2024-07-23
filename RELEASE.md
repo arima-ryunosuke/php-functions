@@ -11,6 +11,10 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.12
+
+- [fixbug] cacheobject の型エラー不具合
+
 ## 2.0.11
 
 - [feature] array_filter_recursive を追加
