@@ -104,7 +104,7 @@ function cacheobject($directory = null, $clean_probability = 0)
             return file_list($this->directory, [
                 '!type'     => ['dir', 'link'],
                 'extension' => ['php-cache'],
-            ]);
+            ]) ?? [];
         }
 
         private function _getMetadata(string $filename): ?array
