@@ -29389,7 +29389,7 @@ if (!function_exists('ryunosuke\\Functions\\cacheobject')) {
                 return file_list($this->directory, [
                     '!type'     => ['dir', 'link'],
                     'extension' => ['php-cache'],
-                ]);
+                ]) ?? [];
             }
 
             private function _getMetadata(string $filename): ?array
