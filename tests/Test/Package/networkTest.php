@@ -775,6 +775,11 @@ class networkTest extends AbstractTestCase
         that(ip_info('100.64.0.0', $options))->is(null);
         that(count(ip_info(null, $options)))->gt(100000);
 
+        that(self::resolveFunction('ip_info'))("1.2.3.4", [
+            'rir' => [
+                'dummy' => TESTRIRSERVER . '/notfound.csv',
+            ],
+        ])->wasThrown('404');
         that(self::resolveFunction('ip_info'))("hogera", $options)->wasThrown('is invalid');
         that(self::resolveFunction('ip_info'))("00:00:5e:ef:10:00:00:00", $options)->wasThrown('is not supported');
     }

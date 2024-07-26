@@ -71,6 +71,7 @@ function ip_info($ipaddr, $options = [])
         'cachedir' => function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__),
         'ttl'      => 60 * 60 * 24 + 120, // 120 は1日1回バッチで叩くことを前提としたバッファ
         'rir'      => [],
+        'throw'    => true, // テスト用で原則 true（例外が飛ばないと情報が膨大過ぎるので失敗しても気付けない）
     ];
     $options['rir'] += [
         'afrinic' => 'https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-latest',
@@ -114,9 +115,12 @@ function ip_info($ipaddr, $options = [])
 
     http_requests($urls, [
         'cachedir' => $options['cachedir'],
-        'callback' => function ($rir, $body) use ($files) {
+        'callback' => function ($rir, $body, $header, $info) use ($files, $options) {
+            if ($options['throw'] && ($body === null || $info['http_code'] >= 400)) {
+                throw new \UnexpectedValueException("request {$info['url']} failed. caused by {$info['http_code']}(error {$info['errno']})");
+            }
             $tmpfile = tmpfile();
-            fwrite($tmpfile, $body);
+            fwrite($tmpfile, $body ?? '');
             rewind($tmpfile);
 
             $cidrs = [];
@@ -141,10 +145,23 @@ function ip_info($ipaddr, $options = [])
         },
     ]);
 
+    // サイズがでかいので static 等にはしない（opcache に完全に任せる）
     $all = [];
     foreach ($files as $file) {
-        // サイズがでかいので static 等にはしない（opcache に完全に任せる）
-        $rir = is_array($file) ? $file : include $file;
+        if (is_array($file)) {
+            $rir = $file;
+        }
+        elseif (file_exists($file)) {
+            $rir = include $file;
+        }
+        else {
+            // @codeCoverageIgnoreStart http が失敗したときなので基本的に到達しない（http が失敗したときは既に例外投げられている）
+            $rir = [];
+            if ($options['throw']) {
+                throw new \UnexpectedValueException("failed to load $file");
+            }
+            // @codeCoverageIgnoreEnd
+        }
 
         if ($ipaddr === null) {
             $all += $rir;
