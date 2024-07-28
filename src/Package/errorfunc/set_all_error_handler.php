@@ -10,7 +10,7 @@ namespace ryunosuke\Functions\Package;
  * 実質的には set_error_handler+set_exception_handler+register_shutdown_function してるだけ。
  * あと小細工して初動エラーも拾うがあまり気にしなくてよい。
  *
- * ハンドラの引数は Throwable 固定（エラーの場合は ErrorException に変換されてコールされる）。
+ * ハンドラの引数は Throwable 固定（エラーの場合は Error に変換されてコールされる）。
  * ハンドラが true/null を返すと設定前（ない場合は標準）のハンドラがコールされる。
  * 実用上は「ログるかログらないか」くらいの差でしかない。
  *
@@ -23,17 +23,7 @@ function set_all_error_handler(
     /** fatal 用に予約するサイズ */ int $reserved_byte = 0,
 ): /** キャンセルする callable */ callable
 {
-    // 初動エラーが error_get_last() で取得できることがある
-    if (($error = error_get_last()) !== null) {
-        // 初動エラーはスクリプト無関係なので line:0 で発生される
-        if ($error['line'] === 0) {
-            $handler(new \ErrorException($error['message'], -1, $error['type'], $error['file'], $error['line']));
-            // 以後一度もエラーがないと shutdown で引っかかってしまう
-            error_clear_last();
-        }
-    }
-
-    return new class($handler, $atmark_error, $reserved_byte) {
+    $result = new class($handler, $atmark_error, $reserved_byte) {
         private static array  $instances         = [];
         private static string $reservedMemory    = '';
         private static bool   $regsteredShutdown = false;
@@ -56,7 +46,7 @@ function set_all_error_handler(
                     return false;
                 }
 
-                $default = ($this->handler)(new \ErrorException($errstr, 0, $errno, $errfile, $errline)) ?? true;
+                $default = ($this->handler)($this->newError($errstr, 0, $errno, $errfile, $errline)) ?? true;
                 if ($default) {
                     return ($this->error_handler)($errno, $errstr, $errfile, $errline);
                 }
@@ -86,7 +76,7 @@ function set_all_error_handler(
                                 || strpos($error['message'], 'Allowed memory size') === 0
                                 || strpos($error['message'], 'Maximum execution time') === 0
                             ) {
-                                ($instance->handler)(new \ErrorException($error['message'], 1, $error['type'], $error['file'], $error['line']));
+                                ($instance->handler)($instance->newError($error['message'], 1, $error['type'], $error['file'], $error['line']));
                             }
                         }
                     }
@@ -100,5 +90,39 @@ function set_all_error_handler(
             restore_exception_handler();
             unset(self::$instances[spl_object_id($this)]);
         }
+
+        public function newError($message, $code, $errno, $errfile, $errline, $previous = null)
+        {
+            return new class($message, $code, $errno, $errfile, $errline, $previous) extends \Error {
+                private int $severity;
+
+                public function __construct($message, $code, $errno, $errfile, $errline, $previous)
+                {
+                    parent::__construct($message, $code, $previous);
+
+                    $this->file = $errfile;
+                    $this->line = $errline;
+
+                    $this->severity = $errno;
+                }
+
+                public function getSeverity(): int
+                {
+                    return $this->severity;
+                }
+            };
+        }
     };
+
+    // 初動エラーが error_get_last() で取得できることがある
+    if (($error = error_get_last()) !== null) {
+        // 初動エラーはスクリプト無関係なので line:0 で発生される
+        if ($error['line'] === 0) {
+            $handler($result->newError($error['message'], -1, $error['type'], $error['file'], $error['line']));
+            // 以後一度もエラーがないと shutdown で引っかかってしまう
+            error_clear_last();
+        }
+    }
+
+    return $result;
 }
