@@ -3,7 +3,9 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../funchand/func_user_func_array.php';
+require_once __DIR__ . '/../utility/function_configure.php';
 require_once __DIR__ . '/../var/arrayval.php';
+require_once __DIR__ . '/../var/is_arrayable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -36,7 +38,11 @@ require_once __DIR__ . '/../var/arrayval.php';
  */
 function array_filters($array, ...$callbacks)
 {
-    $array = arrayval($array, false);
+    // Iterator だが ArrayAccess ではないオブジェクト（Generator とか）は unset できないので配列として扱わざるを得ない
+    if (!(function_configure('array.variant') && is_arrayable($array))) {
+        $array = arrayval($array, false);
+    }
+
     foreach ($callbacks as $callback) {
         if (is_string($callback) && $callback[0] === '@') {
             $margs = [];
@@ -59,7 +65,7 @@ function array_filters($array, ...$callbacks)
             $callback = func_user_func_array($callback);
         }
         $n = 0;
-        foreach ($array as $k => $v) {
+        foreach (arrayval($array, false) as $k => $v) {
             if (isset($margs)) {
                 $flag = ([$v, $callback])(...$margs);
             }

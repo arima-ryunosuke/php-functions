@@ -25,6 +25,7 @@ function function_configure($option)
     $config['placeholder'] ??= '';
     $config['var_stream'] ??= 'VarStreamV010000';
     $config['memory_stream'] ??= 'MemoryStreamV010000';
+    $config['array.variant'] ??= false;
     $config['chain.version'] ??= 2;
     $config['chain.nullsafe'] ??= false;
     $config['process.autoload'] ??= [];

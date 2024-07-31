@@ -75,6 +75,7 @@ use function ryunosuke\Functions\Package\attr_get;
 use function ryunosuke\Functions\Package\first_key;
 use function ryunosuke\Functions\Package\first_keyvalue;
 use function ryunosuke\Functions\Package\first_value;
+use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\groupsort;
 use function ryunosuke\Functions\Package\in_array_and;
 use function ryunosuke\Functions\Package\in_array_or;
@@ -1131,6 +1132,24 @@ class arrayTest extends AbstractTestCase
 
         // prefix とキーを付与して返す。ただし null は除外する
         that(array_filter_map([null, 'hoge', 'fuga', null, 'piyo'], fn(&$v, $k) => $v !== null ? $v = "prefix-$k:$v" : false))->is([1 => 'prefix-1:hoge', 2 => 'prefix-2:fuga', 4 => 'prefix-4:piyo']);
+
+        $restorer = $this->restorer(fn($v) => function_configure(['array.variant' => $v]), [true], [false]);
+
+        that(array_filter_map((fn() => yield from [1, 2, 3, 4, 5])(), function (&$v) {
+            if ($v % 2 === 0) {
+                return false;
+            }
+            $v = $v ** 2;
+        }))->is([0 => 1, 2 => 9, 4 => 25]);
+
+        that(array_filter_map(new \ArrayObject([1, 2, 3, 4, 5]), function (&$v) {
+            if ($v % 2 === 0) {
+                return false;
+            }
+            $v = $v ** 2;
+        }))->is(new \ArrayObject([0 => 1, 2 => 9, 4 => 25]));
+
+        unset($restorer);
     }
 
     function test_array_filter_recursive()
@@ -1262,6 +1281,12 @@ class arrayTest extends AbstractTestCase
         $obj2 = new \Concrete('hoge');
         that(array_filters([$obj0, $obj1, $obj2], ['getName' => ['p-']]))->isSame([1 => $obj1, 2 => $obj2]);
         that(array_filters(new \ArrayObject([$obj0, $obj1, $obj2]), ['getName' => ['p-']]))->isSame([1 => $obj1, 2 => $obj2]);
+
+        $restorer = $this->restorer(fn($v) => function_configure(['array.variant' => $v]), [true], [false]);
+
+        that(array_filters(new \ArrayObject([$obj0, $obj1, $obj2]), ['getName' => ['p-']]))->is(new \ArrayObject([1 => $obj1, 2 => $obj2]));
+
+        unset($restorer);
     }
 
     function test_array_find()
@@ -1896,6 +1921,14 @@ class arrayTest extends AbstractTestCase
 
         // strict:true は null がフィルタされる
         that(array_map_filter([1, 2, 3, 4, 5], fn($v) => $v === 3 ? null : $v - 3, true))->is([-2, -1, '3' => 1, 2]);
+
+        $restorer = $this->restorer(fn($v) => function_configure(['array.variant' => $v]), [true], [false]);
+
+        that(array_map_filter((fn() => yield from [1, 2, 3, 4, 5])(), fn($v) => $v - 3, false))->is([-2, -1, '3' => 1, 2]);
+
+        that(array_map_filter(new \ArrayObject([1, 2, 3, 4, 5]), fn($v) => $v - 3, false))->is(new \ArrayObject([-2, -1, '3' => 1, 2]));
+
+        unset($restorer);
     }
 
     function test_array_map_key()
@@ -2027,6 +2060,15 @@ class arrayTest extends AbstractTestCase
 
         $objs = new \ArrayObject([new \Concrete('a'), new \Concrete('b'), new \Concrete('c')]);
         that(array_maps($objs, ['getName' => ['p-', true]]))->is(['P-A', 'P-B', 'P-C']);
+
+        $restorer = $this->restorer(fn($v) => function_configure(['array.variant' => $v]), [true], [false]);
+
+        that(array_maps((fn() => yield from ['a', 'b', 'c'])(), 'strtoupper', fn($v, $k) => strcat("$k:$v")))->is(['0:A', '1:B', '2:C']);
+
+        $objs = new \ArrayObject([new \Concrete('a'), new \Concrete('b'), new \Concrete('c')]);
+        that(array_maps($objs, ['getName' => ['p-', true]]))->is(new \ArrayObject(['P-A', 'P-B', 'P-C']));
+
+        unset($restorer);
     }
 
     function test_array_merge2()

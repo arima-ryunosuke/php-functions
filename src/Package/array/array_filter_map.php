@@ -3,6 +3,9 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../funchand/func_user_func_array.php';
+require_once __DIR__ . '/../utility/function_configure.php';
+require_once __DIR__ . '/../var/arrayval.php';
+require_once __DIR__ . '/../var/is_arrayable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -22,17 +25,25 @@ require_once __DIR__ . '/../funchand/func_user_func_array.php';
  *
  * @param iterable $array 対象配列
  * @param callable $callback 評価クロージャ
- * @return array $callback が !false を返し map された配列
+ * @return iterable $callback が !false を返し map された配列
  */
 function array_filter_map($array, $callback)
 {
+    // Iterator だが ArrayAccess ではないオブジェクト（Generator とか）は unset できないので配列として扱わざるを得ない
+    if (!(function_configure('array.variant') && is_arrayable($array))) {
+        $array = arrayval($array, false);
+    }
+
     $callback = func_user_func_array($callback);
-    $result = [];
     $n = 0;
-    foreach ($array as $k => &$v) {
-        if ($callback($v, $k, $n++) !== false) {
-            $result[$k] = $v;
+    foreach (arrayval($array, false) as $k => $v) {
+        $map = $callback($v, $k, $n++);
+        if ($map === false) {
+            unset($array[$k]);
+        }
+        else {
+            $array[$k] = $v;
         }
     }
-    return $result;
+    return $array;
 }

@@ -3,7 +3,9 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../funchand/func_user_func_array.php';
+require_once __DIR__ . '/../utility/function_configure.php';
 require_once __DIR__ . '/../var/arrayval.php';
+require_once __DIR__ . '/../var/is_arrayable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -35,11 +37,15 @@ require_once __DIR__ . '/../var/arrayval.php';
  *
  * @param iterable $array 対象配列
  * @param callable ...$callbacks 評価クロージャ配列
- * @return array 評価クロージャを通した新しい配列
+ * @return iterable 評価クロージャを通した新しい配列
  */
 function array_maps($array, ...$callbacks)
 {
-    $result = arrayval($array, false);
+    // Iterator だが ArrayAccess ではないオブジェクト（Generator とか）は unset できないので配列として扱わざるを得ない
+    if (!(function_configure('array.variant') && is_arrayable($array))) {
+        $array = arrayval($array, false);
+    }
+
     foreach ($callbacks as $callback) {
         if (is_string($callback) && $callback[0] === '@') {
             $margs = [];
@@ -62,17 +68,17 @@ function array_maps($array, ...$callbacks)
             $callback = func_user_func_array($callback);
         }
         $n = 0;
-        foreach ($result as $k => $v) {
+        foreach (arrayval($array, false) as $k => $v) {
             if (isset($margs)) {
-                $result[$k] = ([$v, $callback])(...$margs);
+                $array[$k] = ([$v, $callback])(...$margs);
             }
             elseif ($vargs) {
-                $result[$k] = $callback(...$v);
+                $array[$k] = $callback(...$v);
             }
             else {
-                $result[$k] = $callback($v, $k, $n++);
+                $array[$k] = $callback($v, $k, $n++);
             }
         }
     }
-    return $result;
+    return $array;
 }
