@@ -1699,19 +1699,27 @@ if (!function_exists('ryunosuke\\Functions\\array_filter_map')) {
      *
      * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
-     * @return array $callback が !false を返し map された配列
+     * @return iterable $callback が !false を返し map された配列
      */
     function array_filter_map($array, $callback)
     {
+        // Iterator だが ArrayAccess ではないオブジェクト（Generator とか）は unset できないので配列として扱わざるを得ない
+        if (!(function_configure('array.variant') && is_arrayable($array))) {
+            $array = arrayval($array, false);
+        }
+
         $callback = func_user_func_array($callback);
-        $result = [];
         $n = 0;
-        foreach ($array as $k => &$v) {
-            if ($callback($v, $k, $n++) !== false) {
-                $result[$k] = $v;
+        foreach (arrayval($array, false) as $k => $v) {
+            $map = $callback($v, $k, $n++);
+            if ($map === false) {
+                unset($array[$k]);
+            }
+            else {
+                $array[$k] = $v;
             }
         }
-        return $result;
+        return $array;
     }
 }
 
@@ -1847,7 +1855,11 @@ if (!function_exists('ryunosuke\\Functions\\array_filters')) {
      */
     function array_filters($array, ...$callbacks)
     {
-        $array = arrayval($array, false);
+        // Iterator だが ArrayAccess ではないオブジェクト（Generator とか）は unset できないので配列として扱わざるを得ない
+        if (!(function_configure('array.variant') && is_arrayable($array))) {
+            $array = arrayval($array, false);
+        }
+
         foreach ($callbacks as $callback) {
             if (is_string($callback) && $callback[0] === '@') {
                 $margs = [];
@@ -1870,7 +1882,7 @@ if (!function_exists('ryunosuke\\Functions\\array_filters')) {
                 $callback = func_user_func_array($callback);
             }
             $n = 0;
-            foreach ($array as $k => $v) {
+            foreach (arrayval($array, false) as $k => $v) {
                 if (isset($margs)) {
                     $flag = ([$v, $callback])(...$margs);
                 }
@@ -2842,20 +2854,27 @@ if (!function_exists('ryunosuke\\Functions\\array_map_filter')) {
      * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param bool $strict 厳密比較フラグ。 true だと null のみが偽とみなされる
-     * @return array $callback が真を返した新しい配列
+     * @return iterable $callback が真を返した新しい配列
      */
     function array_map_filter($array, $callback, $strict = false)
     {
+        // Iterator だが ArrayAccess ではないオブジェクト（Generator とか）は unset できないので配列として扱わざるを得ない
+        if (!(function_configure('array.variant') && is_arrayable($array))) {
+            $array = arrayval($array, false);
+        }
+
         $callback = func_user_func_array($callback);
-        $result = [];
         $n = 0;
-        foreach ($array as $k => $v) {
+        foreach (arrayval($array, false) as $k => $v) {
             $vv = $callback($v, $k, $n++);
             if (($strict && $vv !== null) || (!$strict && $vv)) {
-                $result[$k] = $vv;
+                $array[$k] = $vv;
+            }
+            else {
+                unset($array[$k]);
             }
         }
-        return $result;
+        return $array;
     }
 }
 
@@ -3017,11 +3036,15 @@ if (!function_exists('ryunosuke\\Functions\\array_maps')) {
      *
      * @param iterable $array 対象配列
      * @param callable ...$callbacks 評価クロージャ配列
-     * @return array 評価クロージャを通した新しい配列
+     * @return iterable 評価クロージャを通した新しい配列
      */
     function array_maps($array, ...$callbacks)
     {
-        $result = arrayval($array, false);
+        // Iterator だが ArrayAccess ではないオブジェクト（Generator とか）は unset できないので配列として扱わざるを得ない
+        if (!(function_configure('array.variant') && is_arrayable($array))) {
+            $array = arrayval($array, false);
+        }
+
         foreach ($callbacks as $callback) {
             if (is_string($callback) && $callback[0] === '@') {
                 $margs = [];
@@ -3044,19 +3067,19 @@ if (!function_exists('ryunosuke\\Functions\\array_maps')) {
                 $callback = func_user_func_array($callback);
             }
             $n = 0;
-            foreach ($result as $k => $v) {
+            foreach (arrayval($array, false) as $k => $v) {
                 if (isset($margs)) {
-                    $result[$k] = ([$v, $callback])(...$margs);
+                    $array[$k] = ([$v, $callback])(...$margs);
                 }
                 elseif ($vargs) {
-                    $result[$k] = $callback(...$v);
+                    $array[$k] = $callback(...$v);
                 }
                 else {
-                    $result[$k] = $callback($v, $k, $n++);
+                    $array[$k] = $callback($v, $k, $n++);
                 }
             }
         }
-        return $result;
+        return $array;
     }
 }
 
@@ -12158,7 +12181,7 @@ if (!function_exists('ryunosuke\\Functions\\set_all_error_handler')) {
      * 実質的には set_error_handler+set_exception_handler+register_shutdown_function してるだけ。
      * あと小細工して初動エラーも拾うがあまり気にしなくてよい。
      *
-     * ハンドラの引数は Throwable 固定（エラーの場合は ErrorException に変換されてコールされる）。
+     * ハンドラの引数は Throwable 固定（エラーの場合は Error に変換されてコールされる）。
      * ハンドラが true/null を返すと設定前（ない場合は標準）のハンドラがコールされる。
      * 実用上は「ログるかログらないか」くらいの差でしかない。
      *
@@ -12171,17 +12194,7 @@ if (!function_exists('ryunosuke\\Functions\\set_all_error_handler')) {
         /** fatal 用に予約するサイズ */ int $reserved_byte = 0,
     ): /** キャンセルする callable */ callable
     {
-        // 初動エラーが error_get_last() で取得できることがある
-        if (($error = error_get_last()) !== null) {
-            // 初動エラーはスクリプト無関係なので line:0 で発生される
-            if ($error['line'] === 0) {
-                $handler(new \ErrorException($error['message'], -1, $error['type'], $error['file'], $error['line']));
-                // 以後一度もエラーがないと shutdown で引っかかってしまう
-                error_clear_last();
-            }
-        }
-
-        return new class($handler, $atmark_error, $reserved_byte) {
+        $result = new class($handler, $atmark_error, $reserved_byte) {
             private static array  $instances         = [];
             private static string $reservedMemory    = '';
             private static bool   $regsteredShutdown = false;
@@ -12204,7 +12217,7 @@ if (!function_exists('ryunosuke\\Functions\\set_all_error_handler')) {
                         return false;
                     }
 
-                    $default = ($this->handler)(new \ErrorException($errstr, 0, $errno, $errfile, $errline)) ?? true;
+                    $default = ($this->handler)($this->newError($errstr, 0, $errno, $errfile, $errline)) ?? true;
                     if ($default) {
                         return ($this->error_handler)($errno, $errstr, $errfile, $errline);
                     }
@@ -12234,7 +12247,7 @@ if (!function_exists('ryunosuke\\Functions\\set_all_error_handler')) {
                                     || strpos($error['message'], 'Allowed memory size') === 0
                                     || strpos($error['message'], 'Maximum execution time') === 0
                                 ) {
-                                    ($instance->handler)(new \ErrorException($error['message'], 1, $error['type'], $error['file'], $error['line']));
+                                    ($instance->handler)($instance->newError($error['message'], 1, $error['type'], $error['file'], $error['line']));
                                 }
                             }
                         }
@@ -12248,7 +12261,41 @@ if (!function_exists('ryunosuke\\Functions\\set_all_error_handler')) {
                 restore_exception_handler();
                 unset(self::$instances[spl_object_id($this)]);
             }
+
+            public function newError($message, $code, $errno, $errfile, $errline, $previous = null)
+            {
+                return new class($message, $code, $errno, $errfile, $errline, $previous) extends \Error {
+                    private int $severity;
+
+                    public function __construct($message, $code, $errno, $errfile, $errline, $previous)
+                    {
+                        parent::__construct($message, $code, $previous);
+
+                        $this->file = $errfile;
+                        $this->line = $errline;
+
+                        $this->severity = $errno;
+                    }
+
+                    public function getSeverity(): int
+                    {
+                        return $this->severity;
+                    }
+                };
+            }
         };
+
+        // 初動エラーが error_get_last() で取得できることがある
+        if (($error = error_get_last()) !== null) {
+            // 初動エラーはスクリプト無関係なので line:0 で発生される
+            if ($error['line'] === 0) {
+                $handler($result->newError($error['message'], -1, $error['type'], $error['file'], $error['line']));
+                // 以後一度もエラーがないと shutdown で引っかかってしまう
+                error_clear_last();
+            }
+        }
+
+        return $result;
     }
 }
 
@@ -20654,6 +20701,7 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
             'cachedir' => function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__),
             'ttl'      => 60 * 60 * 24 + 120, // 120 は1日1回バッチで叩くことを前提としたバッファ
             'rir'      => [],
+            'throw'    => true, // テスト用で原則 true（例外が飛ばないと情報が膨大過ぎるので失敗しても気付けない）
         ];
         $options['rir'] += [
             'afrinic' => 'https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-latest',
@@ -20697,9 +20745,12 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
 
         http_requests($urls, [
             'cachedir' => $options['cachedir'],
-            'callback' => function ($rir, $body) use ($files) {
+            'callback' => function ($rir, $body, $header, $info) use ($files, $options) {
+                if ($options['throw'] && ($body === null || $info['http_code'] >= 400)) {
+                    throw new \UnexpectedValueException("request {$info['url']} failed. caused by {$info['http_code']}(error {$info['errno']})");
+                }
                 $tmpfile = tmpfile();
-                fwrite($tmpfile, $body);
+                fwrite($tmpfile, $body ?? '');
                 rewind($tmpfile);
 
                 $cidrs = [];
@@ -20724,10 +20775,23 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
             },
         ]);
 
+        // サイズがでかいので static 等にはしない（opcache に完全に任せる）
         $all = [];
         foreach ($files as $file) {
-            // サイズがでかいので static 等にはしない（opcache に完全に任せる）
-            $rir = is_array($file) ? $file : include $file;
+            if (is_array($file)) {
+                $rir = $file;
+            }
+            elseif (file_exists($file)) {
+                $rir = include $file;
+            }
+            else {
+                // @codeCoverageIgnoreStart http が失敗したときなので基本的に到達しない（http が失敗したときは既に例外投げられている）
+                $rir = [];
+                if ($options['throw']) {
+                    throw new \UnexpectedValueException("failed to load $file");
+                }
+                // @codeCoverageIgnoreEnd
+            }
 
             if ($ipaddr === null) {
                 $all += $rir;
@@ -25275,13 +25339,15 @@ if (!function_exists('ryunosuke\\Functions\\str_anyof')) {
      *
      * @package ryunosuke\Functions\Package\strings
      *
-     * @param string $needle 調べる文字列
+     * @param ?string $needle 調べる文字列
      * @param iterable $haystack 候補配列
      * @param bool $case_insensitivity 大文字小文字を無視するか
      * @return bool 候補の中にあるならそのキー。無いなら null
      */
     function str_anyof(?string $needle, $haystack, $case_insensitivity = false)
     {
+        $needle ??= '';
+
         foreach ($haystack as $k => $v) {
             if (!$case_insensitivity && strcmp($needle, $v) === 0) {
                 return $k;
@@ -29623,6 +29689,7 @@ if (!function_exists('ryunosuke\\Functions\\function_configure')) {
         $config['placeholder'] ??= '';
         $config['var_stream'] ??= 'VarStreamV010000';
         $config['memory_stream'] ??= 'MemoryStreamV010000';
+        $config['array.variant'] ??= false;
         $config['chain.version'] ??= 2;
         $config['chain.nullsafe'] ??= false;
         $config['process.autoload'] ??= [];
@@ -30847,6 +30914,8 @@ if (!function_exists('ryunosuke\\Functions\\is_typeof')) {
      */
     function is_typeof($var, string $typestring, $context = null)
     {
+        $context ??= '';
+
         $match = function ($type) use ($var, $context) {
             $type = trim($type);
             // ?type は 7.4 を最後に姿を消したが $typestring はただの文字列なので与えられる可能性がなくはない
@@ -31597,9 +31666,17 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
                     }
                     elseif ($next->text === '(') {
                         $text = namespace_resolve($text, $ref->getFileName(), 'function') ?? $text;
+                        // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
+                        if (!function_exists($text) && function_exists($nstext = '\\' . $ref->getNamespaceName() . '\\' . $text)) {
+                            $text = $nstext;
+                        }
                     }
                     else {
                         $text = namespace_resolve($text, $ref->getFileName(), 'const') ?? $text;
+                        // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
+                        if (!const_exists($text) && const_exists($nstext = '\\' . $ref->getNamespaceName() . '\\' . $text)) {
+                            $text = $nstext;
+                        }
                     }
                 }
 
@@ -31896,11 +31973,16 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
             if (is_resourcable($value)) {
                 // スタンダードなリソースなら復元できないこともない
                 $meta = stream_get_meta_data($value);
-                if (!in_array(strtolower($meta['stream_type']), ['stdio', 'output'], true)) {
+                $stream_type = strtolower($meta['stream_type']);
+                if (!in_array($stream_type, ['stdio', 'output', 'temp', 'memory'], true)) {
                     throw new \DomainException('resource is supported stream resource only.');
                 }
                 $meta['position'] = @ftell($value);
                 $meta['context'] = stream_context_get_options($value);
+                $meta['buffer'] = null;
+                if (in_array($stream_type, ['temp', 'memory'], true)) {
+                    $meta['buffer'] = stream_get_contents($value, null, 0);
+                }
                 return "\$this->$vid = \$this->open({$export($meta, $nest + 1)})";
             }
 
@@ -31970,6 +32052,9 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
                     $resource = fopen($metadata['uri'], $metadata['mode'], false, stream_context_create($metadata['context']));
                     if ($resource === false) {
                         return null;
+                    }
+                    if ($metadata['seekable'] && is_string($metadata['buffer'])) {
+                        fwrite($resource, $metadata['buffer']);
                     }
                     if ($metadata['seekable'] && is_int($metadata['position'])) {
                         fseek($resource, $metadata['position']);
