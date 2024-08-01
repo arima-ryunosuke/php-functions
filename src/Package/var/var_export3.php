@@ -451,11 +451,16 @@ function var_export3($value, $return = false)
         if (is_resourcable($value)) {
             // スタンダードなリソースなら復元できないこともない
             $meta = stream_get_meta_data($value);
-            if (!in_array(strtolower($meta['stream_type']), ['stdio', 'output'], true)) {
+            $stream_type = strtolower($meta['stream_type']);
+            if (!in_array($stream_type, ['stdio', 'output', 'temp', 'memory'], true)) {
                 throw new \DomainException('resource is supported stream resource only.');
             }
             $meta['position'] = @ftell($value);
             $meta['context'] = stream_context_get_options($value);
+            $meta['buffer'] = null;
+            if (in_array($stream_type, ['temp', 'memory'], true)) {
+                $meta['buffer'] = stream_get_contents($value, null, 0);
+            }
             return "\$this->$vid = \$this->open({$export($meta, $nest + 1)})";
         }
 
@@ -525,6 +530,9 @@ function var_export3($value, $return = false)
                 $resource = fopen($metadata['uri'], $metadata['mode'], false, stream_context_create($metadata['context']));
                 if ($resource === false) {
                     return null;
+                }
+                if ($metadata['seekable'] && is_string($metadata['buffer'])) {
+                    fwrite($resource, $metadata['buffer']);
                 }
                 if ($metadata['seekable'] && is_int($metadata['position'])) {
                     fseek($resource, $metadata['position']);

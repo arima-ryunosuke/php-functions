@@ -1376,8 +1376,18 @@ class varTest extends AbstractTestCase
         $file = fopen($tmp, 'r+', false, stream_context_create(['file' => ['hoge' => 'HOGE']]));
         fwrite($file, 'Hello');
 
+        $memory = fopen('php://memory', 'rw');
+        fwrite($memory, 'Hello');
+        fseek($memory, 2);
+
+        $temp = fopen('php://temp/maxmemory:1024', 'rw');
+        fwrite($temp, 'Hello');
+        fseek($temp, 2);
+
         $values = [
             'file'   => $file,
+            'memory' => $memory,
+            'temp'   => $temp,
             'stdout' => STDOUT,
             'output' => fopen('php://output', 'w'),
         ];
@@ -1385,6 +1395,8 @@ class varTest extends AbstractTestCase
         $values2 = eval($exported);
 
         that($values2['file'])->isResource();
+        that($values2['memory'])->isResource();
+        that($values2['temp'])->isResource();
         that($values2['stdout'])->isResource();
         that($values2['output'])->isResource();
 
@@ -1394,6 +1406,12 @@ class varTest extends AbstractTestCase
         that(ftell($values2['file']))->is(5);
         fwrite($values2['file'], 'World');
         that(file_get_contents($tmp))->is('HelloWorld');
+
+        fwrite($values2['memory'], 'World');
+        that(stream_get_contents($values2['memory'], null, 0))->is('HeWorld');
+
+        fwrite($values2['temp'], 'World');
+        that(stream_get_contents($values2['temp'], null, 0))->is('HeWorld');
 
         $this->expectOutputString('this is output string');
         fwrite($values2['output'], 'this is output string');
