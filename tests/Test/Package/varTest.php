@@ -1160,6 +1160,12 @@ class varTest extends AbstractTestCase
 
     function test_var_export3_closure()
     {
+        function dummy_function($id)
+        {
+            return $id + 1;
+        }
+
+        define(__NAMESPACE__ . '\\DUMMY_CONST', 1);
         $object = new \DateTime('2014/12/24 12:34:56');
         $closures = [
             'object'    => $object,
@@ -1167,6 +1173,7 @@ class varTest extends AbstractTestCase
             'declare'   => static function (?Ex $e = null, $c = SR): Ex { return $e; },
             'alias'     => static function () { return [SR, Ex::class, gt(123)]; },
             'use'       => static function () use ($object) { return $object; },
+            'resolve'   => static function () { return dummy_function(DUMMY_CONST); },
             'const'     => static function () { return [__NAMESPACE__, __DIR__, __FILE__]; },
             'arrow'     => static fn($format): string => $object->format($format),
             'bind'      => \Closure::bind(function () { return $this; }, $object),
@@ -1181,6 +1188,7 @@ class varTest extends AbstractTestCase
         that($closures['declare'](new \Exception('yyy')))->is(new \Exception('yyy'));
         that($closures['alias']())->is([SR, Ex::class, 'integer']);
         that($closures['use']())->is($object);
+        that($closures['resolve']())->is(2);
         that($closures['const']())->is([__NAMESPACE__, __DIR__, __FILE__]);
         that($closures['arrow']('Y-m-dTH:i:s'))->is('2014-12-24T12:34:56');
         that($closures['bind']())->is($object);

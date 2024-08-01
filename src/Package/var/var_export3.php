@@ -4,6 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_all.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
+require_once __DIR__ . '/../classobj/const_exists.php';
 require_once __DIR__ . '/../classobj/object_properties.php';
 require_once __DIR__ . '/../funchand/is_bindable_closure.php';
 require_once __DIR__ . '/../misc/namespace_resolve.php';
@@ -152,9 +153,17 @@ function var_export3($value, $return = false)
                 }
                 elseif ($next->text === '(') {
                     $text = namespace_resolve($text, $ref->getFileName(), 'function') ?? $text;
+                    // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
+                    if (!function_exists($text) && function_exists($nstext = '\\' . $ref->getNamespaceName() . '\\' . $text)) {
+                        $text = $nstext;
+                    }
                 }
                 else {
                     $text = namespace_resolve($text, $ref->getFileName(), 'const') ?? $text;
+                    // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
+                    if (!const_exists($text) && const_exists($nstext = '\\' . $ref->getNamespaceName() . '\\' . $text)) {
+                        $text = $nstext;
+                    }
                 }
             }
 
