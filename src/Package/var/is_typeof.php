@@ -37,6 +37,8 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  */
 function is_typeof($var, string $typestring, $context = null)
 {
+    $context ??= '';
+
     $match = function ($type) use ($var, $context) {
         $type = trim($type);
         // ?type は 7.4 を最後に姿を消したが $typestring はただの文字列なので与えられる可能性がなくはない

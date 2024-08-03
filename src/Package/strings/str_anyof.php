@@ -25,13 +25,15 @@ namespace ryunosuke\Functions\Package;
  *
  * @package ryunosuke\Functions\Package\strings
  *
- * @param string $needle 調べる文字列
+ * @param ?string $needle 調べる文字列
  * @param iterable $haystack 候補配列
  * @param bool $case_insensitivity 大文字小文字を無視するか
  * @return bool 候補の中にあるならそのキー。無いなら null
  */
 function str_anyof(?string $needle, $haystack, $case_insensitivity = false)
 {
+    $needle ??= '';
+
     foreach ($haystack as $k => $v) {
         if (!$case_insensitivity && strcmp($needle, $v) === 0) {
             return $k;

@@ -512,10 +512,8 @@ class varTest extends AbstractTestCase
         }))->isFalse();
         that(is_exportable(function () { }))->isFalse();
         that(is_exportable((function () { yield 1; })()))->isFalse();
-        if (version_compare(PHP_VERSION, 8.1) < 0) {
-            that(is_exportable(IntEnum::Case1()))->isTrue();
-            that(is_exportable(StringEnum::CaseHoge()))->isTrue();
-        }
+        that(is_exportable(IntEnum::Case1()))->isTrue();
+        that(is_exportable(StringEnum::CaseHoge()))->isTrue();
     }
 
     function test_is_primitive()
@@ -1274,17 +1272,15 @@ class varTest extends AbstractTestCase
 
     function test_var_export3_enum()
     {
-        if (version_compare(PHP_VERSION, 8.1) < 0) {
-            $values = [
-                'int-enum'    => IntEnum::Case1(),
-                'string-enum' => StringEnum::CaseHoge(),
-            ];
-            $exported = var_export3($values, ['outmode' => 'eval']);
-            $values2 = eval($exported);
+        $values = [
+            'int-enum'    => IntEnum::Case1(),
+            'string-enum' => StringEnum::CaseHoge(),
+        ];
+        $exported = var_export3($values, ['outmode' => 'eval']);
+        $values2 = eval($exported);
 
-            that($values2['int-enum'])->isSame(IntEnum::Case1());
-            that($values2['string-enum'])->isSame(StringEnum::CaseHoge());
-        }
+        that($values2['int-enum'])->isSame(IntEnum::Case1());
+        that($values2['string-enum'])->isSame(StringEnum::CaseHoge());
     }
 
     function test_var_export3_reference()
