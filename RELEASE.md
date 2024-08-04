@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.13
+
+- [feature] php8.2 の対応漏れを修正
+- [fixbug] var_export3 でクロージャ内の関数が解決されない不具合
+- [feature] var_export3 の memory/temp 対応
+- [feature] iterable の map/filter 系で型を維持する機能
+- [change] set_all_error_handler でエラーの場合は Error を投げるように変更
+- [fixbug] ip_info でリクエストの失敗が考慮されていない不具合
+
 ## 2.0.12
 
 - [fixbug] cacheobject の型エラー不具合
