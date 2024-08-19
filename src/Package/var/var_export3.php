@@ -148,21 +148,31 @@ function var_export3($value, $return = false)
         $resolveSymbol = function ($token, $prev, $next, $ref) use ($var_export) {
             $text = $token->text;
             if ($token->id === T_STRING) {
+                $namespaces = [$ref->getNamespaceName()];
+                if ($ref instanceof \ReflectionFunctionAbstract) {
+                    $namespaces[] = $ref->getClosureScopeClass()?->getNamespaceName();
+                }
                 if ($prev->id === T_NEW || $next->id === T_DOUBLE_COLON || $next->id === T_VARIABLE || $next->text === '{') {
                     $text = namespace_resolve($text, $ref->getFileName(), 'alias') ?? $text;
                 }
                 elseif ($next->text === '(') {
                     $text = namespace_resolve($text, $ref->getFileName(), 'function') ?? $text;
                     // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
-                    if (!function_exists($text) && function_exists($nstext = '\\' . $ref->getNamespaceName() . '\\' . $text)) {
-                        $text = $nstext;
+                    foreach ($namespaces as $namespace) {
+                        if (!function_exists($text) && function_exists($nstext = "\\$namespace\\$text")) {
+                            $text = $nstext;
+                            break;
+                        }
                     }
                 }
                 else {
                     $text = namespace_resolve($text, $ref->getFileName(), 'const') ?? $text;
                     // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
-                    if (!const_exists($text) && const_exists($nstext = '\\' . $ref->getNamespaceName() . '\\' . $text)) {
-                        $text = $nstext;
+                    foreach ($namespaces as $namespace) {
+                        if (!const_exists($text) && const_exists($nstext = "\\$namespace\\$text")) {
+                            $text = $nstext;
+                            break;
+                        }
                     }
                 }
             }
@@ -244,12 +254,12 @@ function var_export3($value, $return = false)
         if ($value instanceof \Closure) {
             $ref = new \ReflectionFunction($value);
             $bind = $ref->getClosureThis();
-            $class = $ref->getClosureScopeClass() ? $ref->getClosureScopeClass()->getName() : null;
+            $class = $ref->getClosureScopeClass();
             $statics = $ref->getStaticVariables();
 
             // 内部由来はきちんと fromCallable しないと差異が出てしまう
             if ($ref->isInternal()) {
-                $receiver = $bind ?? $class;
+                $receiver = $bind ?? $class?->getName();
                 $callee = $receiver ? [$receiver, $ref->getName()] : $ref->getName();
                 return "\$this->$vid = \\Closure::fromCallable({$export($callee, $nest)})";
             }
@@ -308,8 +318,14 @@ function var_export3($value, $return = false)
                 'baseline' => -1,
             ]);
             if ($bind) {
-                $scope = $var_export($class === 'Closure' ? 'static' : $class);
-                $code = "\Closure::bind($code, {$export($bind, $nest + 1)}, $scope)";
+                $instance = $export($bind, $nest + 1);
+                if ($class->isAnonymous()) {
+                    $scope = "get_class({$export($bind, $nest + 1)})";
+                }
+                else {
+                    $scope = $var_export($class?->getName() === 'Closure' ? 'static' : $class?->getName());
+                }
+                $code = "\Closure::bind($code, $instance, $scope)";
             }
             elseif (!is_bindable_closure($value)) {
                 $code = "static $code";

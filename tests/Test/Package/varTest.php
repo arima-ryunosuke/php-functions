@@ -7,6 +7,7 @@ use ArrayObject;
 use Concrete;
 use Exception as Ex;
 use Invoker;
+use ryunosuke\Functions\Package\Caller;
 use ryunosuke\Test\Package\files\enums\IntEnum;
 use ryunosuke\Test\Package\files\enums\StringEnum;
 use SerialMethod;
@@ -43,6 +44,7 @@ use function ryunosuke\Functions\Package\var_hash;
 use function ryunosuke\Functions\Package\var_pretty;
 use function ryunosuke\Functions\Package\var_type;
 use function ryunosuke\Functions\Package\varcmp;
+use const ryunosuke\Functions\Package\IS_OWNSELF;
 use const ryunosuke\Functions\Package\SI_UNITS;
 use const ryunosuke\Functions\Package\SORT_STRICT;
 use const SORT_REGULAR as SR;
@@ -1069,6 +1071,8 @@ class varTest extends AbstractTestCase
                     return $this->object->method();
                 }
             },
+            'closure1'  => \Closure::fromCallable([$anonymous, 'method']),
+            'closure2'  => (new \ReflectionMethod($anonymous, 'method'))->getClosure($anonymous),
             'resolve'   => new class ( ) extends ArrayObject { },
             'internal'  => (function () {
                 $object = new class () {
@@ -1097,6 +1101,8 @@ class varTest extends AbstractTestCase
         $exported = var_export3($objects, ['outmode' => 'eval']);
         $objects2 = eval($exported);
         that($objects2['anonymous']())->is([1, 2, 3]);
+        that($objects2['closure1']())->is([1, 2, 3]);
+        that($objects2['closure2']())->is([1, 2, 3]);
         that($objects2['resolve'])->isInstanceOf(ArrayObject::class);
         that($objects2['internal'])->getPDO()->getAttribute(\PDO::ATTR_DRIVER_NAME)->is('sqlite');
         that($objects2['internal'])->pdo1->getAttribute(\PDO::ATTR_DRIVER_NAME)->is('sqlite');
@@ -1158,6 +1164,8 @@ class varTest extends AbstractTestCase
 
     function test_var_export3_closure()
     {
+        require __DIR__ . '/files/classes/namespace.php';
+
         function dummy_function($id)
         {
             return $id + 1;
@@ -1175,6 +1183,7 @@ class varTest extends AbstractTestCase
             'const'     => static function () { return [__NAMESPACE__, __DIR__, __FILE__]; },
             'arrow'     => static fn($format): string => $object->format($format),
             'bind'      => \Closure::bind(function () { return $this; }, $object),
+            'method'    => \Closure::fromCallable([new class ( ) extends Caller { }, 'arrayize']),
             'internal1' => \Closure::fromCallable('strlen'),
             'internal2' => \Closure::fromCallable('Closure::fromCallable'),
             'internal3' => (new \ReflectionClass($object))->getMethod('format')->getClosure($object),
@@ -1190,6 +1199,7 @@ class varTest extends AbstractTestCase
         that($closures['const']())->is([__NAMESPACE__, __DIR__, __FILE__]);
         that($closures['arrow']('Y-m-dTH:i:s'))->is('2014-12-24T12:34:56');
         that($closures['bind']())->is($object);
+        that($closures['method'](1, 2, 3))->is([IS_OWNSELF, 1, 2, 3]);
         that($closures['internal1']('hoge'))->is(4);
         that($closures['internal2']('strlen')('fuga'))->is(4);
         that($closures['internal3']('Ymd'))->is('20141224');
