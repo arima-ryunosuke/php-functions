@@ -303,6 +303,11 @@ trait ChainObject2
     public function mb_ereg(string $pattern, string $string, &$matches = null): self { }
     public function mb_ereg(string $string, &$matches = null): self { }
 
+    /** @see ReflectionClassConstant_isEnumCase() */
+    public self $reflectionclassconstant_isenumcase;
+    public function reflectionclassconstant_isenumcase(\ReflectionClassConstant $that): self { }
+    public function reflectionclassconstant_isenumcase(): self { }
+
     /** @see array_any() */
     public self $array_any;
     public function array_any(iterable $array, callable $callback = null, $default = false): self { }

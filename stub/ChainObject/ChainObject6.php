@@ -28,16 +28,6 @@ trait ChainObject6
     public function date_modify(\DateTime $object, string $modifier): self { }
     public function date_modify(string $modifier): self { }
 
-    /** @see preg_replace() */
-    public self $preg_replace;
-    public function preg_replace(array|string $pattern, array|string $replacement, array|string $subject, int $limit = -1, &$count = null): self { }
-    public function preg_replace(array|string $replacement, array|string $subject, int $limit = -1, &$count = null): self { }
-
-    /** @see preg_replace_callback_array() */
-    public self $preg_replace_callback_array;
-    public function preg_replace_callback_array(array $pattern, array|string $subject, int $limit = -1, &$count = null, int $flags = 0): self { }
-    public function preg_replace_callback_array(array|string $subject, int $limit = -1, &$count = null, int $flags = 0): self { }
-
     /** @see hash_hmac() */
     public self $hash_hmac;
     public function hash_hmac(string $algo, string $data, string $key, bool $binary = false): self { }
@@ -47,6 +37,16 @@ trait ChainObject6
     public self $hash_copy;
     public function hash_copy(\HashContext $context): self { }
     public function hash_copy(): self { }
+
+    /** @see preg_replace() */
+    public self $preg_replace;
+    public function preg_replace(array|string $pattern, array|string $replacement, array|string $subject, int $limit = -1, &$count = null): self { }
+    public function preg_replace(array|string $replacement, array|string $subject, int $limit = -1, &$count = null): self { }
+
+    /** @see preg_replace_callback_array() */
+    public self $preg_replace_callback_array;
+    public function preg_replace_callback_array(array $pattern, array|string $subject, int $limit = -1, &$count = null, int $flags = 0): self { }
+    public function preg_replace_callback_array(array|string $subject, int $limit = -1, &$count = null, int $flags = 0): self { }
 
     /** @see count() */
     public self $count;
@@ -373,6 +373,11 @@ trait ChainObject6
     public function cli_set_process_title(string $title): self { }
     public function cli_set_process_title(): self { }
 
+    /** @see enum_exists() */
+    public self $enum_exists;
+    public function enum_exists(string $enum, bool $autoload = true): self { }
+    public function enum_exists(bool $autoload = true): self { }
+
     /** @see array_cross() */
     public self $array_cross;
     public function array_cross(iterable ...$arrays): self { }
@@ -548,6 +553,11 @@ trait ChainObject6
     public function ip_info($ipaddr, $options = []): self { }
     public function ip_info($options = []): self { }
 
+    /** @see ip_normalize() */
+    public self $ip_normalize;
+    public function ip_normalize(string $ipaddr): self { }
+    public function ip_normalize(): self { }
+
     /** @see preg_matches() */
     public self $preg_matches;
     public function preg_matches($pattern, $subject, $flags = 0, $offset = 0): self { }
@@ -585,13 +595,13 @@ trait ChainObject6
 
     /** @see str_array() */
     public self $str_array;
-    public function str_array($string, ?string $delimiter, $hashmode): self { }
-    public function str_array(?string $delimiter, $hashmode): self { }
+    public function str_array($string, ?string $delimiter, $hashmode, $strict = true): self { }
+    public function str_array(?string $delimiter, $hashmode, $strict = true): self { }
 
     /** @see str_array() */
     public self $array;
-    public function array($string, ?string $delimiter, $hashmode): self { }
-    public function array(?string $delimiter, $hashmode): self { }
+    public function array($string, ?string $delimiter, $hashmode, $strict = true): self { }
+    public function array(?string $delimiter, $hashmode, $strict = true): self { }
 
     /** @see str_between() */
     public self $str_between;

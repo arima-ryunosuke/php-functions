@@ -28,11 +28,6 @@ trait ChainObject5
     public function date_interval_create_from_date_string(string $datetime): self { }
     public function date_interval_create_from_date_string(): self { }
 
-    /** @see preg_match() */
-    public self $preg_match;
-    public function preg_match(string $pattern, string $subject, &$matches = null, int $flags = 0, int $offset = 0): self { }
-    public function preg_match(string $subject, &$matches = null, int $flags = 0, int $offset = 0): self { }
-
     /** @see hash_final() */
     public self $hash_final;
     public function hash_final(\HashContext $context, bool $binary = false): self { }
@@ -52,6 +47,11 @@ trait ChainObject5
     public self $mhash_keygen_s2k;
     public function mhash_keygen_s2k(int $algo, string $password, string $salt, int $length): self { }
     public function mhash_keygen_s2k(string $password, string $salt, int $length): self { }
+
+    /** @see preg_match() */
+    public self $preg_match;
+    public function preg_match(string $pattern, string $subject, &$matches = null, int $flags = 0, int $offset = 0): self { }
+    public function preg_match(string $subject, &$matches = null, int $flags = 0, int $offset = 0): self { }
 
     /** @see range() */
     public self $range;
@@ -489,6 +489,11 @@ TEXT): self { }
     public function ini_sets($values): self { }
     public function ini_sets(): self { }
 
+    /** @see system_status() */
+    public self $system_status;
+    public function system_status(string $siunit = "", string $datetime_format = \DateTime::RFC3339): self { }
+    public function system_status(string $datetime_format = \DateTime::RFC3339): self { }
+
     /** @see average() */
     public self $average;
     public function average(...$variadic): self { }
@@ -608,6 +613,11 @@ TEXT): self { }
     public self $is_recursive;
     public function is_recursive($var): self { }
     public function is_recursive(): self { }
+
+    /** @see strdec() */
+    public self $strdec;
+    public function strdec($var): self { }
+    public function strdec(): self { }
 
     /** @see var_apply() */
     public self $var_apply;

@@ -23,15 +23,15 @@ trait ChainObject0
     public function date_offset_get(\DateTimeInterface $object): self { }
     public function date_offset_get(): self { }
 
-    /** @see preg_grep() */
-    public self $preg_grep;
-    public function preg_grep(string $pattern, array $array, int $flags = 0): self { }
-    public function preg_grep(array $array, int $flags = 0): self { }
-
     /** @see hash_update_stream() */
     public self $hash_update_stream;
     public function hash_update_stream(\HashContext $context, $stream, int $length = -1): self { }
     public function hash_update_stream($stream, int $length = -1): self { }
+
+    /** @see preg_grep() */
+    public self $preg_grep;
+    public function preg_grep(string $pattern, array $array, int $flags = 0): self { }
+    public function preg_grep(array $array, int $flags = 0): self { }
 
     /** @see uasort() */
     public self $uasort;
@@ -505,8 +505,8 @@ trait ChainObject0
 
     /** @see si_unprefix() */
     public self $si_unprefix;
-    public function si_unprefix($var, $unit = 1000): self { }
-    public function si_unprefix($unit = 1000): self { }
+    public function si_unprefix($var, $unit = 1000, $format = "%d%s"): self { }
+    public function si_unprefix($unit = 1000, $format = "%d%s"): self { }
 
     /** @see var_html() */
     public self $var_html;

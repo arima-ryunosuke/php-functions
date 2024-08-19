@@ -4,28 +4,27 @@
 /**
  * stub for cacheobject
  *
- *
+ * @noinspection PhpIncompatibleReturnTypeInspection
  *
  * @used-by \cacheobject()
  * @used-by \ryunosuke\Functions\cacheobject()
  * @used-by \ryunosuke\Functions\Package\cacheobject()
  */
-class Cacheobject
+class Cacheobject implements Psr\SimpleCache\CacheInterface
 {
 
 
-    public function __debugInfo() { }
-    public function keys(?string $pattern = null) { }
     public function clean() { }
-    public function fetch($key, $provider, $ttl = null) { }
-    public function fetchMultiple($providers, $ttl = null) { }
-    public function get($key, $default = null) { }
-    public function set($key, $value, $ttl = null) { }
-    public function delete($key) { }
-    public function provide($provider, ...$args) { }
-    public function clear() { }
-    public function getMultiple($keys, $default = null) { }
-    public function setMultiple($values, $ttl = null) { }
-    public function deleteMultiple($keys) { }
-    public function has($key) { }
+    public function keys($pattern = null): iterable { }
+    public function fetch($key, $provider, $ttl = null): mixed { }
+    public function fetchMultiple($providers, $ttl = null): iterable { }
+    public function get($key, $default = null): mixed { }
+    public function set($key, $value, $ttl = null): bool { }
+    public function delete($key): bool { }
+    public function provide($provider, ...$args): mixed { }
+    public function clear(): bool { }
+    public function getMultiple($keys, $default = null): iterable { }
+    public function setMultiple($values, $ttl = null): bool { }
+    public function deleteMultiple($keys): bool { }
+    public function has($key): bool { }
 }

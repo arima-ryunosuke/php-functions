@@ -13,11 +13,13 @@
 class ReflectCallable extends ReflectionFunction implements Reflector, Stringable
 {
     public $name;
+    public $class;
 
     public function __invoke(...$args): mixed { }
     public function call($newThis = null, ...$args): mixed { }
     public function getDeclaration(): string { }
     public function getCode(): string { }
+    public function isAnonymous(): bool { }
     public function isStatic(): bool { }
     public function getUsedVariables(): array { }
     public function __toString(): string { }
@@ -52,4 +54,20 @@ class ReflectCallable extends ReflectionFunction implements Reflector, Stringabl
     public function hasReturnType() { }
     public function getReturnType() { }
     public function getAttributes(?string $name = null, int $flags = 0): array { }
+    public function getTraitMethod(): ?ReflectionMethod { }
+    public function isPublic() { }
+    public function isPrivate() { }
+    public function isProtected() { }
+    public function isAbstract() { }
+    public function isFinal() { }
+    public function isStatic() { }
+    public function isConstructor() { }
+    public function isDestructor() { }
+    public function getClosure(?object $object = null) { }
+    public function getModifiers() { }
+    public function invoke(?object $object, mixed ...$args) { }
+    public function invokeArgs(?object $object, array $args) { }
+    public function getDeclaringClass() { }
+    public function getPrototype() { }
+    public function setAccessible(bool $accessible) { }
 }

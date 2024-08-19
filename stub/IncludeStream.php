@@ -5,7 +5,7 @@
  * stub for include_stream
  *
  * file スキームで STREAM_OPEN_FOR_INCLUDE だけを特別扱いしたプロトコル
- *
+ * 
  * include/require で呼ばれるメソッドはたかが知れているが、その前後等で通常操作がある可能性があるため、結局全部の実装が必要。
  *
  * @used-by \include_stream()

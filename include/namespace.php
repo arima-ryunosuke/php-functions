@@ -8091,7 +8091,8 @@ if (!function_exists('ryunosuke\\Functions\\sql_format')) {
             }
             // END IF, END LOOP などは一つのトークンとする
             elseif (strtoupper($last->text ?? '') === 'END' && in_array(strtoupper($token->text), ['CASE', 'IF', 'LOOP', 'REPEAT', 'WHILE'], true)) {
-                $tokens[array_key_last($tokens)]->text .= " " . $token->text;
+                $lasttoken = $tokens[array_key_last($tokens)];
+                $lasttoken->text .= " " . $token->text;
             }
             // 上記以外はただのトークンとして格納する
             else {
@@ -8989,10 +8990,10 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
 
         $restore = set_error_exception_handler();
         try {
-            return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $grouping, $callback) {
+            $n = -1;
+            return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $grouping, $callback) use (&$n) {
                 $mb_internal_encoding = mb_internal_encoding();
                 $result = [];
-                $n = -1;
                 while ($row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape)) {
                     if ($row === [null]) {
                         continue;
@@ -9059,6 +9060,13 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
 
                 return $result;
             })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
+        }
+        catch (\Throwable $t) {
+            // 何行目？ が欲しくなることが非常に多いので例外メッセージを書き換える
+            $message = new \ReflectionProperty($t, 'message');
+            $message->setAccessible(true);
+            $message->setValue($t, "csv#$n: " . $t->getMessage());
+            throw $t;
         }
         finally {
             $restore();
@@ -17325,6 +17333,468 @@ if (!function_exists('ryunosuke\\Functions\\sys_set_temp_dir')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\system_status') || (new \ReflectionFunction('ryunosuke\\Functions\\system_status'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\system_status')) {
+    /**
+     * システムの各種情報配列を返す
+     *
+     * Windows 版はオマケ実装。
+     * この関数の結果は互換性を考慮しない。
+     *
+     * @codeCoverageIgnore
+     * @package ryunosuke\Functions\Package\info
+     */
+    function system_status(
+        /** バイト系数値の単位 */ string $siunit = '',
+        /** 日時系のフォーマット */ string $datetime_format = \DateTime::RFC3339,
+    ): array {
+        $unitize = function ($size) use ($siunit) {
+            return match ($siunit) {
+                'k'     => sprintf('%.3f', $size / 1024),
+                'm'     => sprintf('%.3f', $size / 1024 / 1024),
+                'g'     => sprintf('%.3f', $size / 1024 / 1024 / 1024),
+                'h'     => si_prefix($size, 1024),
+                ','     => number_format($size),
+                ''      => $size,
+                default => throw new \InvalidArgumentException("$siunit must be [k,m,g,h,'']"),
+            };
+        };
+        $datetime = function ($time) use ($datetime_format) {
+            if (strlen($datetime_format)) {
+                return date($datetime_format, $time);
+            }
+            else {
+                return $time;
+            }
+        };
+
+        // counter 値だけは待機が長いので一括で取ってくる
+        $counters = null;
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $counters = process_async('powershell', [
+                '-Command',
+                'ConvertTo-Json @(
+              Get-Counter -MaxSamples 1 -SampleInterval 1 -Counter "\System\Processor Queue Length","\Process(*)\% Privileged Time","\Process(*)\% User Time","\Processor(*)\% Processor Time"
+            ).CounterSamples',
+            ]);
+            $counters->setCompleteAction(function () {
+                /** @var \ProcessAsync $this */
+                $data = json_decode($this->stdout, true);
+                $counters = [
+                    'queue'  => [],
+                    'system' => [],
+                    'user'   => [],
+                    'time'   => [],
+                ];
+                foreach ($data as $stat) {
+                    if (str_ends_with($stat['Path'], '\\system\\processor queue length')) {
+                        $counters['queue'] = $stat['CookedValue'];
+                    }
+                    elseif (str_ends_with($stat['Path'], '\\% privileged time')) {
+                        $counters['system'][$stat['InstanceName']] = $stat['CookedValue'];
+                    }
+                    elseif (str_ends_with($stat['Path'], '\\% user time')) {
+                        $counters['user'][$stat['InstanceName']] = $stat['CookedValue'];
+                    }
+                    elseif (str_ends_with($stat['Path'], '\\% processor time')) {
+                        $counters['time'][$stat['InstanceName']] = $stat['CookedValue'];
+                    }
+                }
+                unset($counters['system']['_total'], $counters['system']['idle']);
+                unset($counters['user']['_total'], $counters['user']['idle']);
+                unset($counters['time']['_total']);
+                return $counters;
+            });
+        }
+
+        return array_map(fn($gather) => $gather(), [
+            'os'         => (function () use ($datetime, $counters) {
+                if (DIRECTORY_SEPARATOR === '\\') {
+                    $provide = process_async('powershell', ['-Command', 'ConvertTo-Json (Get-WmiObject win32_operatingsystem | Select-Object *)']);
+                    $provide->setCompleteAction(function () use ($counters) {
+                        /** @var \ProcessAsync $this */
+                        $data = json_decode($this->stdout, true);
+                        return [
+                            'name'    => $data['Caption'],
+                            'version' => php_uname('r'),
+                            'release' => $data['Version'],
+                            'uptime'  => time() - date_create_from_format('YmdHis.u+', $data['LastBootUpTime'])->getTimestamp(),
+                            'process' => [
+                                'running' => count(array_filter($counters()['user'], fn($v) => $v > 0)),
+                                'blocked' => count(array_filter($counters()['system'], fn($v) => $v > 0)),
+                            ],
+                            'loadavg' => [1 => (float) $counters()['queue']],
+                        ];
+                    });
+                }
+                else {
+                    $provide = function () {
+                        $os_release = parse_ini_file('/etc/os-release');
+                        $proc_uptime = explode(' ', file_get_contents('/proc/uptime'));
+                        preg_match_all('#^(procs_.+?)\s+(\d+)$#mu', file_get_contents('/proc/stat'), $matches, PREG_SET_ORDER);
+                        $procs = [];
+                        foreach ($matches as [, $name, $count]) {
+                            $procs[$name] = $count;
+                        }
+                        return [
+                            'name'    => $os_release['NAME'],
+                            'version' => $os_release['VERSION_ID'],
+                            'release' => php_uname('r'),
+                            'uptime'  => (int) $proc_uptime[0],
+                            'process' => [
+                                'running' => (int) $procs['procs_running'],
+                                'blocked' => (int) $procs['procs_blocked'],
+                            ],
+                            'loadavg' => array_combine([60, 300, 900], sys_getloadavg()),
+                        ];
+                    };
+                }
+
+                return function () use ($provide, $datetime) {
+                    $misc = $provide();
+                    return [
+                        'name'         => $misc['name'],
+                        'version'      => $misc['version'],
+                        'release'      => $misc['release'],
+                        'architecture' => php_uname('m'),
+                        'hostname'     => php_uname('n'),
+                        'boottime'     => $datetime(time() - $misc['uptime']),
+                        'uptime'       => $misc['uptime'],
+                        'localtime'    => $datetime(time()),
+                        'process'      => $misc['process'],
+                        'loadavg'      => $misc['loadavg'],
+                    ];
+                };
+            })(),
+            'cpu'        => (function () use ($unitize, $counters) {
+                if (DIRECTORY_SEPARATOR === '\\') {
+                    $provide = process_async('powershell', ['-Command', 'ConvertTo-Json @(Get-WmiObject win32_processor | Select-Object *)']);
+                    $provide->setCompleteAction(function () use ($counters) {
+                        /** @var \ProcessAsync $this */
+                        $cpu_info = json_decode($this->stdout, true);
+                        $rules = [
+                            'id'     => fn($v) => $v['DeviceID'],
+                            'bit'    => fn($v) => (int) $v['DataWidth'],
+                            'clock'  => fn($v) => $v['MaxClockSpeed'] * 1024 * 1024,
+                            'core'   => fn($v) => (int) $v['NumberOfCores'],
+                            'thread' => fn($v) => (int) $v['NumberOfLogicalProcessors'],
+                            'cache'  => fn($v) => ($v['L2CacheSize'] + $v['L3CacheSize']) * 1024,
+                            'name'   => fn($v) => trim($v['Name']),
+                            'vendor' => fn($v) => trim($v['Manufacturer']),
+                        ];
+                        $cpus = [];
+                        foreach ($cpu_info as $cpu) {
+                            $cpus[] = array_map(fn($rule) => $rule($cpu), $rules);
+                        }
+                        return [$cpus, array_map(fn($v) => $v / 100, $counters()['time'])];
+                    });
+                }
+                else {
+                    $provide = function () {
+                        $CLK_TCK = 100; // sysconf(_SC_CLK_TCK);
+                        $TIME_SPAN = 1000 / rand(5000, 10000);
+
+                        $proc_stat = function () {
+                            preg_match_all('#^cpu(\d+)\s+(.+)$#mu', file_get_contents('/proc/stat'), $matches, PREG_SET_ORDER);
+                            $stats = [];
+                            foreach ($matches as [, $core, $ticks]) {
+                                [$user, $nice, $system, /*$idle*/, $iowait, $irq, $softirq, $steal, $guest, $guest_nice] = preg_split('#\s+#u', $ticks, -1, PREG_SPLIT_NO_EMPTY);
+                                $stats[$core] = (int) $user + (int) $nice + (int) $system + (int) $iowait + (int) $irq + (int) $softirq + (int) $steal + (int) $guest + (int) $guest_nice;
+                            }
+                            return $stats;
+                        };
+
+                        $before = $proc_stat();
+                        usleep((int) ($TIME_SPAN * 1000 * 1000));
+                        $after = $proc_stat();
+
+                        $times = [];
+                        foreach ($after as $core => $ticks) {
+                            $times[$core] = ($ticks - $before[$core]) / $CLK_TCK / $TIME_SPAN;
+                        }
+
+                        $rules = [
+                            'id'     => fn($v) => (int) $v['physical id'],
+                            'bit'    => fn($v) => (int) $v['clflush size'],
+                            'clock'  => fn($v) => $v['cpu MHz'] * 1024 * 1024,
+                            'core'   => fn($v) => (int) $v['cpu cores'],
+                            'thread' => fn($v) => (int) $v['siblings'],
+                            'cache'  => fn($v) => si_unprefix($v['cache size'], 1024, '%d %sB'),
+                            'name'   => fn($v) => trim($v['model name']),
+                            'vendor' => fn($v) => trim($v['vendor_id']),
+                        ];
+                        $cpu_info = preg_split("#\R\R#u", trim(file_get_contents('/proc/cpuinfo')));
+
+                        $cpus = [];
+                        foreach ($cpu_info as $info) {
+                            $info = str_array($info, ':', true);
+                            $cpu = array_map(fn($rule) => $rule($info), $rules);
+                            $cpus[$cpu['id']] = $cpu;
+                        }
+                        return [$cpus, $times];
+                    };
+                }
+
+                return function () use ($provide, $unitize) {
+                    [$cpus, $times] = $provide();
+
+                    foreach ($cpus as $n => $cpu) {
+                        $cpus[$n]['clock'] = $unitize($cpu['clock']);
+                        $cpus[$n]['cache'] = $unitize($cpu['cache']);
+
+                        $usages = array_splice($times, 0, $cpu['thread'], []);
+                        $cpus[$n]['usage'] = array_sum($usages) / $cpu['thread'];
+                        $cpus[$n]['usages'] = $usages;
+                    }
+                    return $cpus;
+                };
+            })(),
+            'memory'     => (function () use ($unitize) {
+                if (DIRECTORY_SEPARATOR === '\\') {
+                    $provide = process_async('powershell', ['-Command', 'ConvertTo-Json (Get-WmiObject win32_operatingsystem | Select-Object *)']);
+                    $provide->setCompleteAction(function () {
+                        /** @var \ProcessAsync $this */
+                        $memory_info = json_decode($this->stdout, true);
+
+                        $memory_total = $memory_info['TotalVisibleMemorySize'] * 1024;
+                        $memory_free = $memory_info['FreePhysicalMemory'] * 1024;
+                        $memory_available = $memory_info['FreePhysicalMemory'] * 1024;
+
+                        $swap_total = ($memory_info['TotalVirtualMemorySize'] - $memory_info['TotalVisibleMemorySize']) * 1024;
+                        $swap_free = $memory_info['FreeVirtualMemory'] * 1024;
+
+                        return [$memory_total, $memory_free, $memory_available, $swap_total, $swap_free];
+                    });
+                }
+                else {
+                    $provide = function () {
+                        $memory_info = str_array(trim(file_get_contents('/proc/meminfo')), ':', true);
+
+                        $memory_total = si_unprefix($memory_info['MemTotal'], 1024, '%d %sB');
+                        $memory_free = si_unprefix($memory_info['MemFree'], 1024, '%d %sB');
+                        $memory_available = si_unprefix($memory_info['MemAvailable'], 1024, '%d %sB');
+
+                        $swap_total = si_unprefix($memory_info['SwapTotal'], 1024, '%d %sB');
+                        $swap_free = si_unprefix($memory_info['SwapFree'], 1024, '%d %sB');
+
+                        return [$memory_total, $memory_free, $memory_available, $swap_total, $swap_free];
+                    };
+                }
+
+                return function () use ($unitize, $provide) {
+                    [$memory_total, $memory_free, $memory_available, $swap_total, $swap_free] = $provide();
+
+                    $memory = [
+                        'total'     => $memory_total,
+                        'free'      => $memory_free,
+                        'usage'     => $memory_total - $memory_free,
+                        'available' => $memory_available,
+                    ];
+                    $swap = [
+                        'total'     => $swap_total,
+                        'free'      => $swap_free,
+                        'usage'     => $swap_total - $swap_free,
+                        'available' => $swap_free, // ミスではない。swap に available など存在せず free に等しいので利便性を考慮して free を返す
+                    ];
+
+                    return [
+                        'memory'      => array_map($unitize, $memory),
+                        'swap'        => array_map($unitize, $swap),
+                        'memory+swap' => array_map($unitize, [
+                            'total'     => $memory['total'] + $swap['total'],
+                            'free'      => $memory['free'] + $swap['free'],
+                            'usage'     => $memory['usage'] + $swap['usage'],
+                            'available' => $memory['available'] + $swap['available'],
+                        ]),
+                    ];
+                };
+            })(),
+            'filesystem' => (function () use ($unitize) {
+                if (DIRECTORY_SEPARATOR === '\\') {
+                    $provide = process_async('powershell', ['-Command', 'ConvertTo-Json @(Get-WmiObject win32_logicaldisk | Select-Object *)']);
+                    $provide->setCompleteAction(function () {
+                        /** @var \ProcessAsync $this */
+                        $mounts = json_decode($this->stdout, true);
+                        $result = [];
+                        foreach ($mounts as $mount) {
+                            $result[] = [
+                                'path' => $mount['DeviceID'],
+                                'type' => $mount['FileSystem'],
+                            ];
+                        }
+                        return $result;
+                    });
+                }
+                else {
+                    $provide = function () {
+                        preg_match_all('#^(/.*?)\s+(/.*?)\s+(.*?)\s+#um', file_get_contents('/proc/mounts'), $matches, PREG_SET_ORDER);
+                        $mounts = [];
+                        foreach ($matches as [, $device, $path, $fstype]) {
+                            if (!isset($mounts[$device])) {
+                                $mounts[$device] = [
+                                    'path' => $path,
+                                    'type' => $fstype,
+                                ];
+                            }
+                        }
+                        return $mounts;
+                    };
+                }
+
+                return function () use ($provide, $unitize) {
+                    $mounts = $provide();
+
+                    $result = [];
+                    foreach ($mounts as $mount) {
+                        $total = @disk_total_space($mount['path']);
+                        if ($total === false) {
+                            $result[$mount['path']] = [
+                                'path'  => $mount['path'],
+                                'type'  => $mount['type'],
+                                'total' => null,
+                                'free'  => null,
+                                'usage' => null,
+                            ];
+                            continue;
+                        }
+                        $free = disk_free_space($mount['path']);
+                        $result[$mount['path']] = [
+                            'path'  => $mount['path'],
+                            'type'  => $mount['type'],
+                            'total' => $unitize((int) $total),
+                            'free'  => $unitize((int) $free),
+                            'usage' => $unitize((int) ($total - $free)),
+                        ];
+                    }
+                    return $result;
+                };
+            })(),
+            'network'    => (function () {
+                if (DIRECTORY_SEPARATOR === '\\') {
+                    $provide = process_async('powershell', [
+                        '-Command',
+                        'ConvertTo-Json @{
+                      tcp = (Get-NetTCPConnection | Select-Object State,LocalAddress,LocalPort)
+                      udp = (Get-NetUDPEndpoint   | Select-Object State,LocalAddress,LocalPort)
+                    }',
+                    ]);
+                    $provide->setCompleteAction(function () {
+                        /** @var \ProcessAsync $this */
+                        $parse = function ($rows, $st) {
+                            $result = [4 => [], 6 => []];
+                            foreach ($rows as $row) {
+                                if ($row['State'] === $st) {
+                                    $address = $row['LocalAddress'];
+                                    if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                                        if ($address === '0.0.0.0') {
+                                            $address = '*';
+                                        }
+                                        $result[4][$address][] = $row['LocalPort'];
+                                    }
+                                    if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                                        if ($address === '::') {
+                                            $address = '*';
+                                        }
+                                        $result[6][$address][] = $row['LocalPort'];
+                                    }
+                                }
+                            }
+                            return $result;
+                        };
+                        $netstat = json_decode($this->stdout, true);
+
+                        $binds = array_merge(
+                            array_combine(['tcp4', 'tcp6'], $parse($netstat['tcp'], 2)),
+                            array_combine(['udp4', 'udp6'], $parse($netstat['udp'], null)), // @todo 取れない？
+                        );
+                        return [[], $binds];
+                    });
+                }
+                else {
+                    $provide = function () {
+                        $nicdata = [];
+                        foreach (glob('/sys/class/net/*') as $nic) {
+                            $nicdata[basename($nic)] = [
+                                'mtu' => (int) trim(file_get_contents("$nic/mtu")),
+                                'mac' => trim(file_get_contents("$nic/address")),
+                            ];
+                        }
+
+                        $parseV4 = function ($filename, $st) {
+                            $result = [];
+                            $rows = str_array(file_get_contents($filename), ' ', false, false);
+                            foreach ($rows as $row) {
+                                if ($row['st'] === $st) {
+                                    [$address, $port] = explode(':', $row['local_address']);
+                                    $address = implode('.', array_map('hexdec', array_reverse(str_split($address, 2))));
+                                    if ($address === '0.0.0.0') {
+                                        $address = '*';
+                                    }
+                                    $result[$address][] = hexdec($port);
+                                }
+                            }
+                            return $result;
+                        };
+                        $parseV6 = function ($filename, $st) {
+                            $result = [];
+                            $rows = str_array(file_get_contents($filename), ' ', false, false);
+                            foreach ($rows as $row) {
+                                if ($row['st'] === $st) {
+                                    [$address, $port] = explode(':', $row['local_address']);
+                                    $segments = str_split($address, 8);
+                                    foreach ($segments as $n => $segment) {
+                                        $segments[$n] = vsprintf("%s%s:%s%s", array_map('strtolower', array_reverse(str_split($segment, 2))));
+                                    }
+                                    $address = implode(':', $segments);
+                                    if ($address === '0000:0000:0000:0000:0000:0000:0000:0000') {
+                                        $address = '*';
+                                    }
+                                    $result[$address][] = hexdec($port);
+                                }
+                            }
+                            return $result;
+                        };
+
+                        $binds = [
+                            'tcp4' => $parseV4('/proc/net/tcp', '0A'),
+                            'tcp6' => $parseV6('/proc/net/tcp6', '0A'),
+                            'udp4' => $parseV4('/proc/net/udp', '07'),
+                            'udp6' => $parseV6('/proc/net/udp6', '07'),
+                        ];
+
+                        return [$nicdata, $binds];
+                    };
+                }
+
+                return function () use ($provide) {
+                    [$nicdata, $binds] = $provide();
+
+                    $result = [];
+                    foreach (net_get_interfaces() as $name => $interface) {
+                        foreach ($interface['unicast'] as $unicast) {
+                            if (in_array($unicast['family'], [AF_INET, AF_INET6])) {
+                                $version = $unicast['family'] === AF_INET ? 4 : 6;
+                                $address = ip_normalize($unicast['address']);
+                                $result[$unicast['address']] = [
+                                    'address'   => $unicast['address'],
+                                    'netmask'   => $unicast['netmask'],
+                                    'version'   => $version,
+                                    'tcp-ports' => array_merge($binds["tcp$version"][$address] ?? [], $binds["tcp$version"]['*'] ?? []),
+                                    'udp-ports' => array_merge($binds["udp$version"][$address] ?? [], $binds["udp$version"]['*'] ?? []),
+                                    'name'      => $name,
+                                    'mac'       => $interface['mac'] ?? $nicdata[$name]['mac'] ?? null,
+                                    'mtu'       => $interface['mtu'] ?? $nicdata[$name]['mtu'] ?? null,
+                                ];
+                            }
+                        }
+                    }
+                    return $result;
+                };
+            })(),
+        ]);
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\iterator_chunk') || (new \ReflectionFunction('ryunosuke\\Functions\\iterator_chunk'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\iterator_chunk')) {
     /**
@@ -20815,6 +21285,85 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\ip_normalize') || (new \ReflectionFunction('ryunosuke\\Functions\\ip_normalize'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\ip_normalize')) {
+    /**
+     * IP アドレスを正規化する
+     *
+     * IPv4 は（あまり有名ではないが）4 オクテット未満や 16,8 進数表記を標準的な 1.2.3.4 形式に正規化する。
+     * IPv6 は 0 の省略や :: 短縮表記を完全表記の 1111:2222:3333:4444:5555:6666:7777:8888 形式に正規化する。
+     * 完全におかしな形式については例外を投げる。
+     *
+     * Example:
+     * ```php
+     * // v4（RFC はないがこのような記法が許されている）
+     * that(ip_normalize('0xff.077.500'))->isSame('255.63.1.244');
+     * // v6（RFC 5952 の短縮表記を完全表記にする）
+     * that(ip_normalize('a::f'))->isSame('000a:0000:0000:0000:0000:0000:0000:000f');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\network
+     */
+    function ip_normalize(string $ipaddr)
+    {
+        // v6 の RFC 5952 短縮表記は filter_var を通るので分岐できる
+        if (filter_var($ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $colon = substr_count($ipaddr, ':');
+            $ipaddr = strtr($ipaddr, ['::' => ':' . implode(':', array_pad([], 8 - $colon, '0000')) . ':']);
+            $segments = explode(':', $ipaddr);
+            foreach ($segments as $n => $segment) {
+                $segment = strtolower($segment);
+                $segment = str_pad($segment, 4, '0', STR_PAD_LEFT);
+                $segments[$n] = $segment;
+            }
+            return implode(':', $segments);
+        }
+
+        $divmod = function (&$n, $d) {
+            $div = intdiv($n, $d);
+            $n = $n % $d;
+            return $div;
+        };
+
+        // 通らない場合は v4 試行だが、様々な形式があるので最後にチェックする
+        $octets = explode('.', $ipaddr);
+        $length = count($octets);
+        // が、1オクテットの場合は完全に処理が異なる
+        if ($length === 1) {
+            $int = strdec($octets[0]);
+            if (0 > $int || $int > 0xFFFFFFFF) {
+                throw new \InvalidArgumentException("$ipaddr is invalid ip address(too large)");
+            }
+            return long2ip($int);
+        }
+        elseif ($length === 2) {
+            $int = strdec($octets[1]);
+            $octets[1] = $divmod($int, 0x10000);
+            $octets[2] = $divmod($int, 0x00100);
+            $octets[3] = $divmod($int, 0x00001);
+        }
+        elseif ($length === 3) {
+            $int = strdec($octets[2]);
+            $octets[2] = $divmod($int, 0x00100);
+            $octets[3] = $divmod($int, 0x00001);
+        }
+        elseif ($length === 4) {
+            // do nothing
+        }
+        else {
+            throw new \InvalidArgumentException("$ipaddr is invalid ip address(many octet)");
+        }
+
+        $octets = array_map(fn($v) => strdec($v), $octets);
+
+        $ipaddr = implode('.', $octets);
+        if (!filter_var($ipaddr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new \InvalidArgumentException("$ipaddr is invalid ip address");
+        }
+        return $ipaddr;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\ping') || (new \ReflectionFunction('ryunosuke\\Functions\\ping'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\ping')) {
     /**
@@ -20867,7 +21416,7 @@ if (!function_exists('ryunosuke\\Functions\\ping')) {
                 '-c' => 1,
                 '-W' => (int) $timeout,
                 $host,
-            ], null, $stdout, $errstr);
+            ], '', $stdout, $errstr);
             // min/avg/max/mdev = 0.026/0.026/0.026/0.000
             if (preg_match('#min/avg/max/mdev.*?[0-9.]+/([0-9.]+)/[0-9.]+/[0-9.]+#', $stdout, $m)) {
                 return $m[1] / 1000.0;
@@ -22411,8 +22960,10 @@ if (!function_exists('ryunosuke\\Functions\\reflect_callable')) {
      *   - 上記二つは __call/__callStatic のメソッドも呼び出せる
      * - getDeclaration: 宣言部のコードを返す
      * - getCode: 定義部のコードを返す
+     * - isAnonymous: 無名関数なら true を返す（8.2 の isAnonymous 互換）
      * - isStatic: $this バインド可能かを返す（クロージャのみ）
      * - getUsedVariables: use している変数配列を返す（クロージャのみ）
+     * - getTraitMethod: トレイト側のリフレクションを返す（メソッドのみ）
      *
      * Example:
      * ```php
@@ -22466,6 +23017,11 @@ if (!function_exists('ryunosuke\\Functions\\reflect_callable')) {
                 {
                     return ($this->definition ??= callable_code($this))[1];
                 }
+
+                public function isAnonymous(): bool
+                {
+                    return false;
+                }
             };
         }
         elseif ($callable instanceof \Closure) {
@@ -22500,6 +23056,15 @@ if (!function_exists('ryunosuke\\Functions\\reflect_callable')) {
                     return ($this->definition ??= callable_code($this))[1];
                 }
 
+                public function isAnonymous(): bool
+                {
+                    if (method_exists(\ReflectionFunction::class, 'isAnonymous')) {
+                        return parent::isAnonymous(); // @codeCoverageIgnore
+                    }
+
+                    return strpos($this->name, '{closure}') !== false;
+                }
+
                 public function isStatic(): bool
                 {
                     return !is_bindable_closure($this->callable);
@@ -22507,6 +23072,10 @@ if (!function_exists('ryunosuke\\Functions\\reflect_callable')) {
 
                 public function getUsedVariables(): array
                 {
+                    if (method_exists(\ReflectionFunction::class, 'getClosureUsedVariables')) {
+                        return parent::getClosureUsedVariables(); // @codeCoverageIgnore
+                    }
+
                     $uses = object_properties($this->callable);
                     unset($uses['this']);
                     return $uses;
@@ -22565,6 +23134,41 @@ if (!function_exists('ryunosuke\\Functions\\reflect_callable')) {
                 public function getCode(): string
                 {
                     return ($this->definition ??= callable_code($this))[1];
+                }
+
+                public function isAnonymous(): bool
+                {
+                    return false;
+                }
+
+                public function getTraitMethod(): ?\ReflectionMethod
+                {
+                    $name = strtolower($this->name);
+                    $class = $this->getDeclaringClass();
+                    $aliases = array_change_key_case($class->getTraitAliases(), CASE_LOWER);
+
+                    if (!isset($aliases[$name])) {
+                        if ($this->getFileName() === $class->getFileName()) {
+                            return null;
+                        }
+                        else {
+                            return $this;
+                        }
+                    }
+
+                    [$tname, $mname] = explode('::', $aliases[$name]);
+                    $result = new self($tname, $mname, $this->callable, $this->call_name);
+
+                    // alias を張ったとしても自身で再宣言はエラーなく可能で、その場合自身が採用されるようだ
+                    if (false
+                        || $this->getFileName() !== $result->getFileName()
+                        || $this->getStartLine() !== $result->getStartLine()
+                        || $this->getEndLine() !== $result->getEndLine()
+                    ) {
+                        return null;
+                    }
+
+                    return $result;
                 }
             };
         }
@@ -25407,6 +26011,34 @@ if (!function_exists('ryunosuke\\Functions\\str_array')) {
      *         '%idle'    => '98.74',
      *     ],
      * ]);
+     *
+     * // strict:false だと列数が一致していなくてもよい（null で埋められる）
+     * that(str_array("
+     * 13:00:01        CPU     %user     %nice   %system   %iowait
+     * 13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19
+     * 13:20:01        all      0.60      0.10
+     * ", ' ', false, false))->isSame([
+     *     1 => [
+     *         '13:00:01' => '13:10:01',
+     *         'CPU'      => 'all',
+     *         '%user'    => '0.99',
+     *         '%nice'    => '0.10',
+     *         '%system'  => '0.71',
+     *         '%iowait'  => '0.00',
+     *         '6'        => '0.00',
+     *         '7'        => '98.19',
+     *     ],
+     *     2 => [
+     *         '13:00:01' => '13:20:01',
+     *         'CPU'      => 'all',
+     *         '%user'    => '0.60',
+     *         '%nice'    => '0.10',
+     *         '%system'  => null,
+     *         '%iowait'  => null,
+     *         '6'        => null,
+     *         '7'        => null,
+     *     ],
+     * ]);
      * ```
      *
      * @package ryunosuke\Functions\Package\strings
@@ -25414,9 +26046,10 @@ if (!function_exists('ryunosuke\\Functions\\str_array')) {
      * @param string|array $string 対象文字列。配列を与えても動作する
      * @param string $delimiter 区切り文字
      * @param bool $hashmode 連想配列モードか
+     * @param bool $strict true にすると列数が一致しない場合に null になる
      * @return array 配列
      */
-    function str_array($string, ?string $delimiter, $hashmode)
+    function str_array($string, ?string $delimiter, $hashmode, $strict = true)
     {
         $array = $string;
         if (is_stringable($string)) {
@@ -25439,7 +26072,20 @@ if (!function_exists('ryunosuke\\Functions\\str_array')) {
                     $keys = $parts;
                     continue;
                 }
-                $result[$n] = count($keys) === count($parts) ? array_combine($keys, $parts) : null;
+                if ($strict) {
+                    $result[$n] = count($keys) === count($parts) ? array_combine($keys, $parts) : null;
+                }
+                else {
+                    if (count($keys) < count($parts)) {
+                        for ($i = count($keys); $i < count($parts); $i++) {
+                            $keys[] = next_key($keys);
+                        }
+                    }
+                    elseif (count($keys) > count($parts)) {
+                        $parts = array_pad($parts, count($keys), null);
+                    }
+                    $result[$n] = array_combine($keys, $parts);
+                }
             }
         }
         return $result;
@@ -31228,21 +31874,80 @@ if (!function_exists('ryunosuke\\Functions\\si_unprefix')) {
      * @param int $unit 桁単位。実用上は 1000, 1024 の2値しか指定することはないはず
      * @return int|float SI 接頭辞を取り払った実際の数値
      */
-    function si_unprefix($var, $unit = 1000)
+    function si_unprefix($var, $unit = 1000, $format = '%d%s')
     {
         assert($unit > 0);
 
         $var = trim($var);
+        $num = numval($var);
 
         foreach (SI_UNITS as $exp => $sis) {
             foreach ($sis as $si) {
-                if (strpos($var, $si) === (strlen($var) - strlen($si))) {
-                    return numval($var) * pow($unit, $exp);
+                if (sprintf($format, $num, $si) === $var) {
+                    return $num * pow($unit, $exp);
                 }
             }
         }
 
-        return numval($var);
+        return $num;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\strdec') || (new \ReflectionFunction('ryunosuke\\Functions\\strdec'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\strdec')) {
+    /**
+     * 0xff,0777 などを10進数値化する
+     *
+     * php のリテラル形式の数値文字列を int に変換すると考えればよい。
+     * intval でも似たようなことはできるが、エラーも例外も発生せず静かに 0 を返すので使い勝手が悪い。
+     * この関数は変換できない場合は例外を投げる。
+     *
+     * Example:
+     * ```php
+     * // 数値を与えれば数値のまま
+     * that(strdec(12345))->isSame(12345);
+     * // 通常の10進数字
+     * that(strdec('12345'))->isSame(12345);
+     * // 16進数字
+     * that(strdec('0xff'))->isSame(255);
+     * // 8進数字
+     * that(strdec('077'))->isSame(63);
+     * that(strdec('0o77'))->isSame(63);
+     * // 2進数字
+     * that(strdec('0b11'))->isSame(3);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\var
+     */
+    function strdec($var): int|float
+    {
+        if (is_int($var) || is_float($var)) {
+            return $var;
+        }
+
+        $restore = set_error_exception_handler();
+        try {
+            $var = strtr($var, ['_' => '']);
+            $sign = 1;
+            if (($var[0] ?? '') === '-') {
+                $sign = -1;
+                $var = substr($var, 1);
+            }
+            if (strcasecmp(substr($var, 0, 2), '0x') === 0) {
+                return $sign * hexdec($var);
+            }
+            if (strcasecmp(substr($var, 0, 2), '0b') === 0) {
+                return $sign * bindec($var);
+            }
+            if (strcasecmp(substr($var, 0, 2), '0o') === 0 || strcasecmp(substr($var, 0, 1), '0') === 0) {
+                return $sign * octdec($var);
+            }
+
+            return $sign * $var;
+        }
+        finally {
+            $restore();
+        }
     }
 }
 
@@ -31661,21 +32366,31 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
             $resolveSymbol = function ($token, $prev, $next, $ref) use ($var_export) {
                 $text = $token->text;
                 if ($token->id === T_STRING) {
+                    $namespaces = [$ref->getNamespaceName()];
+                    if ($ref instanceof \ReflectionFunctionAbstract) {
+                        $namespaces[] = $ref->getClosureScopeClass()?->getNamespaceName();
+                    }
                     if ($prev->id === T_NEW || $next->id === T_DOUBLE_COLON || $next->id === T_VARIABLE || $next->text === '{') {
                         $text = namespace_resolve($text, $ref->getFileName(), 'alias') ?? $text;
                     }
                     elseif ($next->text === '(') {
                         $text = namespace_resolve($text, $ref->getFileName(), 'function') ?? $text;
                         // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
-                        if (!function_exists($text) && function_exists($nstext = '\\' . $ref->getNamespaceName() . '\\' . $text)) {
-                            $text = $nstext;
+                        foreach ($namespaces as $namespace) {
+                            if (!function_exists($text) && function_exists($nstext = "\\$namespace\\$text")) {
+                                $text = $nstext;
+                                break;
+                            }
                         }
                     }
                     else {
                         $text = namespace_resolve($text, $ref->getFileName(), 'const') ?? $text;
                         // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
-                        if (!const_exists($text) && const_exists($nstext = '\\' . $ref->getNamespaceName() . '\\' . $text)) {
-                            $text = $nstext;
+                        foreach ($namespaces as $namespace) {
+                            if (!const_exists($text) && const_exists($nstext = "\\$namespace\\$text")) {
+                                $text = $nstext;
+                                break;
+                            }
                         }
                     }
                 }
@@ -31757,12 +32472,12 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
             if ($value instanceof \Closure) {
                 $ref = new \ReflectionFunction($value);
                 $bind = $ref->getClosureThis();
-                $class = $ref->getClosureScopeClass() ? $ref->getClosureScopeClass()->getName() : null;
+                $class = $ref->getClosureScopeClass();
                 $statics = $ref->getStaticVariables();
 
                 // 内部由来はきちんと fromCallable しないと差異が出てしまう
                 if ($ref->isInternal()) {
-                    $receiver = $bind ?? $class;
+                    $receiver = $bind ?? $class?->getName();
                     $callee = $receiver ? [$receiver, $ref->getName()] : $ref->getName();
                     return "\$this->$vid = \\Closure::fromCallable({$export($callee, $nest)})";
                 }
@@ -31821,8 +32536,14 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
                     'baseline' => -1,
                 ]);
                 if ($bind) {
-                    $scope = $var_export($class === 'Closure' ? 'static' : $class);
-                    $code = "\Closure::bind($code, {$export($bind, $nest + 1)}, $scope)";
+                    $instance = $export($bind, $nest + 1);
+                    if ($class->isAnonymous()) {
+                        $scope = "get_class({$export($bind, $nest + 1)})";
+                    }
+                    else {
+                        $scope = $var_export($class?->getName() === 'Closure' ? 'static' : $class?->getName());
+                    }
+                    $code = "\Closure::bind($code, $instance, $scope)";
                 }
                 elseif (!is_bindable_closure($value)) {
                     $code = "static $code";

@@ -38,6 +38,11 @@ trait ChainObject3
     public function date_interval_format(\DateInterval $object, string $format): self { }
     public function date_interval_format(string $format): self { }
 
+    /** @see mhash() */
+    public self $mhash;
+    public function mhash(int $algo, string $data, ?string $key = null): self { }
+    public function mhash(string $data, ?string $key = null): self { }
+
     /** @see preg_match_all() */
     public self $preg_match_all;
     public function preg_match_all(string $pattern, string $subject, &$matches = null, int $flags = 0, int $offset = 0): self { }
@@ -47,11 +52,6 @@ trait ChainObject3
     public self $preg_replace_callback;
     public function preg_replace_callback(array|string $pattern, callable $callback, array|string $subject, int $limit = -1, &$count = null, int $flags = 0): self { }
     public function preg_replace_callback(callable $callback, array|string $subject, int $limit = -1, &$count = null, int $flags = 0): self { }
-
-    /** @see mhash() */
-    public self $mhash;
-    public function mhash(int $algo, string $data, ?string $key = null): self { }
-    public function mhash(string $data, ?string $key = null): self { }
 
     /** @see array_push() */
     public self $array_push;
