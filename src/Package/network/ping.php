@@ -56,7 +56,7 @@ function ping($host, $port = null, $timeout = 1, &$errstr = '')
             '-c' => 1,
             '-W' => (int) $timeout,
             $host,
-        ], null, $stdout, $errstr);
+        ], '', $stdout, $errstr);
         // min/avg/max/mdev = 0.026/0.026/0.026/0.000
         if (preg_match('#min/avg/max/mdev.*?[0-9.]+/([0-9.]+)/[0-9.]+/[0-9.]+#', $stdout, $m)) {
             return $m[1] / 1000.0;
