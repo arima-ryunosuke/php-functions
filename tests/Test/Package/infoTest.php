@@ -14,6 +14,7 @@ use function ryunosuke\Functions\Package\ini_sets;
 use function ryunosuke\Functions\Package\is_ansi;
 use function ryunosuke\Functions\Package\php_binary;
 use function ryunosuke\Functions\Package\sys_set_temp_dir;
+use function ryunosuke\Functions\Package\system_status;
 
 class infoTest extends AbstractTestCase
 {
@@ -603,5 +604,19 @@ class infoTest extends AbstractTestCase
         that(sys_set_temp_dir('local', true, false))->isTrue();
         that(sys_set_temp_dir($tmpdir, false, false))->isTrue();
         that(sys_set_temp_dir('local', false, false))->isTrue();
+    }
+
+    function test_system_status()
+    {
+        // 環境差異が激しいので実質的にカバレッジのみ
+
+        $status = system_status();
+        that($status)->isArray();
+        that($status)->hasKeyAll(['os', 'cpu', 'memory', 'filesystem', 'network']);
+        that($status['os'])->hasKeyAll(['name', 'loadavg']);
+        that($status['cpu'])->isArray();
+        that($status['memory'])->hasKeyAll(['memory', 'swap', 'memory+swap']);
+        that($status['filesystem'])->isArray();
+        that($status['network'])->isArray();
     }
 }
