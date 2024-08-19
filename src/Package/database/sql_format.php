@@ -730,7 +730,8 @@ function sql_format($sql, $options = [])
         }
         // END IF, END LOOP などは一つのトークンとする
         elseif (strtoupper($last->text ?? '') === 'END' && in_array(strtoupper($token->text), ['CASE', 'IF', 'LOOP', 'REPEAT', 'WHILE'], true)) {
-            $tokens[array_key_last($tokens)]->text .= " " . $token->text;
+            $lasttoken = $tokens[array_key_last($tokens)];
+            $lasttoken->text .= " " . $token->text;
         }
         // 上記以外はただのトークンとして格納する
         else {
