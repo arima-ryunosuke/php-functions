@@ -819,6 +819,7 @@ class varTest extends AbstractTestCase
         that(si_unprefix('1023', 1024))->is(1023);
         that(si_unprefix('1k', 1024))->is(1024);
         that(si_unprefix('1K', 1024))->is(1024);
+        that(si_unprefix('1 K', 1024, '%d %s'))->is(1024);
     }
 
     function test_stringify()

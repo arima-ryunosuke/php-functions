@@ -32,19 +32,20 @@ require_once __DIR__ . '/../constants.php';
  * @param int $unit 桁単位。実用上は 1000, 1024 の2値しか指定することはないはず
  * @return int|float SI 接頭辞を取り払った実際の数値
  */
-function si_unprefix($var, $unit = 1000)
+function si_unprefix($var, $unit = 1000, $format = '%d%s')
 {
     assert($unit > 0);
 
     $var = trim($var);
+    $num = numval($var);
 
     foreach (SI_UNITS as $exp => $sis) {
         foreach ($sis as $si) {
-            if (strpos($var, $si) === (strlen($var) - strlen($si))) {
-                return numval($var) * pow($unit, $exp);
+            if (sprintf($format, $num, $si) === $var) {
+                return $num * pow($unit, $exp);
             }
         }
     }
 
-    return numval($var);
+    return $num;
 }
