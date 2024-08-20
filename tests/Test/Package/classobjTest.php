@@ -232,7 +232,7 @@ class classobjTest extends AbstractTestCase
             function getClassMap()
             {
                 return [
-                    'hoge'     => "files/classes/classmap/hoge.php",
+                    'hoge' => "files/classes/classmap/hoge.php",
                 ];
             }
         };
