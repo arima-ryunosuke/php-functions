@@ -903,6 +903,55 @@ zero is index 0.
                 ],
             ]);
 
+        // strict:false
+        $string = <<<TEXT
+        13:00:01        CPU     %user     %nice   %system   %iowait    %steal     %idle %hoge
+        13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19 hoge
+        13:20:01        all      0.60      0.10      0.56      0.00      0.00     98.74 hoge fuga piyo
+        13:30:01        all      0.60      0.10      0.56      0.00      0.00
+        TEXT;
+        that(str_array($string, ' ', false, false))->is(
+            [
+                1 => [
+                    "13:00:01" => "13:10:01",
+                    "CPU"      => "all",
+                    "%user"    => "0.99",
+                    "%nice"    => "0.10",
+                    "%system"  => "0.71",
+                    "%iowait"  => "0.00",
+                    "%steal"   => "0.00",
+                    "%idle"    => "98.19",
+                    "%hoge"    => "hoge",
+                ],
+                2 => [
+                    "13:00:01" => "13:20:01",
+                    "CPU"      => "all",
+                    "%user"    => "0.60",
+                    "%nice"    => "0.10",
+                    "%system"  => "0.56",
+                    "%iowait"  => "0.00",
+                    "%steal"   => "0.00",
+                    "%idle"    => "98.74",
+                    "%hoge"    => "hoge",
+                    9          => "fuga",
+                    10         => "piyo",
+                ],
+                3 => [
+                    "13:00:01" => "13:30:01",
+                    "CPU"      => "all",
+                    "%user"    => "0.60",
+                    "%nice"    => "0.10",
+                    "%system"  => "0.56",
+                    "%iowait"  => "0.00",
+                    "%steal"   => "0.00",
+                    "%idle"    => null,
+                    "%hoge"    => null,
+                    9          => null,
+                    10         => null,
+                ],
+            ],
+        );
+
         // misc
         that(str_array("a=A\n\nb=B\n \nc", '=', true))->is([
             'a' => 'A',

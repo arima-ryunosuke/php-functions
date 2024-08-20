@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../array/next_key.php';
 require_once __DIR__ . '/../var/is_stringable.php';
 // @codeCoverageIgnoreEnd
 
@@ -50,6 +51,34 @@ require_once __DIR__ . '/../var/is_stringable.php';
  *         '%idle'    => '98.74',
  *     ],
  * ]);
+ *
+ * // strict:false だと列数が一致していなくてもよい（null で埋められる）
+ * that(str_array("
+ * 13:00:01        CPU     %user     %nice   %system   %iowait
+ * 13:10:01        all      0.99      0.10      0.71      0.00      0.00     98.19
+ * 13:20:01        all      0.60      0.10
+ * ", ' ', false, false))->isSame([
+ *     1 => [
+ *         '13:00:01' => '13:10:01',
+ *         'CPU'      => 'all',
+ *         '%user'    => '0.99',
+ *         '%nice'    => '0.10',
+ *         '%system'  => '0.71',
+ *         '%iowait'  => '0.00',
+ *         '6'        => '0.00',
+ *         '7'        => '98.19',
+ *     ],
+ *     2 => [
+ *         '13:00:01' => '13:20:01',
+ *         'CPU'      => 'all',
+ *         '%user'    => '0.60',
+ *         '%nice'    => '0.10',
+ *         '%system'  => null,
+ *         '%iowait'  => null,
+ *         '6'        => null,
+ *         '7'        => null,
+ *     ],
+ * ]);
  * ```
  *
  * @package ryunosuke\Functions\Package\strings
@@ -57,9 +86,10 @@ require_once __DIR__ . '/../var/is_stringable.php';
  * @param string|array $string 対象文字列。配列を与えても動作する
  * @param string $delimiter 区切り文字
  * @param bool $hashmode 連想配列モードか
+ * @param bool $strict true にすると列数が一致しない場合に null になる
  * @return array 配列
  */
-function str_array($string, ?string $delimiter, $hashmode)
+function str_array($string, ?string $delimiter, $hashmode, $strict = true)
 {
     $array = $string;
     if (is_stringable($string)) {
@@ -82,7 +112,20 @@ function str_array($string, ?string $delimiter, $hashmode)
                 $keys = $parts;
                 continue;
             }
-            $result[$n] = count($keys) === count($parts) ? array_combine($keys, $parts) : null;
+            if ($strict) {
+                $result[$n] = count($keys) === count($parts) ? array_combine($keys, $parts) : null;
+            }
+            else {
+                if (count($keys) < count($parts)) {
+                    for ($i = count($keys); $i < count($parts); $i++) {
+                        $keys[] = next_key($keys);
+                    }
+                }
+                elseif (count($keys) > count($parts)) {
+                    $parts = array_pad($parts, count($keys), null);
+                }
+                $result[$n] = array_combine($keys, $parts);
+            }
         }
     }
     return $result;
