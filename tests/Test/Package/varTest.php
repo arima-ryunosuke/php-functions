@@ -35,6 +35,7 @@ use function ryunosuke\Functions\Package\numval;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\si_prefix;
 use function ryunosuke\Functions\Package\si_unprefix;
+use function ryunosuke\Functions\Package\strdec;
 use function ryunosuke\Functions\Package\stringify;
 use function ryunosuke\Functions\Package\var_apply;
 use function ryunosuke\Functions\Package\var_applys;
@@ -820,6 +821,38 @@ class varTest extends AbstractTestCase
         that(si_unprefix('1k', 1024))->is(1024);
         that(si_unprefix('1K', 1024))->is(1024);
         that(si_unprefix('1 K', 1024, '%d %s'))->is(1024);
+    }
+
+    function test_strdec()
+    {
+        that(self::resolveFunction('strdec'))('')->wasThrown();
+
+        that(strdec(1234))->isSame(1234);
+        that(strdec(3.14))->isSame(3.14);
+        that(strdec(-1234))->isSame(-1234);
+        that(strdec(-3.14))->isSame(-3.14);
+        that(self::resolveFunction('strdec'))('hoge')->wasThrown();
+
+        that(strdec('1234'))->isSame(1234);
+        that(strdec('3.14'))->isSame(3.14);
+        that(strdec('-1234'))->isSame(-1234);
+        that(strdec('-3.14'))->isSame(-3.14);
+        that(self::resolveFunction('strdec'))('-hoge')->wasThrown();
+
+        that(strdec('0xff'))->isSame(255);
+        that(strdec('0XFF'))->isSame(255);
+        that(strdec('-0XFF'))->isSame(-255);
+        that(self::resolveFunction('strdec'))('0xGG')->wasThrown();
+
+        that(strdec('0b11'))->isSame(3);
+        that(strdec('0B11'))->isSame(3);
+        that(strdec('-0B11'))->isSame(-3);
+        that(self::resolveFunction('strdec'))('0B22')->wasThrown();
+
+        that(strdec('077'))->isSame(63);
+        that(strdec('0o77'))->isSame(63);
+        that(strdec('-0o77'))->isSame(-63);
+        that(self::resolveFunction('strdec'))('0o88')->wasThrown();
     }
 
     function test_stringify()
