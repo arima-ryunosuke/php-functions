@@ -18,6 +18,7 @@ use function ryunosuke\Functions\Package\http_requests;
 use function ryunosuke\Functions\Package\incidr;
 use function ryunosuke\Functions\Package\ip2cidr;
 use function ryunosuke\Functions\Package\ip_info;
+use function ryunosuke\Functions\Package\ip_normalize;
 use function ryunosuke\Functions\Package\ping;
 use function ryunosuke\Functions\Package\rm_rf;
 
@@ -672,9 +673,9 @@ class networkTest extends AbstractTestCase
         that(incidr("192.168.1.1", "192.168.1.1/1"))->isSame(true);
         that(incidr("192.168.1.1", "192.168.1.0/24"))->isSame(true);
         that(incidr("192.168.1.1", "1.2.3.4/1"))->isSame(false);
-        that(incidr("192.168.1.1", ["1.2.3.4/1", "192.168.1.0/24"],))->isSame(true);
-        that(incidr("192.168.1.1", ["192.168.1.0/24", "1.2.3.4/1"],))->isSame(true);
-        that(incidr("192.168.1.1", ["1.2.3.4/1", "4.3.2.1/1"],))->isSame(false);
+        that(incidr("192.168.1.1", ["1.2.3.4/1", "192.168.1.0/24"]))->isSame(true);
+        that(incidr("192.168.1.1", ["192.168.1.0/24", "1.2.3.4/1"]))->isSame(true);
+        that(incidr("192.168.1.1", ["1.2.3.4/1", "4.3.2.1/1"]))->isSame(false);
         that(incidr("1.2.3.4", "0.0.0.0/0"))->isSame(true);
         that(incidr("1.2.3.4", "192.168.1.0/0"))->isSame(true);
 
@@ -782,6 +783,59 @@ class networkTest extends AbstractTestCase
         ])->wasThrown('404');
         that(self::resolveFunction('ip_info'))("hogera", $options)->wasThrown('is invalid');
         that(self::resolveFunction('ip_info'))("00:00:5e:ef:10:00:00:00", $options)->wasThrown('is not supported');
+    }
+
+    function test_ip_normalize()
+    {
+        // v4
+        that(ip_normalize('127.0.0.1'))->is('127.0.0.1');
+        that(ip_normalize('127.0.0xff.077'))->is('127.0.255.63');
+        that(ip_normalize('0xff.077.500'))->isSame('255.63.1.244');
+
+        that(ip_normalize('127.0.0'))->is('127.0.0.0');
+        that(ip_normalize('127.0.255'))->is('127.0.0.255');
+        that(ip_normalize('127.0.256'))->is('127.0.1.0');
+        that(ip_normalize('127.0.65535'))->is('127.0.255.255');
+
+        that(ip_normalize('127.0'))->is('127.0.0.0');
+        that(ip_normalize('127.255'))->is('127.0.0.255');
+        that(ip_normalize('127.256'))->is('127.0.1.0');
+        that(ip_normalize('127.65535'))->is('127.0.255.255');
+        that(ip_normalize('127.65536'))->is('127.1.0.0');
+        that(ip_normalize('127.16777215'))->is('127.255.255.255');
+
+        that(ip_normalize('0'))->is('0.0.0.0');
+        that(ip_normalize('255'))->is('0.0.0.255');
+        that(ip_normalize('256'))->is('0.0.1.0');
+        that(ip_normalize('65535'))->is('0.0.255.255');
+        that(ip_normalize('65536'))->is('0.1.0.0');
+        that(ip_normalize('16777215'))->is('0.255.255.255');
+        that(ip_normalize('16777216'))->is('1.0.0.0');
+        that(ip_normalize('4294967295'))->is('255.255.255.255');
+
+        that(self::resolveFunction('ip_normalize'))("1.2.3.4.5")->wasThrown('invalid ip');
+        that(self::resolveFunction('ip_normalize'))("127.0.65536")->wasThrown('invalid ip');
+        that(self::resolveFunction('ip_normalize'))("127.16777216")->wasThrown('invalid ip');
+        that(self::resolveFunction('ip_normalize'))("4294967296")->wasThrown('invalid ip');
+        that(self::resolveFunction('ip_normalize'))("-1")->wasThrown('invalid ip');
+        that(self::resolveFunction('ip_normalize'))("0xz")->wasThrown();
+        that(self::resolveFunction('ip_normalize'))("hoge")->wasThrown();
+        that(self::resolveFunction('ip_normalize'))("")->wasThrown();
+
+        // v6
+        that(ip_normalize('000a:0000:0000:0000:0000:0000:0000:000f'))->is('000a:0000:0000:0000:0000:0000:0000:000f');
+
+        that(ip_normalize('1::8'))->is('0001:0000:0000:0000:0000:0000:0000:0008');
+        that(ip_normalize('1:2::8'))->is('0001:0002:0000:0000:0000:0000:0000:0008');
+        that(ip_normalize('1:2:3::8'))->is('0001:0002:0003:0000:0000:0000:0000:0008');
+        that(ip_normalize('1:2:3:4::8'))->is('0001:0002:0003:0004:0000:0000:0000:0008');
+        that(ip_normalize('1:2:3:4:5::8'))->is('0001:0002:0003:0004:0005:0000:0000:0008');
+        that(ip_normalize('1:2:3:4:5:6::8'))->is('0001:0002:0003:0004:0005:0006:0000:0008');
+        that(ip_normalize('1:2:3:4:5:6:7:8'))->is('0001:0002:0003:0004:0005:0006:0007:0008');
+
+        that(ip_normalize('a::'))->is('000a:0000:0000:0000:0000:0000:0000:0000');
+        that(ip_normalize('::f'))->is('0000:0000:0000:0000:0000:0000:0000:000f');
+        that(ip_normalize('::'))->is('0000:0000:0000:0000:0000:0000:0000:0000');
     }
 
     function test_ping()
