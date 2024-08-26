@@ -117,10 +117,10 @@ function csv_import($csvstring, $options = [])
 
     $restore = set_error_exception_handler();
     try {
-        return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $grouping, $callback) {
+        $n = -1;
+        return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $grouping, $callback) use (&$n) {
             $mb_internal_encoding = mb_internal_encoding();
             $result = [];
-            $n = -1;
             while ($row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape)) {
                 if ($row === [null]) {
                     continue;
@@ -187,6 +187,13 @@ function csv_import($csvstring, $options = [])
 
             return $result;
         })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
+    }
+    catch (\Throwable $t) {
+        // 何行目？ が欲しくなることが非常に多いので例外メッセージを書き換える
+        $message = new \ReflectionProperty($t, 'message');
+        $message->setAccessible(true);
+        $message->setValue($t, "csv#$n: " . $t->getMessage());
+        throw $t;
     }
     finally {
         $restore();

@@ -368,7 +368,7 @@ Ahoge,Bhoge2,Bfuga2,Afuga,other21,other22
         ]);
 
         // 要素数が合わないと例外
-        that(self::resolveFunction('csv_import'))("a,b,c\nhoge")->wasThrown('array_combine');
+        that(self::resolveFunction('csv_import'))("a,b,c\nhoge")->wasThrown('csv#0: array_combine()');
     }
 
     function test_html_attr()
