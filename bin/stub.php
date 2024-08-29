@@ -1,5 +1,6 @@
 <?php
 
+require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../include/global.php';
 
 $V = fn($v) => $v;
@@ -9,41 +10,57 @@ rm_rf("$targetDirectory/ChainObject");
 mkdir("$targetDirectory/ChainObject");
 
 $targetFunction = [
-    'cpu_timer'        => [],
-    'include_stream'   => [],
-    'object_storage'   => [],
-    'process_async'    => [PHP_BINARY, ['-v']],
-    'cacheobject'      => [__DIR__],
-    'reflect_callable' => [function () { }],
-    'reflect_types'    => [],
+    'cpu_timer'        => [[]],
+    'include_stream'   => [[]],
+    'object_storage'   => [[]],
+    'process_async'    => [[PHP_BINARY, ['-v']]],
+    'cacheobject'      => [[__DIR__]],
+    'reflect_callable' => [[function () { }], [[PhpToken::class, 'tokenize']]],
+    'reflect_types'    => [[]],
 ];
 
-foreach ($targetFunction as $funcname => $args) {
-    $object = $funcname(...$args);
-    $refobject = new \ReflectionObject($object);
-
-    $extends = concat(" extends ", get_parent_class($object));
-    $implements = concat(" implements ", implode(', ', class_implements($object)));
-    $uses = concat("\n    use ", implode(', ', class_uses($object)));
-
-    $doccomment = preg_replace('#^/\*\*\s*|\s*\*/$#ums', '', $refobject->getDocComment() ?: '*');
-    $doccomment = preg_replace('#\\R\s+#u', "\n ", $doccomment);
+foreach ($targetFunction as $funcname => $argses) {
     $classname = pascal_case($funcname);
-    $properties = array_map_filter($refobject->getProperties(), function (\ReflectionProperty $property) {
-        if ($property->isPublic()) {
-            $doccomment = preg_replace('#\\R\s+#u', "\n ", $property->getDocComment());
-            $doccomment = concat($doccomment, "\n");
-            return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public $" . $property->getName() . ";");
-        }
-    });
-    $methods = array_map_filter($refobject->getMethods(), function (\ReflectionMethod $method) {
-        if ($method->isPublic() && !$method->isConstructor() && !$method->isDestructor()) {
-            $doccomment = preg_replace('#\\R\s+#u', "\n ", $method->getDocComment());
-            $doccomment = concat($doccomment, "\n");
-            $return = $method->hasReturnType() ? ": {$method->getReturnType()}" : "";
-            return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public function " . $method->getName() . "(" . implode(", ", function_parameter($method)) . ")$return { }");
-        }
-    });
+    $doccomment = null;
+    $extends = null;
+    $implements = [];
+    $uses = [];
+    $properties = [];
+    $methods = [];
+
+    foreach ($argses as $args) {
+        $object = $funcname(...$args);
+        $refobject = new \ReflectionObject($object);
+
+        $doccomment ??= trim(preg_replace('#(^/\*\*[ \t]*)|([ \t]*\*/$)|(^[ \t]+\*[ \t]*)#um', '', $refobject->getDocComment() ?: ''));
+
+        $extends ??= get_parent_class($object);
+        $implements += array_flip(class_implements($object));
+        $uses = array_flip(class_uses($object));
+
+        $properties = array_merge($properties, array_map_filter($refobject->getProperties(), function (\ReflectionProperty $property) {
+            if ($property->isPublic()) {
+                $doccomment = preg_replace('#\\R\s+#u', "\n ", $property->getDocComment());
+                $doccomment = concat($doccomment, "\n");
+                return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public $" . $property->getName() . ";");
+            }
+        }));
+        $methods = array_merge($methods, array_map_filter($refobject->getMethods(), function (\ReflectionMethod $method) {
+            if ($method->isPublic() && !$method->isConstructor() && !$method->isDestructor()) {
+                $doccomment = preg_replace('#\\R\s+#u', "\n ", $method->getDocComment());
+                $doccomment = concat($doccomment, "\n");
+                $return = $method->hasReturnType() ? ": {$method->getReturnType()}" : "";
+                return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public function " . $method->getName() . "(" . implode(", ", function_parameter($method)) . ")$return { }");
+            }
+        }));
+    }
+
+    $extends = concat(" extends ", $extends);
+    $implements = concat(" implements ", implode(', ', array_keys($implements)));
+    $uses = concat("\n    use ", implode(', ', array_keys($uses)));
+
+    $properties = array_unique($properties);
+    $methods = array_unique($methods);
 
     file_put_contents("$targetDirectory/$classname.php", <<<CLASS
     <?php
@@ -52,7 +69,7 @@ foreach ($targetFunction as $funcname => $args) {
     /**
      * stub for $funcname
      *
-     $doccomment
+     *{$V(concat(' ', implode("\n * ", explode("\n", $doccomment))))}
      *
      * @used-by \\{$funcname}()
      * @used-by \\ryunosuke\\Functions\\{$funcname}()
