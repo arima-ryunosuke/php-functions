@@ -16,8 +16,10 @@ require_once __DIR__ . '/../reflection/callable_code.php';
  *   - 上記二つは __call/__callStatic のメソッドも呼び出せる
  * - getDeclaration: 宣言部のコードを返す
  * - getCode: 定義部のコードを返す
+ * - isAnonymous: 無名関数なら true を返す（8.2 の isAnonymous 互換）
  * - isStatic: $this バインド可能かを返す（クロージャのみ）
  * - getUsedVariables: use している変数配列を返す（クロージャのみ）
+ * - getTraitMethod: トレイト側のリフレクションを返す（メソッドのみ）
  *
  * Example:
  * ```php
@@ -71,6 +73,11 @@ function reflect_callable($callable)
             {
                 return ($this->definition ??= callable_code($this))[1];
             }
+
+            public function isAnonymous(): bool
+            {
+                return false;
+            }
         };
     }
     elseif ($callable instanceof \Closure) {
@@ -105,6 +112,15 @@ function reflect_callable($callable)
                 return ($this->definition ??= callable_code($this))[1];
             }
 
+            public function isAnonymous(): bool
+            {
+                if (method_exists(\ReflectionFunction::class, 'isAnonymous')) {
+                    return parent::isAnonymous(); // @codeCoverageIgnore
+                }
+
+                return strpos($this->name, '{closure}') !== false;
+            }
+
             public function isStatic(): bool
             {
                 return !is_bindable_closure($this->callable);
@@ -112,6 +128,10 @@ function reflect_callable($callable)
 
             public function getUsedVariables(): array
             {
+                if (method_exists(\ReflectionFunction::class, 'getClosureUsedVariables')) {
+                    return parent::getClosureUsedVariables(); // @codeCoverageIgnore
+                }
+
                 $uses = object_properties($this->callable);
                 unset($uses['this']);
                 return $uses;
@@ -170,6 +190,41 @@ function reflect_callable($callable)
             public function getCode(): string
             {
                 return ($this->definition ??= callable_code($this))[1];
+            }
+
+            public function isAnonymous(): bool
+            {
+                return false;
+            }
+
+            public function getTraitMethod(): ?\ReflectionMethod
+            {
+                $name = strtolower($this->name);
+                $class = $this->getDeclaringClass();
+                $aliases = array_change_key_case($class->getTraitAliases(), CASE_LOWER);
+
+                if (!isset($aliases[$name])) {
+                    if ($this->getFileName() === $class->getFileName()) {
+                        return null;
+                    }
+                    else {
+                        return $this;
+                    }
+                }
+
+                [$tname, $mname] = explode('::', $aliases[$name]);
+                $result = new self($tname, $mname, $this->callable, $this->call_name);
+
+                // alias を張ったとしても自身で再宣言はエラーなく可能で、その場合自身が採用されるようだ
+                if (false
+                    || $this->getFileName() !== $result->getFileName()
+                    || $this->getStartLine() !== $result->getStartLine()
+                    || $this->getEndLine() !== $result->getEndLine()
+                ) {
+                    return null;
+                }
+
+                return $result;
             }
         };
     }

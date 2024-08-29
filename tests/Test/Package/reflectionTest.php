@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use Concrete;
+use Traitable;
 use function ryunosuke\Functions\Package\callable_code;
 use function ryunosuke\Functions\Package\function_doccomments;
 use function ryunosuke\Functions\Package\function_export_false2null;
@@ -364,6 +365,14 @@ class reflectionTest extends AbstractTestCase
         // タイプ X: メソッドスコープ
         that(reflect_callable(['PrivateClass', 'privateMethod']))->isInstanceOf('\ReflectionMethod');
 
+        // isAnonymous
+        that(reflect_callable(fn() => null))->isAnonymous()->isTrue();
+        that(reflect_callable('strlen'))->isAnonymous()->isFalse();
+        that(reflect_callable(['Concrete', 'staticMethod']))->isAnonymous()->isFalse();
+        that(reflect_callable(\Closure::fromCallable(fn() => null)))->isAnonymous()->isTrue();
+        that(reflect_callable(\Closure::fromCallable('strlen')))->isAnonymous()->isFalse();
+        that(reflect_callable(\Closure::fromCallable(['Concrete', 'staticMethod'])))->isAnonymous()->isFalse();
+
         // そんなものは存在しない
         that(self::resolveFunction('reflect_callable'))('hogefuga')->wasThrown('does not exist');
 
@@ -420,6 +429,38 @@ class reflectionTest extends AbstractTestCase
         that($reffunc->getCode())->contains('return $name;');
         that($reffunc->call(new Concrete('fuga')))->is('hogera');
         that($reffunc())->is('hogera');
+
+        $object = new class { use Traitable; };
+        that(reflect_callable([$object, 'traitMethod'])->getTraitMethod())->isInstanceOf(\ReflectionMethod::class);
+        that(reflect_callable([$object, 'traitMethod'])->getTraitMethod())()->is(Traitable::class);
+
+        $object = new class {
+            use Traitable {
+                traitMethod as aliasMethod;
+            }
+        };
+        that(reflect_callable([$object, 'traitMethod'])->getTraitMethod())->isInstanceOf(\ReflectionMethod::class);
+        that(reflect_callable([$object, 'aliasMethod'])->getTraitMethod())->isInstanceOf(\ReflectionMethod::class);
+        that(reflect_callable([$object, 'traitMethod'])->getTraitMethod())()->is(Traitable::class);
+        that(reflect_callable([$object, 'aliasMethod'])->getTraitMethod())()->wasThrown('object is not an instance of the class');
+
+        $object = new class {
+            use Traitable;
+
+            function traitMethod() { }
+        };
+        that(reflect_callable([$object, 'traitMethod'])->getTraitMethod())->is(null);
+
+        $object = new class {
+            use Traitable {
+                traitMethod as aliasMethod;
+            }
+
+            function aliasMethod() { }
+        };
+        that(reflect_callable([$object, 'traitMethod'])->getTraitMethod())->isInstanceOf(\ReflectionMethod::class);
+        that(reflect_callable([$object, 'traitMethod'])->getTraitMethod())()->is(Traitable::class);
+        that(reflect_callable([$object, 'aliasMethod'])->getTraitMethod())->is(null);
     }
 
     function test_reflect_type_resolve()
