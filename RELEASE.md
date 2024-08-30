@@ -11,6 +11,19 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.14
+
+- [fixbug] php8.2 の対応漏れを修正
+- [fixbug] Narrowing occurred during type inference of ZEND_FETCH_DIM_RW
+- [feature] reflect_callable にメソッド追加
+- [feature] system_status を追加
+- [feature] ip_normalize を追加
+- [feature] strdec を追加
+- [feature] str_array の loose モードを追加
+- [feature] si_unprefix のリバースフォーマット
+- [feature] csv_import でエラー時に行番号を表示する機能
+- [fixbug] var_export3 の不具合を修正
+
 ## 2.0.13
 
 - [feature] php8.2 の対応漏れを修正
