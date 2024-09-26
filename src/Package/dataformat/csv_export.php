@@ -8,6 +8,7 @@ require_once __DIR__ . '/../iterator/iterator_join.php';
 require_once __DIR__ . '/../iterator/iterator_split.php';
 require_once __DIR__ . '/../strings/starts_with.php';
 require_once __DIR__ . '/../strings/str_array.php';
+require_once __DIR__ . '/../var/is_stringable.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -117,8 +118,11 @@ function csv_export($csvarrays, $options = [])
                     $csvarrays[$n] = array_map('rawurldecode', str_array(explode('&', $query), '=', true));
                 }
             }
-            if (strlen($initial)) {
-                fwrite($fp, $initial);
+            if (is_stringable($initial) && strlen($initial)) {
+                $size += fwrite($fp, $initial);
+            }
+            elseif (is_array($initial) && $initial) {
+                $size += fputcsv($fp, $initial, $delimiter, $enclosure, $escape);
             }
             if (!$headers) {
                 $tmp = [];

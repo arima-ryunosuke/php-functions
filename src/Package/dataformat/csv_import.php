@@ -93,6 +93,7 @@ function csv_import($csvstring, $options = [])
         'enclosure' => '"',
         'escape'    => '\\',
         'encoding'  => ini_get('default_charset'),
+        'initial'   => [],
         'headers'   => [],
         'headermap' => null,
         'structure' => false,
@@ -116,7 +117,7 @@ function csv_import($csvstring, $options = [])
     }
 
     try {
-        return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $grouping, $callback) {
+        return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $headermap, $structure, $grouping, $callback) {
             $default_charset = ini_get('default_charset');
             if ($default_charset !== $encoding) {
                 // https://www.php.net/manual/ja/function.iconv.php
@@ -127,6 +128,20 @@ function csv_import($csvstring, $options = [])
                 // となると変換失敗したことを知る術がなく、全てを捨てざるを得ない
                 // ので IGNORE にしている（エラーを検知しつつも処理は継続させるのが理想だったけど…）
                 stream_filter_append($fp, "convert.iconv.$encoding/$default_charset//IGNORE", STREAM_FILTER_READ);
+            }
+
+            foreach ($initial as $rule => $count) {
+                for ($i = 0; $i < $count; $i++) {
+                    if ($rule === 'byte') {
+                        fgetc($fp);
+                    }
+                    elseif ($rule === 'line') {
+                        fgets($fp);
+                    }
+                    elseif ($rule === 'csv') {
+                        fgetcsv($fp, 0, $delimiter, $enclosure, $escape);
+                    }
+                }
             }
 
             $result = [];
@@ -193,7 +208,7 @@ function csv_import($csvstring, $options = [])
             }
 
             return $result;
-        }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
+        }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
     }
     finally {
         fclose($fp);
