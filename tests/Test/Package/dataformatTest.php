@@ -67,6 +67,7 @@ class dataformatTest extends AbstractTestCase
         ];
         $sjisstring = require "$DATADIR/sjisstring.php";
         $sjisstring12345 = require "$DATADIR/sjisstring12345.php";
+        $sjisstring5C = require "$DATADIR/sjisstring5C.php";
         $sjisstringnohead = require "$DATADIR/sjisstringnohead.php";
 
         that(csv_export($utf8array, ['encoding' => 'SJIS']))->is($sjisstring);
@@ -92,6 +93,73 @@ class dataformatTest extends AbstractTestCase
                 'Ｅ',
             ],
         ]))->is($utf8array);
+        that(csv_import($sjisstring5C, [
+            'encoding' => 'cp932',
+        ]))->is([
+            [
+                "あ" => "―",
+                "い" => "ソ",
+                "う" => "Ы",
+                "え" => "Ⅸ",
+                "お" => "噂",
+            ],
+            [
+                "あ" => "浬",
+                "い" => "欺",
+                "う" => "圭",
+                "え" => "構",
+                "お" => "蚕",
+            ],
+            [
+                "あ" => "十",
+                "い" => "申",
+                "う" => "曾",
+                "え" => "箪",
+                "お" => "貼",
+            ],
+            [
+                "あ" => "能",
+                "い" => "表",
+                "う" => "暴",
+                "え" => "予",
+                "お" => "禄",
+            ],
+            [
+                "あ" => "兔",
+                "い" => "喀",
+                "う" => "媾",
+                "え" => "彌",
+                "お" => "拿",
+            ],
+            [
+                "あ" => "杤",
+                "い" => "歃",
+                "う" => "濬",
+                "え" => "畚",
+                "お" => "秉",
+            ],
+            [
+                "あ" => "綵",
+                "い" => "臀",
+                "う" => "藹",
+                "え" => "觸",
+                "お" => "軆",
+            ],
+            [
+                "あ" => "鐔",
+                "い" => "饅",
+                "う" => "鷭",
+                "え" => "纊",
+                "お" => "犾",
+            ],
+            [
+                "あ" => "偆",
+                "い" => "砡",
+                "う" => "du",
+                "え" => "mm",
+                "お" => "y",
+            ],
+        ]);
     }
 
     function test_csv_export()

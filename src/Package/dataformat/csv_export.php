@@ -80,7 +80,7 @@ function csv_export($csvarrays, $options = [])
         'delimiter'       => ',',
         'enclosure'       => '"',
         'escape'          => '\\',
-        'encoding'        => mb_internal_encoding(),
+        'encoding'        => ini_get('default_charset'),
         'initial'         => '', // "\xEF\xBB\xBF"
         'headers'         => null,
         'structure'       => false,
@@ -99,8 +99,13 @@ function csv_export($csvarrays, $options = [])
     }
     try {
         $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback, $callback_header) {
+            $default_charset = ini_get('default_charset');
+            if ($default_charset !== $encoding) {
+                // import とは違い、吐き出すときは明確なエラーだろうので TRANSLIT も IGNORE もしない
+                stream_filter_append($fp, "convert.iconv.$default_charset/$encoding", STREAM_FILTER_WRITE);
+            }
+
             $size = 0;
-            $mb_internal_encoding = mb_internal_encoding();
 
             if (!is_array($csvarrays)) {
                 [$csvarrays, $csvarrays2] = iterator_split($csvarrays, [1], true);
@@ -160,9 +165,6 @@ function csv_export($csvarrays, $options = [])
                 }
 
                 $headerline = $headers;
-                if ($encoding !== $mb_internal_encoding) {
-                    mb_convert_variables($encoding, $mb_internal_encoding, $headerline);
-                }
                 if ($structure) {
                     $headerline = array_map(fn($header) => preg_replace('#\[\d+]$#imu', '[]', $header), $headerline);
                 }
@@ -184,9 +186,6 @@ function csv_export($csvarrays, $options = [])
                     }
                 }
                 $row = array_intersect_key(array_replace($default, $array), $default);
-                if ($encoding !== $mb_internal_encoding) {
-                    mb_convert_variables($encoding, $mb_internal_encoding, $row);
-                }
                 $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
             }
             return $size;
