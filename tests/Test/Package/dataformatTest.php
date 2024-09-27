@@ -67,6 +67,7 @@ class dataformatTest extends AbstractTestCase
         ];
         $sjisstring = require "$DATADIR/sjisstring.php";
         $sjisstring12345 = require "$DATADIR/sjisstring12345.php";
+        $sjisstring5C = require "$DATADIR/sjisstring5C.php";
         $sjisstringnohead = require "$DATADIR/sjisstringnohead.php";
 
         that(csv_export($utf8array, ['encoding' => 'SJIS']))->is($sjisstring);
@@ -92,6 +93,73 @@ class dataformatTest extends AbstractTestCase
                 'Ｅ',
             ],
         ]))->is($utf8array);
+        that(csv_import($sjisstring5C, [
+            'encoding' => 'cp932',
+        ]))->is([
+            [
+                "あ" => "―",
+                "い" => "ソ",
+                "う" => "Ы",
+                "え" => "Ⅸ",
+                "お" => "噂",
+            ],
+            [
+                "あ" => "浬",
+                "い" => "欺",
+                "う" => "圭",
+                "え" => "構",
+                "お" => "蚕",
+            ],
+            [
+                "あ" => "十",
+                "い" => "申",
+                "う" => "曾",
+                "え" => "箪",
+                "お" => "貼",
+            ],
+            [
+                "あ" => "能",
+                "い" => "表",
+                "う" => "暴",
+                "え" => "予",
+                "お" => "禄",
+            ],
+            [
+                "あ" => "兔",
+                "い" => "喀",
+                "う" => "媾",
+                "え" => "彌",
+                "お" => "拿",
+            ],
+            [
+                "あ" => "杤",
+                "い" => "歃",
+                "う" => "濬",
+                "え" => "畚",
+                "お" => "秉",
+            ],
+            [
+                "あ" => "綵",
+                "い" => "臀",
+                "う" => "藹",
+                "え" => "觸",
+                "お" => "軆",
+            ],
+            [
+                "あ" => "鐔",
+                "い" => "饅",
+                "う" => "鷭",
+                "え" => "纊",
+                "お" => "犾",
+            ],
+            [
+                "あ" => "偆",
+                "い" => "砡",
+                "う" => "du",
+                "え" => "mm",
+                "お" => "y",
+            ],
+        ]);
     }
 
     function test_csv_export()
@@ -136,6 +204,14 @@ a1,b1,c1
 a2,b2,c2
 a3,b3,c3
 ");
+
+        // 冒頭指定
+        that(csv_export($csvarrays, ['initial' => ['a is A', '', 'c is C']]))->is('"a is A",,"c is C"
+a,b,c
+a1,b1,c1
+a2,b2,c2
+a3,b3,c3
+');
 
         // callback
         that(csv_export($csvarrays, [
@@ -290,6 +366,34 @@ a2,b2,c2
 ', ['headers' => ['C' => 'xC', 'A' => 'xA', 'unknown' => 'x']]))->is([
             ['xA' => 'a1', 'xC' => 'c1'],
             ['xA' => 'a2', 'xC' => 'c2'],
+        ]);
+
+        // 読み飛ばし（csv）
+        that(csv_import('"a is A",,"c is C"
+a,b,c
+a1,b1,c1
+a2,b2,c2
+', ['initial' => ['csv' => 1]]))->is([
+            ['a' => 'a1', 'b' => 'b1', 'c' => 'c1'],
+            ['a' => 'a2', 'b' => 'b2', 'c' => 'c2'],
+        ]);
+        // 読み飛ばし（line）
+        that(csv_import('summary1
+summary2
+a,b,c
+a1,b1,c1
+a2,b2,c2
+', ['initial' => ['line' => 2]]))->is([
+            ['a' => 'a1', 'b' => 'b1', 'c' => 'c1'],
+            ['a' => 'a2', 'b' => 'b2', 'c' => 'c2'],
+        ]);
+        // 読み飛ばし（byte）
+        that(csv_import('xyza,b,c
+a1,b1,c1
+a2,b2,c2
+', ['initial' => ['byte' => 2]]))->is([
+            ['za' => 'a1', 'b' => 'b1', 'c' => 'c1'],
+            ['za' => 'a2', 'b' => 'b2', 'c' => 'c2'],
         ]);
 
         // コールバック指定

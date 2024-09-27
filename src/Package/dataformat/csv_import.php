@@ -92,7 +92,8 @@ function csv_import($csvstring, $options = [])
         'delimiter' => ',',
         'enclosure' => '"',
         'escape'    => '\\',
-        'encoding'  => mb_internal_encoding(),
+        'encoding'  => ini_get('default_charset'),
+        'initial'   => [],
         'headers'   => [],
         'headermap' => null,
         'structure' => false,
@@ -118,15 +119,37 @@ function csv_import($csvstring, $options = [])
     $restore = set_error_exception_handler();
     try {
         $n = -1;
-        return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $grouping, $callback) use (&$n) {
-            $mb_internal_encoding = mb_internal_encoding();
+        return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $headermap, $structure, $grouping, $callback) use (&$n) {
+            $default_charset = ini_get('default_charset');
+            if ($default_charset !== $encoding) {
+                // https://www.php.net/manual/ja/function.iconv.php
+                // > TRANSLIT が機能したとしたら、 どう動くかはシステムの iconv() の実装 (ICONV_IMPL を参照) に依存します。
+                // > 実装によっては、//TRANSLIT を無視することが知られています。
+                // > よって、to_encoding において無効な文字に対しては、 変換処理は失敗するかもしれません。
+                // とのことで失敗すると feof は true になり fgetcsv は false を返すようになり ftell も進まない
+                // となると変換失敗したことを知る術がなく、全てを捨てざるを得ない
+                // ので IGNORE にしている（エラーを検知しつつも処理は継続させるのが理想だったけど…）
+                stream_filter_append($fp, "convert.iconv.$encoding/$default_charset//IGNORE", STREAM_FILTER_READ);
+            }
+
+            foreach ($initial as $rule => $count) {
+                for ($i = 0; $i < $count; $i++) {
+                    if ($rule === 'byte') {
+                        fgetc($fp);
+                    }
+                    elseif ($rule === 'line') {
+                        fgets($fp);
+                    }
+                    elseif ($rule === 'csv') {
+                        fgetcsv($fp, 0, $delimiter, $enclosure, $escape);
+                    }
+                }
+            }
+
             $result = [];
             while ($row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape)) {
                 if ($row === [null]) {
                     continue;
-                }
-                if ($mb_internal_encoding !== $encoding) {
-                    mb_convert_variables($mb_internal_encoding, $encoding, $row);
                 }
                 if (!$headers) {
                     $headers = $row;
@@ -186,7 +209,7 @@ function csv_import($csvstring, $options = [])
             }
 
             return $result;
-        })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
+        })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
     }
     catch (\Throwable $t) {
         // 何行目？ が欲しくなることが非常に多いので例外メッセージを書き換える

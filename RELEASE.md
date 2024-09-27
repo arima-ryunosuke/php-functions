@@ -202,6 +202,11 @@
     - build_uri: uri_build
     - parse_uri: uri_parse
 
+## 1.6.21
+
+- [feature] csv_export の initial の配列対応と csv_import の initial 対応
+- [change] csv のエンコーディング変換を mb から iconv filter に変更
+
 ## 1.6.20
 
 - [fixbug] cache で特定文字があるとキャッシュが使われない不具合
