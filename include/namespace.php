@@ -8862,6 +8862,7 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
             'enclosure'       => '"',
             'escape'          => '\\',
             'encoding'        => ini_get('default_charset'),
+            'scrub'           => 'TRANSLIT',
             'initial'         => '', // "\xEF\xBB\xBF"
             'headers'         => null,
             'structure'       => false,
@@ -8879,11 +8880,11 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
             $fp = fopen('php://temp', 'rw+');
         }
         try {
-            $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback, $callback_header) {
+            $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $structure, $callback, $callback_header) {
                 $default_charset = ini_get('default_charset');
                 if ($default_charset !== $encoding) {
                     // import とは違い、吐き出すときは明確なエラーだろうので TRANSLIT も IGNORE もしない
-                    stream_filter_append($fp, "convert.iconv.$default_charset/$encoding", STREAM_FILTER_WRITE);
+                    stream_filter_append($fp, "convert.iconv.$default_charset/$encoding" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_WRITE);
                 }
 
                 $size = 0;
@@ -8973,7 +8974,7 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
                     $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
                 }
                 return $size;
-            }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['structure'], $options['callback'], $options['callback_header']);
+            }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['structure'], $options['callback'], $options['callback_header']);
             if ($output) {
                 return $size;
             }
@@ -9073,6 +9074,7 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
             'enclosure' => '"',
             'escape'    => '\\',
             'encoding'  => ini_get('default_charset'),
+            'scrub'     => 'IGNORE',
             'initial'   => [],
             'headers'   => [],
             'headermap' => null,
@@ -9097,17 +9099,10 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
         }
 
         try {
-            return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $headermap, $structure, $grouping, $callback) {
+            return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $headermap, $structure, $grouping, $callback) {
                 $default_charset = ini_get('default_charset');
                 if ($default_charset !== $encoding) {
-                    // https://www.php.net/manual/ja/function.iconv.php
-                    // > TRANSLIT が機能したとしたら、 どう動くかはシステムの iconv() の実装 (ICONV_IMPL を参照) に依存します。
-                    // > 実装によっては、//TRANSLIT を無視することが知られています。
-                    // > よって、to_encoding において無効な文字に対しては、 変換処理は失敗するかもしれません。
-                    // とのことで失敗すると feof は true になり fgetcsv は false を返すようになり ftell も進まない
-                    // となると変換失敗したことを知る術がなく、全てを捨てざるを得ない
-                    // ので IGNORE にしている（エラーを検知しつつも処理は継続させるのが理想だったけど…）
-                    stream_filter_append($fp, "convert.iconv.$encoding/$default_charset//IGNORE", STREAM_FILTER_READ);
+                    stream_filter_append($fp, "convert.iconv.$encoding/$default_charset" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_READ);
                 }
 
                 foreach ($initial as $rule => $count) {
@@ -9188,7 +9183,7 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
                 }
 
                 return $result;
-            }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
+            }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
         }
         finally {
             fclose($fp);
