@@ -202,6 +202,10 @@
     - build_uri: uri_build
     - parse_uri: uri_parse
 
+## 1.6.22
+
+- [feature] csv 系の scrub オプションを追加
+
 ## 1.6.21
 
 - [feature] csv_export の initial の配列対応と csv_import の initial 対応
