@@ -93,6 +93,7 @@ function csv_import($csvstring, $options = [])
         'enclosure' => '"',
         'escape'    => '\\',
         'encoding'  => ini_get('default_charset'),
+        'scrub'     => 'IGNORE',
         'initial'   => [],
         'headers'   => [],
         'headermap' => null,
@@ -117,17 +118,10 @@ function csv_import($csvstring, $options = [])
     }
 
     try {
-        return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $headermap, $structure, $grouping, $callback) {
+        return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $headermap, $structure, $grouping, $callback) {
             $default_charset = ini_get('default_charset');
             if ($default_charset !== $encoding) {
-                // https://www.php.net/manual/ja/function.iconv.php
-                // > TRANSLIT が機能したとしたら、 どう動くかはシステムの iconv() の実装 (ICONV_IMPL を参照) に依存します。
-                // > 実装によっては、//TRANSLIT を無視することが知られています。
-                // > よって、to_encoding において無効な文字に対しては、 変換処理は失敗するかもしれません。
-                // とのことで失敗すると feof は true になり fgetcsv は false を返すようになり ftell も進まない
-                // となると変換失敗したことを知る術がなく、全てを捨てざるを得ない
-                // ので IGNORE にしている（エラーを検知しつつも処理は継続させるのが理想だったけど…）
-                stream_filter_append($fp, "convert.iconv.$encoding/$default_charset//IGNORE", STREAM_FILTER_READ);
+                stream_filter_append($fp, "convert.iconv.$encoding/$default_charset" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_READ);
             }
 
             foreach ($initial as $rule => $count) {
@@ -208,7 +202,7 @@ function csv_import($csvstring, $options = [])
             }
 
             return $result;
-        }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
+        }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
     }
     finally {
         fclose($fp);

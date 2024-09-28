@@ -160,6 +160,15 @@ class dataformatTest extends AbstractTestCase
                 "お" => "y",
             ],
         ]);
+
+        that(self::resolveFunction('csv_import'))($sjisstring5C, [
+            'encoding' => 'sjis',
+            'scrub'    => '',
+        ])->wasThrown('invalid multibyte sequence');
+        that(self::resolveFunction('csv_export'))([['a' => '㈱']], [
+            'encoding' => 'sjis',
+            'scrub'    => '',
+        ])->wasThrown('invalid multibyte sequence');
     }
 
     function test_csv_export()

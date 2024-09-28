@@ -82,6 +82,7 @@ function csv_export($csvarrays, $options = [])
         'enclosure'       => '"',
         'escape'          => '\\',
         'encoding'        => ini_get('default_charset'),
+        'scrub'           => 'TRANSLIT',
         'initial'         => '', // "\xEF\xBB\xBF"
         'headers'         => null,
         'structure'       => false,
@@ -99,11 +100,11 @@ function csv_export($csvarrays, $options = [])
         $fp = fopen('php://temp', 'rw+');
     }
     try {
-        $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback, $callback_header) {
+        $size = call_safely(function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $structure, $callback, $callback_header) {
             $default_charset = ini_get('default_charset');
             if ($default_charset !== $encoding) {
                 // import とは違い、吐き出すときは明確なエラーだろうので TRANSLIT も IGNORE もしない
-                stream_filter_append($fp, "convert.iconv.$default_charset/$encoding", STREAM_FILTER_WRITE);
+                stream_filter_append($fp, "convert.iconv.$default_charset/$encoding" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_WRITE);
             }
 
             $size = 0;
@@ -193,7 +194,7 @@ function csv_export($csvarrays, $options = [])
                 $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
             }
             return $size;
-        }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['structure'], $options['callback'], $options['callback_header']);
+        }, $fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['structure'], $options['callback'], $options['callback_header']);
         if ($output) {
             return $size;
         }
