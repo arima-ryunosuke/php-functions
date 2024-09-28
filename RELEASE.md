@@ -12,6 +12,10 @@
 - 使わん関数が多すぎるので整理する（次のメジャーアップ）
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 1.6.22
+
+- [feature] csv 系の scrub オプションを追加
+
 ## 1.6.21
 
 - [feature] csv_export の initial の配列対応と csv_import の initial 対応
