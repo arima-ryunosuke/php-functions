@@ -100,6 +100,7 @@ function csv_import($csvstring, $options = [])
         'structure' => false,
         'grouping'  => null,
         'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
+        'limit'     => null, // 正味のデータ行の最大値（超えた場合はそこで処理を終了する。例外が飛んだりはしない）
     ];
 
     // 文字キーを含む場合はヘッダーありの読み換えとなる
@@ -118,7 +119,7 @@ function csv_import($csvstring, $options = [])
     }
 
     try {
-        return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $headermap, $structure, $grouping, $callback) {
+        return call_safely(function ($fp, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $headermap, $structure, $grouping, $callback, $limit) {
             $default_charset = ini_get('default_charset');
             if ($default_charset !== $encoding) {
                 stream_filter_append($fp, "convert.iconv.$encoding/$default_charset" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_READ);
@@ -193,6 +194,10 @@ function csv_import($csvstring, $options = [])
                 else {
                     $result[] = $row;
                 }
+
+                if ($limit !== null && count($result) >= $limit) {
+                    break;
+                }
             }
 
             if ($grouping !== null) {
@@ -202,7 +207,7 @@ function csv_import($csvstring, $options = [])
             }
 
             return $result;
-        }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
+        }, $fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback'], $options['limit']);
     }
     finally {
         fclose($fp);
