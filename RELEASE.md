@@ -202,6 +202,10 @@
     - build_uri: uri_build
     - parse_uri: uri_parse
 
+## 1.6.23
+
+- [feature] csv_import に limit オプションを追加
+
 ## 1.6.22
 
 - [feature] csv 系の scrub オプションを追加
