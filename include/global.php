@@ -17907,7 +17907,7 @@ if (!function_exists('iterator_join')) {
         }
 
         $n = 0;
-        foreach ($iterator as $k => $it) {
+        foreach (new \NoRewindIterator($iterator) as $k => $it) {
             if ($preserve_keys) {
                 yield $k => $it;
             }
