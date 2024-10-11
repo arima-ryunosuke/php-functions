@@ -1920,6 +1920,130 @@ class varTest extends AbstractTestCase
         that(var_type(new class { }))->stringContains('anonymous');
     }
 
+    function test_var_type_phpdoc()
+    {
+        // 空
+        that(var_type([], ['phpdoc' => true]))->is('array');
+        that(var_type((object) [], ['phpdoc' => true]))->is('object');
+        that(var_type([[]], ['phpdoc' => true]))->is('array<array>');
+        that(var_type([[[]]], ['phpdoc' => true]))->is('array<array<array>>');
+
+        // 型混在配列
+        that(var_type([null, true, 1, 2.3, 'str', new \Exception()], ['phpdoc' => true]))->is('array<\\Exception|bool|float|int|null|string>');
+        that(var_type([
+            [new \Exception(), new \LogicException(), new \InvalidArgumentException()],
+            [new \InvalidArgumentException(), new \LogicException(), new \Exception()],
+        ], ['phpdoc' => true]))->is('array<array<\\InvalidArgumentException>>');
+
+        // 連番・連想混在配列
+        that(var_type([
+            [1, 2, 3],
+            'hash' => ['id' => 1, 'name' => 'a'],
+            [],
+        ], ['phpdoc' => true]))->is('array<array<int>>|array{hash: array{id: int, name: string}}');
+        that(var_type([
+            [],
+            [1, 2, 3],
+            'hash' => ['id' => 1, 'name' => 'a'],
+        ], ['phpdoc' => true]))->is('array<array<int>>|array{hash: array{id: int, name: string}}');
+
+        // いわゆる array-shape
+        that(var_type(['id' => 1, 'name' => 'a'], ['phpdoc' => true]))->is('array{id: int, name: string}');
+
+        // …の配列は最大の型に拡張される
+        that(var_type([
+            ['id' => 1, 'name' => 'a'],
+            ['name' => 'b', 'id' => 2, 'other' => [1, 2, 3]],
+        ], ['phpdoc' => true]))->is('array<array{id: int, name: string, other?: array<int>}>');
+        that(var_type([
+            ['name' => 'b', 'id' => 2, 'other' => [1, 2, 3]],
+            ['id' => 1, 'name' => 'a'],
+        ], ['phpdoc' => true]))->is('array<array{id: int, name: string, other?: array<int>}>');
+
+        // さらに各型が違うとマージされる
+        that(var_type([
+            ['id' => '1', 'name' => 'a', 'other' => ['x']],
+            ['name' => 'b', 'id' => 2, 'other' => [1, 2, 3]],
+        ], ['phpdoc' => true]))->is('array<array{id: int|string, name: string, other: array<int|string>}>');
+
+        // オブジェクトは下位型に呑まれる
+        that(var_type([new \Exception(), new \LogicException(), new \InvalidArgumentException()], ['phpdoc' => true]))->is('array<\\InvalidArgumentException>');
+        that(var_type([new \InvalidArgumentException(), new \LogicException(), new \Exception()], ['phpdoc' => true]))->is('array<\\InvalidArgumentException>');
+
+        // stdClass や AllowDynamicProperties は object になる
+        that(var_type(new #[\AllowDynamicProperties] class(
+            id: 1,
+            name: 'a',
+            children: [
+                (object) ['cid' => 1, 'cname' => 'x'],
+                (object) ['cid' => 2, 'cname' => 'y'],
+                (object) ['cid' => 3, 'cname' => 'z'],
+            ]) implements \Stringable {
+            public function __construct(public $id, public $name, public $children) { }
+
+            public function __toString(): string { }
+        }, ['phpdoc' => true]))->is('\Stringable|object{children: array<\stdClass|object{cid: int, cname: string}>, id: int, name: string}');
+
+        // 連想配列判定の指定
+        that(var_type([
+            'id-1' => ['id' => 1, 'name' => 'a'],
+            'id-2' => ['id' => 2, 'name' => 'b'],
+            'id-3' => ['id' => 3, 'name' => 'c'],
+        ], ['phpdoc' => true, 'is_list' => fn($v) => preg_match('#^id-\d+$#', $v)]))->is('array<array{id: int, name: string}>');
+
+        // クロージャは引数と返り値が埋め込まれる
+        that(var_type(fn($x) => null, ['phpdoc' => true]))->is('\\Closure(mixed): mixed');
+        that(var_type(fn(?int $x): ?\ArrayObject => null, ['phpdoc' => true]))->is('\\Closure(?int): ?\\ArrayObject');
+
+        // 無名クラスは特定できる限りの配列になる（特定できない場合は object）
+        that(var_type(new class ( ) extends \ArrayObject { }, ['phpdoc' => true]))->is('\\ArrayObject');
+        that(var_type(new class () implements \Stringable, \Countable {
+            public function __toString(): string { }
+
+            public function count(): int { }
+        }, ['phpdoc' => true]))->is('\\Stringable|\\Countable');
+        that(var_type(new class () extends \ArrayObject implements \Stringable, \Countable {
+            public function __toString(): string { }
+
+            public function count(): int { }
+        }, ['phpdoc' => true]))->is('\\ArrayObject|\\Stringable');
+        that(var_type(new class ( ) { }, ['phpdoc' => true]))->is('object');
+
+        // フォーマットレベル
+        $value = [
+            'scalar'    => 123,
+            'lish-hash' => [
+                ['id' => 1, 'name' => 'a'],
+                ['id' => 2, 'name' => 'b'],
+            ],
+            'nest'      => [
+                'a' => [
+                    'b' => [
+                        'c' => ['a', 'b', 'c'],
+                    ],
+                ],
+            ],
+        ];
+        that(var_type($value, ['phpdoc' => true, 'format' => 0]))->is('array{"lish-hash":array<array{id:int,name:string}>,nest:array{a:array{b:array{c:array<string>}}},scalar:int}');
+        that(var_type($value, ['phpdoc' => true, 'format' => 1]))->is('array{"lish-hash": array<array{id: int, name: string}>, nest: array{a: array{b: array{c: array<string>}}}, scalar: int}');
+        that(var_type($value, ['phpdoc' => true, 'format' => 2]))->is(<<<SHAPE
+        array{
+          "lish-hash": array<array{
+            id: int,
+            name: string
+          }>,
+          nest: array{
+            a: array{
+              b: array{
+                c: array<string>
+              }
+            }
+          },
+          scalar: int
+        }
+        SHAPE,);
+    }
+
     function test_varcmp()
     {
         // strict
