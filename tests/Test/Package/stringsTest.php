@@ -15,7 +15,7 @@ use function ryunosuke\Functions\Package\mb_ellipsis;
 use function ryunosuke\Functions\Package\mb_ereg_options;
 use function ryunosuke\Functions\Package\mb_ereg_split;
 use function ryunosuke\Functions\Package\mb_monospace;
-use function ryunosuke\Functions\Package\mb_str_pad;
+use function ryunosuke\Functions\Package\mb_pad_width;
 use function ryunosuke\Functions\Package\mb_substr_replace;
 use function ryunosuke\Functions\Package\mb_trim;
 use function ryunosuke\Functions\Package\mb_wordwrap;
@@ -366,65 +366,65 @@ This is VARIABLE.
         ]))->isSame(35);
     }
 
-    function test_mb_str_pad()
+    function test_mb_pad_width()
     {
-        that(mb_str_pad('a', 11, '', STR_PAD_LEFT))->isSame('a');
-        that(mb_str_pad('aaa', 1, 'x', STR_PAD_LEFT))->isSame('aaa');
+        that(mb_pad_width('a', 11, '', STR_PAD_LEFT))->isSame('a');
+        that(mb_pad_width('aaa', 1, 'x', STR_PAD_LEFT))->isSame('aaa');
 
-        that(mb_str_pad('あ', 2, 'x', STR_PAD_LEFT))->isSame('あ');
-        that(mb_str_pad('あ', 3, 'x', STR_PAD_LEFT))->isSame('xあ');
-        that(mb_str_pad('ああ', 4, 'x', STR_PAD_LEFT))->isSame('ああ');
-        that(mb_str_pad('ああ', 5, 'x', STR_PAD_LEFT))->isSame('xああ');
-        that(mb_str_pad('ああ', 6, 'x', STR_PAD_LEFT))->isSame('xxああ');
+        that(mb_pad_width('あ', 2, 'x', STR_PAD_LEFT))->isSame('あ');
+        that(mb_pad_width('あ', 3, 'x', STR_PAD_LEFT))->isSame('xあ');
+        that(mb_pad_width('ああ', 4, 'x', STR_PAD_LEFT))->isSame('ああ');
+        that(mb_pad_width('ああ', 5, 'x', STR_PAD_LEFT))->isSame('xああ');
+        that(mb_pad_width('ああ', 6, 'x', STR_PAD_LEFT))->isSame('xxああ');
 
-        that(mb_str_pad('a', 6, 'x', STR_PAD_LEFT))->isSame('xxxxxa');
-        that(mb_str_pad('a', 6, 'x', STR_PAD_RIGHT))->isSame('axxxxx');
-        that(mb_str_pad('a', 6, 'x', STR_PAD_BOTH))->isSame('xxaxxx');
+        that(mb_pad_width('a', 6, 'x', STR_PAD_LEFT))->isSame('xxxxxa');
+        that(mb_pad_width('a', 6, 'x', STR_PAD_RIGHT))->isSame('axxxxx');
+        that(mb_pad_width('a', 6, 'x', STR_PAD_BOTH))->isSame('xxaxxx');
 
-        that(mb_str_pad('あ', 7, 'x', STR_PAD_LEFT))->isSame('xxxxxあ');
-        that(mb_str_pad('あ', 7, 'x', STR_PAD_RIGHT))->isSame('あxxxxx');
-        that(mb_str_pad('あ', 7, 'x', STR_PAD_BOTH))->isSame('xxあxxx');
+        that(mb_pad_width('あ', 7, 'x', STR_PAD_LEFT))->isSame('xxxxxあ');
+        that(mb_pad_width('あ', 7, 'x', STR_PAD_RIGHT))->isSame('あxxxxx');
+        that(mb_pad_width('あ', 7, 'x', STR_PAD_BOTH))->isSame('xxあxxx');
 
-        that(mb_str_pad('a', 11, 'x', STR_PAD_LEFT))->isSame('xxxxxxxxxxa');
-        that(mb_str_pad('a', 11, 'xyz', STR_PAD_LEFT))->isSame('xyzxyzxyza');
-        that(mb_str_pad('a', 11, 'x', STR_PAD_RIGHT))->isSame('axxxxxxxxxx');
-        that(mb_str_pad('a', 11, 'xyz', STR_PAD_RIGHT))->isSame('axyzxyzxyz');
-        that(mb_str_pad('a', 11, 'x', STR_PAD_BOTH))->isSame('xxxxxaxxxxx');
-        that(mb_str_pad('a', 11, 'xyz', STR_PAD_BOTH))->isSame('xyzaxyzxyz');
-        that(mb_str_pad('a', 11, 'xy', STR_PAD_BOTH))->isSame('xyxyaxyxyxy');
+        that(mb_pad_width('a', 11, 'x', STR_PAD_LEFT))->isSame('xxxxxxxxxxa');
+        that(mb_pad_width('a', 11, 'xyz', STR_PAD_LEFT))->isSame('xyzxyzxyza');
+        that(mb_pad_width('a', 11, 'x', STR_PAD_RIGHT))->isSame('axxxxxxxxxx');
+        that(mb_pad_width('a', 11, 'xyz', STR_PAD_RIGHT))->isSame('axyzxyzxyz');
+        that(mb_pad_width('a', 11, 'x', STR_PAD_BOTH))->isSame('xxxxxaxxxxx');
+        that(mb_pad_width('a', 11, 'xyz', STR_PAD_BOTH))->isSame('xyzaxyzxyz');
+        that(mb_pad_width('a', 11, 'xy', STR_PAD_BOTH))->isSame('xyxyaxyxyxy');
 
-        that(mb_str_pad('あ', 11, 'わ', STR_PAD_LEFT))->isSame('わわわわあ');
-        that(mb_str_pad('あ', 11, 'わをん', STR_PAD_LEFT))->isSame('わをんあ');
-        that(mb_str_pad('あ', 11, 'わ', STR_PAD_RIGHT))->isSame('あわわわわ');
-        that(mb_str_pad('あ', 11, 'わをん', STR_PAD_RIGHT))->isSame('あわをん');
-        that(mb_str_pad('あ', 11, 'わ', STR_PAD_BOTH))->isSame('わわあわわ');
-        that(mb_str_pad('あ', 11, 'わをん', STR_PAD_BOTH))->isSame('あわをん');
-        that(mb_str_pad('あ', 11, 'わを', STR_PAD_BOTH))->isSame('わをあわを');
+        that(mb_pad_width('あ', 11, 'わ', STR_PAD_LEFT))->isSame('わわわわあ');
+        that(mb_pad_width('あ', 11, 'わをん', STR_PAD_LEFT))->isSame('わをんあ');
+        that(mb_pad_width('あ', 11, 'わ', STR_PAD_RIGHT))->isSame('あわわわわ');
+        that(mb_pad_width('あ', 11, 'わをん', STR_PAD_RIGHT))->isSame('あわをん');
+        that(mb_pad_width('あ', 11, 'わ', STR_PAD_BOTH))->isSame('わわあわわ');
+        that(mb_pad_width('あ', 11, 'わをん', STR_PAD_BOTH))->isSame('あわをん');
+        that(mb_pad_width('あ', 11, 'わを', STR_PAD_BOTH))->isSame('わをあわを');
 
-        that(mb_str_pad('あ', 12, 'xy', STR_PAD_LEFT))->isSame('xyxyxyxyxyあ');
-        that(mb_str_pad('あ', 12, 'xyzxyz', STR_PAD_LEFT))->isSame('xyzxyzあ');
-        that(mb_str_pad('あ', 12, 'xy', STR_PAD_RIGHT))->isSame('あxyxyxyxyxy');
-        that(mb_str_pad('あ', 12, 'xyzxyz', STR_PAD_RIGHT))->isSame('あxyzxyz');
-        that(mb_str_pad('あ', 12, 'xy', STR_PAD_BOTH))->isSame('xyxyあxyxyxy');
-        that(mb_str_pad('あ', 12, 'xyzxyz', STR_PAD_BOTH))->isSame('あxyzxyz');
-        that(mb_str_pad('あ', 12, 'xyxy', STR_PAD_BOTH))->isSame('xyxyあxyxy');
+        that(mb_pad_width('あ', 12, 'xy', STR_PAD_LEFT))->isSame('xyxyxyxyxyあ');
+        that(mb_pad_width('あ', 12, 'xyzxyz', STR_PAD_LEFT))->isSame('xyzxyzあ');
+        that(mb_pad_width('あ', 12, 'xy', STR_PAD_RIGHT))->isSame('あxyxyxyxyxy');
+        that(mb_pad_width('あ', 12, 'xyzxyz', STR_PAD_RIGHT))->isSame('あxyzxyz');
+        that(mb_pad_width('あ', 12, 'xy', STR_PAD_BOTH))->isSame('xyxyあxyxyxy');
+        that(mb_pad_width('あ', 12, 'xyzxyz', STR_PAD_BOTH))->isSame('あxyzxyz');
+        that(mb_pad_width('あ', 12, 'xyxy', STR_PAD_BOTH))->isSame('xyxyあxyxy');
 
-        that(mb_str_pad('あ', 12, 'わ', STR_PAD_LEFT))->isSame('わわわわわあ');
-        that(mb_str_pad('あ', 12, 'わをん', STR_PAD_LEFT))->isSame('わをんあ');
-        that(mb_str_pad('あ', 12, 'わ', STR_PAD_RIGHT))->isSame('あわわわわわ');
-        that(mb_str_pad('あ', 12, 'わをん', STR_PAD_RIGHT))->isSame('あわをん');
-        that(mb_str_pad('あ', 12, 'わ', STR_PAD_BOTH))->isSame('わわあわわわ');
-        that(mb_str_pad('あ', 12, 'わをん', STR_PAD_BOTH))->isSame('あわをん');
-        that(mb_str_pad('あ', 12, 'わを', STR_PAD_BOTH))->isSame('わをあわを');
+        that(mb_pad_width('あ', 12, 'わ', STR_PAD_LEFT))->isSame('わわわわわあ');
+        that(mb_pad_width('あ', 12, 'わをん', STR_PAD_LEFT))->isSame('わをんあ');
+        that(mb_pad_width('あ', 12, 'わ', STR_PAD_RIGHT))->isSame('あわわわわわ');
+        that(mb_pad_width('あ', 12, 'わをん', STR_PAD_RIGHT))->isSame('あわをん');
+        that(mb_pad_width('あ', 12, 'わ', STR_PAD_BOTH))->isSame('わわあわわわ');
+        that(mb_pad_width('あ', 12, 'わをん', STR_PAD_BOTH))->isSame('あわをん');
+        that(mb_pad_width('あ', 12, 'わを', STR_PAD_BOTH))->isSame('わをあわを');
 
         // 最もよくあるユースケース（これをやるために mb_strlen ではなく mb_strwidth である必要がある）
         $strings = [
-            mb_str_pad('a', 16, ' ', STR_PAD_RIGHT) . ': 1 alpha',
-            mb_str_pad('hoge', 16, ' ', STR_PAD_RIGHT) . ': 4 alpha',
-            mb_str_pad('free text', 16, ' ', STR_PAD_RIGHT) . ': 9 alpha',
-            mb_str_pad('あ', 16, ' ', STR_PAD_RIGHT) . ': 1 mb',
-            mb_str_pad('ほげ', 16, ' ', STR_PAD_RIGHT) . ': 2 mb',
-            mb_str_pad('自由文', 16, ' ', STR_PAD_RIGHT) . ': 3 mb',
+            mb_pad_width('a', 16, ' ', STR_PAD_RIGHT) . ': 1 alpha',
+            mb_pad_width('hoge', 16, ' ', STR_PAD_RIGHT) . ': 4 alpha',
+            mb_pad_width('free text', 16, ' ', STR_PAD_RIGHT) . ': 9 alpha',
+            mb_pad_width('あ', 16, ' ', STR_PAD_RIGHT) . ': 1 mb',
+            mb_pad_width('ほげ', 16, ' ', STR_PAD_RIGHT) . ': 2 mb',
+            mb_pad_width('自由文', 16, ' ', STR_PAD_RIGHT) . ': 3 mb',
         ];
         that(implode("\n", $strings))->is(<<<EXPECTED
         a               : 1 alpha
@@ -461,19 +461,6 @@ This is VARIABLE.
         that(mb_substr_replace('０１２３４５６７８９', 'X', 2, -2))->is('０１X８９');
         that(mb_substr_replace('０１２３４５６７８９', 'X', -8, 6))->is('０１X８９');
         that(mb_substr_replace('０１２３４５６７８９', 'X', -8, -2))->is('０１X８９');
-    }
-
-    function test_mb_trim()
-    {
-        that(mb_trim(' 　 　 　'))->is('');
-        that(mb_trim(' 　 あああ　 　'))->is('あああ');
-        that(mb_trim(' 　
-あああ　 　
- 　 いいい
- 　 ううう　 　
-'))->is(('あああ　 　
- 　 いいい
- 　 ううう'));
     }
 
     function test_mb_wordwrap()

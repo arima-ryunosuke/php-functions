@@ -4,7 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_zip.php';
 require_once __DIR__ . '/../strings/mb_ereg_options.php';
-require_once __DIR__ . '/../strings/mb_str_pad.php';
+require_once __DIR__ . '/../strings/mb_pad_width.php';
 require_once __DIR__ . '/../strings/mb_wordwrap.php';
 // @codeCoverageIgnoreEnd
 
@@ -482,7 +482,7 @@ function str_diff($xstring, $ystring, $options = [])
                     $d1 = mb_wordwrap($d[1] ?? '', $columns, null);
                     foreach (array_zip($d0, $d1) as $n => $dd) {
                         $gutter = $n === 0 ? $rule[0] : " ";
-                        $result[] = mb_str_pad($dd[0] ?? '', $columns) . " $gutter " . $dd[1] ?? '';
+                        $result[] = mb_pad_width($dd[0] ?? '', $columns) . " $gutter " . $dd[1] ?? '';
                     }
                 }
             }

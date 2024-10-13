@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 use function ryunosuke\Functions\Package\array_add;
 use function ryunosuke\Functions\Package\array_aggregate;
 use function ryunosuke\Functions\Package\array_all;
+use function ryunosuke\Functions\Package\array_and;
 use function ryunosuke\Functions\Package\array_any;
 use function ryunosuke\Functions\Package\array_append;
 use function ryunosuke\Functions\Package\array_assort;
@@ -25,6 +26,7 @@ use function ryunosuke\Functions\Package\array_filter_map;
 use function ryunosuke\Functions\Package\array_filter_recursive;
 use function ryunosuke\Functions\Package\array_filters;
 use function ryunosuke\Functions\Package\array_find;
+use function ryunosuke\Functions\Package\array_find_first;
 use function ryunosuke\Functions\Package\array_find_last;
 use function ryunosuke\Functions\Package\array_find_recursive;
 use function ryunosuke\Functions\Package\array_flatten;
@@ -46,6 +48,7 @@ use function ryunosuke\Functions\Package\array_merge2;
 use function ryunosuke\Functions\Package\array_mix;
 use function ryunosuke\Functions\Package\array_nest;
 use function ryunosuke\Functions\Package\array_of;
+use function ryunosuke\Functions\Package\array_or;
 use function ryunosuke\Functions\Package\array_order;
 use function ryunosuke\Functions\Package\array_pickup;
 use function ryunosuke\Functions\Package\array_pos;
@@ -217,7 +220,7 @@ class arrayTest extends AbstractTestCase
         ]);
     }
 
-    function test_array_all()
+    function test_array_and()
     {
         $array = [
             0 => ['id' => 1, 'name' => '', 'flag' => false],
@@ -225,20 +228,20 @@ class arrayTest extends AbstractTestCase
             2 => ['id' => 3, 'name' => '', 'flag' => false],
         ];
 
-        that(array_all([], null))->isTrue();
-        that(array_all([], null, false))->isFalse();
+        that(array_and([], null))->isTrue();
+        that(array_and([], null, false))->isFalse();
 
-        that(array_all([true, true]))->isTrue();
-        that(array_all([true, false]))->isFalse();
-        that(array_all([false, false]))->isFalse();
+        that(array_and([true, true]))->isTrue();
+        that(array_and([true, false]))->isFalse();
+        that(array_and([false, false]))->isFalse();
 
-        that(array_all($array, fn($v) => $v['id']))->isTrue();
-        that(array_all($array, fn($v) => $v['flag']))->isFalse();
-        that(array_all($array, fn($v) => $v['name']))->isFalse();
-        that(array_all($array, fn($v, $k) => $k && $v['flag']))->isFalse();
+        that(array_and($array, fn($v) => $v['id']))->isTrue();
+        that(array_and($array, fn($v) => $v['flag']))->isFalse();
+        that(array_and($array, fn($v) => $v['name']))->isFalse();
+        that(array_and($array, fn($v, $k) => $k && $v['flag']))->isFalse();
     }
 
-    function test_array_any()
+    function test_array_or()
     {
         $array = [
             0 => ['id' => 1, 'name' => '', 'flag' => false],
@@ -246,17 +249,17 @@ class arrayTest extends AbstractTestCase
             2 => ['id' => 3, 'name' => '', 'flag' => false],
         ];
 
-        that(array_any([], null))->isFalse();
-        that(array_any([], null, true))->isTrue();
+        that(array_or([], null))->isFalse();
+        that(array_or([], null, true))->isTrue();
 
-        that(array_any([true, true]))->isTrue();
-        that(array_any([true, false]))->isTrue();
-        that(array_any([false, false]))->isFalse();
+        that(array_or([true, true]))->isTrue();
+        that(array_or([true, false]))->isTrue();
+        that(array_or([false, false]))->isFalse();
 
-        that(array_any($array, fn($v) => $v['id']))->isTrue();
-        that(array_any($array, fn($v) => $v['flag']))->isTrue();
-        that(array_any($array, fn($v) => $v['name']))->isFalse();
-        that(array_any($array, fn($v, $k) => $k && $v['flag']))->isTrue();
+        that(array_or($array, fn($v) => $v['id']))->isTrue();
+        that(array_or($array, fn($v) => $v['flag']))->isTrue();
+        that(array_or($array, fn($v) => $v['name']))->isFalse();
+        that(array_or($array, fn($v, $k) => $k && $v['flag']))->isTrue();
     }
 
     function test_array_append()
@@ -1289,16 +1292,16 @@ class arrayTest extends AbstractTestCase
         unset($restorer);
     }
 
-    function test_array_find()
+    function test_array_find_first()
     {
-        that(array_find(['a', 'b', '9'], 'ctype_digit'))->is(2);
-        that(array_find(['a' => 'A', 'b' => 'B'], fn($v) => $v === 'B'))->is('b');
-        that(array_find(['9', 'b', 'c'], 'ctype_digit'))->isSame(0);
-        that(array_find(['a', 'b', 'c'], fn($v) => null))->isSame(null);
+        that(array_find_first(['a', 'b', '9'], 'ctype_digit'))->is(2);
+        that(array_find_first(['a' => 'A', 'b' => 'B'], fn($v) => $v === 'B'))->is('b');
+        that(array_find_first(['9', 'b', 'c'], 'ctype_digit'))->isSame(0);
+        that(array_find_first(['a', 'b', 'c'], fn($v) => null))->isSame(null);
 
-        that(array_find(['a', 'b', '9'], fn($v) => ctype_digit($v) ? false : strtoupper($v), false))->is('A');
-        that(array_find(['9', 'b', 'c'], fn($v) => ctype_digit($v) ? false : strtoupper($v), false))->is('B');
-        that(array_find([1, 2, 3, 4, -5, -6], fn($v) => $v < 0 ? abs($v) : false, false))->is(5);
+        that(array_find_first(['a', 'b', '9'], fn($v) => ctype_digit($v) ? false : strtoupper($v), false))->is('A');
+        that(array_find_first(['9', 'b', 'c'], fn($v) => ctype_digit($v) ? false : strtoupper($v), false))->is('B');
+        that(array_find_first([1, 2, 3, 4, -5, -6], fn($v) => $v < 0 ? abs($v) : false, false))->is(5);
     }
 
     function test_array_find_last()

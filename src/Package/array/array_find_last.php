@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_find.php';
+require_once __DIR__ . '/../array/array_find_first.php';
 require_once __DIR__ . '/../funchand/func_user_func_array.php';
 // @codeCoverageIgnoreEnd
 
@@ -36,7 +36,7 @@ function array_find_last($array, $callback, $is_key = true)
 {
     // 配列なら reverse すればよい
     if (is_array($array)) {
-        return array_find(array_reverse($array, true), $callback, $is_key);
+        return array_find_first(array_reverse($array, true), $callback, $is_key);
     }
 
     $callback = func_user_func_array($callback);

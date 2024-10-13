@@ -2,8 +2,8 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_all.php';
-require_once __DIR__ . '/../array/array_any.php';
+require_once __DIR__ . '/../array/array_and.php';
+require_once __DIR__ . '/../array/array_or.php';
 require_once __DIR__ . '/../array/array_sprintf.php';
 require_once __DIR__ . '/../array/array_unset.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
@@ -328,7 +328,7 @@ function var_pretty($value, $options = [])
                 }
 
                 $is_hasharray = is_hasharray($value);
-                $primitive_only = array_all($value, fn(...$args) => is_primitive(...$args));
+                $primitive_only = array_and($value, fn(...$args) => is_primitive(...$args));
                 $assoc = !$this->options['minify'] && ($is_hasharray || !$primitive_only);
                 $tableofarray = (function () use ($count, $value) {
                     if ($this->options['minify'] || !$this->options['table'] || $count <= 1) {
@@ -347,7 +347,7 @@ function var_pretty($value, $options = [])
                     }
                     else {
                         $first_condition = array_keys($first);
-                        if (array_any($first_condition, 'is_int')) {
+                        if (array_or($first_condition, 'is_int')) {
                             return null;
                         }
                     }

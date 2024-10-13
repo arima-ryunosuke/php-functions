@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_all.php';
+require_once __DIR__ . '/../array/array_and.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../classobj/const_exists.php';
 require_once __DIR__ . '/../classobj/object_properties.php';
@@ -204,7 +204,7 @@ function var_export3($value, $return = false)
 
         if (is_array($value)) {
             $hashed = is_hasharray($value);
-            if (!$hashed && array_all($value, fn(...$args) => is_primitive(...$args))) {
+            if (!$hashed && array_and($value, fn(...$args) => is_primitive(...$args))) {
                 [$begin, $middle, $end] = ["", ", ", ""];
             }
             else {

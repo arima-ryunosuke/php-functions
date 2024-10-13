@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_all.php';
+require_once __DIR__ . '/../array/array_and.php';
 require_once __DIR__ . '/../array/array_append.php';
 require_once __DIR__ . '/../array/array_unset.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
@@ -124,7 +124,7 @@ function json_export($value, $options = [])
                 }
             }
             if ($inline_scalarlist) {
-                $inline = $inline || !$objective && array_all($value, fn($v) => is_primitive($v) || $v instanceof \Closure);
+                $inline = $inline || !$objective && array_and($value, fn($v) => is_primitive($v) || $v instanceof \Closure);
             }
 
             $break = $indent0 = $indent1 = $indent2 = $separator = '';

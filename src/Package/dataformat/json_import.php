@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_explode.php';
-require_once __DIR__ . '/../array/array_find.php';
+require_once __DIR__ . '/../array/array_find_first.php';
 require_once __DIR__ . '/../array/first_value.php';
 require_once __DIR__ . '/../array/last_value.php';
 require_once __DIR__ . '/../misc/php_parse.php';
@@ -145,7 +145,7 @@ function json_import($value, $options = [])
                                 throw $this->exception("Missing object key", first_value($keyandval[0]));
                             }
                             // check objective key (e.g. {[1]: 123})
-                            if (($k = array_find($keyandval[0], fn($v) => $v instanceof $this)) !== null) {
+                            if (($k = array_find_first($keyandval[0], fn($v) => $v instanceof $this)) !== null) {
                                 throw $this->exception("Unexpected object key", $keyandval[0][$k]);
                             }
                             // check consecutive objective value (e.g. {k: 123 [1]})

@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_all.php';
+require_once __DIR__ . '/../array/array_and.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../classobj/object_properties.php';
 require_once __DIR__ . '/../random/unique_string.php';
@@ -99,7 +99,7 @@ function var_export2($value, $options = [])
             $hashed = is_hasharray($value);
 
             // スカラー値のみで構成されているならシンプルな再帰
-            if (!$hashed && array_all($value, fn(...$args) => is_primitive(...$args))) {
+            if (!$hashed && array_and($value, fn(...$args) => is_primitive(...$args))) {
                 return '[' . implode(",$space", array_map(fn($v) => $export($v, 'array-value'), $value)) . ']';
             }
 

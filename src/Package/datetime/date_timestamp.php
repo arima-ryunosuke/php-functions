@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_find.php';
+require_once __DIR__ . '/../array/array_find_first.php';
 require_once __DIR__ . '/../constants.php';
 // @codeCoverageIgnoreEnd
 
@@ -74,7 +74,7 @@ function date_timestamp($datetimedata, $baseTimestamp = null)
         $jpnames = array_merge(array_column(JP_ERA, 'name'), array_column(JP_ERA, 'abbr'));
         $datetimedata = preg_replace_callback('/^(' . implode('|', $jpnames) . ')(\d{1,2}|元)/u', function ($matches) {
             [, $era, $year] = $matches;
-            $eratime = array_find(JP_ERA, function ($v) use ($era) {
+            $eratime = array_find_first(JP_ERA, function ($v) use ($era) {
                 if (in_array($era, [$v['name'], $v['abbr']], true)) {
                     return $v['since'];
                 }

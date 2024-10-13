@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/array_find.php';
+require_once __DIR__ . '/../array/array_find_first.php';
 require_once __DIR__ . '/../datetime/date_timestamp.php';
 require_once __DIR__ . '/../strings/strtr_escaped.php';
 require_once __DIR__ . '/../constants.php';
@@ -78,7 +78,7 @@ function date_convert($format, $datetimedata = null)
     }
 
     if (!$return_object) {
-        $era = array_find(JP_ERA, function ($era) use ($timestamp) {
+        $era = array_find_first(JP_ERA, function ($era) use ($timestamp) {
             if ($era['since'] <= $timestamp) {
                 $era['year'] = idate('Y', (int) $timestamp) - idate('Y', $era['since']) + 1;
                 $era['gann'] = $era['year'] === 1 ? '元' : $era['year'];

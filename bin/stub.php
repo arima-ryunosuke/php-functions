@@ -132,7 +132,7 @@ foreach (get_defined_functions(true) as $type => $functions) {
             continue;
         }
         // 参照渡しだけの関数は実質呼べないに等しいので除外
-        if (array_all($reffunc->getParameters(), fn(ReflectionParameter $p) => $p->isPassedByReference())) {
+        if (array_and($reffunc->getParameters(), fn(ReflectionParameter $p) => $p->isPassedByReference())) {
             continue;
         }
 

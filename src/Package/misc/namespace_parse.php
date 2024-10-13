@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_explode.php';
-require_once __DIR__ . '/../array/array_find.php';
+require_once __DIR__ . '/../array/array_find_first.php';
 require_once __DIR__ . '/../array/last_key.php';
 require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../strings/concat.php';
@@ -150,7 +150,7 @@ function namespace_parse($filename, $options = [])
                     ];
                     break;
                 case T_USE:
-                    $tokenCorF = array_find($tokens, fn($token) => ($token->id === T_CONST || $token->id === T_FUNCTION) ? $token->id : 0, false);
+                    $tokenCorF = array_find_first($tokens, fn($token) => ($token->id === T_CONST || $token->id === T_FUNCTION) ? $token->id : 0, false);
 
                     $prefix = '';
                     if (end($tokens)->text === '{') {
