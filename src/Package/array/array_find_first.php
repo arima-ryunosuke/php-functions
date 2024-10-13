@@ -17,11 +17,11 @@ require_once __DIR__ . '/../funchand/func_user_func_array.php';
  * Example:
  * ```php
  * // 最初に見つかったキーを返す
- * that(array_find(['a', '8', '9'], 'ctype_digit'))->isSame(1);
- * that(array_find(['a', 'b', 'b'], fn($v) => $v === 'b'))->isSame(1);
+ * that(array_find_first(['a', '8', '9'], 'ctype_digit'))->isSame(1);
+ * that(array_find_first(['a', 'b', 'b'], fn($v) => $v === 'b'))->isSame(1);
  * // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
  * $ifnumeric2power = fn($v) => ctype_digit($v) ? $v * $v : false;
- * that(array_find(['a', '8', '9'], $ifnumeric2power, false))->isSame(64);
+ * that(array_find_first(['a', '8', '9'], $ifnumeric2power, false))->isSame(64);
  * ```
  *
  * @package ryunosuke\Functions\Package\array
@@ -31,7 +31,7 @@ require_once __DIR__ . '/../funchand/func_user_func_array.php';
  * @param bool $is_key キーを返すか否か
  * @return mixed コールバックが true を返した最初のキー。存在しなかったら null
  */
-function array_find($array, $callback, $is_key = true)
+function array_find_first($array, $callback, $is_key = true)
 {
     $callback = func_user_func_array($callback);
 

@@ -19,11 +19,11 @@ require_once __DIR__ . '/../strings/mb_monospace.php';
  * Example:
  * ```php
  * // マルチバイトは2文字幅として換算される
- * that(mb_str_pad('aaaa', 12, '-'))->isSame('aaaa--------');
- * that(mb_str_pad('ああ', 12, '-'))->isSame('ああ--------');
+ * that(mb_pad_width('aaaa', 12, '-'))->isSame('aaaa--------');
+ * that(mb_pad_width('ああ', 12, '-'))->isSame('ああ--------');
  * // $pad_string は切り捨てられない
- * that(mb_str_pad('aaaa', 12, 'xyz'))->isSame('aaaaxyzxyz'); // 10文字で返す（あと1回 xyz すると 13 文字になり width を超えてしまう（かといって xy だけを足したりもしない））
- * that(mb_str_pad('ああ', 12, 'xyz'))->isSame('ああxyzxyz'); // マルチバイトでも同じ
+ * that(mb_pad_width('aaaa', 12, 'xyz'))->isSame('aaaaxyzxyz'); // 10文字で返す（あと1回 xyz すると 13 文字になり width を超えてしまう（かといって xy だけを足したりもしない））
+ * that(mb_pad_width('ああ', 12, 'xyz'))->isSame('ああxyzxyz'); // マルチバイトでも同じ
  * ```
  *
  * @package ryunosuke\Functions\Package\strings
@@ -34,7 +34,7 @@ require_once __DIR__ . '/../strings/mb_monospace.php';
  * @param int $pad_type 埋める位置
  * @return string 指定文字で埋められた文字列
  */
-function mb_str_pad(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT)
+function mb_pad_width(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT)
 {
     assert(in_array($pad_type, [STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH]));
 

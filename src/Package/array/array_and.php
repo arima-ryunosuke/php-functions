@@ -13,9 +13,9 @@ require_once __DIR__ . '/../var/is_empty.php';
  *
  * Example:
  * ```php
- * that(array_all([true, true]))->isTrue();
- * that(array_all([true, false]))->isFalse();
- * that(array_all([false, false]))->isFalse();
+ * that(array_and([true, true]))->isTrue();
+ * that(array_and([true, false]))->isFalse();
+ * that(array_and([false, false]))->isFalse();
  * ```
  *
  * @package ryunosuke\Functions\Package\array
@@ -25,7 +25,7 @@ require_once __DIR__ . '/../var/is_empty.php';
  * @param bool|mixed $default 空配列の場合のデフォルト値
  * @return bool 全要素が true なら true
  */
-function array_all($array, $callback = null, $default = true)
+function array_and($array, $callback = null, $default = true)
 {
     if (is_empty($array)) {
         return $default;
