@@ -7,17 +7,13 @@ namespace ryunosuke\Functions\Package;
 /**
  * マルチバイト対応 trim
  *
- * Example:
- * ```php
- * that(mb_trim(' 　 あああ　 　'))->isSame('あああ');
- * ```
- *
+ * @see https://github.com/symfony/polyfill-php84/
+ * @deprecated 標準関数と重複
+ * @codeCoverageIgnore
  * @package ryunosuke\Functions\Package\strings
- *
- * @param string $string 対象文字列
- * @return string trim した文字列
  */
 function mb_trim(?string $string)
 {
+    trigger_error(__FUNCTION__ . ' is deprecated. use symfony/polyfill or 8.4 builtin', E_USER_DEPRECATED);
     return preg_replace('/\A[\p{C}\p{Z}]++|[\p{C}\p{Z}]++\z/u', '', $string);
 }
