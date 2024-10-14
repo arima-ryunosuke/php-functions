@@ -11,6 +11,18 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.15
+
+- [feature] benchmark で memory_reset_peak_usage が使えるなら使う
+- [feature] json_export で特定クラスに独自変換を行う機能
+- [fixbug] json_export の不具合修正
+- [change] starts/ends with の空文字の挙動を標準に合わせる
+- [change] 元関数を非推奨化
+- [change] 内部呼び出しとテストを変更
+- [change] 標準関数と重複する関数をリネーム
+- [feature] reflect_callable に getClosure を追加
+- [feature] var_type に phpdoc 用のオプションを追加
+
 ## 2.0.14
 
 - [fixbug] php8.2 の対応漏れを修正
