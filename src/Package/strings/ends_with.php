@@ -29,7 +29,12 @@ require_once __DIR__ . '/../strings/str_equals.php';
 function ends_with(?string $string, $with, $case_insensitivity = false)
 {
     foreach ((array) $with as $w) {
-        assert(strlen($w));
+        $w = (string) $w;
+
+        // All strings end with the empty string
+        if ($w === '') {
+            return true;
+        }
 
         if (str_equals(substr($string, -strlen($w)), $w, $case_insensitivity)) {
             return true;

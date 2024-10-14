@@ -138,6 +138,8 @@ class stringsTest extends AbstractTestCase
         that(ends_with('abcdef', ['XXX']))->isFalse();
         that(ends_with('abcdef', []))->isFalse();
 
+        that(ends_with('', ''))->isTrue();
+        that(ends_with('s', ''))->isTrue();
         that(ends_with('', 's'))->isFalse();
     }
 
@@ -815,6 +817,8 @@ zero is index 0.
         that(starts_with('abcdef', ['XXX']))->isFalse();
         that(starts_with('abcdef', []))->isFalse();
 
+        that(starts_with('', ''))->isTrue();
+        that(starts_with('s', ''))->isTrue();
         that(starts_with('', 's'))->isFalse();
     }
 
