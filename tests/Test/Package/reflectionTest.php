@@ -387,6 +387,7 @@ class reflectionTest extends AbstractTestCase
         that($reffunc->getCode())->contains('return $x - $y;');
         that($reffunc(4, 1))->is(3);
         that($reffunc(y: 1, x: 4))->is(3);
+        that($reffunc->getClosure()(y: 1, x: 4))->is(3);
 
         $reffunc = reflect_callable(function ($x) use (&$use): int { return $x + $use++; });
         that($reffunc->getDeclaration())->is('function ($x) use (&$use): int');
@@ -396,14 +397,16 @@ class reflectionTest extends AbstractTestCase
         that($reffunc->call($this, 1))->is(1);
         that($reffunc(1))->is(2);
         that($reffunc(x: 1))->is(3);
+        that($reffunc->getClosure()(x: 1))->is(4);
 
         $reffunc = reflect_callable(static function ($x) use (&$use): int { return $x + $use++; });
         that($reffunc->getDeclaration())->is('function ($x) use (&$use): int');
         that($reffunc->getCode())->contains('return $x + $use++;');
         that($reffunc->getUsedVariables())->is(['use' => $use]);
         that($reffunc->isStatic())->is(true);
-        that($reffunc(1))->is(4);
-        that($reffunc(x: 1))->is(5);
+        that($reffunc(1))->is(5);
+        that($reffunc(x: 1))->is(6);
+        that($reffunc->getClosure()(x: 1))->is(7);
 
         $reffunc = reflect_callable([new Concrete('hoge'), 'getName']);
         that($reffunc->getDeclaration())->is('function getName($prefix = \'\', $upper = false)');
@@ -411,24 +414,28 @@ class reflectionTest extends AbstractTestCase
         that($reffunc->call(new Concrete('fuga')))->is('fuga');
         that($reffunc('p-'))->is('p-hoge');
         that($reffunc(upper: true))->is('HOGE');
+        that($reffunc->getClosure()(upper: true))->is('HOGE');
 
         $reffunc = reflect_callable([new Concrete('hoge'), 'staticMethod']);
         that($reffunc->getDeclaration())->is('function staticMethod($a = null)');
         that($reffunc->getCode())->contains('return __METHOD__;');
         that($reffunc->call(new Concrete('fuga')))->is('Concrete::staticMethod');
         that($reffunc(a: 1))->is('Concrete::staticMethod');
+        that($reffunc->getClosure()(a: 1))->is('Concrete::staticMethod');
 
         $reffunc = reflect_callable([new Concrete('hoge'), 'hogera']);
         that($reffunc->getDeclaration())->is('function __call($name, $arguments)');
         that($reffunc->getCode())->contains('return $name;');
         that($reffunc->call(new Concrete('fuga')))->is('hogera');
         that($reffunc())->is('hogera');
+        that($reffunc->getClosure()())->is('hogera');
 
         $reffunc = reflect_callable([Concrete::class, 'hogera']);
         that($reffunc->getDeclaration())->is('function __callStatic($name, $arguments)');
         that($reffunc->getCode())->contains('return $name;');
         that($reffunc->call(new Concrete('fuga')))->is('hogera');
         that($reffunc())->is('hogera');
+        that($reffunc->getClosure()())->is('hogera');
 
         $object = new class { use Traitable; };
         that(reflect_callable([$object, 'traitMethod'])->getTraitMethod())->isInstanceOf(\ReflectionMethod::class);

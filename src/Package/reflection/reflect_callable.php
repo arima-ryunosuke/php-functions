@@ -19,6 +19,8 @@ require_once __DIR__ . '/../reflection/callable_code.php';
  * - isAnonymous: 無名関数なら true を返す（8.2 の isAnonymous 互換）
  * - isStatic: $this バインド可能かを返す（クロージャのみ）
  * - getUsedVariables: use している変数配列を返す（クロージャのみ）
+ * - getClosure: 元となったオブジェクトを $object としたクロージャを返す（メソッドのみ）
+ *   - 上記二つは __call/__callStatic のメソッドも呼び出せる
  * - getTraitMethod: トレイト側のリフレクションを返す（メソッドのみ）
  *
  * Example:
@@ -195,6 +197,24 @@ function reflect_callable($callable)
             public function isAnonymous(): bool
             {
                 return false;
+            }
+
+            public function getClosure(?object $object = null): \Closure
+            {
+                $name = strtolower($this->name);
+
+                if ($this->isStatic()) {
+                    if ($name === '__callstatic') {
+                        return \Closure::fromCallable([$this->class, $this->call_name]);
+                    }
+                    return parent::getClosure();
+                }
+
+                $object ??= $this->callable[0];
+                if ($name === '__call') {
+                    return \Closure::fromCallable([$object, $this->call_name]);
+                }
+                return parent::getClosure($object);
             }
 
             public function getTraitMethod(): ?\ReflectionMethod
