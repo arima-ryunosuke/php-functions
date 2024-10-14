@@ -20,8 +20,8 @@ trait ChainObject4
 
     /** @see hash_init() */
     public self $hash_init;
-    public function hash_init(string $algo, int $flags = 0, string $key = ""): self { }
-    public function hash_init(int $flags = 0, string $key = ""): self { }
+    public function hash_init(string $algo, int $flags = 0, string $key = "", array $options = []): self { }
+    public function hash_init(int $flags = 0, string $key = "", array $options = []): self { }
 
     /** @see header_register_callback() */
     public self $header_register_callback;
@@ -68,6 +68,16 @@ trait ChainObject4
     public function chunk(array $array, int $length, bool $preserve_keys = false): self { }
     public function chunk(int $length, bool $preserve_keys = false): self { }
 
+    /** @see array_is_list() */
+    public self $array_is_list;
+    public function array_is_list(array $array): self { }
+    public function array_is_list(): self { }
+
+    /** @see array_is_list() */
+    public self $is_list;
+    public function is_list(array $array): self { }
+    public function is_list(): self { }
+
     /** @see getenv() */
     public self $getenv;
     public function getenv(?string $name = null, bool $local_only = false): self { }
@@ -95,8 +105,8 @@ trait ChainObject4
 
     /** @see html_entity_decode() */
     public self $html_entity_decode;
-    public function html_entity_decode(string $string, int $flags = ENT_COMPAT, ?string $encoding = null): self { }
-    public function html_entity_decode(int $flags = ENT_COMPAT, ?string $encoding = null): self { }
+    public function html_entity_decode(string $string, int $flags = 11, ?string $encoding = null): self { }
+    public function html_entity_decode(int $flags = 11, ?string $encoding = null): self { }
 
     /** @see hex2bin() */
     public self $hex2bin;
@@ -177,11 +187,6 @@ trait ChainObject4
     public self $gettimeofday;
     public function gettimeofday(bool $as_float = false): self { }
     public function gettimeofday(): self { }
-
-    /** @see random_bytes() */
-    public self $random_bytes;
-    public function random_bytes(int $length): self { }
-    public function random_bytes(): self { }
 
     /** @see set_file_buffer() */
     public self $set_file_buffer;

@@ -30,8 +30,8 @@ trait ChainObject7
 
     /** @see hash_file() */
     public self $hash_file;
-    public function hash_file(string $algo, string $filename, bool $binary = false): self { }
-    public function hash_file(string $filename, bool $binary = false): self { }
+    public function hash_file(string $algo, string $filename, bool $binary = false, array $options = []): self { }
+    public function hash_file(string $filename, bool $binary = false, array $options = []): self { }
 
     /** @see hash_hmac_file() */
     public self $hash_hmac_file;
@@ -249,11 +249,6 @@ TEXT): self { }
     public function log1p(float $num): self { }
     public function log1p(): self { }
 
-    /** @see mt_srand() */
-    public self $mt_srand;
-    public function mt_srand(int $seed = 0, int $mode = MT_RAND_MT19937): self { }
-    public function mt_srand(int $mode = MT_RAND_MT19937): self { }
-
     /** @see is_scalar() */
     public self $is_scalar;
     public function is_scalar(mixed $value): self { }
@@ -446,7 +441,7 @@ TEXT): self { }
 
     /** @see var_type() */
     public self $var_type;
-    public function var_type($var): self { }
-    public function var_type(): self { }
+    public function var_type(mixed $var, array $options = []): self { }
+    public function var_type(array $options = []): self { }
 
 }

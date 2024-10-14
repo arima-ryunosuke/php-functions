@@ -23,15 +23,15 @@ trait ChainObject0
     public function date_offset_get(\DateTimeInterface $object): self { }
     public function date_offset_get(): self { }
 
-    /** @see hash_update_stream() */
-    public self $hash_update_stream;
-    public function hash_update_stream(\HashContext $context, $stream, int $length = -1): self { }
-    public function hash_update_stream($stream, int $length = -1): self { }
-
     /** @see preg_grep() */
     public self $preg_grep;
     public function preg_grep(string $pattern, array $array, int $flags = 0): self { }
     public function preg_grep(array $array, int $flags = 0): self { }
+
+    /** @see hash_update_stream() */
+    public self $hash_update_stream;
+    public function hash_update_stream(\HashContext $context, $stream, int $length = -1): self { }
+    public function hash_update_stream($stream, int $length = -1): self { }
 
     /** @see uasort() */
     public self $uasort;
@@ -153,6 +153,11 @@ trait ChainObject0
     public function rewinddir($dir_handle = null): self { }
     public function rewinddir(): self { }
 
+    /** @see fdatasync() */
+    public self $fdatasync;
+    public function fdatasync($stream): self { }
+    public function fdatasync(): self { }
+
     /** @see file() */
     public self $file;
     public function file(string $filename, int $flags = 0, $context = null): self { }
@@ -187,11 +192,6 @@ trait ChainObject0
     public self $pack;
     public function pack(string $format, mixed ...$values): self { }
     public function pack(mixed ...$values): self { }
-
-    /** @see srand() */
-    public self $srand;
-    public function srand(int $seed = 0, int $mode = MT_RAND_MT19937): self { }
-    public function srand(int $mode = MT_RAND_MT19937): self { }
 
     /** @see gettype() */
     public self $gettype;

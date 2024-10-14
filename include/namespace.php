@@ -275,6 +275,10 @@ if (!defined('ryunosuke\\Functions\\JSON_BARE_AS_STRING')) {
     define('ryunosuke\\Functions\\JSON_BARE_AS_STRING', -106);
 }
 
+if (!defined('ryunosuke\\Functions\\JSON_OBJECT_HANDLER')) {
+    define('ryunosuke\\Functions\\JSON_OBJECT_HANDLER', -107);
+}
+
 if (!defined('ryunosuke\\Functions\\SI_UNITS')) {
     define('ryunosuke\\Functions\\SI_UNITS', [
         -8 => ["y"],
@@ -472,13 +476,30 @@ if (!function_exists('ryunosuke\\Functions\\array_all')) {
     /**
      * 全要素が true になるなら true を返す（1つでも false なら false を返す）
      *
+     * @see array_and()
+     * @deprecated 標準関数と重複
+     * @codeCoverageIgnore
+     * @package ryunosuke\Functions\Package\array
+     */
+    function array_all($array, $callback = null, $default = true)
+    {
+        trigger_error(__FUNCTION__ . ' is deprecated. use array_and or 8.4 builtin', E_USER_DEPRECATED);
+        return array_and($array, $callback, $default);
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\array_and') || (new \ReflectionFunction('ryunosuke\\Functions\\array_and'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\array_and')) {
+    /**
+     * 全要素が true になるなら true を返す（1つでも false なら false を返す）
+     *
      * $callback が要求するならキーも渡ってくる。
      *
      * Example:
      * ```php
-     * that(array_all([true, true]))->isTrue();
-     * that(array_all([true, false]))->isFalse();
-     * that(array_all([false, false]))->isFalse();
+     * that(array_and([true, true]))->isTrue();
+     * that(array_and([true, false]))->isFalse();
+     * that(array_and([false, false]))->isFalse();
      * ```
      *
      * @package ryunosuke\Functions\Package\array
@@ -488,7 +509,7 @@ if (!function_exists('ryunosuke\\Functions\\array_all')) {
      * @param bool|mixed $default 空配列の場合のデフォルト値
      * @return bool 全要素が true なら true
      */
-    function array_all($array, $callback = null, $default = true)
+    function array_and($array, $callback = null, $default = true)
     {
         if (is_empty($array)) {
             return $default;
@@ -511,37 +532,15 @@ if (!function_exists('ryunosuke\\Functions\\array_any')) {
     /**
      * 全要素が false になるなら false を返す（1つでも true なら true を返す）
      *
-     * $callback が要求するならキーも渡ってくる。
-     *
-     * Example:
-     * ```php
-     * that(array_any([true, true]))->isTrue();
-     * that(array_any([true, false]))->isTrue();
-     * that(array_any([false, false]))->isFalse();
-     * ```
-     *
+     * @see array_or()
+     * @deprecated 標準関数と重複
+     * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\array
-     *
-     * @param iterable $array 対象配列
-     * @param ?callable $callback 評価クロージャ。 null なら値そのもので評価
-     * @param bool|mixed $default 空配列の場合のデフォルト値
-     * @return bool 全要素が false なら false
      */
     function array_any($array, $callback = null, $default = false)
     {
-        if (is_empty($array)) {
-            return $default;
-        }
-
-        $callback = func_user_func_array($callback);
-
-        $n = 0;
-        foreach ($array as $k => $v) {
-            if ($callback($v, $k, $n++)) {
-                return true;
-            }
-        }
-        return false;
+        trigger_error(__FUNCTION__ . ' is deprecated. use array_or or 8.4 builtin', E_USER_DEPRECATED);
+        return array_or($array, $callback , $default);
     }
 }
 
@@ -1907,6 +1906,23 @@ if (!function_exists('ryunosuke\\Functions\\array_find')) {
     /**
      * array_search のクロージャ版のようなもの
      *
+     * @see array_find_first()
+     * @deprecated 標準関数と重複
+     * @codeCoverageIgnore
+     * @package ryunosuke\Functions\Package\array
+     */
+    function array_find($array, $callback, $is_key = true)
+    {
+        trigger_error(__FUNCTION__ . ' is deprecated. use array_find_first or 8.4 builtin', E_USER_DEPRECATED);
+        return array_find_first($array, $callback, $is_key);
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\array_find_first') || (new \ReflectionFunction('ryunosuke\\Functions\\array_find_first'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\array_find_first')) {
+    /**
+     * array_search のクロージャ版のようなもの
+     *
      * コールバックの返り値が true 相当のものを返す。
      * $is_key に true を与えるとそのキーを返す（デフォルトの動作）。
      * $is_key に false を与えるとコールバックの結果を返す。
@@ -1916,11 +1932,11 @@ if (!function_exists('ryunosuke\\Functions\\array_find')) {
      * Example:
      * ```php
      * // 最初に見つかったキーを返す
-     * that(array_find(['a', '8', '9'], 'ctype_digit'))->isSame(1);
-     * that(array_find(['a', 'b', 'b'], fn($v) => $v === 'b'))->isSame(1);
+     * that(array_find_first(['a', '8', '9'], 'ctype_digit'))->isSame(1);
+     * that(array_find_first(['a', 'b', 'b'], fn($v) => $v === 'b'))->isSame(1);
      * // 最初に見つかったコールバック結果を返す（最初の数字の2乗を返す）
      * $ifnumeric2power = fn($v) => ctype_digit($v) ? $v * $v : false;
-     * that(array_find(['a', '8', '9'], $ifnumeric2power, false))->isSame(64);
+     * that(array_find_first(['a', '8', '9'], $ifnumeric2power, false))->isSame(64);
      * ```
      *
      * @package ryunosuke\Functions\Package\array
@@ -1930,7 +1946,7 @@ if (!function_exists('ryunosuke\\Functions\\array_find')) {
      * @param bool $is_key キーを返すか否か
      * @return mixed コールバックが true を返した最初のキー。存在しなかったら null
      */
-    function array_find($array, $callback, $is_key = true)
+    function array_find_first($array, $callback, $is_key = true)
     {
         $callback = func_user_func_array($callback);
 
@@ -1980,7 +1996,7 @@ if (!function_exists('ryunosuke\\Functions\\array_find_last')) {
     {
         // 配列なら reverse すればよい
         if (is_array($array)) {
-            return array_find(array_reverse($array, true), $callback, $is_key);
+            return array_find_first(array_reverse($array, true), $callback, $is_key);
         }
 
         $callback = func_user_func_array($callback);
@@ -3313,6 +3329,45 @@ if (!function_exists('ryunosuke\\Functions\\array_of')) {
     {
         $nodefault = func_num_args() === 1;
         return fn(array $array) => $nodefault ? array_get($array, $key) : array_get($array, $key, $default);
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\array_or') || (new \ReflectionFunction('ryunosuke\\Functions\\array_or'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\array_or')) {
+    /**
+     * 全要素が false になるなら false を返す（1つでも true なら true を返す）
+     *
+     * $callback が要求するならキーも渡ってくる。
+     *
+     * Example:
+     * ```php
+     * that(array_or([true, true]))->isTrue();
+     * that(array_or([true, false]))->isTrue();
+     * that(array_or([false, false]))->isFalse();
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\array
+     *
+     * @param iterable $array 対象配列
+     * @param ?callable $callback 評価クロージャ。 null なら値そのもので評価
+     * @param bool|mixed $default 空配列の場合のデフォルト値
+     * @return bool 全要素が false なら false
+     */
+    function array_or($array, $callback = null, $default = false)
+    {
+        if (is_empty($array)) {
+            return $default;
+        }
+
+        $callback = func_user_func_array($callback);
+
+        $n = 0;
+        foreach ($array as $k => $v) {
+            if ($callback($v, $k, $n++)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -8754,7 +8809,8 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
             'delimiter' => ',',
             'enclosure' => '"',
             'escape'    => '\\',
-            'encoding'  => mb_internal_encoding(),
+            'encoding'  => ini_get('default_charset'),
+            'scrub'     => 'TRANSLIT',
             'initial'   => '', // "\xEF\xBB\xBF"
             'headers'   => null,
             'structure' => false,
@@ -8773,9 +8829,14 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
 
         $restore = set_error_exception_handler();
         try {
-            $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $initial, $headers, $structure, $callback) {
+            $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $structure, $callback) {
+                $default_charset = ini_get('default_charset');
+                if ($default_charset !== $encoding) {
+                    // import とは違い、吐き出すときは明確なエラーだろうので TRANSLIT も IGNORE もしない
+                    stream_filter_append($fp, "convert.iconv.$default_charset/$encoding" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_WRITE);
+                }
+
                 $size = 0;
-                $mb_internal_encoding = mb_internal_encoding();
 
                 if (!is_array($csvarrays)) {
                     [$csvarrays, $csvarrays2] = iterator_split($csvarrays, [1], true);
@@ -8787,8 +8848,11 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
                         $csvarrays[$n] = array_map('rawurldecode', str_array(explode('&', $query), '=', true));
                     }
                 }
-                if (strlen($initial)) {
-                    fwrite($fp, $initial);
+                if (is_stringable($initial) && strlen($initial)) {
+                    $size += fwrite($fp, $initial);
+                }
+                elseif (is_array($initial) && $initial) {
+                    $size += fputcsv($fp, $initial, $delimiter, $enclosure, $escape);
                 }
                 if (!$headers) {
                     $tmp = [];
@@ -8835,9 +8899,6 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
                     }
 
                     $headerline = $headers;
-                    if ($encoding !== $mb_internal_encoding) {
-                        mb_convert_variables($encoding, $mb_internal_encoding, $headerline);
-                    }
                     if ($structure) {
                         $headerline = array_map(fn($header) => preg_replace('#\[\d+]$#imu', '[]', $header), $headerline);
                     }
@@ -8859,13 +8920,10 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
                         }
                     }
                     $row = array_intersect_key(array_replace($default, $array), $default);
-                    if ($encoding !== $mb_internal_encoding) {
-                        mb_convert_variables($encoding, $mb_internal_encoding, $row);
-                    }
                     $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
                 }
                 return $size;
-            })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
+            })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
             if ($output) {
                 return $size;
             }
@@ -8965,12 +9023,15 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
             'delimiter' => ',',
             'enclosure' => '"',
             'escape'    => '\\',
-            'encoding'  => mb_internal_encoding(),
+            'encoding'  => ini_get('default_charset'),
+            'scrub'     => 'IGNORE',
+            'initial'   => [],
             'headers'   => [],
             'headermap' => null,
             'structure' => false,
             'grouping'  => null,
             'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
+            'limit'     => null, // 正味のデータ行の最大値（超えた場合はそこで処理を終了する。例外が飛んだりはしない）
         ];
 
         // 文字キーを含む場合はヘッダーありの読み換えとなる
@@ -8991,15 +9052,30 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
         $restore = set_error_exception_handler();
         try {
             $n = -1;
-            return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $headers, $headermap, $structure, $grouping, $callback) use (&$n) {
-                $mb_internal_encoding = mb_internal_encoding();
+            return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $headermap, $structure, $grouping, $callback, $limit) use (&$n) {
+                $default_charset = ini_get('default_charset');
+                if ($default_charset !== $encoding) {
+                    stream_filter_append($fp, "convert.iconv.$encoding/$default_charset" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_READ);
+                }
+
+                foreach ($initial as $rule => $count) {
+                    for ($i = 0; $i < $count; $i++) {
+                        if ($rule === 'byte') {
+                            fgetc($fp);
+                        }
+                        elseif ($rule === 'line') {
+                            fgets($fp);
+                        }
+                        elseif ($rule === 'csv') {
+                            fgetcsv($fp, 0, $delimiter, $enclosure, $escape);
+                        }
+                    }
+                }
+
                 $result = [];
                 while ($row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape)) {
                     if ($row === [null]) {
                         continue;
-                    }
-                    if ($mb_internal_encoding !== $encoding) {
-                        mb_convert_variables($mb_internal_encoding, $encoding, $row);
                     }
                     if (!$headers) {
                         $headers = $row;
@@ -9050,6 +9126,10 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
                     else {
                         $result[] = $row;
                     }
+
+                    if ($limit !== null && count($result) >= $limit) {
+                        break;
+                    }
                 }
 
                 if ($grouping !== null) {
@@ -9059,7 +9139,7 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
                 }
 
                 return $result;
-            })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback']);
+            })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback'], $options['limit']);
         }
         catch (\Throwable $t) {
             // 何行目？ が欲しくなることが非常に多いので例外メッセージを書き換える
@@ -9667,10 +9747,15 @@ if (!function_exists('ryunosuke\\Functions\\json_export')) {
         $inline_level = array_unset($options, JSON_INLINE_LEVEL, 0);
         $template_literal = array_unset($options, JSON_TEMPLATE_LITERAL, false);
         $inline_scalarlist = array_unset($options, JSON_INLINE_SCALARLIST, false);
+        // 後方互換性のため null のときのみデフォルト値を使う
+        $object_handlers = array_unset($options, JSON_OBJECT_HANDLER, []) ?? [
+            \DateTimeInterface::class => fn($v) => 'new Date(' . floor($v->format("U.v") * 1000) . ')',
+            \GMP::class               => fn($v) => gmp_strval($v) . "n",
+        ];
 
         $option = array_sum(array_keys(array_filter($options)));
 
-        $encode = function ($value, $parents, $objective) use (&$encode, $option, $depth, $indent, $closure, $template_literal, $inline_scalarlist, $nest_level, $inline_level, $es5, $comma, $comment) {
+        $encode = function ($value, $parents, $objective) use (&$encode, $option, $depth, $indent, $closure, $template_literal, $object_handlers, $inline_scalarlist, $nest_level, $inline_level, $es5, $comma, $comment) {
             $nest = $nest_level + count($parents);
             $indent = $indent ?: 4;
 
@@ -9684,7 +9769,14 @@ if (!function_exists('ryunosuke\\Functions\\json_export')) {
                 if ($value instanceof \JsonSerializable) {
                     return $encode($value->jsonSerialize(), $parents, false);
                 }
-                return $encode(arrayval($value, false), $parents, true);
+                if ($es5) {
+                    foreach ($object_handlers as $class => $handler) {
+                        if (is_a($value, $class, true)) {
+                            return $handler($value);
+                        }
+                    }
+                }
+                return $encode((array) $value, $parents, true);
             }
             if (is_array($value)) {
                 $pretty_print = $option & JSON_PRETTY_PRINT;
@@ -9714,7 +9806,7 @@ if (!function_exists('ryunosuke\\Functions\\json_export')) {
                     }
                 }
                 if ($inline_scalarlist) {
-                    $inline = $inline || !$objective && array_all($value, fn($v) => is_primitive($v) || $v instanceof \Closure);
+                    $inline = $inline || !$objective && array_and($value, fn($v) => is_primitive($v) || $v instanceof \Closure);
                 }
 
                 $break = $indent0 = $indent1 = $indent2 = $separator = '';
@@ -9780,14 +9872,14 @@ if (!function_exists('ryunosuke\\Functions\\json_export')) {
                     return '-Infinity';
                 }
                 if ($template_literal && is_string($value) && strpos($value, "\n") !== false) {
-                    $indent1 = ctype_digit("$indent") ? str_repeat(' ', ($nest + 1) * $indent) : str_repeat($indent, ($nest + 1));
-                    $jsonstr = json_encode(str_replace(["\r\n", "\r"], "\n", $value), $option, $depth);
+                    $jsonstr = json_encode($value, $option, $depth);
                     $jsonstr = substr($jsonstr, 1, -1);
                     $jsonstr = strtr_escaped($jsonstr, [
-                        '\\n' => "\n$indent1",
+                        '\\n' => "\n",
+                        '\\r' => "\r",
                         '`'   => '\\`',
                     ]);
-                    return "`\n$indent1$jsonstr\n$indent1`";
+                    return "`$jsonstr`";
                 }
             }
             return json_encode($value, $option, $depth);
@@ -9940,7 +10032,7 @@ if (!function_exists('ryunosuke\\Functions\\json_import')) {
                                     throw $this->exception("Missing object key", first_value($keyandval[0]));
                                 }
                                 // check objective key (e.g. {[1]: 123})
-                                if (($k = array_find($keyandval[0], fn($v) => $v instanceof $this)) !== null) {
+                                if (($k = array_find_first($keyandval[0], fn($v) => $v instanceof $this)) !== null) {
                                     throw $this->exception("Unexpected object key", $keyandval[0][$k]);
                                 }
                                 // check consecutive objective value (e.g. {k: 123 [1]})
@@ -10849,7 +10941,7 @@ if (!function_exists('ryunosuke\\Functions\\date_convert')) {
         }
 
         if (!$return_object) {
-            $era = array_find(JP_ERA, function ($era) use ($timestamp) {
+            $era = array_find_first(JP_ERA, function ($era) use ($timestamp) {
                 if ($era['since'] <= $timestamp) {
                     $era['year'] = idate('Y', (int) $timestamp) - idate('Y', $era['since']) + 1;
                     $era['gann'] = $era['year'] === 1 ? '元' : $era['year'];
@@ -11789,7 +11881,7 @@ if (!function_exists('ryunosuke\\Functions\\date_timestamp')) {
             $jpnames = array_merge(array_column(JP_ERA, 'name'), array_column(JP_ERA, 'abbr'));
             $datetimedata = preg_replace_callback('/^(' . implode('|', $jpnames) . ')(\d{1,2}|元)/u', function ($matches) {
                 [, $era, $year] = $matches;
-                $eratime = array_find(JP_ERA, function ($v) use ($era) {
+                $eratime = array_find_first(JP_ERA, function ($v) use ($era) {
                     if (in_array($era, [$v['name'], $v['abbr']], true)) {
                         return $v['since'];
                     }
@@ -17996,7 +18088,7 @@ if (!function_exists('ryunosuke\\Functions\\iterator_join')) {
         }
 
         $n = 0;
-        foreach ($iterator as $k => $it) {
+        foreach (new \NoRewindIterator($iterator) as $k => $it) {
             if ($preserve_keys) {
                 yield $k => $it;
             }
@@ -19100,7 +19192,7 @@ if (!function_exists('ryunosuke\\Functions\\namespace_parse')) {
                         ];
                         break;
                     case T_USE:
-                        $tokenCorF = array_find($tokens, fn($token) => ($token->id === T_CONST || $token->id === T_FUNCTION) ? $token->id : 0, false);
+                        $tokenCorF = array_find_first($tokens, fn($token) => ($token->id === T_CONST || $token->id === T_FUNCTION) ? $token->id : 0, false);
 
                         $prefix = '';
                         if (end($tokens)->text === '{') {
@@ -22963,6 +23055,8 @@ if (!function_exists('ryunosuke\\Functions\\reflect_callable')) {
      * - isAnonymous: 無名関数なら true を返す（8.2 の isAnonymous 互換）
      * - isStatic: $this バインド可能かを返す（クロージャのみ）
      * - getUsedVariables: use している変数配列を返す（クロージャのみ）
+     * - getClosure: 元となったオブジェクトを $object としたクロージャを返す（メソッドのみ）
+     *   - 上記二つは __call/__callStatic のメソッドも呼び出せる
      * - getTraitMethod: トレイト側のリフレクションを返す（メソッドのみ）
      *
      * Example:
@@ -23139,6 +23233,24 @@ if (!function_exists('ryunosuke\\Functions\\reflect_callable')) {
                 public function isAnonymous(): bool
                 {
                     return false;
+                }
+
+                public function getClosure(?object $object = null): \Closure
+                {
+                    $name = strtolower($this->name);
+
+                    if ($this->isStatic()) {
+                        if ($name === '__callstatic') {
+                            return \Closure::fromCallable([$this->class, $this->call_name]);
+                        }
+                        return parent::getClosure();
+                    }
+
+                    $object ??= $this->callable[0];
+                    if ($name === '__call') {
+                        return \Closure::fromCallable([$object, $this->call_name]);
+                    }
+                    return parent::getClosure($object);
                 }
 
                 public function getTraitMethod(): ?\ReflectionMethod
@@ -24734,7 +24846,12 @@ if (!function_exists('ryunosuke\\Functions\\ends_with')) {
     function ends_with(?string $string, $with, $case_insensitivity = false)
     {
         foreach ((array) $with as $w) {
-            assert(strlen($w));
+            $w = (string) $w;
+
+            // All strings end with the empty string
+            if ($w === '') {
+                return true;
+            }
 
             if (str_equals(substr($string, -strlen($w)), $w, $case_insensitivity)) {
                 return true;
@@ -25233,8 +25350,8 @@ if (!function_exists('ryunosuke\\Functions\\mb_monospace')) {
     }
 }
 
-assert(!function_exists('ryunosuke\\Functions\\mb_str_pad') || (new \ReflectionFunction('ryunosuke\\Functions\\mb_str_pad'))->isUserDefined());
-if (!function_exists('ryunosuke\\Functions\\mb_str_pad')) {
+assert(!function_exists('ryunosuke\\Functions\\mb_pad_width') || (new \ReflectionFunction('ryunosuke\\Functions\\mb_pad_width'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\mb_pad_width')) {
     /**
      * マルチバイト版 str_pad
      *
@@ -25249,11 +25366,11 @@ if (!function_exists('ryunosuke\\Functions\\mb_str_pad')) {
      * Example:
      * ```php
      * // マルチバイトは2文字幅として換算される
-     * that(mb_str_pad('aaaa', 12, '-'))->isSame('aaaa--------');
-     * that(mb_str_pad('ああ', 12, '-'))->isSame('ああ--------');
+     * that(mb_pad_width('aaaa', 12, '-'))->isSame('aaaa--------');
+     * that(mb_pad_width('ああ', 12, '-'))->isSame('ああ--------');
      * // $pad_string は切り捨てられない
-     * that(mb_str_pad('aaaa', 12, 'xyz'))->isSame('aaaaxyzxyz'); // 10文字で返す（あと1回 xyz すると 13 文字になり width を超えてしまう（かといって xy だけを足したりもしない））
-     * that(mb_str_pad('ああ', 12, 'xyz'))->isSame('ああxyzxyz'); // マルチバイトでも同じ
+     * that(mb_pad_width('aaaa', 12, 'xyz'))->isSame('aaaaxyzxyz'); // 10文字で返す（あと1回 xyz すると 13 文字になり width を超えてしまう（かといって xy だけを足したりもしない））
+     * that(mb_pad_width('ああ', 12, 'xyz'))->isSame('ああxyzxyz'); // マルチバイトでも同じ
      * ```
      *
      * @package ryunosuke\Functions\Package\strings
@@ -25264,7 +25381,7 @@ if (!function_exists('ryunosuke\\Functions\\mb_str_pad')) {
      * @param int $pad_type 埋める位置
      * @return string 指定文字で埋められた文字列
      */
-    function mb_str_pad(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT)
+    function mb_pad_width(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT)
     {
         assert(in_array($pad_type, [STR_PAD_LEFT, STR_PAD_RIGHT, STR_PAD_BOTH]));
 
@@ -25290,6 +25407,23 @@ if (!function_exists('ryunosuke\\Functions\\mb_str_pad')) {
             case STR_PAD_LEFT:
                 return str_repeat($pad_string, floor($pad_count)) . $string;
         }
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\mb_str_pad') || (new \ReflectionFunction('ryunosuke\\Functions\\mb_str_pad'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\mb_str_pad')) {
+    /**
+     * マルチバイト版 str_pad
+     *
+     * @see mb_pad_width()
+     * @deprecated 標準関数と重複
+     * @codeCoverageIgnore
+     * @package ryunosuke\Functions\Package\strings
+     */
+    function mb_str_pad(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT)
+    {
+        trigger_error(__FUNCTION__ . ' is deprecated. use mb_pad_width', E_USER_DEPRECATED);
+        return mb_pad_width($string, $width, $pad_string, $pad_type);
     }
 }
 
@@ -25336,18 +25470,14 @@ if (!function_exists('ryunosuke\\Functions\\mb_trim')) {
     /**
      * マルチバイト対応 trim
      *
-     * Example:
-     * ```php
-     * that(mb_trim(' 　 あああ　 　'))->isSame('あああ');
-     * ```
-     *
+     * @see https://github.com/symfony/polyfill-php84/
+     * @deprecated 標準関数と重複
+     * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\strings
-     *
-     * @param string $string 対象文字列
-     * @return string trim した文字列
      */
     function mb_trim(?string $string)
     {
+        trigger_error(__FUNCTION__ . ' is deprecated. use symfony/polyfill or 8.4 builtin', E_USER_DEPRECATED);
         return preg_replace('/\A[\p{C}\p{Z}]++|[\p{C}\p{Z}]++\z/u', '', $string);
     }
 }
@@ -25910,7 +26040,12 @@ if (!function_exists('ryunosuke\\Functions\\starts_with')) {
     function starts_with(?string $string, $with, $case_insensitivity = false)
     {
         foreach ((array) $with as $w) {
-            assert(strlen($w));
+            $w = (string) $w;
+
+            // All strings end with the empty string
+            if ($w === '') {
+                return true;
+            }
 
             if (str_equals(substr($string, 0, strlen($w)), $w, $case_insensitivity)) {
                 return true;
@@ -26878,7 +27013,7 @@ if (!function_exists('ryunosuke\\Functions\\str_diff')) {
                         $d1 = mb_wordwrap($d[1] ?? '', $columns, null);
                         foreach (array_zip($d0, $d1) as $n => $dd) {
                             $gutter = $n === 0 ? $rule[0] : " ";
-                            $result[] = mb_str_pad($dd[0] ?? '', $columns) . " $gutter " . $dd[1] ?? '';
+                            $result[] = mb_pad_width($dd[0] ?? '', $columns) . " $gutter " . $dd[1] ?? '';
                         }
                     }
                 }
@@ -29606,19 +29741,21 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
             }
 
             $closure = \Closure::fromCallable($caller);
-            // for compatible (wait for memory_reset_peak_usage)
-            try {
-                // いったん受けて返すことで tick を誘発する
-                // @codeCoverageIgnoreStart
-                $caller = function (&...$args) use ($caller) {
-                    $dummy = $caller(...$args);
-                    return $dummy;
-                };
-                // @codeCoverageIgnoreEnd
-                $closure = evaluate("declare(ticks=1);\n" . var_export3($caller, ['outmode' => 'eval']));
-            }
-            catch (\Throwable) { // @codeCoverageIgnore
-                // do nothing
+            if (!function_exists('memory_reset_peak_usage')) {
+                // for compatible (wait for memory_reset_peak_usage)
+                try {
+                    // いったん受けて返すことで tick を誘発する
+                    // @codeCoverageIgnoreStart
+                    $caller = function (&...$args) use ($caller) {
+                        $dummy = $caller(...$args);
+                        return $dummy;
+                    };
+                    // @codeCoverageIgnoreEnd
+                    $closure = evaluate("declare(ticks=1);\n" . var_export3($caller, ['outmode' => 'eval']));
+                }
+                catch (\Throwable) { // @codeCoverageIgnore
+                    // do nothing
+                }
             }
             $benchset[$name] = $closure;
         }
@@ -29673,16 +29810,51 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
 
         // ベンチ
         $cpu_timer = cpu_timer();
-        $tick = function () use (&$usage) {
-            $usage = max($usage, memory_get_usage());
+        // for compatible (wait for memory_reset_peak_usage)
+        $memory_measurer = new class() {
+            private int $peak;
+            private int $initial;
+
+            public function __construct()
+            {
+                register_tick_function($this);
+            }
+
+            public function __destruct()
+            {
+                unregister_tick_function($this);
+            }
+
+            public function __invoke()
+            {
+                $this->peak = max($this->peak ?? 0, memory_get_usage());
+            }
+
+            public function start()
+            {
+                gc_collect_cycles();
+                if (function_exists('memory_reset_peak_usage')) {
+                    memory_reset_peak_usage(); // @codeCoverageIgnore
+                }
+                unset($this->peak);
+                $this->initial = memory_get_usage();
+            }
+
+            public function result(): ?int
+            {
+                if (function_exists('memory_reset_peak_usage')) {
+                    return memory_get_peak_usage() - $this->initial; // @codeCoverageIgnore
+                }
+                if (!isset($this->peak)) {
+                    return null;
+                }
+                return $this->peak - $this->initial;
+            }
         };
-        register_tick_function($tick);
         $stats = [];
         foreach ($benchset as $name => $caller) {
-            $usage = null;
-            gc_collect_cycles();
             $cpu_timer->start();
-            $memory = memory_get_usage();
+            $memory_measurer->start();
             $microtime = microtime(true);
             $end = $microtime + $millisec / 1000;
             $args2 = $args;
@@ -29695,9 +29867,8 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
             $stats[$name]['count'] = $n;
             $stats[$name]['mills'] = (microtime(true) - $microtime) / $n;
             $stats[$name]['cpu'] = $cpu_timer->result();
-            $stats[$name]['memory'] = $usage === null ? null : $usage - $memory;
+            $stats[$name]['memory'] = $memory_measurer->result();
         }
-        unregister_tick_function($tick);
 
         $restore();
 
@@ -32168,7 +32339,7 @@ if (!function_exists('ryunosuke\\Functions\\var_export2')) {
                 $hashed = is_hasharray($value);
 
                 // スカラー値のみで構成されているならシンプルな再帰
-                if (!$hashed && array_all($value, fn(...$args) => is_primitive(...$args))) {
+                if (!$hashed && array_and($value, fn(...$args) => is_primitive(...$args))) {
                     return '[' . implode(",$space", array_map(fn($v) => $export($v, 'array-value'), $value)) . ']';
                 }
 
@@ -32422,7 +32593,7 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
 
             if (is_array($value)) {
                 $hashed = is_hasharray($value);
-                if (!$hashed && array_all($value, fn(...$args) => is_primitive(...$args))) {
+                if (!$hashed && array_and($value, fn(...$args) => is_primitive(...$args))) {
                     [$begin, $middle, $end] = ["", ", ", ""];
                 }
                 else {
@@ -33274,7 +33445,7 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
                     }
 
                     $is_hasharray = is_hasharray($value);
-                    $primitive_only = array_all($value, fn(...$args) => is_primitive(...$args));
+                    $primitive_only = array_and($value, fn(...$args) => is_primitive(...$args));
                     $assoc = !$this->options['minify'] && ($is_hasharray || !$primitive_only);
                     $tableofarray = (function () use ($count, $value) {
                         if ($this->options['minify'] || !$this->options['table'] || $count <= 1) {
@@ -33293,7 +33464,7 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
                         }
                         else {
                             $first_condition = array_keys($first);
-                            if (array_any($first_condition, 'is_int')) {
+                            if (array_or($first_condition, 'is_int')) {
                                 return null;
                             }
                         }
@@ -33537,6 +33708,17 @@ if (!function_exists('ryunosuke\\Functions\\var_type')) {
      * 無名クラスの場合は extends, implements の優先順位でその名前を使う。
      * 継承も実装もされていない場合は標準の get_class の結果を返す。
      *
+     * phpdoc に true を渡すと array-shape 記法も有効になり下記のようになる。
+     *
+     * - 連想配列は想起した通り
+     * - 連番配列は中身の和集合を取る
+     *     - 中身がさらに配列なら再帰的に処理する
+     *         - 有り無し混在は null 扱いになる
+     * - 無名クラスは親クラス＋インターフェースを取る
+     *     - 完全無名クラスは object になる
+     *
+     * phpdoc:true の場合の結果は互換性を考慮しない。
+     *
      * Example:
      * ```php
      * // プリミティブ型は get_debug_type と同義
@@ -33554,16 +33736,242 @@ if (!function_exists('ryunosuke\\Functions\\var_type')) {
      * that(var_type(new class implements \JsonSerializable{
      *     public function jsonSerialize(): string { return ''; }
      * }))->isSame('\\JsonSerializable');
+     *
+     * // phpdoc 形式
+     * that(var_type([
+     *     'scalar'    => 123,
+     *     'lish-hash' => [
+     *         ['id' => 1, 'name' => 'a'],
+     *         ['id' => 2, 'name' => 'b'],
+     *     ],
+     *     'nest'      => [
+     *         'a' => [
+     *             'b' => [
+     *                 'c' => ['a', 'b', 'c'],
+     *             ],
+     *         ],
+     *     ],
+     * ], ['phpdoc' => true, 'format' => 9]))->is(<<<ARRAYSHAPE
+     * array{
+     *   "lish-hash": array<array{
+     *     id: int,
+     *     name: string
+     *   }>,
+     *   nest: array{
+     *     a: array{
+     *       b: array{
+     *         c: array<string>
+     *       }
+     *     }
+     *   },
+     *   scalar: int
+     * }
+     * ARRAYSHAPE);
      * ```
      *
      * @package ryunosuke\Functions\Package\var
-     *
-     * @param mixed $var 型を取得する値
-     * @return string 型名
      */
-    function var_type($var)
+    function var_type(
+        /** 型を取得する値 */ mixed $var,
+        /** オプション配列 */ array $options = [],
+    ): /** 型名 */ string
     {
+        $options['phpdoc'] ??= false;                             // phpdoc 形式で書き出すか
+        $options['format'] ??= 1;                                 // フォーマットレベル（0:no space, 1:separator only, ...9:pretty）
+        $options['is_list'] ??= fn($k, $v, $array) => is_int($k); // 連番配列の判定処理（例えば UUID などを連番として扱いたいことがある）
+        $options['is_object'] ??= function ($var) {               // object-shape 記法にするオブジェクトの判定処理
+            if (is_object($var)) {
+                if ($var instanceof \stdClass) {
+                    return true;
+                }
+                /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
+                if (count((new \ReflectionClass($var))->getAttributes(\AllowDynamicProperties::class))) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        $options['nest'] = 0;
+
+        if (is_array($var) || $options['is_object']($var)) {
+            if ($options['phpdoc']) {
+                $shape = new class($var, $options) {
+                    private string $shape;
+                    private array  $type     = [];
+                    private array  $list     = [];
+                    private array  $hash     = [];
+                    private array  $object   = [];
+                    private bool   $optional = false;
+                    private array  $options;
+
+                    private string $result;
+
+                    public function __construct($var, $options)
+                    {
+                        $this->shape = is_object($var) ? 'object' : 'array';
+                        $this->options = $options;
+
+                        if (is_array($var) || $this->options['is_object']($var)) {
+                            foreach ($var as $k => $v) {
+                                if ($this->options['is_list']($k, $v, $var)) {
+                                    $new = new self($v, $this->options);
+                                    foreach ($this->list as $n => $old) {
+                                        /** @var self $old */
+                                        if (type_exists($newtype = (string) $new) && type_exists($oldtype = (string) $old)) {
+                                            if (is_subclass_of($newtype, $oldtype)) {
+                                                $this->list[$n] = $new;
+                                                continue 2;
+                                            }
+                                            if (is_subclass_of($oldtype, $newtype)) {
+                                                continue 2;
+                                            }
+                                        }
+
+                                        if ($new->list xor $old->list) {
+                                            if ($new->list && !$old->list) {
+                                                $this->list[$n] = $new;
+                                                continue 2;
+                                            }
+                                            if (!$new->list && $old->list) {
+                                                continue 2;
+                                            }
+                                        }
+
+                                        $flag = false;
+                                        foreach (['hash', 'object'] as $property) {
+                                            if ($new->$property && $old->$property) {
+                                                $flag = true;
+                                                $diffs = array_diff_key($new->$property, $old->$property) + array_diff_key($old->$property, $new->$property);
+
+                                                foreach ($diffs as $diff) {
+                                                    /** @var self $diff */
+                                                    unset($diff->result);
+                                                    $diff->optional = true;
+                                                }
+                                                $old->$property += $diffs;
+
+                                                foreach ($old->$property as $name => $diff) {
+                                                    unset($diff->result);
+                                                    $diff->type = array_merge($diff->type, $new->$property[$name]?->type ?? []);
+                                                    $diff->list = array_merge($diff->list, $new->$property[$name]?->list ?? []);
+                                                    $diff->hash = array_merge($diff->hash, $new->$property[$name]?->hash ?? []);
+                                                    $diff->object = array_merge($diff->object, $new->$property[$name]?->object ?? []);
+                                                }
+                                            }
+                                        }
+                                        if ($flag) {
+                                            continue 2;
+                                        }
+                                    }
+                                    $this->list[] = $new;
+                                }
+                                else {
+                                    $new = new self($v, ['nest' => $this->options['nest'] + 1] + $this->options);
+                                    if (is_object($var)) {
+                                        $type = var_type($var, ['is_object' => fn() => false] + $this->options);
+                                        if ($type !== 'object') {
+                                            $this->type[] = $type;
+                                        }
+                                        $this->object[$k] = $new;
+                                    }
+                                    else {
+                                        $this->hash[$k] = $new;
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            $this->type[] = var_type($var, $this->options);
+                        }
+                    }
+
+                    public function __toString(): string
+                    {
+                        return $this->result ??= (function () {
+                            $result = [];
+                            if ($t = array_filter(array_map('strval', $this->type), 'strlen')) {
+                                sort($t);
+                                $result[] = $t ? implode('|', array_unique($t)) : "";
+                            }
+                            if ($t = array_filter(array_map('strval', $this->list), 'strlen')) {
+                                sort($t);
+                                $result[] = $t ? "array<" . implode('|', array_unique($t)) . ">" : "";
+                            }
+                            foreach (['hash', 'object'] as $property) {
+                                if ($t = array_filter(array_map('strval', $this->$property), 'strlen')) {
+                                    $space = $this->options['format'] > 0 ? " " : "";
+                                    $break = $this->options['format'] > 1 ? "\n" : "";
+                                    $delim = $this->options['format'] > 1 ? $break : $space;
+                                    $indent = $this->options['format'] > 1 ? "  " : "";
+                                    $indent0 = $this->options['format'] > 1 ? str_repeat($indent, $this->options['nest'] + 0) : "";
+                                    $indent1 = $this->options['format'] > 1 ? str_repeat($indent, $this->options['nest'] + 1) : "";
+
+                                    ksort($t);
+                                    $keyvalues = array_map(function ($v, $k) use ($property, $indent1, $space) {
+                                        if (!preg_match('#^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$#u', $k)) {
+                                            $k = str_quote($k);
+                                        }
+                                        if ($this->$property[$k]->optional ?? false) {
+                                            $k = "$k?";
+                                        }
+                                        return "{$indent1}$k:{$space}$v";
+                                    }, $t, array_keys($t));
+                                    $result[] = $t ? "{$this->shape}{{$break}" . implode(",{$delim}", $keyvalues) . "{$break}{$indent0}}" : "";
+                                }
+                            }
+                            $result = array_filter($result, 'strlen');
+                            return $result ? implode('|', $result) : $this->shape;
+                        })();
+                    }
+
+                    /** @codeCoverageIgnore */
+                    public function __debugInfo(): ?array
+                    {
+                        return [
+                            'type'     => $this->type,
+                            'list'     => $this->list,
+                            'hash'     => $this->hash,
+                            'object'   => $this->object,
+                            'optional' => $this->optional,
+                        ];
+                    }
+                };
+                //var_pretty($shape);
+                return (string) $shape;
+            }
+        }
         if (is_object($var)) {
+            if ($options['phpdoc']) {
+                // クロージャだけはどうせ情報量がゼロなので特別扱いにする
+                if ($var instanceof \Closure) {
+                    $space = $options['format'] > 0 ? " " : "";
+
+                    $ref = new \ReflectionFunction($var);
+                    $args = array_map(fn($p) => ($p->getType() ?? "mixed") . ($p->isVariadic() ? '...' : ''), $ref->getParameters());
+                    $return = ($ref->getReturnType() ?? 'mixed');
+                    $return = is_string($return) || $return instanceof \ReflectionNamedType ? $return : "($return)";
+                    return "\\Closure(" . implode(",$space", $args) . "):$space" . reflect_type_resolve($return);
+                }
+
+                $types = [];
+                $ref = new \ReflectionObject($var);
+                if ($ref->isAnonymous()) {
+                    $ifs = [];
+                    if ($pc = $ref->getParentClass()) {
+                        $types[] = $pc->name;
+                        $ifs = $pc->getInterfaceNames();
+                    }
+                    $types = array_merge($types, array_diff($ref->getInterfaceNames(), $ifs));
+                }
+                else {
+                    $types[] = get_class($var);
+                }
+                if (!$types) {
+                    return 'object';
+                }
+                return implode('|', array_map(fn($v) => "\\" . ltrim($v, '\\'), $types));
+            }
             $ref = new \ReflectionObject($var);
             if ($ref->isAnonymous()) {
                 if ($pc = $ref->getParentClass()) {

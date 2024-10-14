@@ -37,6 +37,7 @@ class ReflectCallable extends ReflectionFunction implements Reflector, Stringabl
     public function getClosureThis() { }
     public function getClosureScopeClass() { }
     public function getClosureCalledClass() { }
+    public function getClosureUsedVariables(): array { }
     public function getDocComment() { }
     public function getEndLine() { }
     public function getExtension() { }
@@ -53,21 +54,24 @@ class ReflectCallable extends ReflectionFunction implements Reflector, Stringabl
     public function returnsReference() { }
     public function hasReturnType() { }
     public function getReturnType() { }
+    public function hasTentativeReturnType(): bool { }
+    public function getTentativeReturnType(): ?ReflectionType { }
     public function getAttributes(?string $name = null, int $flags = 0): array { }
+    public function getClosure(?object $object = null): Closure { }
     public function getTraitMethod(): ?ReflectionMethod { }
     public function isPublic() { }
     public function isPrivate() { }
     public function isProtected() { }
     public function isAbstract() { }
     public function isFinal() { }
-    public function isStatic() { }
     public function isConstructor() { }
     public function isDestructor() { }
-    public function getClosure(?object $object = null) { }
     public function getModifiers() { }
     public function invoke(?object $object, mixed ...$args) { }
     public function invokeArgs(?object $object, array $args) { }
     public function getDeclaringClass() { }
     public function getPrototype() { }
+    public function hasPrototype(): bool { }
     public function setAccessible(bool $accessible) { }
+    public function isStatic() { }
 }

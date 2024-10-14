@@ -135,8 +135,8 @@ trait ChainObject2
 
     /** @see ini_alter() */
     public self $ini_alter;
-    public function ini_alter(string $option, string $value): self { }
-    public function ini_alter(string $value): self { }
+    public function ini_alter(string $option, string|int|float|bool|null $value): self { }
+    public function ini_alter(string|int|float|bool|null $value): self { }
 
     /** @see is_uploaded_file() */
     public self $is_uploaded_file;
@@ -165,8 +165,8 @@ trait ChainObject2
 
     /** @see htmlentities() */
     public self $htmlentities;
-    public function htmlentities(string $string, int $flags = ENT_COMPAT, ?string $encoding = null, bool $double_encode = true): self { }
-    public function htmlentities(int $flags = ENT_COMPAT, ?string $encoding = null, bool $double_encode = true): self { }
+    public function htmlentities(string $string, int $flags = 11, ?string $encoding = null, bool $double_encode = true): self { }
+    public function htmlentities(int $flags = 11, ?string $encoding = null, bool $double_encode = true): self { }
 
     /** @see strpos() */
     public self $strpos;
@@ -267,16 +267,6 @@ trait ChainObject2
     public self $quoted_printable_encode;
     public function quoted_printable_encode(string $string): self { }
     public function quoted_printable_encode(): self { }
-
-    /** @see rand() */
-    public self $rand;
-    public function rand(int $min = null, int $max = null): self { }
-    public function rand(int $max = null): self { }
-
-    /** @see mt_rand() */
-    public self $mt_rand;
-    public function mt_rand(int $min = null, int $max = null): self { }
-    public function mt_rand(int $max = null): self { }
 
     /** @see strval() */
     public self $strval;

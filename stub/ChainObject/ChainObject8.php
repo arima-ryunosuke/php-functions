@@ -20,8 +20,8 @@ trait ChainObject8
 
     /** @see hash() */
     public self $hash;
-    public function hash(string $algo, string $data, bool $binary = false): self { }
-    public function hash(string $data, bool $binary = false): self { }
+    public function hash(string $algo, string $data, bool $binary = false, array $options = []): self { }
+    public function hash(string $data, bool $binary = false, array $options = []): self { }
 
     /** @see hash_update() */
     public self $hash_update;
@@ -30,8 +30,8 @@ trait ChainObject8
 
     /** @see hash_pbkdf2() */
     public self $hash_pbkdf2;
-    public function hash_pbkdf2(string $algo, string $password, string $salt, int $iterations, int $length = 0, bool $binary = false): self { }
-    public function hash_pbkdf2(string $password, string $salt, int $iterations, int $length = 0, bool $binary = false): self { }
+    public function hash_pbkdf2(string $algo, string $password, string $salt, int $iterations, int $length = 0, bool $binary = false, array $options = []): self { }
+    public function hash_pbkdf2(string $password, string $salt, int $iterations, int $length = 0, bool $binary = false, array $options = []): self { }
 
     /** @see array_search() */
     public self $array_search;
@@ -115,8 +115,8 @@ trait ChainObject8
 
     /** @see htmlspecialchars_decode() */
     public self $htmlspecialchars_decode;
-    public function htmlspecialchars_decode(string $string, int $flags = ENT_COMPAT): self { }
-    public function htmlspecialchars_decode(int $flags = ENT_COMPAT): self { }
+    public function htmlspecialchars_decode(string $string, int $flags = 11): self { }
+    public function htmlspecialchars_decode(int $flags = 11): self { }
 
     /** @see assert() */
     public self $assert;
@@ -181,8 +181,8 @@ TEXT): self { }
 
     /** @see fputcsv() */
     public self $fputcsv;
-    public function fputcsv($stream, array $fields, string $separator = ",", string $enclosure = "\"", string $escape = "\\"): self { }
-    public function fputcsv(array $fields, string $separator = ",", string $enclosure = "\"", string $escape = "\\"): self { }
+    public function fputcsv($stream, array $fields, string $separator = ",", string $enclosure = "\"", string $escape = "\\", string $eol = "\n"): self { }
+    public function fputcsv(array $fields, string $separator = ",", string $enclosure = "\"", string $escape = "\\", string $eol = "\n"): self { }
 
     /** @see fileatime() */
     public self $fileatime;
@@ -239,11 +239,6 @@ TEXT): self { }
     public function password_verify(string $password, string $hash): self { }
     public function password_verify(string $hash): self { }
 
-    /** @see random_int() */
-    public self $random_int;
-    public function random_int(int $min, int $max): self { }
-    public function random_int(int $max): self { }
-
     /** @see var_dump() */
     public self $var_dump;
     public function var_dump(mixed ...$values): self { }
@@ -278,6 +273,16 @@ TEXT): self { }
     public self $mb_split;
     public function mb_split(string $pattern, string $string, int $limit = -1): self { }
     public function mb_split(string $string, int $limit = -1): self { }
+
+    /** @see array_and() */
+    public self $array_and;
+    public function array_and(iterable $array, callable $callback = null, $default = true): self { }
+    public function array_and(callable $callback = null, $default = true): self { }
+
+    /** @see array_and() */
+    public self $and;
+    public function and(iterable $array, callable $callback = null, $default = true): self { }
+    public function and(callable $callback = null, $default = true): self { }
 
     /** @see array_insert() */
     public self $array_insert;

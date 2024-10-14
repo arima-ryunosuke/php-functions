@@ -28,16 +28,6 @@ trait ChainObject6
     public function date_modify(\DateTime $object, string $modifier): self { }
     public function date_modify(string $modifier): self { }
 
-    /** @see hash_hmac() */
-    public self $hash_hmac;
-    public function hash_hmac(string $algo, string $data, string $key, bool $binary = false): self { }
-    public function hash_hmac(string $data, string $key, bool $binary = false): self { }
-
-    /** @see hash_copy() */
-    public self $hash_copy;
-    public function hash_copy(\HashContext $context): self { }
-    public function hash_copy(): self { }
-
     /** @see preg_replace() */
     public self $preg_replace;
     public function preg_replace(array|string $pattern, array|string $replacement, array|string $subject, int $limit = -1, &$count = null): self { }
@@ -47,6 +37,16 @@ trait ChainObject6
     public self $preg_replace_callback_array;
     public function preg_replace_callback_array(array $pattern, array|string $subject, int $limit = -1, &$count = null, int $flags = 0): self { }
     public function preg_replace_callback_array(array|string $subject, int $limit = -1, &$count = null, int $flags = 0): self { }
+
+    /** @see hash_hmac() */
+    public self $hash_hmac;
+    public function hash_hmac(string $algo, string $data, string $key, bool $binary = false): self { }
+    public function hash_hmac(string $data, string $key, bool $binary = false): self { }
+
+    /** @see hash_copy() */
+    public self $hash_copy;
+    public function hash_copy(\HashContext $context): self { }
+    public function hash_copy(): self { }
 
     /** @see count() */
     public self $count;
@@ -155,13 +155,13 @@ trait ChainObject6
 
     /** @see htmlspecialchars() */
     public self $htmlspecialchars;
-    public function htmlspecialchars(string $string, int $flags = ENT_COMPAT, ?string $encoding = null, bool $double_encode = true): self { }
-    public function htmlspecialchars(int $flags = ENT_COMPAT, ?string $encoding = null, bool $double_encode = true): self { }
+    public function htmlspecialchars(string $string, int $flags = 11, ?string $encoding = null, bool $double_encode = true): self { }
+    public function htmlspecialchars(int $flags = 11, ?string $encoding = null, bool $double_encode = true): self { }
 
     /** @see get_html_translation_table() */
     public self $get_html_translation_table;
-    public function get_html_translation_table(int $table = HTML_SPECIALCHARS, int $flags = ENT_COMPAT, string $encoding = "UTF-8"): self { }
-    public function get_html_translation_table(int $flags = ENT_COMPAT, string $encoding = "UTF-8"): self { }
+    public function get_html_translation_table(int $table = HTML_SPECIALCHARS, int $flags = 11, string $encoding = "UTF-8"): self { }
+    public function get_html_translation_table(int $flags = 11, string $encoding = "UTF-8"): self { }
 
     /** @see strcspn() */
     public self $strcspn;
@@ -373,11 +373,6 @@ trait ChainObject6
     public function cli_set_process_title(string $title): self { }
     public function cli_set_process_title(): self { }
 
-    /** @see enum_exists() */
-    public self $enum_exists;
-    public function enum_exists(string $enum, bool $autoload = true): self { }
-    public function enum_exists(bool $autoload = true): self { }
-
     /** @see array_cross() */
     public self $array_cross;
     public function array_cross(iterable ...$arrays): self { }
@@ -437,6 +432,16 @@ trait ChainObject6
     public self $of;
     public function of($key, $default = null): self { }
     public function of($default = null): self { }
+
+    /** @see array_or() */
+    public self $array_or;
+    public function array_or(iterable $array, callable $callback = null, $default = false): self { }
+    public function array_or(callable $callback = null, $default = false): self { }
+
+    /** @see array_or() */
+    public self $or;
+    public function or(iterable $array, callable $callback = null, $default = false): self { }
+    public function or(callable $callback = null, $default = false): self { }
 
     /** @see array_pos_key() */
     public self $array_pos_key;

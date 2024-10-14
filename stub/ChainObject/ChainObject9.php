@@ -105,8 +105,8 @@ trait ChainObject9
 
     /** @see ini_set() */
     public self $ini_set;
-    public function ini_set(string $option, string $value): self { }
-    public function ini_set(string $value): self { }
+    public function ini_set(string $option, string|int|float|bool|null $value): self { }
+    public function ini_set(string|int|float|bool|null $value): self { }
 
     /** @see getservbyport() */
     public self $getservbyport;
@@ -248,6 +248,11 @@ trait ChainObject9
     public function fgetc($stream): self { }
     public function fgetc(): self { }
 
+    /** @see fsync() */
+    public self $fsync;
+    public function fsync($stream): self { }
+    public function fsync(): self { }
+
     /** @see mkdir() */
     public self $mkdir;
     public function mkdir(string $directory, int $permissions = 511, bool $recursive = false, $context = null): self { }
@@ -352,6 +357,16 @@ trait ChainObject9
     public self $all;
     public function all(iterable $array, callable $callback = null, $default = true): self { }
     public function all(callable $callback = null, $default = true): self { }
+
+    /** @see array_find_first() */
+    public self $array_find_first;
+    public function array_find_first(iterable $array, callable $callback, $is_key = true): self { }
+    public function array_find_first(callable $callback, $is_key = true): self { }
+
+    /** @see array_find_first() */
+    public self $find_first;
+    public function find_first(iterable $array, callable $callback, $is_key = true): self { }
+    public function find_first(callable $callback, $is_key = true): self { }
 
     /** @see array_find_last() */
     public self $array_find_last;

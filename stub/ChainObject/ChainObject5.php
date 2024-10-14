@@ -28,6 +28,11 @@ trait ChainObject5
     public function date_interval_create_from_date_string(string $datetime): self { }
     public function date_interval_create_from_date_string(): self { }
 
+    /** @see preg_match() */
+    public self $preg_match;
+    public function preg_match(string $pattern, string $subject, &$matches = null, int $flags = 0, int $offset = 0): self { }
+    public function preg_match(string $subject, &$matches = null, int $flags = 0, int $offset = 0): self { }
+
     /** @see hash_final() */
     public self $hash_final;
     public function hash_final(\HashContext $context, bool $binary = false): self { }
@@ -47,11 +52,6 @@ trait ChainObject5
     public self $mhash_keygen_s2k;
     public function mhash_keygen_s2k(int $algo, string $password, string $salt, int $length): self { }
     public function mhash_keygen_s2k(string $password, string $salt, int $length): self { }
-
-    /** @see preg_match() */
-    public self $preg_match;
-    public function preg_match(string $pattern, string $subject, &$matches = null, int $flags = 0, int $offset = 0): self { }
-    public function preg_match(string $subject, &$matches = null, int $flags = 0, int $offset = 0): self { }
 
     /** @see range() */
     public self $range;
@@ -112,6 +112,11 @@ trait ChainObject5
     public self $call_user_func_array;
     public function call_user_func_array(callable $callback, array $args): self { }
     public function call_user_func_array(array $args): self { }
+
+    /** @see ini_parse_quantity() */
+    public self $ini_parse_quantity;
+    public function ini_parse_quantity(string $shorthand): self { }
+    public function ini_parse_quantity(): self { }
 
     /** @see crc32() */
     public self $crc32;
@@ -548,6 +553,11 @@ TEXT): self { }
     public self $kvsprintf;
     public function kvsprintf(?string $format, array $array): self { }
     public function kvsprintf(array $array): self { }
+
+    /** @see mb_pad_width() */
+    public self $mb_pad_width;
+    public function mb_pad_width(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
+    public function mb_pad_width($width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
 
     /** @see quoteexplode() */
     public self $quoteexplode;
