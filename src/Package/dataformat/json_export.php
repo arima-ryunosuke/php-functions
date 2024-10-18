@@ -8,7 +8,6 @@ require_once __DIR__ . '/../array/array_unset.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../filesystem/fnmatch_or.php';
 require_once __DIR__ . '/../strings/strtr_escaped.php';
-require_once __DIR__ . '/../var/arrayval.php';
 require_once __DIR__ . '/../var/is_primitive.php';
 require_once __DIR__ . '/../constants.php';
 // @codeCoverageIgnoreEnd
@@ -94,7 +93,7 @@ function json_export($value, $options = [])
             if ($value instanceof \JsonSerializable) {
                 return $encode($value->jsonSerialize(), $parents, false);
             }
-            return $encode(arrayval($value, false), $parents, true);
+            return $encode((array) $value, $parents, true);
         }
         if (is_array($value)) {
             $pretty_print = $option & JSON_PRETTY_PRINT;
@@ -190,14 +189,14 @@ function json_export($value, $options = [])
                 return '-Infinity';
             }
             if ($template_literal && is_string($value) && strpos($value, "\n") !== false) {
-                $indent1 = ctype_digit("$indent") ? str_repeat(' ', ($nest + 1) * $indent) : str_repeat($indent, ($nest + 1));
-                $jsonstr = json_encode(str_replace(["\r\n", "\r"], "\n", $value), $option, $depth);
+                $jsonstr = json_encode($value, $option, $depth);
                 $jsonstr = substr($jsonstr, 1, -1);
                 $jsonstr = strtr_escaped($jsonstr, [
-                    '\\n' => "\n$indent1",
+                    '\\n' => "\n",
+                    '\\r' => "\r",
                     '`'   => '\\`',
                 ]);
-                return "`\n$indent1$jsonstr\n$indent1`";
+                return "`$jsonstr`";
             }
         }
         return json_encode($value, $option, $depth);

@@ -1357,10 +1357,8 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
         ], [JSON_TEMPLATE_LITERAL => true] + $es5_opt))->is('{
   a: {
     b: {
-      c: `
-        aaa
-        zzz
-        `,
+      c: `aaa
+zzz`,
     },
   },
 }');
