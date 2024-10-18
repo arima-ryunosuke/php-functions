@@ -30,6 +30,7 @@ use const ryunosuke\Functions\Package\JSON_INLINE_LEVEL;
 use const ryunosuke\Functions\Package\JSON_INLINE_SCALARLIST;
 use const ryunosuke\Functions\Package\JSON_INT_AS_STRING;
 use const ryunosuke\Functions\Package\JSON_MAX_DEPTH;
+use const ryunosuke\Functions\Package\JSON_OBJECT_HANDLER;
 use const ryunosuke\Functions\Package\JSON_TEMPLATE_LITERAL;
 use const ryunosuke\Functions\Package\JSON_TRAILING_COMMA;
 
@@ -1361,6 +1362,14 @@ this is line comment2*/a:"A",/*this is block comment1this is block comment2*/b:"
 zzz`,
     },
   },
+}');
+
+        that(json_export([
+            'datetime' => (new \DateTime('2014/12/24 00:00:00'))->setTime(12, 34, 56, 123456),
+            'gmp' => gmp_init('123456789012345678901234567890'),
+        ], [JSON_OBJECT_HANDLER => null] + $es5_opt))->is('{
+  datetime: new Date(1419392096123),
+  gmp: 123456789012345678901234567890n,
 }');
 
         // depth

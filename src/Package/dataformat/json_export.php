@@ -76,10 +76,15 @@ function json_export($value, $options = [])
     $inline_level = array_unset($options, JSON_INLINE_LEVEL, 0);
     $template_literal = array_unset($options, JSON_TEMPLATE_LITERAL, false);
     $inline_scalarlist = array_unset($options, JSON_INLINE_SCALARLIST, false);
+    // 後方互換性のため null のときのみデフォルト値を使う
+    $object_handlers = array_unset($options, JSON_OBJECT_HANDLER, []) ?? [
+        \DateTimeInterface::class => fn($v) => 'new Date(' . floor($v->format("U.v") * 1000) . ')',
+        \GMP::class               => fn($v) => gmp_strval($v) . "n",
+    ];
 
     $option = array_sum(array_keys(array_filter($options)));
 
-    $encode = function ($value, $parents, $objective) use (&$encode, $option, $depth, $indent, $closure, $template_literal, $inline_scalarlist, $nest_level, $inline_level, $es5, $comma, $comment) {
+    $encode = function ($value, $parents, $objective) use (&$encode, $option, $depth, $indent, $closure, $template_literal, $object_handlers, $inline_scalarlist, $nest_level, $inline_level, $es5, $comma, $comment) {
         $nest = $nest_level + count($parents);
         $indent = $indent ?: 4;
 
@@ -92,6 +97,13 @@ function json_export($value, $options = [])
         if (is_object($value)) {
             if ($value instanceof \JsonSerializable) {
                 return $encode($value->jsonSerialize(), $parents, false);
+            }
+            if ($es5) {
+                foreach ($object_handlers as $class => $handler) {
+                    if (is_a($value, $class, true)) {
+                        return $handler($value);
+                    }
+                }
             }
             return $encode((array) $value, $parents, true);
         }

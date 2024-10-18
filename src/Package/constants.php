@@ -252,6 +252,9 @@ const JSON_TEMPLATE_LITERAL = -105;
 /** json_*** 関数で bare string を文字列として扱うか */
 const JSON_BARE_AS_STRING = -106;
 
+/** json_*** 関数で特定クラスの独自変換の定数 */
+const JSON_OBJECT_HANDLER = -107;
+
 const SI_UNITS = [
     -8 => ["y"],
     -7 => ["z"],
