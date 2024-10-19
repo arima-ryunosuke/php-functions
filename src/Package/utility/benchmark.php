@@ -61,19 +61,21 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
         }
 
         $closure = \Closure::fromCallable($caller);
-        // for compatible (wait for memory_reset_peak_usage)
-        try {
-            // いったん受けて返すことで tick を誘発する
-            // @codeCoverageIgnoreStart
-            $caller = function (&...$args) use ($caller) {
-                $dummy = $caller(...$args);
-                return $dummy;
-            };
-            // @codeCoverageIgnoreEnd
-            $closure = evaluate("declare(ticks=1);\n" . var_export3($caller, ['outmode' => 'eval']));
-        }
-        catch (\Throwable) { // @codeCoverageIgnore
-            // do nothing
+        if (!function_exists('memory_reset_peak_usage')) {
+            // for compatible (wait for memory_reset_peak_usage)
+            try {
+                // いったん受けて返すことで tick を誘発する
+                // @codeCoverageIgnoreStart
+                $caller = function (&...$args) use ($caller) {
+                    $dummy = $caller(...$args);
+                    return $dummy;
+                };
+                // @codeCoverageIgnoreEnd
+                $closure = evaluate("declare(ticks=1);\n" . var_export3($caller, ['outmode' => 'eval']));
+            }
+            catch (\Throwable) { // @codeCoverageIgnore
+                // do nothing
+            }
         }
         $benchset[$name] = $closure;
     }
@@ -128,16 +130,51 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
 
     // ベンチ
     $cpu_timer = cpu_timer();
-    $tick = function () use (&$usage) {
-        $usage = max($usage, memory_get_usage());
+    // for compatible (wait for memory_reset_peak_usage)
+    $memory_measurer = new class() {
+        private int $peak;
+        private int $initial;
+
+        public function __construct()
+        {
+            register_tick_function($this);
+        }
+
+        public function __destruct()
+        {
+            unregister_tick_function($this);
+        }
+
+        public function __invoke()
+        {
+            $this->peak = max($this->peak ?? 0, memory_get_usage());
+        }
+
+        public function start()
+        {
+            gc_collect_cycles();
+            if (function_exists('memory_reset_peak_usage')) {
+                memory_reset_peak_usage(); // @codeCoverageIgnore
+            }
+            unset($this->peak);
+            $this->initial = memory_get_usage();
+        }
+
+        public function result(): ?int
+        {
+            if (function_exists('memory_reset_peak_usage')) {
+                return memory_get_peak_usage() - $this->initial; // @codeCoverageIgnore
+            }
+            if (!isset($this->peak)) {
+                return null;
+            }
+            return $this->peak - $this->initial;
+        }
     };
-    register_tick_function($tick);
     $stats = [];
     foreach ($benchset as $name => $caller) {
-        $usage = null;
-        gc_collect_cycles();
         $cpu_timer->start();
-        $memory = memory_get_usage();
+        $memory_measurer->start();
         $microtime = microtime(true);
         $end = $microtime + $millisec / 1000;
         $args2 = $args;
@@ -150,9 +187,8 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
         $stats[$name]['count'] = $n;
         $stats[$name]['mills'] = (microtime(true) - $microtime) / $n;
         $stats[$name]['cpu'] = $cpu_timer->result();
-        $stats[$name]['memory'] = $usage === null ? null : $usage - $memory;
+        $stats[$name]['memory'] = $memory_measurer->result();
     }
-    unregister_tick_function($tick);
 
     $restore();
 
