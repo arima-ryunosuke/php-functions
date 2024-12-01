@@ -33,7 +33,7 @@ function iterator_join($iterables, $preserve_keys = true)
     }
 
     $n = 0;
-    foreach ($iterator as $k => $it) {
+    foreach (new \NoRewindIterator($iterator) as $k => $it) {
         if ($preserve_keys) {
             yield $k => $it;
         }

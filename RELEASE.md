@@ -202,6 +202,10 @@
     - build_uri: uri_build
     - parse_uri: uri_parse
 
+## 1.6.24
+
+- [fixbug] csv_export に空ジェネレータを渡すとエラーになる不具合
+
 ## 1.6.23
 
 - [feature] csv_import に limit オプションを追加

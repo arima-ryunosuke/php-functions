@@ -159,6 +159,8 @@ class iteratorTest extends AbstractTestCase
             new \ArrayIterator(['b' => 'B']),
             (fn() => yield 'c' => 'C')(),
         ], true)))->is(['a' => 'A', 'b' => 'B', 'c' => 'C']);
+
+        that(iterator_to_array(iterator_join((function () { yield from []; })())))->is([]);
     }
 
     function test_iterator_map()
@@ -266,5 +268,7 @@ class iteratorTest extends AbstractTestCase
             yield 'C';
             yield 'D';
         })(), [1, 2], true))))->is(['A', 'B', 'C', 'D']);
+
+        that(iterator_to_array(iterator_join(iterator_split((function () { yield from []; })(), [1]))))->is([]);
     }
 }
