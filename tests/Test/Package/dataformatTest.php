@@ -1369,7 +1369,7 @@ zzz`,
 
         that(json_export([
             'datetime' => (new \DateTime('2014/12/24 00:00:00'))->setTime(12, 34, 56, 123456),
-            'gmp' => gmp_init('123456789012345678901234567890'),
+            'gmp'      => gmp_init('123456789012345678901234567890'),
         ], [JSON_OBJECT_HANDLER => null] + $es5_opt))->is('{
   datetime: new Date(1419392096123),
   gmp: 123456789012345678901234567890n,

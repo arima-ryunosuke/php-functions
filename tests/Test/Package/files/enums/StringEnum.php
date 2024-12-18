@@ -2,9 +2,6 @@
 
 namespace ryunosuke\Test\Package\files\enums;
 
-use ryunosuke\polyfill\enum\traits\Compatible;
-use ryunosuke\polyfill\enum\traits\Initializable;
-
 if (version_compare(PHP_VERSION, '8.1') >= 0) {
     eval(<<<'PHP'
         namespace ryunosuke\Test\Package\files\enums;

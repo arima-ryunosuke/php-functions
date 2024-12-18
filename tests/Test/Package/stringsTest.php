@@ -17,7 +17,6 @@ use function ryunosuke\Functions\Package\mb_ereg_split;
 use function ryunosuke\Functions\Package\mb_monospace;
 use function ryunosuke\Functions\Package\mb_pad_width;
 use function ryunosuke\Functions\Package\mb_substr_replace;
-use function ryunosuke\Functions\Package\mb_trim;
 use function ryunosuke\Functions\Package\mb_wordwrap;
 use function ryunosuke\Functions\Package\multiexplode;
 use function ryunosuke\Functions\Package\namespace_split;

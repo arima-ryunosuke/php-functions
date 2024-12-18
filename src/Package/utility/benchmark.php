@@ -135,16 +135,6 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
         private int $peak;
         private int $initial;
 
-        public function __construct()
-        {
-            register_tick_function($this);
-        }
-
-        public function __destruct()
-        {
-            unregister_tick_function($this);
-        }
-
         public function __invoke()
         {
             $this->peak = max($this->peak ?? 0, memory_get_usage());
@@ -152,6 +142,7 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
 
         public function start()
         {
+            register_tick_function($this);
             gc_collect_cycles();
             if (function_exists('memory_reset_peak_usage')) {
                 memory_reset_peak_usage(); // @codeCoverageIgnore
@@ -162,11 +153,12 @@ function benchmark($suite, $args = [], $millisec = 1000, $output = true)
 
         public function result(): ?int
         {
+            unregister_tick_function($this);
             if (function_exists('memory_reset_peak_usage')) {
                 return memory_get_peak_usage() - $this->initial; // @codeCoverageIgnore
             }
             if (!isset($this->peak)) {
-                return null;
+                return null; // @codeCoverageIgnore コード次第では tick されない場合がある
             }
             return $this->peak - $this->initial;
         }

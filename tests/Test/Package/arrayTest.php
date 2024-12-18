@@ -4,9 +4,7 @@ namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\array_add;
 use function ryunosuke\Functions\Package\array_aggregate;
-use function ryunosuke\Functions\Package\array_all;
 use function ryunosuke\Functions\Package\array_and;
-use function ryunosuke\Functions\Package\array_any;
 use function ryunosuke\Functions\Package\array_append;
 use function ryunosuke\Functions\Package\array_assort;
 use function ryunosuke\Functions\Package\array_columns;
@@ -25,7 +23,6 @@ use function ryunosuke\Functions\Package\array_fill_gap;
 use function ryunosuke\Functions\Package\array_filter_map;
 use function ryunosuke\Functions\Package\array_filter_recursive;
 use function ryunosuke\Functions\Package\array_filters;
-use function ryunosuke\Functions\Package\array_find;
 use function ryunosuke\Functions\Package\array_find_first;
 use function ryunosuke\Functions\Package\array_find_last;
 use function ryunosuke\Functions\Package\array_find_recursive;
