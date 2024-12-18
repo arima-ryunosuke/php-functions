@@ -1893,9 +1893,9 @@ class arrayTest extends AbstractTestCase
     function test_array_lookup()
     {
         $arrays = [
-            11 => ['id' => 1, 'name' => 'name1'],
-            12 => ['id' => 2, 'name' => 'name2'],
-            13 => ['id' => 3, 'name' => 'name3'],
+            11 => ['id' => 1, 'name' => 'name1', 'status' => true],
+            12 => ['id' => 2, 'name' => 'name2', 'status' => false],
+            13 => ['id' => 3, 'name' => 'name3', 'status' => true],
         ];
 
         // 第3引数を与えれば array_column と全く同じ
@@ -1909,6 +1909,18 @@ class arrayTest extends AbstractTestCase
         that(array_lookup($objects, 'name'))->isSame([11 => 'name1', 12 => 'name2', 13 => 'name3']);
         // クロージャもOK
         that(array_lookup($objects, 'name', fn($v, $k) => "$k-{$v->name}"))->isSame(["11-name1" => 'name1', "12-name2" => 'name2', "13-name3" => 'name3']);
+        // 配列カラム
+        that(array_lookup($objects, ['status', 'id']))->isSame([
+            11 => ['status' => true, 'id' => 1],
+            12 => ['status' => false, 'id' => 2],
+            13 => ['status' => true, 'id' => 3],
+        ]);
+        // 配列カラム（読み替え）
+        that(array_lookup($objects, ['status' => 's', 'id' => 'cid']))->isSame([
+            11 => ['s' => true, 'cid' => 1],
+            12 => ['s' => false, 'cid' => 2],
+            13 => ['s' => true, 'cid' => 3],
+        ]);
     }
 
     function test_array_map_filter()
