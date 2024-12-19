@@ -22,6 +22,7 @@ use function ryunosuke\Functions\Package\object_storage;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\register_autoload_function;
 use function ryunosuke\Functions\Package\rm_rf;
+use function ryunosuke\Functions\Package\stdclass;
 use function ryunosuke\Functions\Package\type_exists;
 use function ryunosuke\Functions\Package\var_export2;
 use const ryunosuke\Functions\Package\IS_OWNSELF;
@@ -697,15 +698,26 @@ class classobjTest extends AbstractTestCase
         that(files\classes\InitializedClass::$initialized3)->isTrue();
     }
 
-    /** @noinspection PhpUnusedPrivateFieldInspection */
-
     function test_stdclass()
     {
-        $fields = ['a', 'b'];
-        $stdclass = (object) $fields;
+        $stdclass = stdclass(a: 1, b: 2, x: [7], y: stdclass(y: 8));
         that($stdclass)->isInstanceOf(stdClass::class);
-        that($stdclass)->{0}->is('a');
-        that($stdclass)->{1}->is('b');
+        that($stdclass)->a->is(1);
+        that($stdclass)->b->is(2);
+        that($stdclass)->x->is([7]);
+        that($stdclass)->y->is((object) ['y' => 8]);
+
+        $iterable = [0, 'a' => 1, 'b' => 2];
+
+        $stdclass = stdclass(...$iterable);
+        that($stdclass)->{0}->is(0);
+        that($stdclass)->a->is(1);
+        that($stdclass)->b->is(2);
+
+        $stdclass = stdclass(...(function ($iterable) { yield from $iterable; })($iterable));
+        that($stdclass)->{0}->is(0);
+        that($stdclass)->a->is(1);
+        that($stdclass)->b->is(2);
     }
 
     function test_type_exists()
