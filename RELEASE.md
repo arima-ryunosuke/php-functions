@@ -11,6 +11,21 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.16
+
+- [tests] windows で opcache.enable_cli が有効だとテストがコケるのを修正
+- [fixbug] 複数利用時に cache/storage dir が混在する不具合
+- [feature] 内部で生成する DateTimeInterface を指定できる機能
+- [feature] http_bechmark を追加
+- [feature] http_requests に chunk オプションを追加
+- [feature] ip_info の改善
+- [change] キャッシュ周りを改善
+- [fixbug] markdown_table 修正
+- [feature] stdclass を復活
+- [feature] array_lookup のカラム選別機能
+- [refactor] code format, fix inspection
+- Merge tag 'v1.6.25'
+
 ## 2.0.15
 
 - [feature] benchmark で memory_reset_peak_usage が使えるなら使う
