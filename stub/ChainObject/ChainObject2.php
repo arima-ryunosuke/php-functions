@@ -373,6 +373,11 @@ trait ChainObject2
     public function markdown_list(iterable $array, $option = []): self { }
     public function markdown_list($option = []): self { }
 
+    /** @see xmlss_export() */
+    public self $xmlss_export;
+    public function xmlss_export(iterable $xmlssarrays, array $options = []): self { }
+    public function xmlss_export(array $options = []): self { }
+
     /** @see process_closure() */
     public self $process_closure;
     public function process_closure($closure, $args = [], $throw = true, $autoload = null, $workdir = null, $env = null, $options = null): self { }

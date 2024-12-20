@@ -459,6 +459,11 @@ TEXT): self { }
     public function sql_quote($value): self { }
     public function sql_quote(): self { }
 
+    /** @see xmlss_import() */
+    public self $xmlss_import;
+    public function xmlss_import($xmlssstring, array $options = []): self { }
+    public function xmlss_import(array $options = []): self { }
+
     /** @see date_alter() */
     public self $date_alter;
     public function date_alter($datetime, $excluded_dates, $follow_count, $format = "Y-m-d"): self { }

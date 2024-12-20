@@ -583,6 +583,11 @@ trait ChainObject9
     public function getipaddress($target = null): self { }
     public function getipaddress(): self { }
 
+    /** @see http_bechmark() */
+    public self $http_bechmark;
+    public function http_bechmark(array|string $urls, int $requests = 10, int $concurrency = 3, $output = null): self { }
+    public function http_bechmark(int $requests = 10, int $concurrency = 3, $output = null): self { }
+
     /** @see http_get() */
     public self $http_get;
     public function http_get($url, $data = [], $options = [], &$response_header = [], &$info = []): self { }

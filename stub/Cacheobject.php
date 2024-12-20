@@ -4,7 +4,7 @@
 /**
  * stub for cacheobject
  *
- * @noinspection PhpIncompatibleReturnTypeInspection
+ *
  *
  * @used-by \cacheobject()
  * @used-by \ryunosuke\Functions\cacheobject()
@@ -14,7 +14,7 @@ class Cacheobject implements Psr\SimpleCache\CacheInterface
 {
 
 
-    public function clean() { }
+    public function clean($max_execution_time = null) { }
     public function keys($pattern = null): iterable { }
     public function fetch($key, $provider, $ttl = null): mixed { }
     public function fetchMultiple($providers, $ttl = null): iterable { }
@@ -22,6 +22,7 @@ class Cacheobject implements Psr\SimpleCache\CacheInterface
     public function set($key, $value, $ttl = null): bool { }
     public function delete($key): bool { }
     public function provide($provider, ...$args): mixed { }
+    public function hash($key, $provider, $ttl = null): mixed { }
     public function clear(): bool { }
     public function getMultiple($keys, $default = null): iterable { }
     public function setMultiple($values, $ttl = null): bool { }

@@ -303,6 +303,11 @@ trait ChainObject4
     public function auto_loader($startdir = null): self { }
     public function auto_loader(): self { }
 
+    /** @see stdclass() */
+    public self $stdclass;
+    public function stdclass(...$fields): self { }
+    public function stdclass(): self { }
+
     /** @see ini_import() */
     public self $ini_import;
     public function ini_import($inistring, $options = []): self { }

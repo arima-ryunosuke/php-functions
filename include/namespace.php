@@ -540,7 +540,7 @@ if (!function_exists('ryunosuke\\Functions\\array_any')) {
     function array_any($array, $callback = null, $default = false)
     {
         trigger_error(__FUNCTION__ . ' is deprecated. use array_or or 8.4 builtin', E_USER_DEPRECATED);
-        return array_or($array, $callback , $default);
+        return array_or($array, $callback, $default);
     }
 }
 
@@ -2804,12 +2804,14 @@ if (!function_exists('ryunosuke\\Functions\\array_lookup')) {
      * array_column は キーを保存することが出来ないが、この関数は引数を2つだけ与えるとキーはそのままで array_column 相当の配列を返す。
      * 逆に第3引数にクロージャを与えるとその結果をキーにすることが出来る。
      *
+     * $column_key に配列を与えるとそれだけの配列を返す。
+     *
      * Example:
      * ```php
      * $array = [
-     *     11 => ['id' => 1, 'name' => 'name1'],
-     *     12 => ['id' => 2, 'name' => 'name2'],
-     *     13 => ['id' => 3, 'name' => 'name3'],
+     *     11 => ['id' => 1, 'name' => 'name1', 'status' => true],
+     *     12 => ['id' => 2, 'name' => 'name2', 'status' => false],
+     *     13 => ['id' => 3, 'name' => 'name3', 'status' => true],
      * ];
      * // 第3引数を渡せば array_column と全く同じ
      * that(array_lookup($array, 'name', 'id'))->isSame(array_column($array, 'name', 'id'));
@@ -2826,12 +2828,18 @@ if (!function_exists('ryunosuke\\Functions\\array_lookup')) {
      *     24 => 'name2',
      *     26 => 'name3',
      * ]);
+     * // $column_key に配列を与えるとそれだけの配列を返す
+     * that(array_lookup($array, ['id', 'status']))->isSame([
+     *     11 => ['id' => 1, 'status' => true],
+     *     12 => ['id' => 2, 'status' => false],
+     *     13 => ['id' => 3, 'status' => true],
+     * ]);
      * ```
      *
      * @package ryunosuke\Functions\Package\array
      *
      * @param iterable $array 対象配列
-     * @param string|null $column_key 値となるキー
+     * @param array|string|null $column_key 値となるキー
      * @param string|\Closure|null $index_key キーとなるキー
      * @return array 新しい配列
      */
@@ -2839,8 +2847,13 @@ if (!function_exists('ryunosuke\\Functions\\array_lookup')) {
     {
         $array = arrayval($array, false);
 
+        if (is_array($column_key)) {
+            $array = array_maps($array, fn($row) => array_pickup($row, $column_key));
+            $column_key = null;
+        }
+
         if ($index_key instanceof \Closure) {
-            return array_combine(array_maps($array, $index_key), array_column($array, $column_key));
+            return array_combine((array) array_maps($array, $index_key), array_column($array, $column_key));
         }
         if (func_num_args() === 3) {
             return array_column($array, $column_key, $index_key);
@@ -5967,7 +5980,7 @@ if (!function_exists('ryunosuke\\Functions\\auto_loader')) {
      */
     function auto_loader($startdir = null)
     {
-        return cache("path-$startdir", function () use ($startdir) {
+        return cacheobject(__FUNCTION__)->hash($startdir, function () use ($startdir) {
             $cache = dirname_r($startdir ?: __DIR__, function ($dir) {
                 if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
                     return $file;
@@ -5977,7 +5990,7 @@ if (!function_exists('ryunosuke\\Functions\\auto_loader')) {
                 throw new \DomainException('autoloader is not found.');
             }
             return $cache;
-        }, __FUNCTION__);
+        });
     }
 }
 
@@ -6384,11 +6397,12 @@ if (!function_exists('ryunosuke\\Functions\\class_map')) {
     {
         $loader ??= class_loader();
         $basePath ??= dirname((new \ReflectionClass($loader))->getFileName(), 3);
-        $cachekey = json_encode([spl_object_id($loader), $basePath]);
+        $cacheobject = cacheobject(__FUNCTION__);
+        $cachekey = [spl_object_id($loader), $basePath];
         if (!$cache) {
-            cache($cachekey, null, __FUNCTION__);
+            $cacheobject->hash($cachekey, null, 0);
         }
-        return cache($cachekey, function () use ($loader, $basePath) {
+        return $cacheobject->hash($cachekey, function () use ($loader, $basePath) {
             $result = [];
 
             // psr0+4
@@ -6464,7 +6478,7 @@ if (!function_exists('ryunosuke\\Functions\\class_map')) {
             }
 
             return $result;
-        }, __FUNCTION__);
+        });
     }
 }
 
@@ -7328,6 +7342,34 @@ if (!function_exists('ryunosuke\\Functions\\register_autoload_function')) {
         spl_autoload_register($loader, true, true);
 
         return $loader;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\stdclass') || (new \ReflectionFunction('ryunosuke\\Functions\\stdclass'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\stdclass')) {
+    /**
+     * stdClass を生成して返す
+     *
+     * object キャストとほとんど同じだが、名前付き可変引数を採用しているので JSON ライクに宣言することができる。
+     * その代わり数値キー等の php の識別子として不正なキーを生やすことはできない。
+     * （厳密に言えば名前付き引数を使わなければ数値キーは生成できるが…そんなことをするなら普通に object キャストをすればよい）。
+     *
+     * Example:
+     * ```php
+     * // 名前付き可変引数でコールできる
+     * that(stdclass(a: 1, b: 2))->isInstanceOf(\stdClass::class);
+     * // iterable も渡せる（この場合は実質的に object キャストと同義）
+     * that(stdclass(...['a' => 1, 'b' => 2]))->isInstanceOf(\stdClass::class);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\classobj
+     *
+     * @param mixed ...$fields メンバー配列
+     * @return \stdClass stdClass
+     */
+    function stdclass(...$fields): \stdClass
+    {
+        return (object) $fields;
     }
 }
 
@@ -10526,13 +10568,17 @@ if (!function_exists('ryunosuke\\Functions\\markdown_table')) {
             throw new \InvalidArgumentException('$array must be array of hasharray.');
         }
 
-        $option += [
-            'keylabel'  => null,   // 指定すると一番左端にキーの列が生える
-            'context'   => 'html', // html:改行がbrになる（html 以外は未定義）
-            'stringify' => fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false]),
-        ];
+        $option['keylabel'] ??= null;
+        $option['context'] ??= (function () {
+            $result = 'html';
+            if (PHP_SAPI === 'cli') {
+                $result = is_ansi(STDOUT) ? 'cli' : 'plain';
+            }
+            return $result;
+        })();
+        $option['stringify'] ??= fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false]);
 
-        $stringify = fn($v) => strtr(trim((is_stringable($v) ? $v : $option['stringify']($v)) ?? ''), ["\t" => '    ']);
+        $stringify = fn($v) => strtr(((is_stringable($v) && !is_null($v) ? $v : $option['stringify']($v)) ?? ''), ["\t" => '    ']);
         $is_numeric = function ($v) {
             $v = trim($v);
             if (strlen($v) === 0) {
@@ -11359,7 +11405,7 @@ if (!function_exists('ryunosuke\\Functions\\xmlss_import')) {
                     case 'Number':
                         return +$value;
                     case 'DateTime':
-                        return new \DateTimeImmutable($value);
+                        return new (function_configure('datetime.class'))($value);
                     default:
                         throw new \UnexpectedValueException('Unknown type: ' . $type); // @codeCoverageIgnore
                 }
@@ -11667,8 +11713,8 @@ if (!function_exists('ryunosuke\\Functions\\date_convert')) {
      * that(date_convert('Y/m/d H:i:s.u', $now))->isSame('2009/02/14 08:31:30.122999');
      * // $format に DateTimeInterface 実装クラス名を与えるとそのインスタンスを返す
      * that(date_convert(\DateTimeImmutable::class, $now))->isInstanceOf(\DateTimeImmutable::class);
-     * // null は DateTime を意味する
-     * that(date_convert(null, $now))->isInstanceOf(\DateTime::class);
+     * // null は DateTimeInterface を意味する
+     * that(date_convert(null, $now))->isInstanceOf(\DateTimeImmutable::class);
      * ```
      *
      * @package ryunosuke\Functions\Package\datetime
@@ -11681,7 +11727,7 @@ if (!function_exists('ryunosuke\\Functions\\date_convert')) {
      */
     function date_convert($format, $datetimedata = null)
     {
-        $format ??= \DateTime::class;
+        $format ??= function_configure('datetime.class');
         $return_object = class_exists($format) && is_subclass_of($format, \DateTimeInterface::class);
 
         if ($return_object && $datetimedata instanceof \DateTimeInterface) {
@@ -11721,7 +11767,7 @@ if (!function_exists('ryunosuke\\Functions\\date_convert')) {
             return date($format, $timestamp);
         }
 
-        $class = $return_object ? $format : \DateTime::class;
+        $class = $return_object ? $format : function_configure('datetime.class');
         $dt = new $class();
         $dt = $dt->setTimestamp((int) $timestamp);
 
@@ -19882,14 +19928,17 @@ if (!function_exists('ryunosuke\\Functions\\namespace_parse')) {
         $options += [
             'cache' => null,
         ];
+
+        $cacheobject = cacheobject(__FUNCTION__);
+
         if ($options['cache'] === null) {
-            $options['cache'] = cache($filename, fn() => $filemtime, 'filemtime') >= $filemtime;
+            $options['cache'] = $cacheobject->hash([$filename, 'mtime'], fn() => $filemtime) >= $filemtime;
         }
         if (!$options['cache']) {
-            cache($filename, null, 'filemtime');
-            cache($filename, null, __FUNCTION__);
+            $cacheobject->hash([$filename, 'mtime'], null, 0);
+            $cacheobject->hash([$filename, 'result'], null, 0);
         }
-        return cache($filename, function () use ($filename) {
+        return $cacheobject->hash([$filename, 'result'], function () use ($filename) {
             $stringify = function ($tokens) {
                 return trim(implode('', array_column(array_filter($tokens, function ($token) {
                     return in_array($token->id, [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true);
@@ -19999,7 +20048,7 @@ if (!function_exists('ryunosuke\\Functions\\namespace_parse')) {
                 }
             }
             return $result;
-        }, __FUNCTION__);
+        });
     }
 }
 
@@ -21052,7 +21101,7 @@ if (!function_exists('ryunosuke\\Functions\\getipaddress')) {
      */
     function getipaddress($target = null)
     {
-        $net_get_interfaces = cache("net_get_interfaces", fn() => net_get_interfaces(), __FUNCTION__);
+        $net_get_interfaces = cacheobject(__FUNCTION__)->fetch('net_get_interfaces', fn() => net_get_interfaces());
 
         // int, null 時は最初のエントリを返す（ループバックは除く）
         if ($target === null || is_int($target)) {
@@ -21095,6 +21144,138 @@ if (!function_exists('ryunosuke\\Functions\\getipaddress')) {
             }
         }
         return null;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\http_benchmark') || (new \ReflectionFunction('ryunosuke\\Functions\\http_benchmark'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\http_benchmark')) {
+    /**
+     * http のベンチマークを取る
+     *
+     * 結果の各意味合いは下記の通り。
+     * - status: http status code の統計
+     *   - 200 以外が混ざっている場合は何かが間違ってるので結果を疑うべき
+     * - wait: 接続確立後から最初の応答までの時間（いわゆる TTFB）
+     *   - ストリーミングなどしていなければ（かつ相手先が php であれば）これが実質的な応答速度と言える（バッファリングされるため transfer はただの消化試合になる）
+     *   - 全体として遅いならスコアは低いと言ってよい
+     *   - min/max の差が激しいならおそらく捌き切れていない（backlog に溜まるなど）
+     * - transfer: 最初の応答から全レスポンス完了までの時間
+     *   - いわゆる帯域…のような単純な値ではない
+     *   - 例えばストリーミングをしている場合はその生成速度と言える
+     * - total: TCP/TLS 等のメタい時間を除いた合計時間
+     *   - レスポンスサイズに引きずられるため参考程度でよい
+     *   - 敢えて言うなら min/max の差が激しいようなら何かを疑うべき
+     *
+     * 例えば下記のような php のベンチを取ると概ね wait:1, transfer:2, total:3 になる。
+     *
+     * ```
+     * ob_end_clean();
+     * sleep(1);
+     * echo "wait";
+     * flush();
+     * sleep(2);
+     * echo 'done';
+     * ```
+     *
+     * 外れ値のフィルタなどは行わない。
+     * 例えば backlog に溜まって応答が10倍になったとしてもそれは外れ値ではないだろう。
+     * と考えるとそもそも「外れ値」の定義自体が不可能であり、余計なことは一切しない。
+     *
+     * @package ryunosuke\Functions\Package\network
+     */
+    function http_bechmark(
+        /** URLs */ array|string $urls,
+        /** 合計リクエスト */ int $requests = 10,
+        /** 同時接続数 */ int $concurrency = 3,
+        /** @param null|resource|bool 出力先（省略時は標準出力） */ $output = null,
+    ): /** 結果配列 */ array
+    {
+        assert($requests > 0);
+        assert($concurrency > 0);
+
+        $urls = (array) $urls;
+        assert(count($urls) > 0);
+
+        $output ??= fopen('php://output', 'w');
+
+        $results = [];
+
+        foreach ($urls as $url => $data) {
+            // 特に意味はないが、接続が残っていたりするかもしれないのでやっておいて損はないだろう
+            gc_collect_cycles();
+
+            if (!is_array($data)) {
+                $data = ['url' => $data];
+            }
+            $curl = $data + ['url' => $url];
+
+            http_requests(array_pad([], $requests, $curl), [
+                CURLOPT_FORBID_REUSE   => true,  // ベンチマーク目的なら切るべき…とは思う
+                CURLOPT_FOLLOWLOCATION => false, // リダイレクトがあるのは本当のベンチマークではないと思う
+            ], [
+                'chunk' => $concurrency,
+            ], $infos);
+
+            $status = [];
+            $waiting = [];
+            $transfer = [];
+            $total = [];
+            $start = [];
+            $end = [];
+            foreach ($infos as [, $info]) {
+                // namelookup(DNS resolve)
+                // ---------->connect(TCP handshake)
+                // ------------------>appconnect(TLS handshake)
+                // ----------------------------->pretransfer(TLS cipher spec)
+                // ----------------------------------------->starttransfer(send request and TTFB)
+                // ------------------------------------------------------->total(complete)
+                $status[] = $info['http_code'];
+                $waiting[] = $w = $info['starttransfer_time'] - $info['pretransfer_time'];
+                $transfer[] = $r = $info['total_time'] - $info['starttransfer_time'];
+                $total[] = $t = $w + $r;
+                $start[] = $info['start'];
+                $end[] = $info['start'] + $t;
+            }
+
+            $results[$infos[0][1]['url']] = [
+                'status'         => array_count_values($status),
+                'wait'           => $waiting,
+                'transfer'       => $transfer,
+                'total'          => $total,
+                'request/second' => $requests / (max($end) - min($start)),
+            ];
+        }
+
+        $minmills = min(array_column($results, 'request/second'));
+        foreach ($results as &$result) {
+            $result['ratio'] = $result['request/second'] / $minmills;
+        }
+        uasort($results, fn($a, $b) => $b['ratio'] <=> $a['ratio']);
+
+        if ($output) {
+            $number_format = function ($value, $ratio = 1, $decimal = 0, $nullvalue = '') {
+                return $value === null ? $nullvalue : number_format($value * $ratio, $decimal);
+            };
+            fprintf($output, "Running %s urls (n/c=%s/%s):\n", count($urls), $number_format($requests), $number_format($concurrency));
+            fwrite($output, markdown_table(array_map(function ($v) use ($number_format) {
+                return [
+                    'status'         => array_sprintf($v['status'], '%2$s:%1$s', ', '),
+                    'wait(min)'      => $number_format(min($v['wait']), 1, 6),
+                    'wait(max)'      => $number_format(max($v['wait']), 1, 6),
+                    'wait(avg)'      => $number_format(mean($v['wait']), 1, 6),
+                    'transfer(min)'  => $number_format(min($v['transfer']), 1, 6),
+                    'transfer(max)'  => $number_format(max($v['transfer']), 1, 6),
+                    'transfer(avg)'  => $number_format(mean($v['transfer']), 1, 6),
+                    'total(min)'     => $number_format(min($v['total']), 1, 6),
+                    'total(max)'     => $number_format(max($v['total']), 1, 6),
+                    'total(avg)'     => $number_format(mean($v['total']), 1, 6),
+                    'request/second' => $number_format($v['request/second'], 1, 3),
+                    'ratio'          => $v['ratio'],
+                ];
+            }, $results), ['keylabel' => 'url', 'context' => null]));
+        }
+
+        return $results;
     }
 }
 
@@ -21743,6 +21924,7 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
 
         $multi_options += [
             'throw' => false, // curl レイヤーでエラーが出たら例外を投げるか（http レイヤーではない）
+            'chunk' => null,  // 並列数（CURLMOPT_MAX_TOTAL_CONNECTIONS と同じだが total_time が乱れない）
         ];
 
         // 固定オプション（必ずこの値が使用される）
@@ -21772,8 +21954,8 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
             curl_multi_setopt($mh, $name, $value);
         }
 
-        try {
-            foreach ($urls as $key => $opt) {
+        $add = function ($length) use (&$urls, $mh, $default, &$resultmap, $set_response) {
+            foreach (array_slice($urls, 0, $length, true) as $key => $opt) {
                 $rheader = null;
                 $info = null;
                 $res = http_request($default + $opt, $rheader, $info);
@@ -21784,7 +21966,12 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
                 else {
                     $set_response($key, $res, $rheader, $info);
                 }
+                unset($urls[$key]);
             }
+        };
+
+        try {
+            $add($multi_options['chunk'] ?? PHP_INT_MAX);
 
             do {
                 do {
@@ -21809,6 +21996,7 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
                     $info = curl_getinfo($handle);
                     $info['errno'] = $minfo['result'];
                     $info['retry'] = $retry_count;
+                    $info['start'] = $now;
 
                     if ($time = $retry($info, $response)) {
                         // 同じリソースを使い回しても大丈夫っぽい？（大丈夫なわけないと思うが…動いてはいる）
@@ -21839,6 +22027,9 @@ if (!function_exists('ryunosuke\\Functions\\http_requests')) {
 
                     curl_multi_remove_handle($mh, $handle);
                     curl_close($handle);
+
+                    $add(1);
+                    $active++;
                 } while ($remains);
             } while ($active && $mrc === CURLM_OK);
         }
@@ -21967,26 +22158,27 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
      * $ipaddr に null を渡すと全 ip 情報を返す。
      * 上記の通り、情報としてかなりでかいので php で処理するのではなく、全取得して RDBMS に登録したり htaccess に書き込んだりするのに使える。
      *
-     * 膨大な配列として保持するのでメモ化等は一切行わない。
-     * opcache 前提であるので、CLI 等で呼ぶとかなり遅くなるので注意。
-     *
      * ipv6 は今のところ未対応。
      *
      * Example:
      * ```php
      * // apnic 管轄
-     * that(ip_info(gethostbyname('www.nic.ad.jp')))->is([
-     *     'cidr'     => '192.41.192.0/24',
-     *     'registry' => 'apnic',
-     *     'cc'       => 'JP',
-     *     'date'     => '19880620',
+     * that(ip_info(gethostbyname('www.nic.ad.jp'), ['timeout' => 300]))->is([
+     *     'cidr'      => '192.41.192.0/24',
+     *     'ipaddress' => '192.41.192.0',
+     *     'netmask'   => 24,
+     *     'registry'  => 'apnic',
+     *     'cc'        => 'JP',
+     *     'date'      => '19880620',
      * ]);
      * // arin 管轄
-     * that(ip_info(gethostbyname('www.internic.net')))->is([
-     *     'cidr'     => '192.0.32.0/20',
-     *     'registry' => 'arin',
-     *     'cc'       => 'US',
-     *     'date'     => '20090629',
+     * that(ip_info(gethostbyname('www.internic.net'), ['timeout' => 300]))->is([
+     *     'cidr'      => '192.0.32.0/20',
+     *     'ipaddress' => '192.0.32.0',
+     *     'netmask'   => 20,
+     *     'registry'  => 'arin',
+     *     'cc'        => 'US',
+     *     'date'      => '20090629',
      * ]);
      * // こういう特殊なアドレスも一応対応している（全てではない）
      * that(ip_info('127.0.0.1'))['registry']->is('RFC1122');
@@ -21997,7 +22189,7 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
      *
      * @param string $ipaddr 調べる IP アドレス
      * @param array $options オプション配列
-     * @return ?array IP の情報。ヒットしない場合は null
+     * @return null|array|iterable IP の情報。ヒットしない場合は null
      */
     function ip_info($ipaddr, $options = [])
     {
@@ -22021,21 +22213,107 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
         $options += [
             'cachedir' => function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__),
             'ttl'      => 60 * 60 * 24 + 120, // 120 は1日1回バッチで叩くことを前提としたバッファ
+            'cache'    => true, // false を指定すると ttl が 0 扱いになり、内部キャッシュもクリアされる
             'rir'      => [],
+            'timeout'  => 180,
+            'generate' => false, // for compatible. true を指定するとジェネレータで返す（将来的に削除か true がデフォルトになる）
             'throw'    => true, // テスト用で原則 true（例外が飛ばないと情報が膨大過ぎるので失敗しても気付けない）
         ];
         $options['rir'] += [
-            'afrinic' => 'https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-latest',
-            'apnic'   => 'https://ftp.apnic.net/pub/stats/apnic/delegated-apnic-latest',
+            'afrinic' => 'https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest',
+            'apnic'   => 'https://ftp.apnic.net/pub/stats/apnic/delegated-apnic-extended-latest',
             'arin'    => 'https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest',
-            'lacnic'  => 'https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-latest',
-            'ripe'    => 'https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-latest',
+            'lacnic'  => 'https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest',
+            'ripe'    => 'https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest',
         ];
 
-        $urls = [];
-        $files = [
-            'reserved' => (function () {
-                $reserved = [];
+        if (!is_dir($options['cachedir'])) {
+            @mkdir($options['cachedir'], 0777, true);
+        }
+
+        $sqlfile = "{$options['cachedir']}/ip_infov001.sqlite";
+        if (!$options['cache']) {
+            @unlink($sqlfile);
+        }
+
+        // PDO(sqlite)取得
+        $initial = !file_exists($sqlfile);
+        $pdo = new \PDO("sqlite:$sqlfile", null, null, [
+            \PDO::ATTR_ERRMODE           => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_STRINGIFY_FETCHES => false,
+            \PDO::ATTR_EMULATE_PREPARES  => false,
+        ]);
+        if ($initial) {
+            $pdo->exec(<<<SQL
+                CREATE TABLE IF NOT EXISTS rir_meta(
+                    registry VARCHAR(32) NOT NULL,
+                    expire   INT         NOT NULL,
+                    PRIMARY KEY (registry)
+                )
+                SQL
+            );
+            $pdo->exec(<<<SQL
+                CREATE TABLE IF NOT EXISTS rir_data(
+                    ipaddress VARCHAR(16) NOT NULL,
+                    netmask   INT         NOT NULL,
+                    registry  VARCHAR(32) NOT NULL,
+                    cc        VARCHAR(16),
+                    date      VARCHAR(8),
+                    PRIMARY KEY (ipaddress, netmask)
+                )
+                SQL
+            );
+        }
+
+        // コールバックをトランザクションで実行するクロージャ
+        $transaction = function ($callback) use ($pdo) {
+            $pdo->beginTransaction();
+            // @codeCoverageIgnoreStart かなりしんどいので ignore
+            try {
+                $callback();
+                $pdo->commit();
+            }
+            catch (\Exception $e) {
+                $pdo->rollBack();
+                throw $e;
+                // @codeCoverageIgnoreEnd
+            }
+        };
+
+        // expire を更新するクロージャ
+        $refresh = function ($registry) use ($pdo, $options) {
+            $pdo->prepare('REPLACE INTO rir_meta VALUES (:registry, :expire)')->execute([
+                'registry' => $registry,
+                'expire'   => time() + $options['ttl'] + rand(0, 60), // 同時に走らないようにバラす
+            ]);
+            $pdo->prepare('DELETE FROM rir_data WHERE registry = :registry')->execute([
+                'registry' => $registry,
+            ]);
+        };
+
+        // IPアドレスと個数で CIDR を生成するクロージャ
+        $cidrize = function ($ipaddr, $count) {
+            $main = function (int $longip, int $count) use (&$main) {
+                if ($count > 0) {
+                    for ($bit = (int) ceil(log($count, 2)); $bit > 1; $bit--) {
+                        $bitcount = (int) pow(2, $bit);
+                        if (($longip & $bitcount - 1) === 0 && $count >= $bitcount) {
+                            yield [long2ip($longip), (32 - $bit)];
+                            yield from $main($longip + $bitcount, $count - $bitcount);
+                            break;
+                        }
+                    }
+                }
+            };
+            yield from $main(ip2long($ipaddr), $count);
+        };
+
+        $meta = $pdo->query("SELECT registry, expire FROM rir_meta")->fetchAll(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE);
+
+        // RFC アドレス
+        if (($meta['reserved']['expire'] ?? 0) < time()) {
+            $transaction(function () use ($pdo, $refresh) {
+                $refresh('reserved');
                 foreach ([
                     ['RFC1700', '0.0.0.0', 8],         // wildcard
                     ['RFC919', '255.255.255.255', 32], // broadcast
@@ -22044,95 +22322,99 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
                     ['RFC3927', '169.254.0.0', 16],    // link-local
                     ['RFC1918', '10.0.0.0', 8],        // private
                     ['RFC1918', '172.16.0.0', 12],     // private
-                    ['RFC1918', '192.168.0.0', 24],    // private
+                    ['RFC1918', '192.168.0.0', 16],    // private
                 ] as [$name, $ip, $mask]) {
-                    $reserved[substr(sprintf("%032b", ip2long($ip)), 0, $mask)] = [
-                        'cidr'     => "$ip/$mask",
-                        'registry' => $name,
-                        'cc'       => null,
-                        'date'     => null,
-                    ];
+                    $pdo->prepare('REPLACE INTO rir_data VALUES (:ipaddress, :netmask, :registry, :cc, :date)')->execute([
+                        'ipaddress' => $ip,
+                        'netmask'   => $mask,
+                        'registry'  => $name,
+                        'cc'        => null,
+                        'date'      => null,
+                    ]);
                 }
-                return $reserved;
-            })(),
-        ];
-        foreach ($options['rir'] as $rir => $url) {
-            $cachefile = "{$options['cachedir']}/$rir.php";
-            if (!file_exists($cachefile) || (time() - filemtime($cachefile)) >= $options['ttl']) {
-                $urls[$rir] = $url;
-            }
-            $files[$rir] = $cachefile;
+            });
         }
 
-        http_requests($urls, [
-            'cachedir' => $options['cachedir'],
-            'callback' => function ($rir, $body, $header, $info) use ($files, $options) {
-                if ($options['throw'] && ($body === null || $info['http_code'] >= 400)) {
-                    throw new \UnexpectedValueException("request {$info['url']} failed. caused by {$info['http_code']}(error {$info['errno']})");
+        // RIR アドレス
+        if ($urls = array_filter($options['rir'], fn($registry) => ($meta[$registry]['expire'] ?? 0) < time(), ARRAY_FILTER_USE_KEY)) {
+            $responses = http_requests($urls, [
+                'cachedir'             => $options['cachedir'],
+                CURLOPT_CONNECTTIMEOUT => $options['timeout'],
+                CURLOPT_TIMEOUT        => $options['timeout'],
+            ], [
+                'throw' => $options['throw'],
+            ], $infos);
+            foreach ($responses as $registry => $response) {
+                if ($options['throw'] && ($response === null || $infos[$registry][1]['http_code'] >= 400)) {
+                    throw new \UnexpectedValueException(sprintf("request %s failed. caused by %s(error [%s] %s)",
+                        $infos[$registry][1]['url'],
+                        $infos[$registry][1]['http_code'],
+                        $infos[$registry][1]['errno'],
+                        curl_strerror($infos[$registry][1]['errno']),
+                    ));
                 }
-                $tmpfile = tmpfile();
-                fwrite($tmpfile, $body ?? '');
-                rewind($tmpfile);
 
-                $cidrs = [];
-                while (($fields = fgetcsv($tmpfile, 0, "|")) !== false) {
-                    if (($fields[2] ?? '') === 'ipv4' && in_array($fields[6] ?? '', ['assigned', 'allocated'], true)) {
-                        $subnet = 32 - strlen(sprintf("%b", $fields[4] - 1));
-                        $key = substr(sprintf("%032b", ip2long($fields[3])), 0, $subnet);
-                        $cidrs[$key] = [
-                            'cidr'     => "{$fields[3]}/$subnet",
-                            'registry' => $fields[0],
-                            'cc'       => $fields[1],
-                            'date'     => $fields[5],
-                        ];
+                $fp = tmpfile();
+                fwrite($fp, $response);
+                rewind($fp);
+
+                $transaction(function () use ($pdo, $fp, $registry, $cidrize, $refresh) {
+                    $refresh($registry);
+                    while (($fields = fgetcsv($fp, 0, "|")) !== false) {
+                        if (($fields[2] ?? '') === 'ipv4' && in_array($fields[6] ?? '', ['assigned', 'allocated'], true)) {
+                            foreach ($cidrize($fields[3], $fields[4]) as $cidr) {
+                                $pdo->prepare('REPLACE INTO rir_data VALUES (:ipaddress, :netmask, :registry, :cc, :date)')->execute([
+                                    'ipaddress' => $cidr[0],
+                                    'netmask'   => $cidr[1],
+                                    'registry'  => $fields[0],
+                                    'cc'        => $fields[1],
+                                    'date'      => $fields[5],
+                                ]);
+                            }
+                        }
                     }
-                }
-
-                $cachefile = $files[$rir];
-                @mkdir(dirname($cachefile));
-                file_put_contents($cachefile, "<?php\nreturn " . var_export($cidrs, true) . ";", LOCK_EX);
-                //file_put_contents($cachefile, php_strip_whitespace($cachefile));
-                opcache_invalidate($cachefile, true);
-            },
-        ]);
-
-        // サイズがでかいので static 等にはしない（opcache に完全に任せる）
-        $all = [];
-        foreach ($files as $file) {
-            if (is_array($file)) {
-                $rir = $file;
-            }
-            elseif (file_exists($file)) {
-                $rir = include $file;
-            }
-            else {
-                // @codeCoverageIgnoreStart http が失敗したときなので基本的に到達しない（http が失敗したときは既に例外投げられている）
-                $rir = [];
-                if ($options['throw']) {
-                    throw new \UnexpectedValueException("failed to load $file");
-                }
-                // @codeCoverageIgnoreEnd
-            }
-
-            if ($ipaddr === null) {
-                $all += $rir;
-                continue;
-            }
-
-            $binary = sprintf("%032b", ip2long($ipaddr));
-            foreach (range(32, 1) as $n) {
-                $key = substr($binary, 0, $n);
-                if (isset($rir[$key])) {
-                    return $rir[$key];
-                }
+                });
             }
         }
 
+        $query = 'SELECT ipaddress || "/" || netmask AS cidr, * FROM rir_data';
+
+        // 全取得モード
         if ($ipaddr === null) {
-            return $all;
+            $generator = (function () use ($pdo, $query) {
+                $stmt = $pdo->query($query, \PDO::FETCH_ASSOC);
+                foreach ($stmt as $row) {
+                    $row['netmask'] = (int) $row['netmask'];
+                    yield $row;
+                }
+            })();
+            if ($options['generate']) {
+                return $generator;
+            }
+            return iterator_to_array($generator);
         }
 
-        return null;
+        // 単一取得モード
+        return cacheobject(__FUNCTION__, 0.01, 1.0)->hash($ipaddr, function () use ($pdo, $query, $ipaddr) {
+            $stmt = $pdo->prepare("$query WHERE ipaddress = :ipaddress AND netmask = :netmask");
+            for ($i = 32; $i > 0; $i--) {
+                $subnet = (32 - $i);
+                $ip = ip2long($ipaddr);
+                $ip = $ip >> $subnet;
+                $ip = $ip << $subnet;
+                $ip = long2ip($ip);
+
+                $stmt->execute([
+                    'ipaddress' => $ip,
+                    'netmask'   => $i,
+                ]);
+                $infos = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                foreach ($infos as $info) {
+                    $info['netmask'] = (int) $info['netmask'];
+                    return $info;
+                }
+            }
+        }, $options['ttl']);
     }
 }
 
@@ -23643,10 +23925,6 @@ if (!function_exists('ryunosuke\\Functions\\parameter_length')) {
     /**
      * callable の引数の数を返す
      *
-     * クロージャはキャッシュされない。毎回リフレクションを生成し、引数の数を調べてそれを返す。
-     * （クロージャには一意性がないので key-value なキャッシュが適用できない）。
-     * ので、ループ内で使ったりすると目に見えてパフォーマンスが低下するので注意。
-     *
      * Example:
      * ```php
      * // trim の引数は2つ
@@ -23664,35 +23942,17 @@ if (!function_exists('ryunosuke\\Functions\\parameter_length')) {
      */
     function parameter_length($callable, $require_only = false, $thought_variadic = false)
     {
-        // クロージャの $call_name には一意性がないのでキャッシュできない（spl_object_hash でもいいが、かなり重複するので完全ではない）
-        if ($callable instanceof \Closure) {
-            /** @var \ReflectionFunctionAbstract $ref */
-            $ref = reflect_callable($callable);
-            if ($thought_variadic && $ref->isVariadic()) {
-                return INF;
-            }
-            elseif ($require_only) {
-                return $ref->getNumberOfRequiredParameters();
-            }
-            else {
-                return $ref->getNumberOfParameters();
-            }
+        /** @var \ReflectionFunctionAbstract $ref */
+        $ref = reflect_callable($callable);
+        if ($thought_variadic && $ref->isVariadic()) {
+            return INF;
         }
-
-        // $call_name 取得
-        is_callable($callable, false, $call_name);
-
-        $cache = cache($call_name, function () use ($callable) {
-            /** @var \ReflectionFunctionAbstract $ref */
-            $ref = reflect_callable($callable);
-            return [
-                '00' => $ref->getNumberOfParameters(),
-                '01' => $ref->isVariadic() ? INF : $ref->getNumberOfParameters(),
-                '10' => $ref->getNumberOfRequiredParameters(),
-                '11' => $ref->isVariadic() ? INF : $ref->getNumberOfRequiredParameters(),
-            ];
-        }, __FUNCTION__);
-        return $cache[(int) $require_only . (int) $thought_variadic];
+        elseif ($require_only) {
+            return $ref->getNumberOfRequiredParameters();
+        }
+        else {
+            return $ref->getNumberOfParameters();
+        }
     }
 }
 
@@ -26656,7 +26916,7 @@ if (!function_exists('ryunosuke\\Functions\\render_template')) {
             return $result;
         };
 
-        [$blocks, $stmts] = cache("template-$template", function () use ($template) {
+        [$blocks, $stmts] = cacheobject(__FUNCTION__)->hash($template, function () use ($template) {
             $tokens = array_slice(php_parse("<?php <<<PHPTEMPLATELITERAL\n" . $template . "\nPHPTEMPLATELITERAL;", [
                 'backtick' => false,
             ]), 2, -2);
@@ -26686,7 +26946,7 @@ if (!function_exists('ryunosuke\\Functions\\render_template')) {
 
             array_walk_recursive($stmts, fn(&$token) => $token = (array) $token);
             return [$blocks, $stmts];
-        }, __FUNCTION__);
+        });
 
         $values = [];
         foreach ($stmts as $stmt) {
@@ -30574,16 +30834,6 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
             private int $peak;
             private int $initial;
 
-            public function __construct()
-            {
-                register_tick_function($this);
-            }
-
-            public function __destruct()
-            {
-                unregister_tick_function($this);
-            }
-
             public function __invoke()
             {
                 $this->peak = max($this->peak ?? 0, memory_get_usage());
@@ -30591,6 +30841,7 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
 
             public function start()
             {
+                register_tick_function($this);
                 gc_collect_cycles();
                 if (function_exists('memory_reset_peak_usage')) {
                     memory_reset_peak_usage(); // @codeCoverageIgnore
@@ -30601,11 +30852,12 @@ if (!function_exists('ryunosuke\\Functions\\benchmark')) {
 
             public function result(): ?int
             {
+                unregister_tick_function($this);
                 if (function_exists('memory_reset_peak_usage')) {
                     return memory_get_peak_usage() - $this->initial; // @codeCoverageIgnore
                 }
                 if (!isset($this->peak)) {
-                    return null;
+                    return null; // @codeCoverageIgnore コード次第では tick されない場合がある
                 }
                 return $this->peak - $this->initial;
             }
@@ -30792,6 +31044,8 @@ if (!function_exists('ryunosuke\\Functions\\cache')) {
      * ```
      *
      * @package ryunosuke\Functions\Package\utility
+     * @deprecated delete in future scope
+     * @codeCoverageIgnore
      *
      * @param string $key キャッシュのキー
      * @param ?callable $provider キャッシュがない場合にコールされる callable
@@ -30948,6 +31202,7 @@ if (!function_exists('ryunosuke\\Functions\\cacheobject')) {
      * - psr-16 にはない getOrSet(fetch) が生えている（利便性が非常に高く使用頻度が多いため）
      *
      * 性質上、参照されない期限切れキャッシュが溜まり続けるが $clean_probability を渡すと一定確率で削除される。
+     * さらに $clean_execution_time を指定すると削除の実行時間が制限される。
      * $clean_probability は 1 が 100%（必ず削除）、 0 が 0%（削除しない）である。
      * 削除処理は軽くはないため高頻度な実行は避けなければならない。
      * clean メソッドが生えているので明示的に呼ぶことも可能。
@@ -30960,286 +31215,348 @@ if (!function_exists('ryunosuke\\Functions\\cacheobject')) {
      *
      * @param ?string $directory キャッシュ保存ディレクトリ
      * @param float $clean_probability 不要キャッシュの削除確率
+     * @param ?float $clean_execution_time 不要キャッシュの最大実行時間
      * @return \Cacheobject psr-16 実装オブジェクト
      */
-    function cacheobject($directory = null, $clean_probability = 0)
+    function cacheobject($directory = null, $clean_probability = 0, $clean_execution_time = null)
     {
         static $cacheobjects = [];
 
-        $directory ??= function_configure('cachedir');
-        $cacheobject = $cacheobjects[$directory] ??= new class($directory) {
-            private $directory;
-            private $entries = [];
+        $cachedir = function_configure('cachedir');
 
-            public function __construct(string $directory)
-            {
-                assert(strlen($directory));
-                $this->directory = $directory;
-            }
+        // 相対パスは cachedir からの相対とする
+        if ($directory !== null && !path_is_absolute($directory)) {
+            $directory = $cachedir . DIRECTORY_SEPARATOR . strtr($directory, ['\\' => '%']);
+        }
+        $directory ??= $cachedir;
 
-            public function __debugInfo()
-            {
-                $class = self::class;
-                $props = (array) $this;
+        $cacheobject = $cacheobjects[$directory] ??= (function ($directory) {
+            $cacheobject = new class($directory) {
+                private $directory;
+                private $entries = [];
 
-                // 全キャッシュは情報量としてでかすぎるが、何がどこに配置されているかくらいは有ってもいい
-                $ekey = "\0$class\0entries";
-                assert(array_key_exists($ekey, $props));
-                $props[$ekey] = array_reduce(array_keys($props[$ekey]), fn($acc, $k) => $acc + [$k => $this->_getFilename($k)], []);
-
-                return $props;
-            }
-
-            private function _exception(string $message = "", int $code = 0, \Throwable $previous = null): \Throwable
-            {
-                return interface_exists(\Psr\SimpleCache\InvalidArgumentException::class)
-                    ? new class ( $message, $code, $previous ) extends \InvalidArgumentException implements \Psr\SimpleCache\InvalidArgumentException { }
-                    : new class ( $message, $code, $previous ) extends \InvalidArgumentException { };
-            }
-
-            private function _validateKey(string $key): void
-            {
-                if ($key === '') {
-                    throw $this->_exception("\$key is empty string");
+                public function __construct(string $directory)
+                {
+                    assert(strlen($directory));
+                    $this->directory = $directory;
                 }
-                if (strpbrk($key, '{}()/\\@:') !== false) {
-                    throw $this->_exception("\$key contains reserved character({}()/\\@:)");
-                }
-            }
 
-            private function _normalizeTtl($ttl): int
-            {
-                if ($ttl === null) {
-                    return 60 * 60 * 24 * 365 * 100;
-                }
-                if (is_int($ttl)) {
-                    return $ttl;
-                }
-                if ($ttl instanceof \DateInterval) {
-                    return (new \DateTime())->setTimestamp(0)->add($ttl)->getTimestamp();
-                }
-                throw $this->_exception("\$ttl must be null|int|DateInterval(" . gettype($ttl) . ")");
-            }
+                public function __debugInfo()
+                {
+                    $class = self::class;
+                    $props = (array) $this;
 
-            private function _getFilename(string $key): string
-            {
-                return $this->directory . DIRECTORY_SEPARATOR . strtr(rawurlencode($key), ['.' => DIRECTORY_SEPARATOR]) . ".php-cache";
-            }
+                    // 全キャッシュは情報量としてでかすぎるが、何がどこに配置されているかくらいは有ってもいい
+                    $ekey = "\0$class\0entries";
+                    assert(array_key_exists($ekey, $props));
+                    $props[$ekey] = array_reduce(array_keys($props[$ekey]), fn($acc, $k) => $acc + [$k => $this->_getFilename($k)], []);
 
-            private function _getCacheFilenames(): array
-            {
-                return file_list($this->directory, [
-                    '!type'     => ['dir', 'link'],
-                    'extension' => ['php-cache'],
-                ]) ?? [];
-            }
-
-            private function _getMetadata(string $filename): ?array
-            {
-                $fp = @fopen($filename, "r");
-                if ($fp === false) {
-                    return null;
+                    return $props;
                 }
-                try {
-                    $first = fgets($fp);
-                    $meta = @json_decode(substr($first, strpos($first, '#') + 1), true);
-                    return $meta ?: null;
-                }
-                finally {
-                    fclose($fp);
-                }
-            }
 
-            public function keys(?string $pattern = null)
-            {
-                $files = $this->_getCacheFilenames();
+                private function _exception(string $message = "", int $code = 0, \Throwable $previous = null): \Throwable
+                {
+                    return interface_exists(\Psr\SimpleCache\InvalidArgumentException::class)
+                        ? new class ( $message, $code, $previous ) extends \InvalidArgumentException implements \Psr\SimpleCache\InvalidArgumentException { }
+                        : new class ( $message, $code, $previous ) extends \InvalidArgumentException { };
+                }
 
-                $now = time();
-                $result = [];
-                foreach ($files as $file) {
-                    $meta = $this->_getMetadata($file);
-                    if ($meta && ($pattern === null || fnmatch($pattern, $meta['key']))) {
-                        $result[$meta['key']] = [
-                            'realpath' => $file,
-                            'size'     => filesize($file),
-                            'ttl'      => $meta['expire'] - $now,
-                        ];
+                private function _validateKey(string $key): void
+                {
+                    if ($key === '') {
+                        throw $this->_exception("\$key is empty string");
+                    }
+                    if (strpbrk($key, '{}()/\\@:') !== false) {
+                        throw $this->_exception("\$key contains reserved character({}()/\\@:)");
                     }
                 }
-                return $result;
-            }
 
-            public function clean()
-            {
-                $files = file_list($this->directory, [
-                    '!type' => 'link',
-                ]);
-
-                foreach ($files as $file) {
-                    if (is_file($file)) {
-                        $meta = $this->_getMetadata($file);
-                        if (isset($meta['expire']) && $meta['expire'] < time()) {
-                            @unlink($file);
-                        }
+                private function _normalizeTtl($ttl): int
+                {
+                    if ($ttl === null) {
+                        return 60 * 60 * 24 * 365 * 100;
                     }
-                    elseif (is_dir($file)) {
-                        @rmdir($file);
+                    if (is_int($ttl)) {
+                        return $ttl;
                     }
-                }
-            }
-
-            public function fetch($key, $provider, $ttl = null)
-            {
-                $value = $this->get($key);
-                if ($value === null) {
-                    $value = $provider($this);
-                    $this->set($key, $value, $ttl);
-                }
-                return $value;
-            }
-
-            public function fetchMultiple($providers, $ttl = null)
-            {
-                $result = $this->getMultiple(array_keys($providers));
-                foreach ($providers as $key => $provider) {
-                    $result[$key] ??= $this->fetch($key, $provider, $ttl);
-                }
-                return $result;
-            }
-
-            public function get($key, $default = null)
-            {
-                $this->_validateKey($key);
-
-                error_clear_last();
-                $entry = $this->entries[$key] ?? @include $this->_getFilename($key);
-                if (error_get_last() !== null || $entry[0] < time()) {
-                    $this->delete($key);
-                    return $default;
+                    if ($ttl instanceof \DateInterval) {
+                        return (new \DateTime())->setTimestamp(0)->add($ttl)->getTimestamp();
+                    }
+                    throw $this->_exception("\$ttl must be null|int|DateInterval(" . gettype($ttl) . ")");
                 }
 
-                $this->entries[$key] = $entry;
-                return $entry[1];
-            }
-
-            public function set($key, $value, $ttl = null)
-            {
-                $this->_validateKey($key);
-                $ttl = $this->_normalizeTtl($ttl);
-
-                if ($ttl <= 0) {
-                    return $this->delete($key);
+                private function _getFilename(string $key): string
+                {
+                    return $this->directory . DIRECTORY_SEPARATOR . strtr(rawurlencode($key), ['.' => DIRECTORY_SEPARATOR]) . ".php-cache";
                 }
 
-                $expire = time() + $ttl;
-                $this->entries[$key] = [$expire, $value];
-                $meta = json_encode(['key' => $key, 'expire' => $expire]);
-                // var_export3 はあらゆる出力を可能にしているので **読み込み時** のオーバーヘッドがでかく、もし var_export が使えるならその方が格段に速い
-                // しかし要素を再帰的に全舐め（is_exportable）しないと「var_export できるか？」は分からないというジレンマがある
-                // このコンテキストは「キャッシュ」なので書き込み時のオーバーヘッドよりも読み込み時のオーバーヘッドを優先して判定を行っている
-                if (is_exportable($this->entries[$key])) {
-                    $code = var_export($this->entries[$key], true);
+                private function _getCacheFilenames(): array
+                {
+                    return file_list($this->directory, [
+                        '!type'     => ['dir', 'link'],
+                        'extension' => ['php-cache'],
+                    ]) ?? [];
                 }
-                else {
-                    $code = var_export3($this->entries[$key], true);
-                }
-                return !!file_set_contents($this->_getFilename($key), "<?php # $meta\nreturn $code;\n");
-            }
 
-            public function delete($key)
-            {
-                $this->_validateKey($key);
-
-                unset($this->entries[$key]);
-                return @unlink($this->_getFilename($key));
-            }
-
-            public function provide($provider, ...$args)
-            {
-                $provider_hash = (string) new \ReflectionFunction($provider);
-                $cacheid = "autoprovide." . hash('fnv164', $provider_hash);
-                $key = $provider_hash . '@' . serialize($args);
-
-                $cache = $this->get($cacheid) ?? [];
-                if (!array_key_exists($key, $cache)) {
-                    $result = $provider(...$args);
-                    if ($result === null) {
+                private function _getMetadata(string $filename): ?array
+                {
+                    $fp = @fopen($filename, "r");
+                    if ($fp === false) {
                         return null;
                     }
-                    $cache[$key] = $result;
-                    $this->set($cacheid, $cache);
+                    try {
+                        $first = fgets($fp);
+                        $meta = @json_decode(substr($first, strpos($first, '#') + 1), true);
+                        return $meta ?: null;
+                    }
+                    finally {
+                        fclose($fp);
+                    }
                 }
-                return $cache[$key];
-            }
 
-            public function clear()
-            {
-                $this->entries = [];
+                public function keys(?string $pattern = null)
+                {
+                    $files = $this->_getCacheFilenames();
 
-                $files = $this->_getCacheFilenames();
-                return count($files) === count(array_filter(array_map('unlink', $files)));
-            }
+                    $now = time();
+                    $result = [];
+                    foreach ($files as $file) {
+                        $meta = $this->_getMetadata($file);
+                        if ($meta && ($pattern === null || fnmatch($pattern, $meta['key']))) {
+                            $result[$meta['key']] = [
+                                'realpath' => $file,
+                                'size'     => filesize($file),
+                                'ttl'      => $meta['expire'] - $now,
+                            ];
+                        }
+                    }
+                    return $result;
+                }
 
-            public function getMultiple($keys, $default = null)
-            {
-                return array_each($keys, function (&$result, $v) use ($default) {
-                    $result[$v] = $this->get($v, $default);
-                }, []);
-            }
+                public function clean($max_execution_time = null)
+                {
+                    $files = file_list($this->directory, [
+                        '!type' => 'link',
+                    ]);
 
-            public function setMultiple($values, $ttl = null)
-            {
-                return array_each($values, function (&$result, $v, $k) use ($ttl) {
-                    $result = $this->set($k, $v, $ttl) && $result;
-                }, true);
-            }
+                    set_error_handler(fn() => true);
+                    try {
+                        $end = microtime(true) + ($max_execution_time ?? 0);
+                        foreach ($files as $file) {
+                            if ($max_execution_time !== null && microtime(true) >= $end) {
+                                break; // @codeCoverageIgnore
+                            }
+                            if (is_file($file)) {
+                                $meta = $this->_getMetadata($file);
+                                if (isset($meta['expire']) && $meta['expire'] < time()) {
+                                    unset($this->entries[$meta['key']]);
+                                    unlink($file);
+                                }
+                            }
+                            elseif (is_dir($file)) {
+                                rmdir($file);
+                            }
+                        }
+                    }
+                    finally {
+                        restore_error_handler();
+                    }
+                }
 
-            public function deleteMultiple($keys)
-            {
-                return array_each($keys, function (&$result, $v) {
-                    $result = $this->delete($v) && $result;
-                }, true);
-            }
+                public function fetch($key, $provider, $ttl = null)
+                {
+                    $value = $this->get($key);
+                    if ($value === null) {
+                        $value = $provider($this);
+                        $this->set($key, $value, $ttl);
+                    }
+                    return $value;
+                }
 
-            public function has($key)
-            {
-                return $this->get($key) !== null;
-            }
-        };
+                public function fetchMultiple($providers, $ttl = null)
+                {
+                    $result = $this->getMultiple(array_keys($providers));
+                    foreach ($providers as $key => $provider) {
+                        $result[$key] ??= $this->fetch($key, $provider, $ttl);
+                    }
+                    return $result;
+                }
+
+                public function get($key, $default = null)
+                {
+                    $this->_validateKey($key);
+
+                    if (!isset($this->entries[$key])) {
+                        error_clear_last();
+                        $this->entries[$key] = @include $this->_getFilename($key);
+                        if (error_get_last() !== null) {
+                            $this->entries[$key] = [0, null];
+                        }
+                    }
+                    $entry = $this->entries[$key];
+                    if ($entry[0] < time()) {
+                        $this->delete($key);
+                        return $default;
+                    }
+
+                    $this->entries[$key] = $entry;
+                    return $entry[1];
+                }
+
+                public function set($key, $value, $ttl = null)
+                {
+                    $this->_validateKey($key);
+                    $ttl = $this->_normalizeTtl($ttl);
+
+                    if ($ttl <= 0) {
+                        return $this->delete($key);
+                    }
+
+                    $expire = time() + $ttl;
+                    $this->entries[$key] = [$expire, $value];
+                    $meta = json_encode(['key' => $key, 'expire' => $expire]);
+                    // var_export3 はあらゆる出力を可能にしているので **読み込み時** のオーバーヘッドがでかく、もし var_export が使えるならその方が格段に速い
+                    // しかし要素を再帰的に全舐め（is_exportable）しないと「var_export できるか？」は分からないというジレンマがある
+                    // このコンテキストは「キャッシュ」なので書き込み時のオーバーヘッドよりも読み込み時のオーバーヘッドを優先して判定を行っている
+                    if (is_exportable($this->entries[$key])) {
+                        $code = var_export($this->entries[$key], true);
+                    }
+                    else {
+                        $code = var_export3($this->entries[$key], true);
+                    }
+                    return !!file_set_contents($this->_getFilename($key), "<?php # $meta\nreturn $code;\n");
+                }
+
+                public function delete($key)
+                {
+                    $this->_validateKey($key);
+
+                    unset($this->entries[$key]);
+                    return @unlink($this->_getFilename($key));
+                }
+
+                public function provide($provider, ...$args)
+                {
+                    $provider_hash = (string) new \ReflectionFunction($provider);
+                    $cacheid = "autoprovide." . hash('fnv164', $provider_hash);
+                    $key = $provider_hash . '@' . serialize($args);
+
+                    $cache = $this->get($cacheid) ?? [];
+                    if (!array_key_exists($key, $cache)) {
+                        $result = $provider(...$args);
+                        if ($result === null) {
+                            return null;
+                        }
+                        $cache[$key] = $result;
+                        $this->set($cacheid, $cache);
+                    }
+                    return $cache[$key];
+                }
+
+                public function hash($key, $provider, $ttl = null)
+                {
+                    $now = time();
+                    $key = is_stringable($key) ? "$key" : json_encode($key);
+                    $cacheid = "hash." . hash('fnv164', $key);
+                    $ttl = $ttl === null ? null : $this->_normalizeTtl($ttl);
+
+                    $cache = $this->get($cacheid) ?? [];
+
+                    // ttl チェック
+                    if (isset($cache[$key][2]) && ($cache[$key][1] + $cache[$key][2]) <= $now) {
+                        // アイテム自体の ttl を max($ttls) にしているため、原則として↑の $this->>get の時点でフィルタされてこのコードは通らない
+                        // ここを通るのはハッシュが衝突してそれぞれの ttl がバラバラの場合のみ
+                        // レアすぎてテストできないので ignore する（A(ttl:100) と B(ttl:50) が衝突してその間（75）で B を取得したときに通ることになる）
+                        unset($cache[$key]); // @codeCoverageIgnore
+                    }
+                    // getter モード
+                    if ($provider === null && $ttl === null) {
+                        return $cache[$key][0] ?? null;
+                    }
+                    // ttl 0 は psr16 と同様に削除モード
+                    if ($ttl !== null && $ttl <= 0) {
+                        $result = isset($cache[$key]);
+                        unset($cache[$key]);
+                        $ttls = array_filter(array_column($cache, 2), fn($v) => $v !== null);
+                        $this->set($cacheid, $cache, $ttls ? max($ttls) : null);
+                        return $result;
+                    }
+
+                    if (!array_key_exists($key, $cache)) {
+                        $cache[$key] = [$provider(), $now, $ttl];
+                        $ttls = array_filter(array_column($cache, 2), fn($v) => $v !== null);
+                        $this->set($cacheid, $cache, $ttls ? max($ttls) : null);
+                    }
+                    return $cache[$key][0];
+                }
+
+                public function clear()
+                {
+                    $this->entries = [];
+
+                    $files = $this->_getCacheFilenames();
+                    return count($files) === count(array_filter(array_map('unlink', $files)));
+                }
+
+                public function getMultiple($keys, $default = null)
+                {
+                    return array_each($keys, function (&$result, $v) use ($default) {
+                        $result[$v] = $this->get($v, $default);
+                    }, []);
+                }
+
+                public function setMultiple($values, $ttl = null)
+                {
+                    return array_each($values, function (&$result, $v, $k) use ($ttl) {
+                        $result = $this->set($k, $v, $ttl) && $result;
+                    }, true);
+                }
+
+                public function deleteMultiple($keys)
+                {
+                    return array_each($keys, function (&$result, $v) {
+                        $result = $this->delete($v) && $result;
+                    }, true);
+                }
+
+                public function has($key)
+                {
+                    return $this->get($key) !== null;
+                }
+            };
+
+            return !interface_exists(\Psr\SimpleCache\CacheInterface::class) ? $cacheobject : new class($cacheobject) implements \Psr\SimpleCache\CacheInterface {
+                public function __construct(private $cacheobject) { }
+
+                // @formatter:off
+                public function clean($max_execution_time = null)                { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function keys($pattern = null): iterable                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function fetch($key, $provider, $ttl = null): mixed       { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function fetchMultiple($providers, $ttl = null): iterable { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function get($key, $default = null): mixed                { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function set($key, $value, $ttl = null): bool             { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function delete($key): bool                               { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function provide($provider, ...$args): mixed              { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function hash($key, $provider, $ttl = null): mixed        { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function clear(): bool                                    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function getMultiple($keys, $default = null): iterable    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function setMultiple($values, $ttl = null): bool          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function deleteMultiple($keys): bool                      { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                public function has($key): bool                                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
+                // @formatter:on
+            };
+        })($directory);
 
         static $cleaned = [];
         if ($clean_probability !== 0 && !($cleaned[$directory] ?? false)) {
             $cleaned[$directory] = true;
             if ($clean_probability * 100 >= rand(1, 100)) {
-                $cacheobject->clean();
+                $cacheobject->clean($clean_execution_time);
             }
         }
 
         /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return !interface_exists(\Psr\SimpleCache\CacheInterface::class) ? $cacheobject : new class($cacheobject) implements \Psr\SimpleCache\CacheInterface {
-            private $cacheobject;
-
-            public function __construct($cacheobject)
-            {
-                $this->cacheobject = $cacheobject;
-            }
-
-            // @formatter:off
-            public function clean()                                          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function keys($pattern = null): iterable                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function fetch($key, $provider, $ttl = null): mixed       { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function fetchMultiple($providers, $ttl = null): iterable { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function get($key, $default = null): mixed                { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function set($key, $value, $ttl = null): bool             { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function delete($key): bool                               { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function provide($provider, ...$args): mixed              { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function clear(): bool                                    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function getMultiple($keys, $default = null): iterable    { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function setMultiple($values, $ttl = null): bool          { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function deleteMultiple($keys): bool                      { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            public function has($key): bool                                  { return $this->cacheobject->{__FUNCTION__}(...func_get_args()); }
-            // @formatter:on
-        };
+        return $cacheobject;
     }
 }
 
@@ -31260,8 +31577,8 @@ if (!function_exists('ryunosuke\\Functions\\function_configure')) {
         static $config = [];
 
         // default
-        $config['cachedir'] ??= sys_get_temp_dir() . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
-        $config['storagedir'] ??= DIRECTORY_SEPARATOR === '/' ? '/var/tmp/rf' : (getenv('ALLUSERSPROFILE') ?: sys_get_temp_dir()) . '\\rf';
+        $config['cachedir'] ??= sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'rf' . DIRECTORY_SEPARATOR . strtr(__NAMESPACE__, ['\\' => '%']);
+        $config['storagedir'] ??= DIRECTORY_SEPARATOR === '/' ? '/var/tmp/rf/' . strtr(__NAMESPACE__, ['\\' => '%']) : (getenv('ALLUSERSPROFILE') ?: sys_get_temp_dir()) . '\\rf\\' . strtr(__NAMESPACE__, ['\\' => '%']);
         $config['placeholder'] ??= '';
         $config['var_stream'] ??= 'VarStreamV010000';
         $config['memory_stream'] ??= 'MemoryStreamV010000';
@@ -31269,6 +31586,7 @@ if (!function_exists('ryunosuke\\Functions\\function_configure')) {
         $config['chain.version'] ??= 2;
         $config['chain.nullsafe'] ??= false;
         $config['process.autoload'] ??= [];
+        $config['datetime.class'] ??= \DateTimeImmutable::class;
 
         // setting
         if (is_array($option)) {
@@ -32020,7 +32338,7 @@ if (!function_exists('ryunosuke\\Functions\\hashvar')) {
         $line = $trace['line'];
         $function = function_shorten($trace['function']);
 
-        $cache = cache($file . '#' . $line, function () use ($file, $line, $function) {
+        $cache = cacheobject(__FUNCTION__)->hash([$file, $line, $function], function () use ($file, $line, $function) {
             // 呼び出し元の1行を取得
             $lines = file($file, FILE_IGNORE_NEW_LINES);
             $target = $lines[$line - 1];
@@ -32070,7 +32388,7 @@ if (!function_exists('ryunosuke\\Functions\\hashvar')) {
             }
 
             return $callers;
-        }, __FUNCTION__);
+        });
 
         // 引数の数が一致する呼び出しを返す
         foreach ($cache as $caller) {

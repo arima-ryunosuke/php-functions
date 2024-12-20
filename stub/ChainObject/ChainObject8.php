@@ -441,8 +441,8 @@ TEXT): self { }
 
     /** @see cacheobject() */
     public self $cacheobject;
-    public function cacheobject($directory = null, $clean_probability = 0): self { }
-    public function cacheobject($clean_probability = 0): self { }
+    public function cacheobject($directory = null, $clean_probability = 0, $clean_execution_time = null): self { }
+    public function cacheobject($clean_probability = 0, $clean_execution_time = null): self { }
 
     /** @see number_serial() */
     public self $number_serial;
