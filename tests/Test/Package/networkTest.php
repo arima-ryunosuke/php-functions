@@ -7,6 +7,7 @@ use function ryunosuke\Functions\Package\cacheobject;
 use function ryunosuke\Functions\Package\cidr2ip;
 use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\getipaddress;
+use function ryunosuke\Functions\Package\http_bechmark;
 use function ryunosuke\Functions\Package\http_delete;
 use function ryunosuke\Functions\Package\http_get;
 use function ryunosuke\Functions\Package\http_head;
@@ -132,6 +133,36 @@ class networkTest extends AbstractTestCase
         that(self::resolveFunction('getipaddress'))('256.256.256.256')->wasThrown('is invalid ip address');
 
         $cacheobject->clear();
+    }
+
+    function test_http_benchmark()
+    {
+        if (!defined('TESTWEBSERVER')) {
+            return;
+        }
+        $server = TESTWEBSERVER;
+
+        // 細かなテストはしない。カバレッジのみ
+        $output = tmpfile();
+        $result = http_bechmark([
+            "$server/delay/1",
+            "$server/delay/2",
+        ],
+            requests: 3,
+            concurrency: 2,
+            output: $output,
+        );
+
+        that($result)->isArray();
+        that($result["$server/delay/1"]['status'])->is([200 => 3]);
+        that($result["$server/delay/2"]['status'])->is([200 => 3]);
+
+        rewind($output);
+        $result = stream_get_contents($output);
+        that($result)->contains('urls (n/c=3/2)');
+        that($result)->contains('200:3');
+        that($result)->contains("$server/delay/1");
+        that($result)->contains("$server/delay/2");
     }
 
     function test_http_cache()
