@@ -1635,10 +1635,11 @@ zzz`,
 ");
 
         that("\n" . markdown_table([['a' => 'aa'], ['b' => "b\nb"]]))->is("
-| a   | b      |
-| --- | ------ |
-| aa  |        |
-|     | b<br>b |
+| a   | b   |
+| --- | --- |
+| aa  |     |
+|     | b   |
+|     | b   |
 ");
 
         that("\n" . markdown_table([['a' => 'あ'], ['b' => 'い']]))->is("

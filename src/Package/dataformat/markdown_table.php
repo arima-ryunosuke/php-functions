@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../info/ansi_strip.php';
+require_once __DIR__ . '/../info/is_ansi.php';
 require_once __DIR__ . '/../strings/mb_monospace.php';
 require_once __DIR__ . '/../var/is_empty.php';
 require_once __DIR__ . '/../var/is_stringable.php';
@@ -43,13 +44,17 @@ function markdown_table($array, $option = [])
         throw new \InvalidArgumentException('$array must be array of hasharray.');
     }
 
-    $option += [
-        'keylabel'  => null,   // 指定すると一番左端にキーの列が生える
-        'context'   => 'html', // html:改行がbrになる（html 以外は未定義）
-        'stringify' => fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false]),
-    ];
+    $option['keylabel'] ??= null;
+    $option['context'] ??= (function () {
+        $result = 'html';
+        if (PHP_SAPI === 'cli') {
+            $result = is_ansi(STDOUT) ? 'cli' : 'plain';
+        }
+        return $result;
+    })();
+    $option['stringify'] ??= fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false]);
 
-    $stringify = fn($v) => strtr(trim((is_stringable($v) ? $v : $option['stringify']($v)) ?? ''), ["\t" => '    ']);
+    $stringify = fn($v) => strtr(((is_stringable($v) && !is_null($v) ? $v : $option['stringify']($v)) ?? ''), ["\t" => '    ']);
     $is_numeric = function ($v) {
         $v = trim($v);
         if (strlen($v) === 0) {
