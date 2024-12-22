@@ -89,6 +89,7 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
 
     $multi_options += [
         'throw' => false, // curl レイヤーでエラーが出たら例外を投げるか（http レイヤーではない）
+        'chunk' => null,  // 並列数（CURLMOPT_MAX_TOTAL_CONNECTIONS と同じだが total_time が乱れない）
     ];
 
     // 固定オプション（必ずこの値が使用される）
@@ -118,8 +119,8 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
         curl_multi_setopt($mh, $name, $value);
     }
 
-    try {
-        foreach ($urls as $key => $opt) {
+    $add = function ($length) use (&$urls, $mh, $default, &$resultmap, $set_response) {
+        foreach (array_slice($urls, 0, $length, true) as $key => $opt) {
             $rheader = null;
             $info = null;
             $res = http_request($default + $opt, $rheader, $info);
@@ -130,7 +131,12 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
             else {
                 $set_response($key, $res, $rheader, $info);
             }
+            unset($urls[$key]);
         }
+    };
+
+    try {
+        $add($multi_options['chunk'] ?? PHP_INT_MAX);
 
         do {
             do {
@@ -155,6 +161,7 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
                 $info = curl_getinfo($handle);
                 $info['errno'] = $minfo['result'];
                 $info['retry'] = $retry_count;
+                $info['start'] = $now;
 
                 if ($time = $retry($info, $response)) {
                     // 同じリソースを使い回しても大丈夫っぽい？（大丈夫なわけないと思うが…動いてはいる）
@@ -185,6 +192,9 @@ function http_requests($urls, $single_options = [], $multi_options = [], &$infos
 
                 curl_multi_remove_handle($mh, $handle);
                 curl_close($handle);
+
+                $add(1);
+                $active++;
             } while ($remains);
         } while ($active && $mrc === CURLM_OK);
     }
