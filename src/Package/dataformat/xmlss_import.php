@@ -6,6 +6,7 @@ require_once __DIR__ . '/../array/array_pickup.php';
 require_once __DIR__ . '/../array/is_indexarray.php';
 require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
 require_once __DIR__ . '/../filesystem/tmpname.php';
+require_once __DIR__ . '/../utility/function_configure.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -83,7 +84,7 @@ function xmlss_import($xmlssstring, array $options = [])
                 case 'Number':
                     return +$value;
                 case 'DateTime':
-                    return new \DateTimeImmutable($value);
+                    return new (function_configure('datetime.class'))($value);
                 default:
                     throw new \UnexpectedValueException('Unknown type: ' . $type); // @codeCoverageIgnore
             }

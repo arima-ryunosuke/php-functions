@@ -5,6 +5,7 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/array_find_first.php';
 require_once __DIR__ . '/../datetime/date_timestamp.php';
 require_once __DIR__ . '/../strings/strtr_escaped.php';
+require_once __DIR__ . '/../utility/function_configure.php';
 require_once __DIR__ . '/../constants.php';
 // @codeCoverageIgnoreEnd
 
@@ -45,8 +46,8 @@ require_once __DIR__ . '/../constants.php';
  * that(date_convert('Y/m/d H:i:s.u', $now))->isSame('2009/02/14 08:31:30.122999');
  * // $format に DateTimeInterface 実装クラス名を与えるとそのインスタンスを返す
  * that(date_convert(\DateTimeImmutable::class, $now))->isInstanceOf(\DateTimeImmutable::class);
- * // null は DateTime を意味する
- * that(date_convert(null, $now))->isInstanceOf(\DateTime::class);
+ * // null は DateTimeInterface を意味する
+ * that(date_convert(null, $now))->isInstanceOf(\DateTimeImmutable::class);
  * ```
  *
  * @package ryunosuke\Functions\Package\datetime
@@ -59,7 +60,7 @@ require_once __DIR__ . '/../constants.php';
  */
 function date_convert($format, $datetimedata = null)
 {
-    $format ??= \DateTime::class;
+    $format ??= function_configure('datetime.class');
     $return_object = class_exists($format) && is_subclass_of($format, \DateTimeInterface::class);
 
     if ($return_object && $datetimedata instanceof \DateTimeInterface) {
@@ -99,7 +100,7 @@ function date_convert($format, $datetimedata = null)
         return date($format, $timestamp);
     }
 
-    $class = $return_object ? $format : \DateTime::class;
+    $class = $return_object ? $format : function_configure('datetime.class');
     $dt = new $class();
     $dt = $dt->setTimestamp((int) $timestamp);
 

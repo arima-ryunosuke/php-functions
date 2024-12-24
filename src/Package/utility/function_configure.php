@@ -29,6 +29,7 @@ function function_configure($option)
     $config['chain.version'] ??= 2;
     $config['chain.nullsafe'] ??= false;
     $config['process.autoload'] ??= [];
+    $config['datetime.class'] ??= \DateTimeImmutable::class;
 
     // setting
     if (is_array($option)) {
