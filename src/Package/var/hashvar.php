@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../funchand/function_shorten.php';
-require_once __DIR__ . '/../utility/cache.php';
+require_once __DIR__ . '/../utility/cacheobject.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -32,7 +32,7 @@ function hashvar(...$vars)
     $line = $trace['line'];
     $function = function_shorten($trace['function']);
 
-    $cache = cache($file . '#' . $line, function () use ($file, $line, $function) {
+    $cache = cacheobject(__FUNCTION__)->hash([$file, $line, $function], function () use ($file, $line, $function) {
         // 呼び出し元の1行を取得
         $lines = file($file, FILE_IGNORE_NEW_LINES);
         $target = $lines[$line - 1];
@@ -82,7 +82,7 @@ function hashvar(...$vars)
         }
 
         return $callers;
-    }, __FUNCTION__);
+    });
 
     // 引数の数が一致する呼び出しを返す
     foreach ($cache as $caller) {

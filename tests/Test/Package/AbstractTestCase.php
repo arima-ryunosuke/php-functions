@@ -3,7 +3,6 @@
 namespace ryunosuke\Test\Package;
 
 use ryunosuke\Functions\Utility;
-use function ryunosuke\Functions\Package\cache;
 use function ryunosuke\Functions\Package\function_configure;
 
 class AbstractTestCase extends \ryunosuke\Test\AbstractTestCase
@@ -20,8 +19,6 @@ class AbstractTestCase extends \ryunosuke\Test\AbstractTestCase
             'cachedir'         => self::$TMPDIR,
             'process.autoload' => glob(__DIR__ . '/../../../src/Package/*/*.php'),
         ]);
-        cache('dummy', function () { });
-        cache(null, null);
 
         Utility::function_configure([
             'cachedir'      => self::$TMPDIR,

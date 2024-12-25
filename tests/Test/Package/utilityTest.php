@@ -6,7 +6,6 @@ use function ryunosuke\Functions\Package\array_flatten;
 use function ryunosuke\Functions\Package\array_maps;
 use function ryunosuke\Functions\Package\benchmark;
 use function ryunosuke\Functions\Package\built_in_server;
-use function ryunosuke\Functions\Package\cache;
 use function ryunosuke\Functions\Package\cache_fetch;
 use function ryunosuke\Functions\Package\cacheobject;
 use function ryunosuke\Functions\Package\function_configure;
@@ -97,24 +96,6 @@ class utilityTest extends AbstractTestCase
         $server->terminate();
     }
 
-    function test_cache()
-    {
-        $provider = fn() => sha1(uniqid(mt_rand(), true));
-
-        // 何度呼んでもキャッシュされるので一致する
-        $current = cache('test', $provider, null);
-        that(cache('test', $provider, null))->is($current);
-        that(cache('test', $provider, null))->is($current);
-        that(cache('test', $provider, null))->is($current);
-
-        // 名前空間を変えれば異なる値が返る（ごく低確率でコケるが、無視していいレベル）
-        that(cache('test', $provider, __FUNCTION__))->isNotEqual($current);
-
-        // null を与えると削除される
-        that(cache('test', null, __FUNCTION__))->isTrue();
-        that(cache('test', fn() => 1, __FUNCTION__))->is(1);
-    }
-
     function test_cache_fetch()
     {
         /** @var \Cacheobject $cache */
@@ -131,29 +112,16 @@ class utilityTest extends AbstractTestCase
         that($cache->get('sha1random'))->isNull();
     }
 
-    function test_cache_object()
-    {
-        cache(null, null);
-        $value = sha1(uniqid(mt_rand(), true));
-
-        $tmpdir = self::$TMPDIR . '/cache_object';
-        rm_rf($tmpdir);
-        function_configure(['cachedir' => $tmpdir]);
-        cache('key', fn() => $value, 'hoge');
-        cache(null, 'dummy');
-        that("$tmpdir/hoge.php-cache")->fileExists();
-        that(cache('key', fn() => 'dummy', 'hoge'))->is($value);
-
-        cache('key', fn() => $value, 'fuga');
-        cache(null, null);
-        that("$tmpdir/hoge.php-cache")->fileNotExists();
-    }
-
     function test_cacheobject()
     {
         /** @var \Cacheobject $cache */
         $tmpdir = self::$TMPDIR . '/cacheobject';
         rm_rf($tmpdir);
+
+        $cache = cacheobject('local');
+        $cache->set('hoge', '');
+        that(self::$TMPDIR . DIRECTORY_SEPARATOR . 'local' . DIRECTORY_SEPARATOR . 'hoge.php-cache')->fileExists();
+
         $cache = cacheobject($tmpdir);
 
         /// same object
@@ -266,6 +234,18 @@ class utilityTest extends AbstractTestCase
         that($cache->provide($provider, 200, 300))->isSame(291);
         that($cache->provide(fn($min, $max) => rand($min, $max), 200, 300))->isSame(229);
         that($cache->provide(fn() => null))->isSame(null);
+
+        // hash
+        that($cache->hash(['a', 'b'], fn() => 'first'))->isSame('first');
+        that($cache->hash(['a', 'b'], null))->isSame('first');
+        that($cache->hash(['a', 'b'], null, 0))->isSame(true);
+        that($cache->hash(['a', 'b'], null, 0))->isSame(false);
+
+        that($cache->hash(['a', 'b'], fn() => 'second1', 1))->isSame('second1');
+        that($cache->hash(['a', 'x'], fn() => 'second2', 3))->isSame('second2');
+        sleep(2);
+        that($cache->hash(['a', 'b'], null))->isSame(null);
+        that($cache->hash(['a', 'x'], null))->isSame('second2');
 
         /// misc
 

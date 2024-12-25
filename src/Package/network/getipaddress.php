@@ -2,7 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../utility/cache.php';
+require_once __DIR__ . '/../utility/cacheobject.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -26,7 +26,7 @@ require_once __DIR__ . '/../utility/cache.php';
  */
 function getipaddress($target = null)
 {
-    $net_get_interfaces = cache("net_get_interfaces", fn() => net_get_interfaces(), __FUNCTION__);
+    $net_get_interfaces = cacheobject(__FUNCTION__)->fetch('net_get_interfaces', fn() => net_get_interfaces());
 
     // int, null 時は最初のエントリを返す（ループバックは除く）
     if ($target === null || is_int($target)) {

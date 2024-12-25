@@ -27,6 +27,8 @@ require_once __DIR__ . '/../utility/function_configure.php';
  * ```
  *
  * @package ryunosuke\Functions\Package\utility
+ * @deprecated delete in future scope
+ * @codeCoverageIgnore
  *
  * @param string $key キャッシュのキー
  * @param ?callable $provider キャッシュがない場合にコールされる callable

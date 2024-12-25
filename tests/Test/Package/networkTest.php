@@ -3,7 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\array_flatten;
-use function ryunosuke\Functions\Package\cache;
+use function ryunosuke\Functions\Package\cacheobject;
 use function ryunosuke\Functions\Package\cidr2ip;
 use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\getipaddress;
@@ -59,10 +59,9 @@ class networkTest extends AbstractTestCase
 
     function test_getipaddress()
     {
-        // cachedir を設定することで擬似的にインジェクションする
-        $backup = function_configure(['cachedir' => self::$TMPDIR . '/' . __FUNCTION__]);
-        cache('net_get_interfaces', null, self::resolveFunction('getipaddress'));
-        cache('net_get_interfaces', fn() => [
+        // 差し替えないとテストにならない
+        $cacheobject = cacheobject(self::resolveFunction('getipaddress'));
+        $cacheobject->set('net_get_interfaces', [
             'lo'   => [
                 'unicast' => [
                     [
@@ -100,7 +99,7 @@ class networkTest extends AbstractTestCase
                     ],
                 ],
             ],
-        ], self::resolveFunction('getipaddress'));
+        ]);
 
         that(getipaddress())->isValidIpv4();
         that(getipaddress(AF_INET))->isValidIpv4();
@@ -127,13 +126,12 @@ class networkTest extends AbstractTestCase
         that(getipaddress('0001:0203:0405:0607:0809:0a0b:ffff:ffff'))->is('0001:0203:0405:0607:0809:0a0b:0c0d:5678');
         that(getipaddress('0001:0203:0405:0607:0809:0a0c:1111:1111'))->is('0001:0203:0405:0607:0809:0a0b:0c0d:1234');
 
-        cache('net_get_interfaces', null, self::resolveFunction('getipaddress'));
-        cache('net_get_interfaces', fn() => [], self::resolveFunction('getipaddress'));
+        $cacheobject->set('net_get_interfaces', []);
 
         that(getipaddress())->isNull();
         that(self::resolveFunction('getipaddress'))('256.256.256.256')->wasThrown('is invalid ip address');
 
-        function_configure($backup);
+        $cacheobject->clear();
     }
 
     function test_http_cache()
