@@ -745,33 +745,69 @@ class networkTest extends AbstractTestCase
             ],
         ];
 
+        // warmup 兼 generate
+        if (version_compare(PHP_VERSION, '8.2') >= 0) {
+            /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
+            memory_reset_peak_usage();
+        }
+        $current = memory_get_usage(true);
+        $generator = ip_info(null, ['cache' => false, 'generate' => true] + $options);
+        that($generator)->isInstanceOf(\Generator::class);
+        $c = 0;
+        foreach ($generator as $info) {
+            assert(is_array($info));
+            $c++;
+        }
+        that($c)->gt(200000);
+        if (version_compare(PHP_VERSION, '8.2') >= 0) {
+            that(memory_get_peak_usage() - $current)->lt(150_000_000);
+        }
+
         that(ip_info("0.0.0.0", $options))->is([
-            "cidr"     => "0.0.0.0/8",
-            "registry" => "RFC1700",
-            "cc"       => null,
-            "date"     => null,
+            "cidr"      => "0.0.0.0/8",
+            "ipaddress" => "0.0.0.0",
+            "netmask"   => 8,
+            "registry"  => "RFC1700",
+            "cc"        => null,
+            "date"      => null,
         ]);
         that(ip_info("127.0.0.0", $options))->is([
-            "cidr"     => "127.0.0.0/8",
-            "registry" => "RFC1122",
-            "cc"       => null,
-            "date"     => null,
+            "cidr"      => "127.0.0.0/8",
+            "ipaddress" => "127.0.0.0",
+            "netmask"   => 8,
+            "registry"  => "RFC1122",
+            "cc"        => null,
+            "date"      => null,
         ]);
 
         that(ip_info(gethostbyname('www.nic.ad.jp'), $options))->is([
-            "cidr"     => "192.41.192.0/24",
-            "registry" => "apnic",
-            "cc"       => "JP",
-            "date"     => "19880620",
+            "cidr"      => "192.41.192.0/24",
+            "ipaddress" => "192.41.192.0",
+            "netmask"   => 24,
+            "registry"  => "apnic",
+            "cc"        => "JP",
+            "date"      => "19880620",
         ]);
         that(ip_info(gethostbyname('www.internic.net'), $options))->is([
-            "cidr"     => "192.0.32.0/20",
-            "registry" => "arin",
-            "cc"       => "US",
-            "date"     => "20090629",
+            "cidr"      => "192.0.32.0/20",
+            "ipaddress" => "192.0.32.0",
+            "netmask"   => 20,
+            "registry"  => "arin",
+            "cc"        => "US",
+            "date"      => "20090629",
+        ]);
+        // キャッシュのテスト
+        that(ip_info(gethostbyname('www.internic.net'), $options))->is([
+            "cidr"      => "192.0.32.0/20",
+            "ipaddress" => "192.0.32.0",
+            "netmask"   => 20,
+            "registry"  => "arin",
+            "cc"        => "US",
+            "date"      => "20090629",
         ]);
 
         that(ip_info('100.64.0.0', $options))->is(null);
+        that(ip_info('100.64.0.0', $options))->is(null); // キャッシュミスのテスト
         that(count(ip_info(null, $options)))->gt(100000);
 
         that(self::resolveFunction('ip_info'))("1.2.3.4", [
