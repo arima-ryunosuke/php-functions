@@ -1071,6 +1071,7 @@ $colA
             $stdin = "<?php include($include);echo serialize(php_parse($export));";
             $stdout = '';
             process(PHP_BINARY, [
+                "-d opcache.enable_cli=0",
                 "-d short_open_tag=$short_open_tag",
             ], $stdin, $stdout);
             return unserialize($stdout);
@@ -1216,7 +1217,9 @@ aplain text
                 $ids[] = $id_info;
             }
             return $ids;
-        }, [0, 1, 2, 3]);
+        }, [0, 1, 2, 3], options: [
+            "opcache.enable_cli" => 0,
+        ]);
 
         $results = array_merge(...array_column($returns, 'return'));
         $ids = array_column($results, 'id');
