@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use Concrete;
+use function ryunosuke\Functions\Package\array_remove;
 use function ryunosuke\Functions\Package\css_selector;
 use function ryunosuke\Functions\Package\csv_export;
 use function ryunosuke\Functions\Package\csv_import;
@@ -20,6 +21,8 @@ use function ryunosuke\Functions\Package\markdown_list;
 use function ryunosuke\Functions\Package\markdown_table;
 use function ryunosuke\Functions\Package\paml_export;
 use function ryunosuke\Functions\Package\paml_import;
+use function ryunosuke\Functions\Package\xmlss_export;
+use function ryunosuke\Functions\Package\xmlss_import;
 use const ryunosuke\Functions\Package\JSON_BARE_AS_STRING;
 use const ryunosuke\Functions\Package\JSON_CLOSURE;
 use const ryunosuke\Functions\Package\JSON_COMMENT_PREFIX;
@@ -1845,5 +1848,521 @@ z',
         $exported = paml_export($array);
         that($exported)->isSame('text: "this is raw string", break: "this\nis\nbreak\nstring", quote1: "a\nz", quote2: "a\\\\nz"');
         that(paml_import($exported))->isSame($array);
+    }
+
+    function test_xmlss_import_excel()
+    {
+        $expected = [
+            [
+                'id'   => '式',
+                'data' => '3',
+            ],
+            [
+                'id'   => '参照',
+                'data' => '3',
+            ],
+            [
+                'id'   => '日付',
+                'data' => new \DateTimeImmutable('2024-12-24T00:00:00.000'),
+            ],
+            [
+                'id'   => '装飾',
+                'data' => 'redboldstrike',
+            ],
+            [
+                'id'   => '空白後',
+                'data' => 'plain',
+            ],
+            [
+                'id'   => 'データ9',
+                'data' => 'data9',
+            ],
+        ];
+
+        $arrays = xmlss_import(fopen(__DIR__ . '/files/xmlss/book.xml', 'r'), [
+            'method' => 'dom',
+            'sheet'  => 'Sheet2',
+            'limit'  => 6,
+        ]);
+        that($arrays)->is($expected);
+        $arrays = xmlss_import(fopen(__DIR__ . '/files/xmlss/book.xml', 'r'), [
+            'method' => 'sax',
+            'sheet'  => 'Sheet2',
+            'limit'  => 6,
+        ]);
+        that($arrays)->is($expected);
+    }
+
+    function test_xmlss_import_invalid()
+    {
+        that(self::resolveFunction('xmlss_import'))('<invalid', [
+            'method' => 'dom',
+        ])->wasThrown('Start Tag invalid');
+        that(self::resolveFunction('xmlss_import'))('<invalid', [
+            'method' => 'sax',
+        ])->wasThrown('Start Tag invalid');
+
+        that(self::resolveFunction('xmlss_import'))('<Workbook></Workbook>', [
+            'method' => 'dom',
+        ])->wasThrown('Worksheet is not found');
+        that(self::resolveFunction('xmlss_import'))('<Workbook></Workbook>', [
+            'method' => 'sax',
+        ])->wasThrown('Worksheet is not found');
+    }
+
+    function test_xmlss_export()
+    {
+        $string = xmlss_export([], [
+            'xml'   => [
+                'document' => [
+                    'Author'  => null,
+                    'Created' => null,
+                    'Version' => null,
+                ],
+                'style'    => [
+                    'Default' => [
+                        'Name'   => null,
+                        'Parent' => null,
+                    ],
+                ],
+                'sheet'    => [
+                    'Name'    => 'SheetName',
+                    'Options' => [
+                        'Panes' => [
+                            [
+                                'ActiveRow'      => null,
+                                'ActiveCol'      => null,
+                                'RangeSelection' => null,
+                            ],
+                        ],
+                    ],
+                ],
+                'table'    => [
+                    'DefaultColumnWidth' => null,
+                    'DefaultRowHeight'   => null,
+                    'StyleID'            => null,
+                ],
+                'column'   => [
+                    [
+                        'AutoFitWidth' => null,
+                        'Width'        => null,
+                    ],
+                    [
+                        'StyleID' => null,
+                    ],
+                ],
+                'comment'  => [
+                    [
+                        'ShowAlways' => null,
+                        'Data'       => null,
+                    ],
+                ],
+                'row'      => [
+                    'Height'  => null,
+                    'StyleID' => null,
+                ],
+            ],
+            'break' => "\n",
+        ]);
+        that($string)->is(<<<XML
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Worksheet ss:Name="SheetName">
+  <Table ss:ExpandedColumnCount="0">
+  </Table>
+ </Worksheet>
+</Workbook>
+XML,);
+
+        $rows = [
+            ['id' => 1, 'name' => '<hoge>', 'create_at' => '2024-12-24'],
+            ['id' => 2, 'name' => "fu\nga", 'create_at' => '2024-12-25'],
+            ['id' => 3, 'name' => 'あいう', 'create_at' => '2024-12-26'],
+        ];
+
+        $receiver = fopen('php://memory', 'r+b');
+        $size = xmlss_export($rows, [
+            'xml'     => [
+                'document' => [
+                    'Author'  => 'arima',
+                    'Created' => '2024-12-24T12:34:56Z',
+                    'Version' => '14.0',
+                ],
+                'style'    => [
+                    's1' => [
+                        'Name'         => 'Custom',
+                        'Alignment'    => [
+                            'WrapText' => 1,
+                        ],
+                        'Borders'      => [
+                            'Top' => [
+                                'Color'     => '#0000ff',
+                                'LineStyle' => 'Continuous',
+                                'Weight'    => 1,
+                            ],
+                        ],
+                        'Font'         => [
+                            'Bold'      => true,
+                            'Color'     => '#ff0000',
+                            'Underline' => "Single",
+                            'Size'      => 24,
+                        ],
+                        'Interior'     => [
+                            'Color'   => '#00ff00',
+                            'Pattern' => "Solid",
+                        ],
+                        'NumberFormat' => [
+                            'Format' => '@',
+                        ],
+                    ],
+                    's2' => [
+                        'Parent' => 's1',
+                    ],
+                ],
+                'sheet'    => [
+                    'Name'    => 'SheetName',
+                    'Options' => [
+                        'Panes' => [
+                            [
+                                'Number'         => 3,
+                                'ActiveRow'      => 1,
+                                'ActiveCol'      => 2,
+                                'RangeSelection' => ['R1C2', [3, 4], [[5, 6]], [[7, 8], [9, 10]]],
+                            ],
+                        ],
+                    ],
+                ],
+                'table'    => [
+                    'DefaultColumnWidth' => 11,
+                    'DefaultRowHeight'   => 22,
+                    'StyleID'            => "s1",
+                ],
+                'column'   => [
+                    [
+                        'AutoFitWidth' => true,
+                        'Width'        => 400,
+                    ],
+                    [
+                        'StyleID' => "s1",
+                    ],
+                ],
+                'comment'  => [
+                    [
+                        'ShowAlways' => true,
+                        'Data'       => 'comment',
+                    ],
+                ],
+                'row'      => [
+                    'Height'  => 12,
+                    'StyleID' => "s1",
+                ],
+            ],
+            'initial' => 'initial header',
+            'break'   => "\n",
+            'output'  => $receiver,
+        ]);
+        rewind($receiver);
+        $string = stream_get_contents($receiver);
+        that($size)->isSame(strlen($string));
+        that($string)->is(<<<XML
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>arima</Author>
+  <Created>2024-12-24T12:34:56Z</Created>
+  <Version>14.0</Version>
+ </DocumentProperties>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+  </Style>
+  <Style ss:ID="s1" ss:Name="Custom">
+   <Alignment ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Top" ss:Color="#0000ff" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:Bold="1" ss:Color="#ff0000" ss:Underline="Single" ss:Size="24"/>
+   <Interior ss:Color="#00ff00" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="@"/>
+  </Style>
+  <Style ss:ID="s2" ss:Parent="s1">
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="SheetName">
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>1</ActiveRow>
+     <ActiveCol>2</ActiveCol>
+     <RangeSelection>R1C2,R3C4,R5C6,R7C8:R9C10</RangeSelection>
+    </Pane>
+   </Panes>
+  </WorksheetOptions>
+  <Table ss:DefaultColumnWidth="11" ss:DefaultRowHeight="22" ss:StyleID="s1" ss:ExpandedColumnCount="3">
+   <Column ss:AutoFitWidth="1" ss:Width="400"/>
+   <Column ss:StyleID="s1"/>
+   <Row ss:Height="12" ss:StyleID="s1">
+    <Cell><Data ss:Type="String">initial header</Data></Cell>
+   </Row>
+   <Row ss:Height="12" ss:StyleID="s1">
+    <Cell><Data ss:Type="String">id</Data><Comment ss:ShowAlways="1"><Data>comment</Data></Comment></Cell>
+    <Cell><Data ss:Type="String">name</Data></Cell>
+    <Cell><Data ss:Type="String">create_at</Data></Cell>
+   </Row>
+   <Row ss:Height="12" ss:StyleID="s1">
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="String">&#60;hoge&#62;</Data></Cell>
+    <Cell><Data ss:Type="String">2024-12-24</Data></Cell>
+   </Row>
+   <Row ss:Height="12" ss:StyleID="s1">
+    <Cell><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="String">fu&#10;ga</Data></Cell>
+    <Cell><Data ss:Type="String">2024-12-25</Data></Cell>
+   </Row>
+   <Row ss:Height="12" ss:StyleID="s1">
+    <Cell><Data ss:Type="Number">3</Data></Cell>
+    <Cell><Data ss:Type="String">あいう</Data></Cell>
+    <Cell><Data ss:Type="String">2024-12-26</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>
+XML,);
+    }
+
+    function test_xmlss_transport_style()
+    {
+        $rows = [
+            ['id' => 1, 'name' => '<hoge>', 'create_at' => '2024-12-24'],
+            ['id' => 2, 'name' => "fu\nga", 'create_at' => '2024-12-25'],
+            ['id' => 3, 'name' => 'あいう', 'create_at' => '2024-12-26'],
+        ];
+
+        $string = xmlss_export($rows, [
+            'xml'     => [
+                'style'  => [
+                    's1' => [
+                        'Name'      => 'Custom',
+                        'Alignment' => [
+                            'WrapText' => 1,
+                        ],
+                        'Borders'   => [
+                            'Top'   => [
+                                'LineStyle' => 'Continuous',
+                                'Weight'    => 1,
+                            ],
+                            'Right' => [
+                                'LineStyle' => null,
+                                'Weight'    => null,
+                            ],
+                        ],
+                    ],
+                ],
+                'column' => [
+                    [
+                        'Width' => 400,
+                    ],
+                    [
+                        'StyleID' => "s1",
+                    ],
+                ],
+            ],
+            'initial' => 'initial header',
+        ]);
+        that($string)->contains('<Style ss:ID="Default" ss:Name="Normal">');
+        that($string)->contains('<Style ss:ID="s1" ss:Name="Custom">');
+        that($string)->contains('<Alignment ss:WrapText="1"/>');
+        that($string)->contains('<Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>');
+        that($string)->notContains('ss:Position="Right"');
+
+        $arrays = xmlss_import($string, [
+            'method'  => 'dom',
+            'initial' => 1,
+        ]);
+        that($arrays)->is($rows);
+        $arrays = xmlss_import($string, [
+            'method'  => 'sax',
+            'initial' => 1,
+        ]);
+        that($arrays)->is($rows);
+    }
+
+    function test_xmlss_transport_type()
+    {
+        $datetime = new class('2024-12-24') extends \DateTimeImmutable {
+            public function __toString(): string
+            {
+                return $this->format(self::ATOM);
+            }
+        };
+        $rows = [
+            ['id' => 1, 'name' => '<hoge>', 'create_at' => $datetime->modify('+1 day'), 'status' => true],
+            ['id' => 2, 'name' => "fu\nga", 'create_at' => $datetime->modify('+2 day'), 'status' => true],
+            ['id' => 3, 'name' => 'あいう', 'create_at' => $datetime->modify('+3 day'), 'status' => false],
+        ];
+
+        $string = xmlss_export($rows, [
+            // stub
+        ]);
+        that($string)->contains('<Data ss:Type="Number">3</Data>');
+        that($string)->contains('<Data ss:Type="String">あいう</Data>');
+        that($string)->contains('<Data ss:Type="DateTime">2024-12-27T00:00:00+09:00</Data>');
+        that($string)->contains('<Data ss:Type="Boolean"></Data></Cell>');
+
+        $generator = xmlss_import($string, [
+            'method'   => 'dom',
+            'generate' => true,
+        ]);
+        that($generator)->isInstanceOf(\Generator::class);
+        $arrays = iterator_to_array($generator);
+        that($arrays)->is($rows);
+        that($arrays[0]['id'])->isInt();
+        that($arrays[0]['name'])->isString();
+        that($arrays[0]['create_at'])->isInstanceOf(\DateTimeInterface::class);
+        that($arrays[0]['status'])->isBool();
+        $generator = xmlss_import($string, [
+            'method'   => 'sax',
+            'generate' => true,
+        ]);
+        that($generator)->isInstanceOf(\Generator::class);
+        $arrays = iterator_to_array($generator);
+        that($arrays)->is($rows);
+        that($arrays[0]['id'])->isInt();
+        that($arrays[0]['name'])->isString();
+        that($arrays[0]['create_at'])->isInstanceOf(\DateTimeInterface::class);
+        that($arrays[0]['status'])->isBool();
+    }
+
+    function test_xmlss_transport_headers()
+    {
+        $rows = [
+            ['id' => 1, 'name' => '<hoge>', 'create_at' => '2024-12-24'],
+            ['id' => 2, 'name' => "fu\nga", 'create_at' => '2024-12-25'],
+            ['id' => 3, 'name' => 'あいう', 'create_at' => '2024-12-26'],
+        ];
+
+        $string = xmlss_export(new \ArrayIterator($rows), [
+            'initial' => 'initial header',
+            'headers' => ['id' => 'ID', 'name' => 'NAME'],
+        ]);
+        that($string)->contains('<Cell><Data ss:Type="String">ID</Data></Cell>');
+        that($string)->contains('<Cell><Data ss:Type="String">NAME</Data></Cell>');
+
+        $arrays = xmlss_import($string, [
+            'method'  => 'dom',
+            'initial' => 1,
+            'headers' => ['ID' => 'id', 'NAME' => 'name'],
+        ]);
+        that($arrays)->is(array_map(fn($row) => array_remove($row, 'create_at'), $rows));
+        $arrays = xmlss_import($string, [
+            'method'  => 'sax',
+            'initial' => 1,
+            'headers' => ['id2', 'name2'],
+        ]);
+        that($arrays)->is([
+            ['id2' => 'ID', 'name2' => 'NAME'],
+            ['id2' => 1, 'name2' => '<hoge>'],
+            ['id2' => 2, 'name2' => "fu\nga"],
+            ['id2' => 3, 'name2' => 'あいう'],
+        ]);
+    }
+
+    function test_xmlss_transport_comment()
+    {
+        $rows = [
+            ['id' => 1, 'name' => '<hoge>', 'create_at' => '2024-12-24'],
+            ['id' => 2, 'name' => "fu\nga", 'create_at' => '2024-12-25'],
+            ['id' => 3, 'name' => 'あいう', 'create_at' => '2024-12-26'],
+        ];
+
+        $string = xmlss_export(new \ArrayIterator($rows), [
+            'xml' => [
+                'comment' => [
+                    'id' => [
+                        'Author'     => 'id',
+                        'ShowAlways' => true,
+                        'Data'       => "foo\nbar",
+                    ],
+                    2    => [
+                        'Author'     => 'create_at',
+                        'ShowAlways' => 0,
+                        'Data'       => new class {
+                            public function __toString(): string
+                            {
+                                return '<Font>data</Font>';
+                            }
+                        },
+                    ],
+                ],
+            ],
+        ]);
+        that($string)->contains('<Comment ss:Author="id" ss:ShowAlways="1"><Data>foo&#10;bar</Data></Comment>');
+        that($string)->contains('<Comment ss:Author="create_at" ss:ShowAlways="0"><Data><Font>data</Font></Data></Comment>');
+
+        $arrays = xmlss_import($string, [
+            'method' => 'dom',
+        ]);
+        that($arrays)->is($rows);
+        $arrays = xmlss_import($string, [
+            'method' => 'sax',
+            'strict' => true,
+        ]);
+        that($arrays)->is($rows);
+    }
+
+    function test_xmlss_transport_callback()
+    {
+        $rows = [
+            ['id' => 1, 'name' => '<hoge>', 'create_at' => '2024-12-24'],
+            ['id' => 2, 'name' => "fu\nga", 'create_at' => '2024-12-25'],
+            ['id' => 3, 'name' => 'あいう', 'create_at' => '2024-12-26'],
+        ];
+
+        $receiver = fopen('php://memory', 'r+b');
+        $size = xmlss_export($rows, [
+            'headers'  => ['id', 'name'],
+            'callback' => function ($row, $n) {
+                if ($n === null) {
+                    return false;
+                }
+                if ($n === 1) {
+                    return false;
+                }
+                return true;
+            },
+            'output'   => $receiver,
+        ]);
+        that($size)->isInt();
+
+        rewind($receiver);
+        $arrays = xmlss_import($receiver, [
+            'method'   => 'dom',
+            'headers'  => ['id', 'name'],
+            'callback' => function (&$row, $n) {
+                if ($n === 0) {
+                    return false;
+                }
+                $row['id_name'] = $row['id'] . $row['name'];
+            },
+        ]);
+        that($arrays)->is([
+            ['id' => 3, 'name' => 'あいう', 'id_name' => '3あいう'],
+        ]);
+        rewind($receiver);
+        $arrays = xmlss_import($receiver, [
+            'method'   => 'sax',
+            'headers'  => ['id', 'name'],
+            'callback' => function (&$row, $n) {
+                if ($n === 0) {
+                    return false;
+                }
+                $row['id_name'] = $row['id'] . $row['name'];
+            },
+        ]);
+        that($arrays)->is([
+            ['id' => 3, 'name' => 'あいう', 'id_name' => '3あいう'],
+        ]);
     }
 }
