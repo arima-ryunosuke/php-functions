@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
+use ryunosuke\Functions\Utility;
 use function ryunosuke\Functions\Package\array_flatten;
 use function ryunosuke\Functions\Package\array_maps;
 use function ryunosuke\Functions\Package\benchmark;
@@ -9,6 +10,7 @@ use function ryunosuke\Functions\Package\built_in_server;
 use function ryunosuke\Functions\Package\cache_fetch;
 use function ryunosuke\Functions\Package\cacheobject;
 use function ryunosuke\Functions\Package\function_configure;
+use function ryunosuke\Functions\Package\function_resolve;
 use function ryunosuke\Functions\Package\number_serial;
 use function ryunosuke\Functions\Package\rm_rf;
 
@@ -292,6 +294,15 @@ class utilityTest extends AbstractTestCase
         that(function_configure(null))->isArray();
 
         that(self::resolveFunction('function_configure'))(123)->wasThrown('unknown type(integer)');
+    }
+
+    function test_function_resolve()
+    {
+        that(function_resolve('hoge'))->is(null);
+        that(function_resolve('arrayize'))->is(self::resolveFunction('arrayize'));
+
+        // exportClass で動くことを担保
+        that(Utility::function_resolve('arrayize'))->is(Utility::class . '::arrayize');
     }
 
     function test_number_serial()

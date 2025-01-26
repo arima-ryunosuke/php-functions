@@ -51,6 +51,16 @@ class TransporterTest extends \ryunosuke\Test\AbstractTestCase
         ;
     }
 
+    function test_export_ignore_var_export3()
+    {
+        that(Transporter::exportGlobal('cacheobject'))
+            ->stringNotContains('function var_export3') // var_export3 はでかいので cacheobject の依存に含めていない
+        ;
+        that(Transporter::exportGlobal('var_export3'))
+            ->stringContains('function var_export3') // 明示指定すれば含まれる
+        ;
+    }
+
     function test_getAllConstant()
     {
         that(Transporter::class)::getAllConstant(true)
