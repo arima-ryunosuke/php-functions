@@ -11,6 +11,10 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.17
+
+- [change] cacheobject の依存から var_export3 を除去
+
 ## 2.0.16
 
 - [tests] windows で opcache.enable_cli が有効だとテストがコケるのを修正
