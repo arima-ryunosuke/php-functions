@@ -5,6 +5,7 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../funchand/func_eval.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
 require_once __DIR__ . '/../utility/function_configure.php';
+require_once __DIR__ . '/../utility/function_resolve.php';
 require_once __DIR__ . '/../var/is_stringable.php';
 // @codeCoverageIgnoreEnd
 
@@ -176,18 +177,9 @@ function chain($source = null)
                 $isiterable = is_iterable($data);
                 $isstringable = is_stringable($data);
                 if (false
-                    // for global
-                    || (is_callable($name, false, $fname))
-                    || ($isiterable && is_callable("array_$name", false, $fname))
-                    || ($isstringable && is_callable("str_$name", false, $fname))
-                    // for namespace
-                    || (is_callable(__NAMESPACE__ . "\\$name", false, $fname))
-                    || ($isiterable && is_callable(__NAMESPACE__ . "\\array_$name", false, $fname))
-                    || ($isstringable && is_callable(__NAMESPACE__ . "\\str_$name", false, $fname))
-                    // for class
-                    || (is_callable([self::$__CLASS__, $name], false, $fname))
-                    || ($isiterable && is_callable([self::$__CLASS__, "array_$name"], false, $fname))
-                    || ($isstringable && is_callable([self::$__CLASS__, "str_$name"], false, $fname))
+                    || ($fname = function_resolve($name))
+                    || ($isiterable && $fname = function_resolve("array_$name"))
+                    || ($isstringable && $fname = function_resolve("str_$name"))
                 ) {
                     return $fname;
                 }
