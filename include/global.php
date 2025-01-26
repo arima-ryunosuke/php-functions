@@ -31417,11 +31417,13 @@ if (!function_exists('cacheobject')) {
                     // var_export3 はあらゆる出力を可能にしているので **読み込み時** のオーバーヘッドがでかく、もし var_export が使えるならその方が格段に速い
                     // しかし要素を再帰的に全舐め（is_exportable）しないと「var_export できるか？」は分からないというジレンマがある
                     // このコンテキストは「キャッシュ」なので書き込み時のオーバーヘッドよりも読み込み時のオーバーヘッドを優先して判定を行っている
-                    if (is_exportable($this->entries[$key])) {
+                    // ただし、 var_export3 は非常に依存がでかいので明示指定時のみ
+                    $var_export3 = function_resolve('var_export3');
+                    if ($var_export3 === null || is_exportable($this->entries[$key])) {
                         $code = var_export($this->entries[$key], true);
                     }
                     else {
-                        $code = var_export3($this->entries[$key], true);
+                        $code = $var_export3($this->entries[$key], true);
                     }
                     return !!file_set_contents($this->_getFilename($key), "<?php # $meta\nreturn $code;\n");
                 }
@@ -31640,6 +31642,34 @@ if (!function_exists('function_configure')) {
         }
 
         throw new \InvalidArgumentException(sprintf('$option is unknown type(%s)', gettype($option)));
+    }
+}
+
+assert(!function_exists('function_resolve') || (new \ReflectionFunction('function_resolve'))->isUserDefined());
+if (!function_exists('function_resolve')) {
+    /**
+     * 本ライブラリの関数名を解決する
+     *
+     * ※ 内部向け
+     *
+     * @package ryunosuke\Functions\Package\utility
+     *
+     * @param string $funcname 関数名
+     * @return ?string FQSEN 名
+     */
+    function function_resolve(string $funcname): ?string
+    {
+        if (false
+            // for class
+            || (is_callable([__CLASS__, $funcname], false, $result))
+            // for namespace
+            || (is_callable(__NAMESPACE__ . "\\$funcname", false, $result))
+            // for global
+            || (is_callable($funcname, false, $result))
+        ) {
+            return $result;
+        }
+        return null;
     }
 }
 

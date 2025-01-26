@@ -653,6 +653,11 @@ trait ChainObject9
     public function try_catch($try, $catch = null, ...$variadic): self { }
     public function try_catch($catch = null, ...$variadic): self { }
 
+    /** @see function_resolve() */
+    public self $function_resolve;
+    public function function_resolve(string $funcname): self { }
+    public function function_resolve(): self { }
+
     /** @see is_resourcable() */
     public self $is_resourcable;
     public function is_resourcable($var): self { }
