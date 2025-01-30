@@ -488,6 +488,11 @@ trait ChainObject0
     public function cache_fetch($cacher, $key, $provider, $ttl = null): self { }
     public function cache_fetch($key, $provider, $ttl = null): self { }
 
+    /** @see json_storage() */
+    public self $json_storage;
+    public function json_storage(string $prefix = "global"): self { }
+    public function json_storage(): self { }
+
     /** @see cipher_metadata() */
     public self $cipher_metadata;
     public function cipher_metadata($cipher): self { }

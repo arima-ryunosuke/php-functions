@@ -3396,11 +3396,13 @@ if (!function_exists('array_order')) {
      *
      * ```php
      * $orders = [
-     *     'col1' => true,                      // true: 昇順, false: 降順。照合は型に依存
-     *     'col2' => SORT_NATURAL,              // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
-     *     'col3' => ['sort', 'this', 'order'], // 指定した配列順で昇順
-     *     'col4' => fn($v) => $v,              // クロージャを通した値で昇順。照合は返り値の型に依存
-     *     'col5' => fn($a, $b) => $a - $b,     // クロージャで比較して昇順（いわゆる比較関数を渡す）
+     *     'col1' => true,                              // true: 昇順, false: 降順。照合は型に依存
+     *     'col2' => SORT_NATURAL,                      // SORT_NATURAL, SORT_REGULAR などで照合。正数で昇順、負数で降順
+     *     'col3' => ['sort', 'this', 'order'],         // 指定した配列順で昇順
+     *     'col4' => fn($v) => $v,                      // 引数1個: クロージャを通した値で昇順。照合は返り値の型に依存
+     *     // 'col4' => fn($v, $o = SORT_DESC) => $v,   // ↑の亜種（第2引数のデフォルト値がオーダーを表す）
+     *     'col5' => fn($av, $bv) => $av - $bv,         // 引数2個: クロージャで比較して値昇順（いわゆる比較関数を渡す）
+     *     'col6' => fn($ak, $bk, $array) => $ak - $bk, // 引数3個: クロージャで比較してキー昇順（いわゆる比較関数を渡す）
      * ];
      * ```
      *
@@ -3482,11 +3484,19 @@ if (!function_exists('array_order')) {
             // クロージャは色々
             elseif ($order instanceof \Closure) {
                 $ref = new \ReflectionFunction($order);
-                // 引数2個なら比較関数
+                // 引数2個なら値比較関数
                 if ($ref->getNumberOfRequiredParameters() === 2) {
                     $map = $columns;
                     usort($map, $order);
                     $args[] = $position($columns, $map);
+                    $args[] = SORT_ASC;
+                    $args[] = SORT_NUMERIC;
+                }
+                // 引数3個はキー比較関数
+                elseif ($ref->getNumberOfRequiredParameters() === 3) {
+                    $map = $columns;
+                    usort($map, fn($a, $b) => $order($a, $b, $array));
+                    $args[] = $map;
                     $args[] = SORT_ASC;
                     $args[] = SORT_NUMERIC;
                 }
@@ -3495,7 +3505,7 @@ if (!function_exists('array_order')) {
                     $arg = array_map($order, $columns);
                     $type = reflect_types($ref->getReturnType())->allows('string') ? 'string' : gettype(reset($arg));
                     $args[] = $arg;
-                    $args[] = SORT_ASC;
+                    $args[] = ($ref->getParameters()[1] ?? null)?->getDefaultValue() ?? SORT_ASC;
                     $args[] = $type === 'string' ? SORT_STRING : SORT_NUMERIC;
                 }
             }
@@ -5979,7 +5989,7 @@ if (!function_exists('auto_loader')) {
      */
     function auto_loader($startdir = null)
     {
-        return cacheobject(__FUNCTION__)->hash($startdir, function () use ($startdir) {
+        return json_storage(__FUNCTION__)[$startdir] ??= (function () use ($startdir) {
             $cache = dirname_r($startdir ?: __DIR__, function ($dir) {
                 if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
                     return $file;
@@ -5989,7 +5999,7 @@ if (!function_exists('auto_loader')) {
                 throw new \DomainException('autoloader is not found.');
             }
             return $cache;
-        });
+        })();
     }
 }
 
@@ -6396,12 +6406,12 @@ if (!function_exists('class_map')) {
     {
         $loader ??= class_loader();
         $basePath ??= dirname((new \ReflectionClass($loader))->getFileName(), 3);
-        $cacheobject = cacheobject(__FUNCTION__);
+        $storage = json_storage(__FUNCTION__);
         $cachekey = [spl_object_id($loader), $basePath];
         if (!$cache) {
-            $cacheobject->hash($cachekey, null, 0);
+            unset($storage[$cachekey]);
         }
-        return $cacheobject->hash($cachekey, function () use ($loader, $basePath) {
+        return $storage[$cachekey] ??= (function () use ($loader, $basePath) {
             $result = [];
 
             // psr0+4
@@ -6477,7 +6487,7 @@ if (!function_exists('class_map')) {
             }
 
             return $result;
-        });
+        })();
     }
 }
 
@@ -14042,6 +14052,82 @@ if (!function_exists('cp_rf')) {
     }
 }
 
+assert(!function_exists('dir_clean') || (new \ReflectionFunction('dir_clean'))->isUserDefined());
+if (!function_exists('dir_clean')) {
+    /**
+     * 指定条件のファイル・ディレクトリを再帰的に消す
+     *
+     * tmpwatch みたいなもので、キャッシュなどのゴミ掃除に使う想定。
+     *
+     * Example:
+     * ```php
+     * // 1時間以上アクセスのないファイルを消す
+     * dir_clean(sys_get_temp_dir() . '/cache',
+     *     atime: 3600,
+     * );
+     * // 1時間以上更新されていないファイルを消す
+     * dir_clean(sys_get_temp_dir() . '/cache',
+     *     mtime: 3600,
+     * );
+     * // 2時間以上アクセスのない かつ 1時間以上更新されていないファイルを消す（両指定は AND）
+     * dir_clean(sys_get_temp_dir() . '/cache',
+     *     atime: 7200,
+     *     mtime: 3600,
+     * );
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\filesystem
+     */
+    function dir_clean(
+        /** 対象ディレクトリ */ string $directory,
+        /** 対象アクセス日時秒数 */ int $atime = 0,
+        /** 対象更新日時秒数 */ int $mtime = 0,
+        /** 除外パターン */ string|array $excludePattern = [],
+    ): /** 消したエントリ配列 */ array
+    {
+        if (!is_dir($directory)) {
+            return [];
+        }
+
+        $rdi = new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_SELF | \FilesystemIterator::UNIX_PATHS);
+        $iterator = new \RecursiveIteratorIterator($rdi, \RecursiveIteratorIterator::CHILD_FIRST);
+
+        $now = time();
+        $result = [];
+
+        /** @var \RecursiveDirectoryIterator $it */
+        foreach ($iterator as $it) {
+            $fullpath = $it->getPathname();
+
+            if ($excludePattern && fnmatch_or($excludePattern, $fullpath)) {
+                continue;
+            }
+
+            if ($it->isDir()) {
+                // 中身があるとか権限があるとか判定するより「やってみてダメだったら」の方が手っ取り早い
+                if (@rmdir($fullpath)) {
+                    $result[] = $fullpath;
+                }
+            }
+            else {
+                if (($now - $atime) < $it->getATime()) {
+                    continue;
+                }
+                if (($now - $mtime) < $it->getMTime()) {
+                    continue;
+                }
+
+                // 別にアトミックではないので存在しないこともある
+                if (@unlink($fullpath)) {
+                    $result[] = $fullpath;
+                }
+            }
+        }
+
+        return $result;
+    }
+}
+
 assert(!function_exists('dir_diff') || (new \ReflectionFunction('dir_diff'))->isUserDefined());
 if (!function_exists('dir_diff')) {
     /**
@@ -14789,6 +14875,8 @@ if (!function_exists('file_mimetype')) {
      * - http(s) に対応（HEAD メソッドで取得する）
      * - 失敗時に false ではなく null を返す
      *
+     * for compatible: $prefer_extension と $parameters 引数は将来的に入れ替わる。
+     *
      * Example:
      * ```php
      * that(file_mimetype(__FILE__))->is('text/x-php');
@@ -14799,10 +14887,13 @@ if (!function_exists('file_mimetype')) {
      *
      * @param string $filename ファイル名（URL）
      * @param array|bool $prefer_extension extension => mimetype のマップ（true を与えると組み込みを使用する）
+     * @param ?array $parameters 引数=値 の連想配列
      * @return string|null MIME タイプ
      */
-    function file_mimetype($filename, $prefer_extension = [])
+    function file_mimetype($filename, $prefer_extension = [], ?array &$parameters = null)
     {
+        $parameters = [];
+
         $mimetypes = GENERAL_MIMETYPE;
         if (is_array($prefer_extension)) {
             $mimetypes = $prefer_extension + $mimetypes;
@@ -14817,20 +14908,35 @@ if (!function_exists('file_mimetype')) {
             }
         }
 
-        switch (strtolower($parts['scheme'] ?? '')) {
-            default:
-            case 'file':
-                return mime_content_type($filename) ?: null;
-
-            case 'http':
-            case 'https':
+        $mimetype = match (strtolower($parts['scheme'] ?? '')) {
+            default         => (function () use ($filename) {
+                $finfo = finfo_open(FILEINFO_MIME);
+                try {
+                    return finfo_file($finfo, $filename) ?: null;
+                }
+                finally {
+                    finfo_close($finfo);
+                }
+            })(),
+            'http', 'https' => (function () use ($filename) {
                 $r = $c = [];
                 http_head($filename, [], ['throw' => false], $r, $c);
                 if ($c['http_code'] === 200) {
                     return $c['content_type'] ?? null;
                 }
                 trigger_error("HEAD $filename {$c['http_code']}", E_USER_WARNING);
+            })(),
+        };
+        if ($mimetype === null) {
+            return null;
         }
+
+        $parts = array_map('trim', explode(';', $mimetype));
+
+        $result = array_shift($parts);
+        $parameters = str_array($parts, '=', true);
+
+        return $result;
     }
 }
 
@@ -16886,18 +16992,9 @@ if (!function_exists('chain')) {
                     $isiterable = is_iterable($data);
                     $isstringable = is_stringable($data);
                     if (false
-                        // for global
-                        || (is_callable($name, false, $fname))
-                        || ($isiterable && is_callable("array_$name", false, $fname))
-                        || ($isstringable && is_callable("str_$name", false, $fname))
-                        // for namespace
-                        || (is_callable(__NAMESPACE__ . "\\$name", false, $fname))
-                        || ($isiterable && is_callable(__NAMESPACE__ . "\\array_$name", false, $fname))
-                        || ($isstringable && is_callable(__NAMESPACE__ . "\\str_$name", false, $fname))
-                        // for class
-                        || (is_callable([self::$__CLASS__, $name], false, $fname))
-                        || ($isiterable && is_callable([self::$__CLASS__, "array_$name"], false, $fname))
-                        || ($isstringable && is_callable([self::$__CLASS__, "str_$name"], false, $fname))
+                        || ($fname = function_resolve($name))
+                        || ($isiterable && $fname = function_resolve("array_$name"))
+                        || ($isstringable && $fname = function_resolve("str_$name"))
                     ) {
                         return $fname;
                     }
@@ -19928,16 +20025,14 @@ if (!function_exists('namespace_parse')) {
             'cache' => null,
         ];
 
-        $cacheobject = cacheobject(__FUNCTION__);
+        $storage = json_storage(__FUNCTION__);
 
-        if ($options['cache'] === null) {
-            $options['cache'] = $cacheobject->hash([$filename, 'mtime'], fn() => $filemtime) >= $filemtime;
-        }
+        $options['cache'] ??= ($storage['mtime'] ?? $filemtime) >= $filemtime;
         if (!$options['cache']) {
-            $cacheobject->hash([$filename, 'mtime'], null, 0);
-            $cacheobject->hash([$filename, 'result'], null, 0);
+            unset($storage['mtime']);
+            unset($storage[$filename]);
         }
-        return $cacheobject->hash([$filename, 'result'], function () use ($filename) {
+        return $storage[$filename] ??= (function () use ($filename) {
             $stringify = function ($tokens) {
                 return trim(implode('', array_column(array_filter($tokens, function ($token) {
                     return in_array($token->id, [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true);
@@ -20047,7 +20142,7 @@ if (!function_exists('namespace_parse')) {
                 }
             }
             return $result;
-        });
+        })();
     }
 }
 
@@ -20827,6 +20922,166 @@ if (!function_exists('php_strip')) {
     }
 }
 
+assert(!function_exists('php_tokens') || (new \ReflectionFunction('php_tokens'))->isUserDefined());
+if (!function_exists('php_tokens')) {
+    /**
+     * PhpToken に便利メソッドを生やした配列を返す
+     *
+     * php_parse とは似て非なる（あっちは何がしたいのかよく分からなくなっている）。
+     * この関数はシンプルに PhpToken の拡張版として動作する。
+     *
+     * 生えているメソッドは下記。
+     * - __debugInfo: デバッグしやすい情報で吐き出す
+     * - clone: 新プロパティを指定して clone する
+     * - name: getTokenName のエイリアス
+     * - prev: ignorable ではない直前のトークンを返す
+     * - next: ignorable ではない直後のトークンを返す
+     * - resolve: text が名前空間を解決して完全修飾になったトークンを返す
+     *
+     * Example:
+     * ```php
+     * $phpcode = '<?php
+     * // dummy
+     * namespace Hogera;
+     * class Example
+     * {
+     *     // something
+     * }';
+     *
+     * $tokens = php_tokens($phpcode);
+     * // name でトークン名が得られる
+     * that($tokens[0])->name()->is('T_OPEN_TAG');
+     * // ↑の次はコメントだが next で namespace が得られる
+     * that($tokens[0])->next()->text->is('namespace');
+     * // 同じく↑の次はホワイトスペースだが next で Hogera が得られる
+     * that($tokens[0])->next()->next()->text->is('Hogera');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\misc
+     *
+     * @noinspection PhpPossiblePolymorphicInvocationInspection
+     *
+     * @param string $phpcode パースする php コード
+     * @param int $flags パースオプション
+     * @return \PhpTokens[] トークン配列
+     */
+    function php_tokens(string $code, int $flags = 0)
+    {
+        $PhpToken = null;
+        $PhpToken ??= new #[\AllowDynamicProperties] class (0, "") extends \PhpToken {
+            public array $tokens;
+            public int   $index;
+
+            private $cache = [];
+
+            public function __debugInfo(): array
+            {
+                $result = get_object_vars($this);
+
+                unset($result['tokens'], $result['cache']);
+
+                $result['name'] = $this->name();
+                $result['prev'] = $this->prev()?->getTokenName();
+                $result['next'] = $this->next()?->getTokenName();
+
+                return $result;
+            }
+
+            public function clone(...$newparams): self
+            {
+                $that = clone $this;
+                foreach ($newparams as $param => $value) {
+                    $that->{$param} = $value;
+                }
+                $that->cache = [];
+                return $that;
+            }
+
+            public function name(): string
+            {
+                return $this->cache['name'] ??= $this->getTokenName();
+            }
+
+            public function prev(): ?self
+            {
+                return $this->cache['prev'] ??= $this->sibling($this->index, -1);
+            }
+
+            public function next(): ?self
+            {
+                return $this->cache['next'] ??= $this->sibling($this->index, +1);
+            }
+
+            public function resolve($ref): string
+            {
+                $var_export = fn($v) => var_export($v, true);
+                $prev = $this->prev();
+                $next = $this->next();
+
+                $text = $this->text;
+                if ($this->id === T_STRING) {
+                    $namespaces = [$ref->getNamespaceName()];
+                    if ($ref instanceof \ReflectionFunctionAbstract) {
+                        $namespaces[] = $ref->getClosureScopeClass()?->getNamespaceName();
+                    }
+                    if ($prev->id === T_NEW || $next->id === T_DOUBLE_COLON || $next->id === T_VARIABLE || $next->text === '{') {
+                        $text = namespace_resolve($text, $ref->getFileName(), 'alias') ?? $text;
+                    }
+                    elseif ($next->text === '(') {
+                        $text = namespace_resolve($text, $ref->getFileName(), 'function') ?? $text;
+                        // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
+                        foreach ($namespaces as $namespace) {
+                            if (!function_exists($text) && function_exists($nstext = "\\$namespace\\$text")) {
+                                $text = $nstext;
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        $text = namespace_resolve($text, $ref->getFileName(), 'const') ?? $text;
+                        // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
+                        foreach ($namespaces as $namespace) {
+                            if (!const_exists($text) && const_exists($nstext = "\\$namespace\\$text")) {
+                                $text = $nstext;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // マジック定数の解決
+                if ($this->id === T_DIR) {
+                    $text = $var_export(dirname($ref->getFileName()));
+                }
+                if ($this->id === T_FILE) {
+                    $text = $var_export($ref->getFileName());
+                }
+                if ($this->id === T_NS_C) {
+                    $text = $var_export($ref->getNamespaceName());
+                }
+                return $text;
+            }
+
+            private function sibling($n, $d)
+            {
+                for ($i = $n + $d; isset($this->tokens[$i]); $i += $d) {
+                    if (!$this->tokens[$i]->isIgnorable()) {
+                        return $this->tokens[$i];
+                    }
+                }
+                return null;
+            }
+        };
+
+        $tokens = $PhpToken::tokenize($code, $flags);
+        foreach ($tokens as $i => $token) {
+            $token->tokens = $tokens;
+            $token->index = $i;
+        }
+        return $tokens;
+    }
+}
+
 assert(!function_exists('unique_id') || (new \ReflectionFunction('unique_id'))->isUserDefined());
 if (!function_exists('unique_id')) {
     /**
@@ -21077,6 +21332,587 @@ if (!function_exists('cidr_parse')) {
     }
 }
 
+assert(!function_exists('dns_resolve') || (new \ReflectionFunction('dns_resolve'))->isUserDefined());
+if (!function_exists('dns_resolve')) {
+    /**
+     * TTL 対応の DNS リゾルバ
+     *
+     * server を指定して自ら UDP で問い合わせたりするような機能はない（将来的にはやってもいいけど）。
+     * リゾルバとしては OS に設定されているネームサーバが使われる（php で言えば dns_get_record）。
+     *
+     * hosts ファイルに記載されているレコードは ttl が 0 になるが、 $ttl0 で明示指定できる。
+     * $nxdomainTtl もほぼ hosts 用の引数（SOA がないドメインなんてほぼ存在しない）。
+     *
+     * 結果はローカルファイルシステムに保存されるので TTL が切れるまでは別プロセスでも同じ結果を返す。
+     * ネガティブキャッシュも実装されており TTL は SOA の minimum-ttl に従う。
+     *
+     * $returnAs で返り値の形式を指定できる。
+     * - 'raw': ほぼ生のまま返す（「ほぼ」というのは type ごとにカテゴライズされるため）
+     * - 'values': 主たる値を配列で返す（「主たる」とは A だったら IP, MX だったら優先度ソート済みの target）
+     * - 'value': 主たる値をスカラーで返す（「主たる」とは A だったらランダムの IP, MX だったら高優先度 target）
+     *
+     * いずれにせよ DNS_XXX に複数の値を含めると複数の値を返し得るので注意。
+     * （根本的に raw+ALL 以外の複数値指定は推奨しない）。
+     *
+     * 普通は 'value' で十分で、MX で別レコードにリトライしたい場合くらいにしか 'values' は使用しない。
+     * 'raw' に至ってはほぼデバック・確認用で通常用途での使用はほぼないはず。
+     *
+     * Example:
+     * ```php
+     * // example.com A の主たる値をスカラーで返す
+     * that(dns_resolve('example.com', DNS_A, 'value'))->isString(); // '96.7.128.175' 等（毎回異なる）
+     * // example.com A の主たる値を配列で返す
+     * that(dns_resolve('example.com', DNS_A, 'values'))->isArray(); // ['23.192.228.80'] 等（順番は毎回異なる）
+     * // example.com 全レコードをカテゴライズして返す
+     * that(dns_resolve('example.com', DNS_ALL, 'raw'))->hasKeyAll(['A', 'AAAA', 'SOA']); // var_dump してみれば一発で分かる
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\network
+     */
+    function dns_resolve(
+        /** 取得するドメイン名 */ string $hostname,
+        /** 取得するレコードタイプ */ int $type = DNS_A,
+        /** 返り値のタイプ */ string $returnAs = 'value', // 'raw' | 'values' | 'value'
+        /** TTL が 0（hosts 等）の場合の代替値 */ int $ttl0 = 0,
+        /** SOA がない場合（hosts 等）のネガティブキャッシュの TTL */ int $nxdomainTtl = 60,
+        /** フラッシュフラグ */ bool $flush = false,
+        /** 注入用 hosts ファイルだが実質的にテスト用 */ array $hosts = [],
+    ) {
+        $client = new class(function_configure('storagedir') . '/dns_resolve/', $ttl0, $nxdomainTtl, $hosts) {
+            private static array $rules;
+            private static array $cache    = [];
+            private static array $original = [];
+
+            public function __construct(private string $storage, private int $ttl0, private int $nxdomainTtl, private array $hosts)
+            {
+                self::$rules ??= [
+                    DNS_SOA   => [
+                        'name'  => 'SOA',
+                        'sort'  => fn(&$records) => shuffle($records),
+                        'value' => fn($record) => preg_replace('#\\.#', '@', $record['rname'] ?? '', 1),
+                    ],
+                    DNS_PTR   => [
+                        'name'  => 'PTR',
+                        'sort'  => fn(&$records) => shuffle($records),
+                        'value' => fn($record) => $record['target'],
+                    ],
+                    DNS_NS    => [
+                        'name'  => 'NS',
+                        'sort'  => fn(&$records) => shuffle($records),
+                        'value' => fn($record) => $record['target'],
+                    ],
+                    DNS_CNAME => [
+                        'name'  => 'CNAME',
+                        'sort'  => fn(&$records) => shuffle($records),
+                        'value' => fn($record) => $record['target'],
+                    ],
+                    DNS_A     => [
+                        'name'  => 'A',
+                        'sort'  => fn(&$records) => shuffle($records),
+                        'value' => fn($record) => $record['ip'],
+                    ],
+                    DNS_AAAA  => [
+                        'name'  => 'AAAA',
+                        'sort'  => fn(&$records) => shuffle($records),
+                        'value' => fn($record) => $record['ipv6'],
+                    ],
+                    DNS_MX    => [
+                        'name'  => 'MX',
+                        'sort'  => function (&$records) {
+                            shuffle($records);
+                            usort($records, fn($a, $b) => $a['pri'] <=> $b['pri']);
+                        },
+                        'value' => fn($record) => $record['target'],
+                    ],
+                    DNS_SRV   => [
+                        'name'  => 'SRV',
+                        'sort'  => function (&$records) {
+                            $weights = array_aggregate($records, ['weights' => fn($group) => array_sum(array_column($group, 'weight'))], 'pri');
+                            $score = array_map(fn($row) => rand($row['weight'], $weights[$row['pri']]['weights']), $records);
+                            uksort($records, fn($a, $b) => $records[$a]['pri'] <=> $records[$b]['pri'] ?: $score[$b] <=> $score[$a]);
+                        },
+                        'value' => fn($record) => $record['target'] . ':' . $record['port'],
+                    ],
+                    DNS_TXT   => [
+                        'name'  => 'TXT',
+                        'sort'  => fn(&$records) => shuffle($records),
+                        'value' => fn($record) => $record['txt'],
+                    ],
+                    DNS_NAPTR => [
+                        'name'  => 'NAPTR',
+                        'sort'  => fn(&$records) => shuffle($records),
+                        'value' => fn($record) => (object) $record,
+                    ],
+                    DNS_HINFO => [
+                        'name'  => 'HINFO',
+                        'sort'  => fn(&$records) => shuffle($records),
+                        'value' => fn($record) => (object) $record,
+                    ],
+                    // Windows not supported
+                    // DNS_A6    => [],
+                    // DNS_CAA   => [],
+                ];
+            }
+
+            public function __destruct()
+            {
+                foreach (self::$cache as $hostname => $records) {
+                    if (self::$original[$hostname] !== $records) {
+                        $cachefile = "{$this->storage}/" . rawurlencode($hostname) . ".php";
+                        file_set_contents($cachefile, '<?php return ' . var_export($records, true) . ';');
+                        opcache_invalidate($cachefile, true);
+                    }
+                }
+            }
+
+            private function &loadCache(string $hostname)
+            {
+                if (!isset(self::$cache[$hostname])) {
+                    $cachefile = "{$this->storage}/" . rawurlencode($hostname) . ".php";
+                    self::$cache[$hostname] = file_exists($cachefile) ? include $cachefile : [];
+                }
+
+                self::$original[$hostname] ??= self::$cache[$hostname];
+
+                return self::$cache[$hostname];
+            }
+
+            public function flush()
+            {
+                self::$cache = [];
+                self::$original = [];
+
+                foreach (glob("{$this->storage}/*.php") as $cachefile) {
+                    @unlink($cachefile);
+                    opcache_invalidate($cachefile, true);
+                }
+            }
+
+            public function resolve(string $hostname, int $type, $returnAs = 'raw')
+            {
+                // 不正な $hostname はこの段階で弾く（下手すると無限ループの可能性があるため）
+                if (!filter_var($hostname, FILTER_VALIDATE_IP) && !filter_var($hostname, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
+                    throw new \InvalidArgumentException("$hostname is not a valid DNS name");
+                }
+
+                // dns_get_record の type は文字列なので読み替え用のマップが必要
+                $target_dns = array_flip(array_map(fn($r) => $r['name'], array_filter(self::$rules, fn($k) => $k & $type, ARRAY_FILTER_USE_KEY)));
+
+                // 全レコード（変更感知のため参照変数）
+                $allRecords = &$this->loadCache($hostname);
+
+                // TTL で伏せる
+                foreach ($allRecords as $rtype => $record) {
+                    foreach ($record as $r) {
+                        if (($r['@time'] + $r['ttl']) <= time()) {
+                            // 不揃い TTL は許容しない。一つでも切れていたら丸ごと伏せる
+                            unset($allRecords[$rtype]);
+                            break;
+                        }
+                    }
+                }
+
+                // 無かったり TTL 切れなどは問い合わせる
+                $missings = array_diff_key($target_dns, $allRecords);
+                if ($missings) {
+                    $allRecords += $this->_query($hostname, array_sum($missings));
+                }
+
+                // それでも無い場合は NXDOMAIN
+                $missings = array_diff_key($target_dns, $allRecords);
+                if ($missings) {
+                    // DNS の仕様上、NXDOMAIN の TTL は SOA(minimum-ttl) に従う
+                    $soa = (function () use ($allRecords, $missings, $hostname) {
+                        // 自身が持っているならそれでよい
+                        if (isset($allRecords['SOA'])) {
+                            return $allRecords['SOA'];
+                        }
+                        // 持っていないなら問い合わせる必要があるが今の問い合わせが SOA だと無限ループするので飛ばす
+                        if (!isset($missings['SOA'])) {
+                            $soa = $this->resolve($hostname, DNS_SOA, 'raw') ?? [];
+                            if (isset($soa[0]['minimum-ttl'])) {
+                                return $soa;
+                            }
+                        }
+                        // それ以降は親を辿っていく
+                        $parentname = implode('.', array_slice(explode('.', $hostname), 1));
+                        if (strlen($parentname)) {
+                            return $this->resolve($parentname, DNS_SOA, 'raw') ?? [];
+                        }
+                        return [];
+                    })();
+
+                    // NXDOMAIN は null として必要最小限の情報だけ入れる
+                    foreach ($missings as $typename => $_) {
+                        $allRecords[$typename][] = [
+                            ''      => null,
+                            'type'  => $typename,
+                            'ttl'   => $soa[0]['minimum-ttl'] ?? $this->nxdomainTtl,
+                            '@time' => time(),
+                        ];
+                    }
+                }
+
+                // 整形して返す（下手に書き換えると保存されるので別メソッドに切り出している）
+                $results = $this->_singulate($allRecords, $returnAs);
+                if (count($target_dns) === 1) {
+                    return $results[array_key_first($target_dns)];
+                }
+                else {
+                    return array_intersect_key($results, $target_dns);
+                }
+            }
+
+            private function _query(string $hostname, int $type)
+            {
+                // IP はエラーにせず A/AAAA で解決されたとみなす
+                if (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                    $resolved = [
+                        ['type' => 'A', 'ttl' => 0, 'ip' => $hostname],
+                        ['type' => 'SOA', 'ttl' => 0, 'minimum-ttl' => $this->nxdomainTtl],
+                    ];
+                }
+                elseif (filter_var($hostname, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                    $resolved = [
+                        ['type' => 'AAAA', 'ttl' => 0, 'ipv6' => $hostname],
+                        ['type' => 'SOA', 'ttl' => 0, 'minimum-ttl' => $this->nxdomainTtl],
+                    ];
+                }
+                // それ以外は DNS を引く
+                else {
+                    $resolved = [];
+                    if ($this->hosts) {
+                        $target_dns = array_flip(array_map(fn($r) => $r['name'], array_filter(self::$rules, fn($k) => $k & $type, ARRAY_FILTER_USE_KEY)));
+                        foreach ($this->hosts as $record) {
+                            if (isset($target_dns[$record['type']]) && $record['host'] === $hostname) {
+                                $resolved[] = $record;
+                            }
+                        }
+                    }
+
+                    if (!$resolved) {
+                        $resolved = @dns_get_record($hostname, $type);
+                        if ($resolved === false) {
+                            $error = error_get_last();
+                            throw new \ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
+                        }
+                    }
+                }
+
+                $records = [];
+                foreach ($resolved as $record) {
+                    if (!($record['ttl'] ?? 0)) {
+                        $record['ttl'] = $this->ttl0;
+                    }
+                    $record['@time'] = time();
+                    $records[$record['type']][] = $record;
+                }
+                return $records;
+            }
+
+            private function _singulate(array $allRecords, $returnAs)
+            {
+                if ($returnAs === 'raw') {
+                    return $allRecords;
+                }
+
+                foreach (self::$rules as $rule) {
+                    if (isset($allRecords[$rule['name']])) {
+                        $records = &$allRecords[$rule['name']];
+
+                        $records = array_values(array_filter($records, fn($r) => !array_key_exists('', $r)));
+                        $rule['sort']($records);
+
+                        foreach ($records as $n => $record) {
+                            $records[$n] = $rule['value']($record);
+                        }
+
+                        if ($returnAs === 'value') {
+                            $records = reset($records) ?: null;
+                        }
+                    }
+                }
+                return $allRecords;
+            }
+        };
+
+        if ($flush) {
+            $client->flush();
+        }
+
+        return $client->resolve($hostname, $type, $returnAs);
+    }
+}
+
+assert(!function_exists('fcgi_request') || (new \ReflectionFunction('fcgi_request'))->isUserDefined());
+if (!function_exists('fcgi_request')) {
+    /**
+     * FastCGI リクエストを行う
+     *
+     * ※ 完全に特定用途向けで普通の使い方は想定していない
+     *
+     * できるだけ http に似せたかったので $url からある程度 $params を推測して自動設定する。
+     * - TCP: tcp://localhost:9000/path/to/script?a=A
+     * - UDS: unix://run%2Fphp-fpm%2Fwww.sock/path/to/script?a=A
+     *   - とても気持ち悪いので UDS ファイルは $options で渡すこともできる
+     *   - unix:///path/to/script?a=A ($options:['udsFile' => '/run/php-fpm/www.sock'])
+     * 上記で SCRIPT_FILENAME, QUERY_STRING が設定される。
+     * $stdin を指定すると REQUEST_METHOD, CONTENT_LENGTH 等も設定される。
+     * $stdin は配列を渡すとよしなに扱われる。
+     *
+     * $params の自動設定は明示指定を決して上書きしない。
+     * ただし null だけは上書きするので自動設定の明示に使える。
+     *
+     * 「任意のホスト（http ではないのでドメイン（≒Host ヘッダ））」に「ドキュメントルートと無関係」に「fpm のコンテキストで実行」できることがほぼ唯一のメリット。
+     * 要するに cli から fpm の opcache を温めたいような限定的なケースでしか使わないし使うべきでない。
+     *
+     * @package ryunosuke\Functions\Package\network
+     */
+    function fcgi_request(
+        /** URL */ string $url,
+        /** FCGI パラメータ */ array $params = [],
+        /** FCGI ボディ */ array|string $stdin = '',
+        /** その他のオプション */ array $options = [],
+    ): /** FCGI レスポンス */ array
+    {
+        $options += [
+            'keepAlive'      => false, // デストラクタで閉じてるので実質的に意味なし
+            'connectTimeout' => 10.0,
+            'socketTimeout'  => 60.0,
+            'udsFile'        => '/run/php-fpm/www.sock',
+            'fpmConf'        => '/etc/php-fpm.d/www.conf',
+        ];
+
+        $parts = uri_parse($url, [
+            'host' => null,
+            'port' => null,
+        ]);
+
+        // scheme が無い場合は fpm の conf ファイルから推測する
+        if ($parts['scheme'] === '' && is_readable($options['fpmConf'])) {
+            if (strlen($listen = parse_ini_file($options['fpmConf'])['listen'] ?? '')) {
+                // UDS モード（本来なら stat で is_socket みたいにした方がいいけどそこまで厳密には不要だろう）
+                if (is_readable($listen)) {
+                    $parts['scheme'] = 'unix';
+                    $parts['host'] ??= $listen;
+                }
+                // TCP モード
+                else {
+                    [$host, $port] = array_pad(explode(':', $listen), -2, null);
+                    $parts['scheme'] = 'tcp';
+                    $parts['host'] ??= ($host === '0.0.0.0' ? null : $host) ?? '127.0.0.1';
+                    $parts['port'] ??= $port;
+                }
+            }
+        }
+        // unix domain socket はホスト名部分をソケットファイル名とみなす（要 urldecode）
+        elseif ($parts['scheme'] === 'unix') {
+            $parts['host'] = strlen($parts['host'] ?? '') ? '/' . rawurldecode($parts['host']) : $options['udsFile'];
+        }
+
+        // path は実行スクリプトとみなす
+        if (strlen($parts['path'])) {
+            $params['SCRIPT_FILENAME'] ??= $parts['path'];
+        }
+        // query はそのままクエリストリングとして使える
+        if ($parts['query']) {
+            $params['QUERY_STRING'] ??= http_build_query($parts['query']);
+        }
+
+        // リクエスト本文が配列ならよしなにする
+        if (is_array($stdin)) {
+            if (($params['CONTENT_TYPE'] ?? '') === 'multipart/form-data' || array_find_recursive($stdin, fn($v) => $v instanceof \SplFileInfo)) {
+                $stdin = formdata_build($stdin, $boundary);
+                $params['CONTENT_TYPE'] ??= "multipart/form-data; boundary=$boundary";
+            }
+            else {
+                $stdin = http_build_query($stdin);
+                $params['CONTENT_TYPE'] ??= "application/x-www-form-urlencoded";
+            }
+        }
+        // $stdin が来てるならある程度決め打ちできる
+        if (strlen($stdin)) {
+            $params['REQUEST_METHOD'] ??= 'POST';
+            $params['CONTENT_LENGTH'] ??= strlen($stdin);
+        }
+
+        // 完全なるデフォルト値で埋めて null フィルタ
+        $params['REQUEST_METHOD'] ??= 'GET';
+        $params['QUERY_STRING'] ??= '';
+        $params['GATEWAY_INTERFACE'] ??= 'CGI/1.1';
+        $params = array_filter($params, fn($v) => $v !== null);
+
+        $client = new class("{$parts['scheme']}://{$parts['host']}" . ($parts['port'] ? ":{$parts['port']}" : ''), $options['connectTimeout'], $options['socketTimeout']) {
+            const FCGI_VERSION_1 = 1;
+
+            const FCGI_HEADER_LEN = 8;
+            const FCGI_KEEP_CONN  = 1;
+
+            const FCGI_BEGIN_REQUEST = 1;
+            const FCGI_ABORT_REQUEST = 2;
+            const FCGI_END_REQUEST   = 3;
+            const FCGI_PARAMS        = 4;
+            const FCGI_STDIN         = 5;
+            const FCGI_STDOUT        = 6;
+            const FCGI_STDERR        = 7;
+            const FCGI_DATA          = 8;
+
+            const FCGI_RESPONDER  = 1;
+            const FCGI_AUTHORIZER = 2;
+            const FCGI_FILTER     = 3;
+
+            const FCGI_REQUEST_COMPLETE = 0;
+            const FCGI_CANT_MPX_CONN    = 1;
+            const FCGI_OVERLOADED       = 2;
+            const FCGI_UNKNOWN_ROLE     = 3;
+
+            const BEGIN_REQUEST_FORMAT = [
+                'role'      => 'n',
+                'flags'     => 'c',
+                'reserved0' => 'c',
+                'reserved1' => 'c',
+                'reserved2' => 'c',
+                'reserved3' => 'c',
+                'reserved4' => 'c',
+            ];
+
+            const END_REQUEST_FORMAT = [
+                'appStatus'      => 'N',
+                'protocolStatus' => 'c',
+                'reserved0'      => 'c',
+                'reserved1'      => 'c',
+                'reserved2'      => 'c',
+            ];
+
+            const RECORD_FORMAT = [
+                'version'       => 'c',
+                'type'          => 'c',
+                'requestId'     => 'n',
+                'contentLength' => 'n',
+                'paddingLength' => 'c',
+                'reserved'      => 'c',
+            ];
+
+            private $socket;
+
+            public function __construct(
+                private string $address,
+                private float $connectTimeout,
+                private float $socketTimeout,
+            ) {
+            }
+
+            public function open()
+            {
+                $this->socket = stream_socket_client($this->address, $errno, $errstr, $this->connectTimeout);
+                stream_set_timeout($this->socket, (int) $this->socketTimeout, fmod($this->socketTimeout, 1) * 1000 * 1000);
+            }
+
+            public function close()
+            {
+                if ($this->socket) {
+                    fclose($this->socket);
+                    unset($this->socket);
+                }
+            }
+
+            private function write(int $type, string $content, int $requestId = 1)
+            {
+                // https://fastcgi-archives.github.io/FastCGI_Specification.html#S3.3
+                foreach (str_split($content, 0xFFFF) ?: [""] as $chunk) {
+                    $fcgi_header = pack(implode('', self::RECORD_FORMAT), self::FCGI_VERSION_1, $type, $requestId, strlen($chunk), ...[0, 0]) . $chunk;
+                    fwrite($this->socket, $fcgi_header) === strlen($fcgi_header) or throw new \RuntimeException('failed to fwrite');
+                }
+
+                fflush($this->socket);
+            }
+
+            private function read()
+            {
+                // https://fastcgi-archives.github.io/FastCGI_Specification.html#S3.3
+                strlen($fcgi_header = fread($this->socket, self::FCGI_HEADER_LEN)) === self::FCGI_HEADER_LEN or throw new \RuntimeException('failed to fread');
+                $record = unpack(array_sprintf(self::RECORD_FORMAT, '%s%s', '/'), $fcgi_header);
+
+                $record['content'] = stream_get_contents($this->socket, $record['contentLength']);
+
+                stream_get_contents($this->socket, $record['paddingLength']);
+                return $record;
+            }
+
+            public function beginRequest(int $flags)
+            {
+                // https://fastcgi-archives.github.io/FastCGI_Specification.html#S5.1
+                $fcgi_begin_request_body = pack(implode('', self::BEGIN_REQUEST_FORMAT), self::FCGI_RESPONDER, $flags, ...[0, 0, 0, 0, 0]);
+                $this->write(self::FCGI_BEGIN_REQUEST, $fcgi_begin_request_body);
+            }
+
+            public function writeParams(array $params)
+            {
+                // https://fastcgi-archives.github.io/FastCGI_Specification.html#S3.4
+                if ($params) {
+                    $this->write(self::FCGI_PARAMS, array_sprintf($params, function ($v, $k) {
+                        $kpacket = pack(strlen($k) < 128 ? 'c' : 'N', strlen($k) | 0x80000000);
+                        $vpacket = pack(strlen($v) < 128 ? 'c' : 'N', strlen($v) | 0x80000000);
+                        return $kpacket . $vpacket . $k . $v;
+                    }, ''));
+                }
+                $this->write(self::FCGI_PARAMS, '');
+            }
+
+            public function writeStdin(string $stdin)
+            {
+                // https://fastcgi-archives.github.io/FastCGI_Specification.html#S5.3
+                if (strlen($stdin)) {
+                    $this->write(self::FCGI_STDIN, $stdin);
+                }
+                $this->write(self::FCGI_STDIN, '');
+            }
+
+            public function endRequest()
+            {
+                $response = [
+                    'appStatus' => null,
+                    'stdout'    => '',
+                    'stderr'    => '',
+                ];
+                while ($record = $this->read()) {
+                    switch ($record['type']) {
+                        case self::FCGI_STDOUT:
+                            $response['stdout'] .= $record['content'];
+                            break;
+                        // @codeCoverageIgnoreStart
+                        case self::FCGI_STDERR:
+                            $response['stderr'] .= $record['content'];
+                            break;
+                        // @codeCoverageIgnoreEnd
+                        case self::FCGI_END_REQUEST:
+                            $status = unpack(array_sprintf(self::END_REQUEST_FORMAT, '%s%s', '/'), $record['content']);
+                            if ($status['protocolStatus'] !== self::FCGI_REQUEST_COMPLETE) {
+                                throw new \RuntimeException('protocolStatus was returned other than REQUEST_COMPLETE'); // @codeCoverageIgnore
+                            }
+                            $response['appStatus'] = $status['appStatus'];
+                            break 2;
+                    }
+                }
+                return $response;
+            }
+        };
+
+        $restore = set_error_exception_handler();
+        try {
+            $client->open();
+            $client->beginRequest($options['keepAlive'] ? $client::FCGI_KEEP_CONN : 0);
+            $client->writeParams($params);
+            $client->writeStdin($stdin);
+            return $client->endRequest();
+        }
+        finally {
+            $restore();
+            $client->close();
+        }
+    }
+}
+
 assert(!function_exists('getipaddress') || (new \ReflectionFunction('getipaddress'))->isUserDefined());
 if (!function_exists('getipaddress')) {
     /**
@@ -21100,7 +21936,7 @@ if (!function_exists('getipaddress')) {
      */
     function getipaddress($target = null)
     {
-        $net_get_interfaces = cacheobject(__FUNCTION__)->fetch('net_get_interfaces', fn() => net_get_interfaces());
+        $net_get_interfaces = json_storage(__FUNCTION__)['net_get_interfaces'] ??= net_get_interfaces();
 
         // int, null 時は最初のエントリを返す（ループバックは除く）
         if ($target === null || is_int($target)) {
@@ -22612,6 +23448,593 @@ if (!function_exists('ping')) {
         finally {
             $restore();
             socket_close($socket);
+        }
+    }
+}
+
+assert(!function_exists('snmp_trap') || (new \ReflectionFunction('snmp_trap'))->isUserDefined());
+if (!function_exists('snmp_trap')) {
+    /**
+     * SNMPTrap を送信する
+     *
+     * UDP で送ろうかと思ったけど、実装が大変なので snmptrap コマンドに日和っている（ので Windows では動かない）。
+     * 将来的には UDP/TCP にするかもしれない。
+     *
+     * インターフェースは v1 に寄せているが、v2 送信も可能。
+     * 大抵の場合、generic:6 で固有トラップを送りたい場合に使うので $generic はオプショナルで未指定の場合自動設定される。
+     *
+     * $variables は値の型を見てバインド型を決めるので厳密に渡さなければならない（1 と 1.0 と "1" は全く別の意味になる）。
+     *
+     * @package ryunosuke\Functions\Package\network
+     */
+    function snmp_trap(
+        /** snmp バージョン */ int $version,
+        /** 送信先 */ string $target,
+        /** コミュニティ */ string $community,
+        /** エンタープライズ OID */ string $enterprise,
+        /** 固有トラップ番号 */ int $specific,
+        /** 標準トラップ番号 */ ?int $generic = null,
+        /** バインド変数 */ array $variables = [],
+        /** 送信元アドレス（v1のみ） */ ?string $agent = null,
+        /** リトライ回数 */ int $retry = 0,
+        /** タイムアウト秒 */ int $timeout = 1,
+    ) {
+        assert(in_array($version, [1, 2], true));
+
+        $cmdArgs = match ($version) {
+            1 => [
+                '-v' => '1',
+                '-c' => $community,
+                '-r' => $retry,
+                '-t' => $timeout,
+                $target,
+                $enterprise,
+                $agent ?? getipaddress($target) ?? '127.0.0.1',
+                $generic ?? 6,
+                $specific,
+                '', // uptime
+            ],
+            2 => [
+                '-v' => '2c',
+                '-c' => $community,
+                '-r' => $retry,
+                '-t' => $timeout,
+                $target,
+                '', // uptime
+                "$enterprise." . ($generic ?? 0) . ".$specific",
+            ],
+        };
+
+        // https://net-snmp.sourceforge.io/tutorial/tutorial-5/commands/snmpset.html
+        foreach ($variables as $oid => $value) {
+            $cmdArgs[] = "$enterprise.$oid";
+            $cmdArgs[] = match (true) {
+                is_int($value)   => 'I',
+                is_float($value) => 'D',
+                default          => 's',
+            };
+            $cmdArgs[] = $value;
+        }
+
+        $snmptrap = path_resolve('snmptrap') ?? path_resolve('snmptrap.exe') ?? throw new \RuntimeException('not found executable snmptrap');
+        $retval = process($snmptrap, $cmdArgs, '', $stdout, $stderr);
+        if ($retval !== 0) {
+            throw new \RuntimeException("snmptrap error: $stderr", $retval); // @codeCoverageIgnore
+        }
+    }
+}
+
+assert(!function_exists('opcache_gc') || (new \ReflectionFunction('opcache_gc'))->isUserDefined());
+if (!function_exists('opcache_gc')) {
+    /**
+     * opcache を減らす
+     *
+     * 生存期間が $thresholdLifetime 以上で hits が $thresholdHits 以下の opcache を消す。
+     * cli で呼んでも意味がないので health check script あたりで呼ぶといいかもしれない。
+     *
+     * $deletedFile は存在しない場合に消す。
+     * 存在しないファイルは validate_timestamp で次読み込み時に自動で無効になるが、それが無効だったり今すぐ消したいときに使う。
+     * ので実質的に false 指定することはない（実ファイル無しで opcache のみで運用しているような特殊なケースでしか意味はない）。
+     *
+     * $modifiedFile は更新された場合に消す。
+     * 消えたか変更されたかの違いで挙動自体は $deletedFile と同じ（次回無効になるのではなく今すぐ無効化したい場合に使う）。
+     *
+     * $includeCondition を指定すると必ず維持される。例えば vendor を維持するなど。
+     * $excludeCondition を指定すると必ず除去される。例えば php cache を除去するなど。
+     *
+     * なお、opcache_invalidate しても無効化されるだけで opcache_get_status のエントリには残る（次回アクセス時に再コンパイルされる）。
+     * つまり一向に opcache_get_status から消えないのは正常動作。
+     * （メモリ使用量にはちゃんと換算されているが、スクリプト数には換算されない。おそらくネガティブキャッシュみたいなものなんだろう）。
+     * この時 opcache.max_accelerated_files を超えていても残り続けるので以後新しいファイルもコンパイルされない。
+     * 基本的に「opcache_reload の前段でコールして無用なキャッシュを保存されないようにする」くらいの用途しかない。
+     *
+     * この関数は互換性を考慮しない。
+     *
+     * @package ryunosuke\Functions\Package\opcache
+     */
+    function opcache_gc(
+        /** 生存期間が指定以上を対象にする */ int $thresholdLifetime = 24 * 3600,
+        /** ヒット数が指定以下を対象にする */ int $thresholdHits = 0,
+        /** 元ファイルが存在しないものを対象にする */ bool $deletedFile = true,
+        /** 元ファイルが変更されたものを対象にする */ bool $modifiedFile = true,
+        /** 強制的に維持する条件クロージャ */ ?\Closure $includeCondition = null,
+        /** 強制的に除去する条件クロージャ */ ?\Closure $excludeCondition = null,
+    ): /** gc したファイル配列 */ array
+    {
+        $result = [];
+        foreach (opcache_get_status()['scripts'] ?? [] as $key => $script) {
+            // 無効になってもエントリは消えずに timestamp=0 で残るっぽい？
+            if ($script['timestamp'] === 0) {
+                continue;
+            }
+
+            if ($includeCondition && $includeCondition($script)) {
+                continue;
+            }
+
+            if (
+                ($excludeCondition && $excludeCondition($script)) ||
+                ($deletedFile && !file_exists($script['full_path'])) ||
+                ($modifiedFile && file_exists($script['full_path']) && filemtime($script['full_path']) > $script['timestamp']) ||
+                ($script['hits'] <= $thresholdHits && (time() - $script['last_used_timestamp']) >= $thresholdLifetime)
+            ) {
+                opcache_invalidate($script['full_path'], true);
+                $result[$key] = $script;
+            }
+        }
+        return $result;
+    }
+}
+
+assert(!function_exists('opcache_info') || (new \ReflectionFunction('opcache_info'))->isUserDefined());
+if (!function_exists('opcache_info')) {
+    /**
+     * phpinfo の opcache 特化版
+     *
+     * この関数は互換性を考慮しない。
+     *
+     * @package ryunosuke\Functions\Package\opcache
+     */
+    function opcache_info()
+    {
+        $V = function ($value, $type = null) use (&$V) {
+            $type ??= match (true) {
+                default          => 'string',
+                is_array($value) => 'array',
+                is_bool($value)  => 'json',
+                is_float($value) => 'percent',
+                is_int($value)   => 'integer',
+            };
+
+            if ($type === 'array') {
+                return "<details><summary>{$V(count($value))} count</summary>{$V(implode("\n", $value))}</details>";
+            }
+
+            $value = match ($type) {
+                default    => $value,
+                'json'     => json_encode($value),
+                'integer'  => number_format($value, 0),
+                'percent'  => number_format($value, 3) . ' %',
+                'datetime' => $value ? date('Y-m-d H:i:s', $value) : '-',
+            };
+            return htmlspecialchars($value, ENT_QUOTES);
+        };
+
+        $opcacheinfo = (function () {
+            $config = opcache_get_configuration() ?: [];
+            $status = opcache_get_status() ?: [];
+
+            return [
+                'version'    => $config['version'] ?? [],
+                'directives' => $config['directives'] ?? [],
+                'blacklist'  => $config['blacklist'] ?? [],
+                'preload'    => $status['preload_statistics'] ?? [
+                        'memory_consumption' => 0,
+                        'scripts'            => [],
+                        'functions'          => [],
+                        'classes'            => [],
+                    ],
+                'jit'        => $status['jit'] ?? [],
+                'status'     => array_filter($status, fn($v) => !is_array($v)),
+                'memory'     => $status['memory_usage'] ?? [],
+                'strings'    => $status['interned_strings_usage'],
+                'statistics' => $status['opcache_statistics'],
+                'scripts'    => $status['scripts'],
+            ];
+        })();
+
+        ?>
+    <style>
+        h1 {
+            border: 1px solid #666;
+            vertical-align: baseline;
+            padding: 4px 5px;
+            text-align: left;
+            font-size: 150%;
+            background-color: #99c;
+        }
+
+        h2 {
+            font-size: 125%;
+        }
+
+        table {
+            margin: 1em auto;
+            text-align: left;
+            border-collapse: collapse;
+            border: 0;
+            width: calc(100vw - 4em);
+            box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        th, td {
+            border: 1px solid #666;
+            font-size: 75%;
+            vertical-align: baseline;
+            padding: 4px 5px;
+            white-space: pre-line;
+        }
+
+        th.header {
+            text-align: center;
+            position: sticky;
+            top: 0;
+            background-color: #99c;
+            font-weight: bold;
+            min-width: 64px;
+        }
+
+        td.title {
+            background-color: #ccf;
+            width: 320px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        td.value {
+            background-color: #ddd;
+            max-width: 300px;
+            overflow-x: auto;
+            word-wrap: break-word;
+        }
+
+        td.number {
+            text-align: right;
+        }
+
+        td.datetime {
+            text-align: center;
+            width: 120px;
+        }
+
+        th .sorter {
+            position: relative;
+            padding-left: 4px;
+
+            a[data-sort-order] {
+                cursor: pointer;
+                position: absolute;
+                opacity: 0.4;
+
+                &.active {
+                    opacity: 1.0;
+                }
+
+                &[data-sort-order="asc"] {
+                    top: -0.75em;
+                }
+
+                &[data-sort-order="desc"] {
+                    bottom: -0.75em;
+                }
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.sorter').forEach(function (sorter) {
+                sorter.addEventListener('click', function (e) {
+                    const a = e.target;
+                    if (!a.matches('a[data-sort-order]')) {
+                        return;
+                    }
+
+                    a.closest('thead').querySelectorAll('[data-sort-order]').forEach((a) => a.classList.remove('active'));
+                    a.classList.add('active');
+
+                    const unit = a.dataset.sortOrder === 'asc' ? +1 : -1;
+                    const index = a.closest('th').cellIndex;
+                    const schwartzian = Array.from(a.closest('table').tBodies[0].rows, (tr) => [
+                        tr,
+                        JSON.parse(tr.cells[index].dataset.sortValue),
+                    ]);
+                    schwartzian.sort(([, a], [, b]) => (a === b ? 0 : a > b ? +1 : -1) * unit);
+                    schwartzian.forEach(([tr]) => tr.parentElement.appendChild(tr));
+                });
+            });
+        });
+    </script>
+
+    <h1><?= $V($opcacheinfo['version']['opcache_product_name']) ?> <?= $V($opcacheinfo['version']['version']) ?></h1>
+
+    <h2>Directives</h2>
+    <table>
+        <thead>
+        <tr>
+            <th class="header">Name</th>
+            <th class="header">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($opcacheinfo['directives'] as $key => $value): ?>
+            <tr>
+                <td class="title"><?= $V($key) ?></td>
+                <td class="value"><?= match ($key) {
+                            'opcache.blacklist_filename' => $V($value) . $V($opcacheinfo['blacklist']),
+                            default                      => $V($value),
+                        } ?></td>
+            </tr>
+        <?php endforeach ?>
+        </tbody>
+    </table>
+
+    <h2>Preload</h2>
+    <table>
+        <thead>
+        <tr>
+            <th class="header">Name</th>
+            <th class="header">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="title"><?= $V('memory_consumption') ?></td>
+            <td class="value"><?= $V($opcacheinfo['preload']['memory_consumption']) ?></td>
+        </tr>
+        <tr>
+            <td class="title"><?= $V('scripts') ?></td>
+            <td class="value"><?= $V($opcacheinfo['preload']['scripts']) ?></td>
+        </tr>
+        <tr>
+            <td class="title"><?= $V('functions') ?></td>
+            <td class="value"><?= $V($opcacheinfo['preload']['functions']) ?></td>
+        </tr>
+        <tr>
+            <td class="title"><?= $V('classes') ?></td>
+            <td class="value"><?= $V($opcacheinfo['preload']['classes']) ?></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>Jit</h2>
+    <table>
+        <thead>
+        <tr>
+            <th class="header">Name</th>
+            <th class="header">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($opcacheinfo['jit'] as $key => $value): ?>
+            <tr>
+                <td class="title"><?= $V($key) ?></td>
+                <td class="value"><?= $V($value) ?></td>
+            </tr>
+        <?php endforeach ?>
+        </tbody>
+    </table>
+
+    <h2>Status</h2>
+    <table>
+        <thead>
+        <tr>
+            <th class="header">Name</th>
+            <th class="header">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($opcacheinfo['status'] as $key => $value): ?>
+            <tr>
+                <td class="title"><?= $V($key) ?></td>
+                <td class="value"><?= $V($value) ?></td>
+            </tr>
+        <?php endforeach ?>
+        </tbody>
+    </table>
+
+    <h2>Memory</h2>
+    <table>
+        <thead>
+        <tr>
+            <th class="header">Name</th>
+            <th class="header">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($opcacheinfo['memory'] as $key => $value): ?>
+            <tr>
+                <td class="title"><?= $V($key) ?></td>
+                <td class="value"><?= $V($value) ?></td>
+            </tr>
+        <?php endforeach ?>
+        </tbody>
+    </table>
+
+    <h2>Interned strings</h2>
+    <table>
+        <thead>
+        <tr>
+            <th class="header">Name</th>
+            <th class="header">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($opcacheinfo['strings'] as $key => $value): ?>
+            <tr>
+                <td class="title"><?= $V($key) ?></td>
+                <td class="value"><?= $V($value) ?></td>
+            </tr>
+        <?php endforeach ?>
+        </tbody>
+    </table>
+
+    <h2>Statistics</h2>
+    <table>
+        <thead>
+        <tr>
+            <th class="header">Name</th>
+            <th class="header">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($opcacheinfo['statistics'] as $key => $value): ?>
+            <tr>
+                <td class="title"><?= $V($key) ?></td>
+                <td class="value"><?= match ($key) {
+                            'start_time', 'last_restart_time' => $V($value, 'datetime'),
+                            default                           => $V($value),
+                        } ?></td>
+            </tr>
+        <?php endforeach ?>
+        </tbody>
+    </table>
+
+    <h2>Scripts</h2>
+    <table>
+        <thead>
+        <tr>
+            <th class="header">File<span class="sorter"><a data-sort-order="asc">︿</a><a data-sort-order="desc">﹀</a></span></th>
+            <th class="header">Hits<span class="sorter"><a data-sort-order="asc">︿</a><a data-sort-order="desc">﹀</a></span></th>
+            <th class="header">Memory<span class="sorter"><a data-sort-order="asc">︿</a><a data-sort-order="desc">﹀</a></span></th>
+            <th class="header">Hits*Memory<span class="sorter"><a data-sort-order="asc">︿</a><a data-sort-order="desc">﹀</a></span></th>
+            <th class="header">Last used<span class="sorter"><a data-sort-order="asc">︿</a><a data-sort-order="desc">﹀</a></span></th>
+            <th class="header">Last modified<span class="sorter"><a data-sort-order="asc">︿</a><a data-sort-order="desc">﹀</a></span></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($opcacheinfo['scripts'] as $key => $value): ?>
+            <tr>
+                <td class="title" data-sort-value="<?= $V($key, 'json') ?>"><?= $V($key) ?></td>
+                <td class="value number" data-sort-value="<?= $V($value['hits'], 'json') ?>"><?= $V($value['hits']) ?></td>
+                <td class="value number" data-sort-value="<?= $V($value['memory_consumption'], 'json') ?>"><?= $V($value['memory_consumption']) ?></td>
+                <td class="value number" data-sort-value="<?= $V($value['hits'] * $value['memory_consumption'], 'json') ?>"><?= $V($value['hits'] * $value['memory_consumption']) ?></td>
+                <td class="value datetime" data-sort-value="<?= $V($value['last_used_timestamp'], 'json') ?>"><?= $V($value['last_used_timestamp'], 'datetime') ?></td>
+                <td class="value datetime" data-sort-value="<?= $V($value['timestamp'], 'json') ?>"><?= $V($value['timestamp'], 'datetime') ?></td>
+            </tr>
+        <?php endforeach ?>
+        </tbody>
+    </table>
+
+    <?php
+}
+}
+
+assert(!function_exists('opcache_reload') || (new \ReflectionFunction('opcache_reload'))->isUserDefined());
+if (!function_exists('opcache_reload')) {
+    /**
+     * opcache の保存兼ウォームアップ
+     *
+     * コールすると現在キャッシュされている opcache のリストを保存しつつ、必要であれば再コンパイルする。
+     * 動的な preload として使用することを想定しているので定期的に呼ぶ必要がある。
+     * cli で呼んでも意味がないので health check script あたりで呼ぶといいかもしれない。
+     *
+     * health check script で呼ぶ時は $reset に注意。
+     * true にすると opcache_reset が呼ばれるので再コンパイルが終わるまで処理が遅くなる可能性がある。
+     * この引数は「ネガティブキャッシュもクリーンにしたい」という状況のためで、logrotate 等で reload してしまえば原則的に指定不要。
+     *
+     * preload は強力だが運用が難しく、「動的に育てつつある程度キャッシュできれば構わない」というゆるふわな運用が難しい。
+     * この関数を呼ぶ script を systemd start 等で叩けばそれだけで簡易ウォームアップとなる。
+     * 様々な理由でそのリクエストは失敗するかもしれないが、本運用には何も影響しない。
+     * あるいは preload に設定してもよい。少なくともエラーにはならないようにしてある。
+     *
+     * この関数は互換性を考慮しない。
+     *
+     * @package ryunosuke\Functions\Package\opcache
+     */
+    function opcache_reload(
+        /** 対象パターン */ array $includePatterns = [],
+        /** 除外パターン */ array $excludePatterns = [],
+        /** reset を伴うか */ bool $reset = false,
+        /** エラーを無視するか（null なら SAPI に応じて自動） */ ?bool $ignoreErrors = null,
+        /** キャッシュファイル名（原則としてテスト用） */ ?string $cachefile = null,
+    ): /** キャッシュ結果配列 */ array
+    {
+        $ignoreErrors ??= isset($_SERVER['PHP_SELF']);
+        $cachefile ??= function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__) . '.json';
+
+        // リスト読み込み
+        $filelist = [];
+        $original = null;
+        if (file_exists($cachefile)) {
+            $filelist = @json_decode(file_get_contents($cachefile), true) ?? [];
+            $original = $filelist;
+        }
+
+        // リスト更新
+        $filelist = array_replace($filelist, (function () {
+            $result = [];
+            foreach (opcache_get_status()['scripts'] ?? [] as $key => $script) {
+                unset($script['full_path']);           // キーと同じ
+                unset($script['hits']);                // キャッシュ時点での hits に価値はない
+                unset($script['last_used_timestamp']); // 同上
+                unset($script['last_used']);           // 値としては last_used_timestamp と実質同じ
+                $result[$key] = $script;
+            }
+            return $result;
+        })());
+
+        // preload のコンテキストで2回読もうとすると即死することがあるのでチェック用
+        $included_files = array_flip(get_included_files());
+
+        // fpm のコンテキストではログが汚れるので無視したい（ちなみにエラーは内部で発生するみたいで抑制する手段がない）
+        // preload のコンテキストでは不審死したときに原因が分からないのでログりたい
+        if ($ignoreErrors) {
+            $log_errors = ini_set('log_errors', 'off');
+        }
+
+        // 再コンパイル
+        if ($reset) {
+            opcache_reset();
+        }
+        $result = [];
+        try {
+            foreach ($filelist as $file => $script) {
+                if ($script['timestamp'] > 0 && file_exists($file)) {
+                    if ((!$includePatterns || fnmatch_or($includePatterns, $file)) && (!$excludePatterns || !fnmatch_or($excludePatterns, $file))) {
+                        try {
+                            // opcache_compile_file は結構容易にコケるが、あくまで warmup が目的なのでエラーはスルーする
+                            if (!isset($included_files[$file]) && !opcache_is_script_cached($file)) {
+                                $result[$file] = 'compile';
+                                @opcache_compile_file($file);
+                            }
+                        }
+                        catch (\Throwable $t) {
+                            $result[$file] = 'error: ' . $t->getMessage();
+                            unset($filelist[$file]);
+                        }
+                    }
+                    else {
+                        // 引数依存で保存されてしまうので unset はしない
+                        $result[$file] = 'ignore';
+                    }
+                }
+                else {
+                    $result[$file] = 'invalidate';
+                    opcache_invalidate($file, true);
+                    unset($filelist[$file]);
+                }
+            }
+            return $result;
+        }
+        finally {
+            if (isset($log_errors)) {
+                ini_set('log_errors', $log_errors);
+            }
+
+            if ($original !== $filelist) {
+                file_set_contents($cachefile, json_encode($filelist, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            }
         }
     }
 }
@@ -24825,30 +26248,22 @@ if (!function_exists('include_stream')) {
                 if (!$this->handle) {
                     return true;
                 }
+
                 // Windows の file スキームでは呼ばれない？（確かにブロッキングやタイムアウトは無縁そう）
                 // @codeCoverageIgnoreStart
-                switch ($option) {
-                    default:
-                        throw new \Exception();
-                    case STREAM_OPTION_BLOCKING:
-                        return stream_set_blocking($this->handle, $arg1);
-                    case STREAM_OPTION_READ_TIMEOUT:
-                        return stream_set_timeout($this->handle, $arg1, $arg2);
-                    case STREAM_OPTION_READ_BUFFER:
-                        return stream_set_read_buffer($this->handle, $arg2) === 0; // @todo $arg1 is used?
-                    case STREAM_OPTION_WRITE_BUFFER:
-                        return stream_set_write_buffer($this->handle, $arg2) === 0; // @todo $arg1 is used?
-                }
+                return match ($option) {
+                    default                    => throw new \Exception(),
+                    STREAM_OPTION_BLOCKING     => stream_set_blocking($this->handle, $arg1),
+                    STREAM_OPTION_READ_TIMEOUT => stream_set_timeout($this->handle, $arg1, $arg2),
+                    STREAM_OPTION_READ_BUFFER  => stream_set_read_buffer($this->handle, $arg2) === 0,  // @todo $arg1 is used?
+                    STREAM_OPTION_WRITE_BUFFER => stream_set_write_buffer($this->handle, $arg2) === 0, // @todo $arg1 is used?
+                };
                 // @codeCoverageIgnoreEnd
             }
 
-            /**
-             * @codeCoverageIgnore
-             */
             public function stream_cast(int $cast_as)
             {
                 assert(is_int($cast_as));
-                assert($this->handle, 'never call this method');
                 return $this->handle;
             }
 
@@ -24859,20 +26274,15 @@ if (!function_exists('include_stream')) {
             public function stream_metadata($path, $option, $value)
             {
                 return $this->call_original(function () use ($path, $option, $value) {
-                    switch ($option) {
-                        default:
-                            throw new \Exception(); // @codeCoverageIgnore
-                        case STREAM_META_TOUCH:
-                            return touch($path, ...$value);
-                        case STREAM_META_ACCESS:
-                            return chmod($path, $value);
-                        case STREAM_META_OWNER_NAME:
-                        case STREAM_META_OWNER:
-                            return chown($path, $value);
-                        case STREAM_META_GROUP_NAME:
-                        case STREAM_META_GROUP:
-                            return chgrp($path, $value);
-                    }
+                    return match ($option) {
+                        default            => throw new \Exception(),
+                        STREAM_META_TOUCH  => touch($path, ...$value),
+                        STREAM_META_ACCESS => chmod($path, $value),
+                        STREAM_META_OWNER_NAME,
+                        STREAM_META_OWNER  => chown($path, $value),
+                        STREAM_META_GROUP_NAME,
+                        STREAM_META_GROUP  => chgrp($path, $value),
+                    };
                 });
             }
 
@@ -25166,26 +26576,16 @@ if (!function_exists('memory_stream')) {
 
                 public function stream_seek(int $offset, int $whence = SEEK_SET): bool
                 {
-                    $strlen = strlen($this->entry->content);
-                    switch ($whence) {
-                        case SEEK_SET:
-                            if ($offset < 0) {
-                                return false;
-                            }
-                            $this->position = $offset;
-                            break;
-
-                        // stream_tell を定義していると SEEK_CUR が呼ばれない？（計算されて SEEK_SET に移譲されているような気がする）
-                        // @codeCoverageIgnoreStart
-                        case SEEK_CUR:
-                            $this->position += $offset;
-                            break;
-                        // @codeCoverageIgnoreEnd
-
-                        case SEEK_END:
-                            $this->position = $strlen + $offset;
-                            break;
+                    if ($whence === SEEK_SET && $offset < 0) {
+                        return false;
                     }
+
+                    $strlen = strlen($this->entry->content);
+                    $this->position = match ($whence) {
+                        SEEK_SET => $offset,
+                        SEEK_CUR => $this->position + $offset,
+                        SEEK_END => $strlen + $offset,
+                    };
                     // ファイルの終端から数えた位置に移動するには、負の値を offset に渡して whence を SEEK_END に設定しなければなりません。
                     if ($this->position < 0) {
                         $this->position = $strlen + $this->position;
@@ -25205,49 +26605,48 @@ if (!function_exists('memory_stream')) {
                 public function stream_metadata($path, $option, $var)
                 {
                     $id = self::id($path);
-                    switch ($option) {
-                        case STREAM_META_TOUCH:
-                            if (!isset(self::$entries[$id])) {
-                                self::create($id, 010_0000);
-                            }
-                            $mtime = $var[0] ?? time();
-                            $atime = $var[1] ?? $mtime;
-                            self::$entries[$id]->mtime = $mtime;
-                            self::$entries[$id]->atime = $atime;
-                            break;
-
-                        case STREAM_META_ACCESS:
-                            if (!isset(self::$entries[$id])) {
-                                return false;
-                            }
-                            self::$entries[$id]->mode &= 077_0000;
-                            self::$entries[$id]->mode |= $var & ~umask();
-                            self::$entries[$id]->ctime = time();
-                            break;
-
-                        /** @noinspection PhpMissingBreakStatementInspection */
-                        case STREAM_META_OWNER_NAME:
-                            $nam = function_exists('posix_getpwnam') ? posix_getpwnam($var) : [];
-                            $var = $nam['uid'] ?? 0;
-                        case STREAM_META_OWNER:
-                            if (!isset(self::$entries[$id])) {
-                                return false;
-                            }
-                            self::$entries[$id]->owner = $var;
-                            self::$entries[$id]->ctime = time();
-                            break;
-
-                        /** @noinspection PhpMissingBreakStatementInspection */
-                        case STREAM_META_GROUP_NAME:
-                            $var = function_exists('posix_getgrnam') ? posix_getgrnam($var)['gid'] : 0;
-                        case STREAM_META_GROUP:
-                            if (!isset(self::$entries[$id])) {
-                                return false;
-                            }
-                            self::$entries[$id]->group = $var;
-                            self::$entries[$id]->ctime = time();
-                            break;
+                    if (!isset(self::$entries[$id])) {
+                        if ($option === STREAM_META_TOUCH) {
+                            self::create($id, 010_0000);
+                        }
+                        else {
+                            return false;
+                        }
                     }
+
+                    $now = time();
+                    $set_entry = function (...$props) use ($id) {
+                        foreach ($props as $prop => $value) {
+                            self::$entries[$id]->$prop = $value;
+                        }
+                    };
+                    match ($option) {
+                        STREAM_META_TOUCH      => $set_entry(
+                            mtime: $var[0] ?? $now,
+                            atime: $var[1] ?? $var[0] ?? $now,
+                        ),
+                        STREAM_META_ACCESS     => $set_entry(
+                            mode: (self::$entries[$id]->mode & 077_0000) | $var & ~umask(),
+                            ctime: $now,
+                        ),
+                        STREAM_META_OWNER_NAME => $set_entry(
+                            owner: function_exists('posix_getpwnam') ? posix_getpwnam($var)['uid'] ?? 0 : 0,
+                            ctime: $now,
+                        ),
+                        STREAM_META_OWNER      => $set_entry(
+                            owner: $var,
+                            ctime: $now,
+                        ),
+                        STREAM_META_GROUP_NAME => $set_entry(
+                            group: function_exists('posix_getgrnam') ? posix_getgrnam($var)['gid'] ?? 0 : 0,
+                            ctime: $now,
+                        ),
+                        STREAM_META_GROUP      => $set_entry(
+                            group: $var,
+                            ctime: $now,
+                        ),
+                    };
+
                     // https://qiita.com/hnw/items/3af76d3d7ec2cf52fff8
                     clearstatcache(true, $path);
                     return true;
@@ -25447,17 +26846,10 @@ if (!function_exists('profiler')) {
 
                             foreach (['callee', 'location'] as $key) {
                                 $condition = $options[$key];
-                                $value = $$key;
                                 if ($condition !== null) {
-                                    if ($condition instanceof \Closure) {
-                                        if (!$condition($value)) {
-                                            continue 2;
-                                        }
-                                    }
-                                    else {
-                                        if (!preg_match($condition, $value)) {
-                                            continue 2;
-                                        }
+                                    $condition = $condition instanceof \Closure ? $condition : fn($v) => preg_match($condition, $v);
+                                    if (!$condition($$key)) {
+                                        continue 2;
                                     }
                                 }
                             }
@@ -25622,26 +27014,16 @@ if (!function_exists('var_stream')) {
 
                 public function stream_seek(int $offset, int $whence = SEEK_SET): bool
                 {
-                    $strlen = strlen($this->entry);
-                    switch ($whence) {
-                        case SEEK_SET:
-                            if ($offset < 0) {
-                                return false;
-                            }
-                            $this->position = $offset;
-                            break;
-
-                        // stream_tell を定義していると SEEK_CUR が呼ばれない？（計算されて SEEK_SET に移譲されているような気がする）
-                        // @codeCoverageIgnoreStart
-                        case SEEK_CUR:
-                            $this->position += $offset;
-                            break;
-                        // @codeCoverageIgnoreEnd
-
-                        case SEEK_END:
-                            $this->position = $strlen + $offset;
-                            break;
+                    if ($whence === SEEK_SET && $offset < 0) {
+                        return false;
                     }
+
+                    $strlen = strlen($this->entry);
+                    $this->position = match ($whence) {
+                        SEEK_SET => $offset,
+                        SEEK_CUR => $this->position + $offset,
+                        SEEK_END => $strlen + $offset,
+                    };
                     // ファイルの終端から数えた位置に移動するには、負の値を offset に渡して whence を SEEK_END に設定しなければなりません。
                     if ($this->position < 0) {
                         $this->position = $strlen + $this->position;
@@ -26915,7 +28297,7 @@ if (!function_exists('render_template')) {
             return $result;
         };
 
-        [$blocks, $stmts] = cacheobject(__FUNCTION__)->hash($template, function () use ($template) {
+        [$blocks, $stmts] = json_storage(__FUNCTION__)[$template] ??= (function () use ($template) {
             $tokens = array_slice(php_parse("<?php <<<PHPTEMPLATELITERAL\n" . $template . "\nPHPTEMPLATELITERAL;", [
                 'backtick' => false,
             ]), 2, -2);
@@ -26945,7 +28327,7 @@ if (!function_exists('render_template')) {
 
             array_walk_recursive($stmts, fn(&$token) => $token = (array) $token);
             return [$blocks, $stmts];
-        });
+        })();
 
         $values = [];
         foreach ($stmts as $stmt) {
@@ -28352,12 +29734,9 @@ if (!function_exists('str_exists')) {
             $needle = [$needle];
         }
 
-        $needle = array_map('strval', $needle);
+        $needle = array_filter(array_map('strval', $needle), 'strlen');
 
         foreach ($needle as $str) {
-            if ($str === '') {
-                continue;
-            }
             $pos = $case_insensitivity ? stripos($haystack, $str) : strpos($haystack, $str);
             if ($and_flag && $pos === false) {
                 return false;
@@ -30354,6 +31733,195 @@ if (!function_exists('dataurl_encode')) {
     }
 }
 
+assert(!function_exists('formdata_build') || (new \ReflectionFunction('formdata_build'))->isUserDefined());
+if (!function_exists('formdata_build')) {
+    /**
+     * multipart/formdata の構築
+     *
+     * $boundary 未指定時はランダム文字列が生成され、衝突した場合は無限にリトライされる。
+     * SplFileInfo はファイルとみなされるが $encoder を指定すれば CURLFile なども活用可能。
+     *
+     * Example:
+     * ```php
+     * $file = sys_get_temp_dir() . '/upload.txt';
+     * file_put_contents($file, 'plain');
+     *
+     * $boundary = 'hogefugapiyo';
+     * that(formdata_build([
+     *     'n' => ['e' => ['s' => ['t' => 'nest']]],
+     *     'f' => new \SplFileInfo($file),
+     * ], $boundary))->is(strtr(<<<FORMDATA
+     * --hogefugapiyo
+     * Content-Disposition: form-data; name="n[e][s][t]"
+     *
+     * nest
+     * --hogefugapiyo
+     * Content-Disposition: form-data; name="f"; filename="upload.txt"
+     * Content-Type: text/plain
+     *
+     * plain
+     * --hogefugapiyo--
+     * FORMDATA, ["\n" => "\r\n"]));
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\url
+     */
+    function formdata_build(
+        /** フォームデータ配列 */
+        array $formdata,
+        /** バウンダリ文字列初期値兼レシーバ引数 */
+        ?string &$boundary = null,
+        /** 値のエンコーダだが実質的にファイルの検出に使う（デフォルトでは SplFileInfo がファイルと認識される） */
+        ?\Closure $encoder = null,
+    ): /** フォームデータ文字列 */ string
+    {
+        $encoder ??= function ($v) {
+            if ($v instanceof \SplFileInfo) {
+                return [
+                    'filename' => rawurlencode($v->getBasename()),
+                    'mimetype' => mime_content_type($v->getRealPath()),
+                    'contents' => file_get_contents($v->getRealPath()),
+                ];
+            }
+            return $v;
+        };
+        $escaper = fn($v) => strtr($v, [
+            '"'    => '%22',
+            "\r\n" => "%0D%0A",
+            "\r"   => "%0D%0A",
+            "\n"   => "%0D%0A",
+        ]);
+
+        while (true) {
+            try {
+                $boundary ??= '----' . random_string(64);
+
+                $result = "";
+                array_walk_recursive2($formdata, function ($v, $key, $array, $keys) use (&$result, $escaper, $boundary, $encoder) {
+                    // http_build_query に倣って null はスルーする
+                    if ($v === null) {
+                        return;
+                    }
+
+                    // name を生成（エスケープはどうすればいいか分からなかったので chrome の挙動を真似た）
+                    $keys[] = $key;
+                    $name = array_shift($keys) . implode('', array_map(fn($k) => "[$k]", $keys));
+                    $name = $escaper($name);
+
+                    // ファイルとスカラーの判定・分岐
+                    $body = $encoder($v);
+                    if (is_array($body)) {
+                        $header = implode("\r\n", [
+                            sprintf('Content-Disposition: form-data; name="%s"; filename="%s"', $name, $body['filename']),
+                            sprintf('Content-Type: %s', $body['mimetype']),
+                        ]);
+                        $body = $body['contents'];
+                    }
+                    else {
+                        $header = implode("\r\n", [
+                            sprintf('Content-Disposition: form-data; name="%s"', $name),
+                        ]);
+                    }
+
+                    // バウンダリの衝突チェック
+                    if (str_contains($body, $boundary) !== false) {
+                        throw new \DomainException('boundary collision');
+                    }
+
+                    // 構築（埋め込みや一時結合はできるだけ避けた方が良いと思う）
+                    $result .= "--$boundary\r\n";
+                    $result .= "$header\r\n\r\n";
+                    $result .= $body;
+                    $result .= "\r\n";
+                });
+
+                if (strlen($result)) {
+                    $result .= "--$boundary--";
+                }
+                return $result;
+            }
+            catch (\Throwable $t) {
+                if ($t->getMessage() !== 'boundary collision') {
+                    throw $t;
+                }
+                $boundary = null;
+            }
+        }
+    }
+}
+
+assert(!function_exists('formdata_parse') || (new \ReflectionFunction('formdata_parse'))->isUserDefined());
+if (!function_exists('formdata_parse')) {
+    /**
+     * multipart/formdata のパース
+     *
+     * Example:
+     * ```php
+     * $data = formdata_parse(<<<FORMDATA
+     * --hogefugapiyo
+     * Content-Disposition: form-data; name="n[e][s][t]"
+     *
+     * nest
+     * --hogefugapiyo
+     * Content-Disposition: form-data; name="f"; filename="upload.txt"
+     * Content-Type: text/plain
+     *
+     * plain
+     * --hogefugapiyo--
+     * FORMDATA);
+     *
+     * that($data['n']['e']['s']['t'])->is('nest');
+     * that($data['f'])->isInstanceOf(\SplFileInfo::class);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\url
+     */
+    function formdata_parse(
+        /** フォームデータ文字列 */
+        string $formdata,
+        /** バウンダリ文字列。省略時は1行目から推測する */
+        ?string $boundary = null,
+        /** 値のデコーダだが実質的にファイルの検出に使う（デフォルトでは一時ファイルの SplFileInfo で返す） */
+        ?\Closure $decoder = null,
+    ): /** フォームデータ配列 */ array
+    {
+        $decoder ??= function ($filename, $mimetype, $contents) {
+            if ($filename === null) {
+                return $contents;
+            }
+            $fname = tmpname('FD');
+            file_put_contents($fname, $contents);
+            return new \SplFileInfo($fname);
+        };
+
+        // バウンダリで分割
+        $boundary ??= substr(preg_split('#\R#u', $formdata, 2)[0], 2);
+        $boundary = preg_quote($boundary, '#');
+        $contents = preg_split("#\R?--$boundary(--)?\R?#u", $formdata, -1, PREG_SPLIT_NO_EMPTY);
+
+        $result = [];
+        foreach ($contents as $content) {
+            // ヘッダとボディに分割
+            [$header, $body] = preg_split("#\R{2}#u", $content, 2);
+
+            // ヘッダを連想配列に変換
+            $headers = array_change_key_case(str_array($header, ':', true), CASE_LOWER);
+            $fields = str_array(explode(';', $headers['content-disposition']), '=', true);
+
+            // name が無いときの挙動は未定義（現状はスキップ実装）
+            if (isset($fields['name'])) {
+                $body = $decoder($fields['filename'] ?? null, $headers['content-type'] ?? null, $body);
+
+                // @todo いい方法が思い浮かばないので富豪的にやっている
+                parse_str(trim($fields['name'], '"'), $query);               // ここで a[b][c][d] が a:[b:[c:[d:""]]] になる
+                array_walk_recursive($query, fn(&$value) => $value = $body); // ここで a:[b:[c:[d:""]]] が a:[b:[c:[d:$body]]] になる
+                $result = array_replace_recursive($result, $query);          // 一つの値しかないのでマージすればよい
+            }
+        }
+        return ($result);
+    }
+}
+
 assert(!function_exists('query_build') || (new \ReflectionFunction('query_build'))->isUserDefined());
 if (!function_exists('query_build')) {
     /**
@@ -31417,13 +32985,11 @@ if (!function_exists('cacheobject')) {
                     // var_export3 はあらゆる出力を可能にしているので **読み込み時** のオーバーヘッドがでかく、もし var_export が使えるならその方が格段に速い
                     // しかし要素を再帰的に全舐め（is_exportable）しないと「var_export できるか？」は分からないというジレンマがある
                     // このコンテキストは「キャッシュ」なので書き込み時のオーバーヘッドよりも読み込み時のオーバーヘッドを優先して判定を行っている
-                    // ただし、 var_export3 は非常に依存がでかいので明示指定時のみ
-                    $var_export3 = function_resolve('var_export3');
-                    if ($var_export3 === null || is_exportable($this->entries[$key])) {
+                    if (is_exportable($this->entries[$key])) {
                         $code = var_export($this->entries[$key], true);
                     }
                     else {
-                        $code = $var_export3($this->entries[$key], true);
+                        $code = var_export3($this->entries[$key], true);
                     }
                     return !!file_set_contents($this->_getFilename($key), "<?php # $meta\nreturn $code;\n");
                 }
@@ -31457,6 +33023,7 @@ if (!function_exists('cacheobject')) {
                 public function hash($key, $provider, $ttl = null)
                 {
                     $now = time();
+                    $args = is_iterable($key) ? $key : [$key];
                     $key = is_stringable($key) ? "$key" : json_encode($key);
                     $cacheid = "hash." . hash('fnv164', $key);
                     $ttl = $ttl === null ? null : $this->_normalizeTtl($ttl);
@@ -31484,7 +33051,7 @@ if (!function_exists('cacheobject')) {
                     }
 
                     if (!array_key_exists($key, $cache)) {
-                        $cache[$key] = [$provider(), $now, $ttl];
+                        $cache[$key] = [$provider(...$args), $now, $ttl];
                         $ttls = array_filter(array_column($cache, 2), fn($v) => $v !== null);
                         $this->set($cacheid, $cache, $ttls ? max($ttls) : null);
                     }
@@ -31670,6 +33237,136 @@ if (!function_exists('function_resolve')) {
             return $result;
         }
         return null;
+    }
+}
+
+assert(!function_exists('json_storage') || (new \ReflectionFunction('json_storage'))->isUserDefined());
+if (!function_exists('json_storage')) {
+    /**
+     * キーが json 化されてファイルシステムに永続化される ArrayAccess を返す
+     *
+     * 非常にシンプルで PSR-16 も実装せず、TTL もクリア手段も（基本的には）存在しない。
+     * ArrayAccess なので `$storage['hoge'] ??= something()` として使うのがほぼ唯一の利用法。
+     * その仕様・利用上、値として null を使用することはできない（使用した場合の動作は未定義とする）。
+     *
+     * キーに指定できるのは json_encode 可能なもののみ。
+     * 値に指定できるのは var_export 可能なもののみ。
+     * 上記以外を与えたときの動作は未定義。
+     *
+     * 得てして簡単な関数・メソッドのメモ化や内部的なキャッシュに使用する。
+     *
+     * Example:
+     * ```php
+     * // ??= を使えば「無かったら値を、有ったらそれを」を単純に実現できる
+     * $storage = json_storage();
+     * that($storage['key'] ??= (fn() => 123)())->is(123);
+     * that($storage['key'] ??= (fn() => 456)())->is(123);
+     * // 引数に与えた prefix で別空間になる
+     * $storage = json_storage('other');
+     * that($storage['key'] ??= (fn() => 789)())->is(789);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\utility
+     *
+     * @param string $directory 永続化ディレクトリ
+     * @return \ArrayObject
+     */
+    function json_storage(string $prefix = 'global')
+    {
+        $cachedir = function_configure('cachedir') . '/' . strtr(__FUNCTION__, ['\\' => '%']);
+        if (!file_exists($cachedir)) {
+            @mkdir($cachedir, 0777, true);
+        }
+
+        static $objects = [];
+        return $objects[$prefix] ??= new class("$cachedir/" . strtr($prefix, ['\\' => '%', '/' => '-'])) extends \ArrayObject {
+            public function __construct(private string $directory)
+            {
+                parent::__construct();
+            }
+
+            public function offsetExists(mixed $key): bool
+            {
+                return $this->offsetGet($key) !== null;
+            }
+
+            public function offsetGet(mixed $key): mixed
+            {
+                $json = $this->json($key);
+
+                // 有るならそれでよい
+                if (parent::offsetExists($json)) {
+                    return parent::offsetGet($json);
+                }
+
+                // 無くてもストレージにある可能性がある
+                $filename = $this->filename($json);
+                clearstatcache(true, $filename);
+                if (file_exists($filename)) {
+                    [$k, $v] = include $filename;
+                    // hash 化してるので万が一競合すると異なるデータを返してしまう
+                    if ($k !== $key) {
+                        return null; // @codeCoverageIgnore
+                    }
+                    // ストレージに有ったら内部キャッシュしてそれを使う
+                    parent::offsetSet($json, $v);
+                    return $v;
+                }
+
+                return null;
+            }
+
+            public function offsetSet(mixed $key, mixed $value): void
+            {
+                $json = $this->json($key);
+
+                // 値が変化したらストレージにも保存
+                if (!parent::offsetExists($json) || parent::offsetGet($json) !== $value) {
+                    assert(is_exportable($value));
+                    $filename = $this->filename($json);
+                    if ($value === null) {
+                        opcache_invalidate($filename, true);
+                        @unlink($filename);
+                    }
+                    else {
+                        file_put_contents($filename, '<?php return ' . var_export([$key, $value], true) . ';', LOCK_EX);
+                    }
+                }
+
+                parent::offsetSet($json, $value);
+            }
+
+            public function offsetUnset(mixed $key): void
+            {
+                $this->offsetSet($key, null);
+            }
+
+            private function json(mixed $data): string
+            {
+                assert((function () use ($data) {
+                    $tmp = [$data];
+                    array_walk_recursive($tmp, function ($value) {
+                        if (is_resourcable($value)) {
+                            throw new \Exception("\$value is resource");
+                        }
+                        if (is_object($value) && (!$value instanceof \JsonSerializable && get_class($value) !== \stdClass::class)) {
+                            throw new \Exception("\$value is not JsonSerializable");
+                        }
+                    });
+                    return true;
+                })());
+                return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+            }
+
+            private function filename(string $json): string
+            {
+                $filename = base64url_encode(implode("\n", [
+                    hash('fnv164', $json, true),
+                    hash('crc32', $json, true),
+                ]));
+                return "{$this->directory}-$filename.php-cache";
+            }
+        };
     }
 }
 
@@ -32367,7 +34064,8 @@ if (!function_exists('hashvar')) {
         $line = $trace['line'];
         $function = function_shorten($trace['function']);
 
-        $cache = cacheobject(__FUNCTION__)->hash([$file, $line, $function], function () use ($file, $line, $function) {
+        $storage = json_storage(__FUNCTION__);
+        $cache = $storage[[$file, $line, $function]] ??= (function () use ($file, $line, $function) {
             // 呼び出し元の1行を取得
             $lines = file($file, FILE_IGNORE_NEW_LINES);
             $target = $lines[$line - 1];
@@ -32417,7 +34115,7 @@ if (!function_exists('hashvar')) {
             }
 
             return $callers;
-        });
+        })();
 
         // 引数の数が一致する呼び出しを返す
         foreach ($cache as $caller) {
@@ -33588,6 +35286,14 @@ if (!function_exists('var_export3')) {
                     return $id;
                 }
                 // 配列は明確な ID が存在しないので、貯めて検索して ID を振る（参照さえ含まなければ ID に意味はないので参照込みのみ）
+                // 何度か検証してしまったので備忘:
+                // ID を振らない方が格段に速いのでそのための分岐の目的もある
+                // ID を振ると参照は関係なく・・・
+                // - return $this->array1 = [$this->array2 = [$this->array3 = [...]]];
+                // のようになり、（多分プロパティの動的作成で）結構遅くなる
+                // ID を振らなければ・・・
+                // - return [[[...]]];
+                // のようになり、実質的に opcache を返すだけになる
                 if (is_array($var) && $this->arrayHasReference($var)) {
                     $id = array_search($var, $this->vars, true);
                     if (!$id) {
@@ -33633,61 +35339,6 @@ if (!function_exists('var_export3')) {
             $spacer1 = str_repeat(" ", 4 * max(0, $nest + 1));
             $raw_export = fn($v) => $v;
             $var_export = fn($v) => var_export($v, true);
-            $neighborToken = function ($n, $d, $tokens) {
-                for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
-                    if ($tokens[$i]->id !== T_WHITESPACE) {
-                        return $tokens[$i];
-                    }
-                }
-            };
-            $resolveSymbol = function ($token, $prev, $next, $ref) use ($var_export) {
-                $text = $token->text;
-                if ($token->id === T_STRING) {
-                    $namespaces = [$ref->getNamespaceName()];
-                    if ($ref instanceof \ReflectionFunctionAbstract) {
-                        $namespaces[] = $ref->getClosureScopeClass()?->getNamespaceName();
-                    }
-                    if ($prev->id === T_NEW || $next->id === T_DOUBLE_COLON || $next->id === T_VARIABLE || $next->text === '{') {
-                        $text = namespace_resolve($text, $ref->getFileName(), 'alias') ?? $text;
-                    }
-                    elseif ($next->text === '(') {
-                        $text = namespace_resolve($text, $ref->getFileName(), 'function') ?? $text;
-                        // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
-                        foreach ($namespaces as $namespace) {
-                            if (!function_exists($text) && function_exists($nstext = "\\$namespace\\$text")) {
-                                $text = $nstext;
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        $text = namespace_resolve($text, $ref->getFileName(), 'const') ?? $text;
-                        // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
-                        foreach ($namespaces as $namespace) {
-                            if (!const_exists($text) && const_exists($nstext = "\\$namespace\\$text")) {
-                                $text = $nstext;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // マジック定数の解決（__CLASS__, __TRAIT__ も書き換えなければならないが、非常に大変なので下記のみ）
-                if ($token->id === T_FILE) {
-                    $text = $var_export($ref->getFileName());
-                }
-                if ($token->id === T_DIR) {
-                    $text = $var_export(dirname($ref->getFileName()));
-                }
-                if ($token->id === T_NS_C) {
-                    $text = $var_export($ref->getNamespaceName());
-                }
-                if ($text !== null) {
-                    $token = clone $token;
-                    $token->text = $text;
-                }
-                return $token;
-            };
 
             $vid = $var_manager->varId($value);
             if ($vid) {
@@ -33761,7 +35412,7 @@ if (!function_exists('var_export3')) {
 
                 [$meta, $body] = callable_code($value);
                 $arrow = starts_with($meta, 'fn') ? ' => ' : ' ';
-                $tokens = array_slice(php_parse("<?php $meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
+                $tokens = array_slice(php_tokens("<?php $meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
 
                 $uses = [];
                 $context = [
@@ -33769,8 +35420,9 @@ if (!function_exists('var_export3')) {
                     'brace' => 0,
                 ];
                 foreach ($tokens as $n => $token) {
-                    $prev = $neighborToken($n, -1, $tokens) ?? (object) ['id' => null, 'text' => null, 'line' => null];
-                    $next = $neighborToken($n, +1, $tokens) ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                    $prev = $token->prev() ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                    $next = $token->next() ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                    assert([$prev, $next]); // あらかじめ取得しておかないとズレるかもしれない
 
                     // クロージャは何でもかける（クロージャ・無名クラス・ジェネレータ etc）のでネスト（ブレース）レベルを記録しておく
                     if ($token->text === '{') {
@@ -33805,7 +35457,7 @@ if (!function_exists('var_export3')) {
                         }
                     }
 
-                    $tokens[$n] = $resolveSymbol($token, $prev, $next, $ref);
+                    $tokens[$n] = $token->clone(text: $token->resolve($ref));
                 }
 
                 $code = php_indent(implode('', array_column($tokens, 'text')), [
@@ -33873,8 +35525,11 @@ if (!function_exists('var_export3')) {
                         serialize($value);
                     }
                 }
-                catch (\Exception) {
-                    return "\$this->$vid = new \\__PHP_Incomplete_Class()";
+                catch (\Exception $e) {
+                    // ただし無名クラス由来の失敗なら何とかできる（かもしれない。やってみないと分からない）のでスルー
+                    if (!str_contains($e->getMessage(), '@anonymous')) {
+                        return "\$this->$vid = new \\__PHP_Incomplete_Class()";
+                    }
                 }
 
                 // 無名クラスは定義がないのでパースが必要
@@ -33883,15 +35538,16 @@ if (!function_exists('var_export3')) {
                     $fname = $ref->getFileName();
                     $sline = $ref->getStartLine();
                     $eline = $ref->getEndLine();
-                    $tokens = php_parse('<?php ' . implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
+                    $tokens = php_tokens('<?php ' . implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
 
                     $block = [];
                     $starting = false;
                     $constructing = 0;
                     $nesting = 0;
-                    foreach ($tokens as $n => $token) {
-                        $prev = $neighborToken($n, -1, $tokens) ?? [null, null, null];
-                        $next = $neighborToken($n, +1, $tokens) ?? [null, null, null];
+                    foreach ($tokens as $token) {
+                        $prev = $token->prev() ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                        $next = $token->next() ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                        assert([$prev, $next]); // あらかじめ取得しておかないとズレるかもしれない
 
                         // 無名クラスは new class か new #[Attribute] で始まるはず（new #[A] ClassName は許可されていない）
                         if (($token->id === T_NEW && $next->id === T_CLASS) || ($token->id === T_NEW && $next->id === T_ATTRIBUTE)) {
@@ -33925,7 +35581,7 @@ if (!function_exists('var_export3')) {
                             $token->text = "replaced__construct";
                         }
 
-                        $block[] = $resolveSymbol($token, $prev, $next, $ref);
+                        $block[] = $token->clone(text: $token->resolve($ref));
 
                         if ($token->text === '{') {
                             $nesting++;
@@ -34237,6 +35893,57 @@ if (!function_exists('var_html')) {
         // @codeCoverageIgnoreEnd
 
         echo "<pre class='var_html'>{$export($value, [])}</pre>";
+    }
+}
+
+assert(!function_exists('var_mimetype') || (new \ReflectionFunction('var_mimetype'))->isUserDefined());
+if (!function_exists('var_mimetype')) {
+    /**
+     * 値の mimetype を返す
+     *
+     * 追加の引数で ; 区切りのパラメータを受け取れる。
+     * mimetype は `タイプ/サブタイプ;引数=値` と規約されているので 引数=>値 の連想配列で受け取る。
+     * したがって返り値は「タイプ/サブタイプ」の文字列で固定となる（ただし失敗時は null を返す）。
+     * とは言っても finfo の仕様上、現状では charset しか返さない。
+     *
+     * Example:
+     * ```php
+     * // 普通の文字列は text/plain
+     * that(var_mimetype('plain text', $parameters))->isSame('text/plain');
+     * // $parameters で引数を受け取れる
+     * that($parameters)->is(['charset' => 'us-ascii']);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\var
+     */
+    function var_mimetype($var, ?array &$parameters = null): ?string
+    {
+        $parameters = [];
+
+        $finfo = finfo_open(FILEINFO_MIME);
+        try {
+            // SplFileInfo 標準のファイルオブジェクトのようなものなので特別扱いする
+            if ($var instanceof \SplFileInfo) {
+                $mimetype = finfo_file($finfo, $var->getPathname()) ?: null;
+            }
+            else {
+                $mimetype = finfo_buffer($finfo, $var) ?: null;
+            }
+        }
+        finally {
+            finfo_close($finfo);
+        }
+
+        if ($mimetype === null) {
+            return null;
+        }
+
+        $parts = array_map('trim', explode(';', $mimetype));
+
+        $result = array_shift($parts);
+        $parameters = str_array($parts, '=', true);
+
+        return $result;
     }
 }
 
@@ -34725,12 +36432,10 @@ if (!function_exists('var_pretty')) {
                     else {
                         $this->plain("static");
                     }
-                    $this->plain(') use ');
+                    $this->plain(')');
                     if ($properties) {
+                        $this->plain(' use ');
                         $this->export($properties, $nest, $parents, $keys, false);
-                    }
-                    else {
-                        $this->plain('{}');
                     }
                 }
                 elseif (is_object($value)) {

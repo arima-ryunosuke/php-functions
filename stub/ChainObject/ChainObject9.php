@@ -593,6 +593,11 @@ trait ChainObject9
     public function http_get($url, $data = [], $options = [], &$response_header = [], &$info = []): self { }
     public function http_get($data = [], $options = [], &$response_header = [], &$info = []): self { }
 
+    /** @see snmp_trap() */
+    public self $snmp_trap;
+    public function snmp_trap(int $version, string $target, string $community, string $enterprise, int $specific, ?int $generic = null, array $variables = [], ?string $agent = null, int $retry = 0, int $timeout = 1): self { }
+    public function snmp_trap(string $target, string $community, string $enterprise, int $specific, ?int $generic = null, array $variables = [], ?string $agent = null, int $retry = 0, int $timeout = 1): self { }
+
     /** @see probability_array() */
     public self $probability_array;
     public function probability_array(iterable $array, $divisor = 100): self { }

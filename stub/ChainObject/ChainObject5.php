@@ -519,6 +519,11 @@ TEXT): self { }
     public function mean(...$variadic): self { }
     public function mean(): self { }
 
+    /** @see php_tokens() */
+    public self $php_tokens;
+    public function php_tokens(string $code, int $flags = 0): self { }
+    public function php_tokens(int $flags = 0): self { }
+
     /** @see unique_id() */
     public self $unique_id;
     public function unique_id(&$id_info = [], $debug = []): self { }

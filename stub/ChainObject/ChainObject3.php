@@ -490,8 +490,8 @@ trait ChainObject3
 
     /** @see file_mimetype() */
     public self $file_mimetype;
-    public function file_mimetype($filename, $prefer_extension = []): self { }
-    public function file_mimetype($prefer_extension = []): self { }
+    public function file_mimetype($filename, $prefer_extension = [], ?array &$parameters = null): self { }
+    public function file_mimetype($prefer_extension = [], ?array &$parameters = null): self { }
 
     /** @see file_rewrite_contents() */
     public self $file_rewrite_contents;

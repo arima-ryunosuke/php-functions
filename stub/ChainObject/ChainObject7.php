@@ -389,6 +389,11 @@ TEXT): self { }
     public function php_strip($phtml, $option = [], &$mapping = []): self { }
     public function php_strip($option = [], &$mapping = []): self { }
 
+    /** @see dns_resolve() */
+    public self $dns_resolve;
+    public function dns_resolve(string $hostname, int $type = DNS_A, string $returnAs = "value", int $ttl0 = 0, int $nxdomainTtl = 60, bool $flush = false, array $hosts = []): self { }
+    public function dns_resolve(int $type = DNS_A, string $returnAs = "value", int $ttl0 = 0, int $nxdomainTtl = 60, bool $flush = false, array $hosts = []): self { }
+
     /** @see http_post() */
     public self $http_post;
     public function http_post($url, $data = [], $options = [], &$response_header = [], &$info = []): self { }
@@ -423,6 +428,11 @@ TEXT): self { }
     public self $strpos_quoted;
     public function strpos_quoted(?string $haystack, $needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
     public function strpos_quoted($needle, $offset = 0, $enclosure = "'\"", $escape = "\\", &$found = null): self { }
+
+    /** @see formdata_parse() */
+    public self $formdata_parse;
+    public function formdata_parse(string $formdata, ?string $boundary = null, ?\Closure $decoder = null): self { }
+    public function formdata_parse(?string $boundary = null, ?\Closure $decoder = null): self { }
 
     /** @see benchmark() */
     public self $benchmark;

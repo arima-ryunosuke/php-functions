@@ -505,6 +505,11 @@ TEXT): self { }
     public function ip2cidr($fromipaddr, $toipaddr): self { }
     public function ip2cidr($toipaddr): self { }
 
+    /** @see opcache_gc() */
+    public self $opcache_gc;
+    public function opcache_gc(int $thresholdLifetime = 86400, int $thresholdHits = 0, bool $deletedFile = true, bool $modifiedFile = true, ?\Closure $includeCondition = null, ?\Closure $excludeCondition = null): self { }
+    public function opcache_gc(int $thresholdHits = 0, bool $deletedFile = true, bool $modifiedFile = true, ?\Closure $includeCondition = null, ?\Closure $excludeCondition = null): self { }
+
     /** @see preg_capture() */
     public self $preg_capture;
     public function preg_capture($pattern, $subject, $default): self { }
@@ -559,6 +564,11 @@ TEXT): self { }
     public self $attr_exists;
     public function attr_exists($key, $value): self { }
     public function attr_exists($value): self { }
+
+    /** @see var_mimetype() */
+    public self $var_mimetype;
+    public function var_mimetype($var, ?array &$parameters = null): self { }
+    public function var_mimetype(?array &$parameters = null): self { }
 
     /** @see varcmp() */
     public self $varcmp;

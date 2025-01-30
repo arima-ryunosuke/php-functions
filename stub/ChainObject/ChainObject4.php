@@ -323,6 +323,11 @@ trait ChainObject4
     public function stacktrace($traces = null, $option = []): self { }
     public function stacktrace($option = []): self { }
 
+    /** @see dir_clean() */
+    public self $dir_clean;
+    public function dir_clean(string $directory, int $atime = 0, int $mtime = 0, array|string $excludePattern = []): self { }
+    public function dir_clean(int $atime = 0, int $mtime = 0, array|string $excludePattern = []): self { }
+
     /** @see dir_diff() */
     public self $dir_diff;
     public function dir_diff($path1, $path2, $options = []): self { }
@@ -422,6 +427,11 @@ trait ChainObject4
     public self $cast;
     public function cast($value, string $type, $default = null): self { }
     public function cast(string $type, $default = null): self { }
+
+    /** @see formdata_build() */
+    public self $formdata_build;
+    public function formdata_build(array $formdata, ?string &$boundary = null, ?\Closure $encoder = null): self { }
+    public function formdata_build(?string &$boundary = null, ?\Closure $encoder = null): self { }
 
     /** @see decrypt() */
     public self $decrypt;

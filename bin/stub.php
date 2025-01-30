@@ -17,6 +17,7 @@ $targetFunction = [
     'cacheobject'      => [[__DIR__]],
     'reflect_callable' => [[function () { }], [[PhpToken::class, 'tokenize']]],
     'reflect_types'    => [[]],
+    'php_tokens'       => [['<?php return null;']],
 ];
 
 foreach ($targetFunction as $funcname => $argses) {
@@ -30,6 +31,9 @@ foreach ($targetFunction as $funcname => $argses) {
 
     foreach ($argses as $args) {
         $object = $funcname(...$args);
+        if (is_array($object)) {
+            $object = reset($object);
+        }
         $refobject = new \ReflectionObject($object);
 
         $doccomment ??= trim(preg_replace('#(^/\*\*[ \t]*)|([ \t]*\*/$)|(^[ \t]+\*[ \t]*)#um', '', $refobject->getDocComment() ?: ''));

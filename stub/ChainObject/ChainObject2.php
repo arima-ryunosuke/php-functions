@@ -418,10 +418,20 @@ trait ChainObject2
     public function php_opcode($phpcode, $level = 131072): self { }
     public function php_opcode($level = 131072): self { }
 
+    /** @see fcgi_request() */
+    public self $fcgi_request;
+    public function fcgi_request(string $url, array $params = [], array|string $stdin = "", array $options = []): self { }
+    public function fcgi_request(array $params = [], array|string $stdin = "", array $options = []): self { }
+
     /** @see http_delete() */
     public self $http_delete;
     public function http_delete($url, $data = [], $options = [], &$response_header = [], &$info = []): self { }
     public function http_delete($data = [], $options = [], &$response_header = [], &$info = []): self { }
+
+    /** @see opcache_reload() */
+    public self $opcache_reload;
+    public function opcache_reload(array $includePatterns = [], array $excludePatterns = [], bool $reset = false, ?bool $ignoreErrors = null, ?string $cachefile = null): self { }
+    public function opcache_reload(array $excludePatterns = [], bool $reset = false, ?bool $ignoreErrors = null, ?string $cachefile = null): self { }
 
     /** @see ob_include() */
     public self $ob_include;

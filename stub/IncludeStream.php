@@ -32,9 +32,6 @@ class IncludeStream
     public function stream_close() { }
     public function stream_stat() { }
     public function stream_set_option($option, $arg1, $arg2) { }
-    /**
-     * @codeCoverageIgnore
-     */
     public function stream_cast(int $cast_as) { }
     public function stream_metadata($path, $option, $value) { }
     public function url_stat($path, $flags) { }
