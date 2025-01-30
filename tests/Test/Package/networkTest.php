@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 use function ryunosuke\Functions\Package\array_flatten;
 use function ryunosuke\Functions\Package\cacheobject;
 use function ryunosuke\Functions\Package\cidr2ip;
+use function ryunosuke\Functions\Package\fcgi_request;
 use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\getipaddress;
 use function ryunosuke\Functions\Package\http_bechmark;
@@ -23,6 +24,7 @@ use function ryunosuke\Functions\Package\ip_normalize;
 use function ryunosuke\Functions\Package\json_storage;
 use function ryunosuke\Functions\Package\ping;
 use function ryunosuke\Functions\Package\rm_rf;
+use function ryunosuke\Functions\Package\str_array;
 
 class networkTest extends AbstractTestCase
 {
@@ -57,6 +59,104 @@ class networkTest extends AbstractTestCase
             $actual = array_flatten(array_map(self::resolveFunction('cidr2ip'), self::resolveFunction('ip2cidr')($min, $max)));
             that($actual)->isSame($expected);
         }
+    }
+
+    function test_fcgi_request()
+    {
+        if (!defined('TESTFCGISERVER')) {
+            return;
+        }
+        $server = TESTFCGISERVER;
+
+        /* /var/www/html/echo.php に下記のようなスクリプトを配置しておく
+        <?php
+        header('x-dummy-header: dummy');
+
+        error_log('error', 4);
+        echo json_encode([
+            'ENV'   => getenv(),
+            'GET'   => $_GET,
+            'POST'  => $_POST,
+            'FILES' => $_FILES,
+        ]);
+         */
+
+        // ペイロードが 128 分岐だったり 65535 チャンクだったりするので大きめに投げる
+        $long_key = str_repeat('abc', 100);
+        $long_value = str_repeat('xyz', 100);
+        $long_post = str_repeat('abcdefg', 10000);
+
+        // application/x-www-form-urlencoded
+        $response = fcgi_request("$server/var/www/html/echo.php?q=123", [
+            "X-DUMMY-ENV"                    => 'dummy',
+            "X-DUMMY-LONGKEY-$long_key"      => 'L',
+            "X-DUMMY-LONGVALUE"              => $long_value,
+            "X-DUMMY-LONGKEYVALUE-$long_key" => $long_value,
+        ], [
+            'p'         => '456',
+            'long-post' => $long_post,
+        ]);
+        [$head, $body] = preg_split("#(\r?\n){2}#", $response['stdout'], 2);
+        $head = str_array($head, ':', true);
+        $body = json_decode($body, true);
+
+        that($head)['x-dummy-header']->is('dummy');
+        that($body)['ENV']["X-DUMMY-ENV"]->is('dummy');
+        that($body)['ENV']["X-DUMMY-LONGKEY-$long_key"]->is('L');
+        that($body)['ENV']["X-DUMMY-LONGVALUE"]->is($long_value);
+        that($body)['ENV']["X-DUMMY-LONGKEYVALUE-$long_key"]->is($long_value);
+        that($body)['GET']['q']->is('123');
+        that($body)['POST']['p']->is('456');
+        that($body)['POST']['long-post']->is($long_post);
+
+        // docker 環境だと docker が stderr を握ってるので出ないことがある
+        that($response['stderr'])->isAny(['error', '']);
+
+        // multipart/form-data
+        $response = fcgi_request("$server/var/www/html/echo.php?q=123", [], [
+            'p'    => '456',
+            'file' => new \SplFileInfo(__FILE__),
+        ]);
+        [, $body] = preg_split("#(\r?\n){2}#", $response['stdout'], 2);
+        $body = json_decode($body, true);
+
+        that($body)['GET']['q']->is('123');
+        that($body)['FILES']['file']['name']->is(basename(__FILE__));
+        that($body)['FILES']['file']['size']->is(filesize(__FILE__));
+
+        that(self::resolveFunction('fcgi_request'))("unix://run%2Fnotfound-dummy.socket", [], [], [])->wasThrown('Unable to connect to unix://');
+
+        // ポートが開いているが fcgi ではないところに投げておかしなことにならないかテスト
+        if (defined('TESTWEBSERVER')) {
+            $parts = parse_url(TESTWEBSERVER);
+            that(self::resolveFunction('fcgi_request'))("tcp://{$parts['host']}:{$parts['port']}", [], [], [])->wasThrown();
+        }
+    }
+
+    function test_fcgi_request_conf()
+    {
+        $workingdir = self::$TMPDIR . '/rf-php-fpm';
+        @mkdir($workingdir, 0777, true);
+        $fpm_conf = "$workingdir/fpm.conf";
+
+        touch("$workingdir/dummy.socket");
+        file_put_contents($fpm_conf, "listen=$workingdir/dummy.socket");
+        that(self::resolveFunction('fcgi_request'))("/dummy.php", [], [], [
+            'fpmConf'        => $fpm_conf,
+            'connectTimeout' => 0.1,
+        ])->wasThrown('Unable to connect to unix://');
+
+        file_put_contents($fpm_conf, "listen=0.0.0.0:9999");
+        that(self::resolveFunction('fcgi_request'))("/dummy.php", [], [], [
+            'fpmConf'        => $fpm_conf,
+            'connectTimeout' => 0.1,
+        ])->wasThrown('Unable to connect to tcp://');
+
+        file_put_contents($fpm_conf, "listen=9999");
+        that(self::resolveFunction('fcgi_request'))("/dummy.php", [], [], [
+            'fpmConf'        => $fpm_conf,
+            'connectTimeout' => 0.1,
+        ])->wasThrown('Unable to connect to tcp://');
     }
 
     function test_getipaddress()
