@@ -184,30 +184,22 @@ function include_stream()
             if (!$this->handle) {
                 return true;
             }
+
             // Windows の file スキームでは呼ばれない？（確かにブロッキングやタイムアウトは無縁そう）
             // @codeCoverageIgnoreStart
-            switch ($option) {
-                default:
-                    throw new \Exception();
-                case STREAM_OPTION_BLOCKING:
-                    return stream_set_blocking($this->handle, $arg1);
-                case STREAM_OPTION_READ_TIMEOUT:
-                    return stream_set_timeout($this->handle, $arg1, $arg2);
-                case STREAM_OPTION_READ_BUFFER:
-                    return stream_set_read_buffer($this->handle, $arg2) === 0; // @todo $arg1 is used?
-                case STREAM_OPTION_WRITE_BUFFER:
-                    return stream_set_write_buffer($this->handle, $arg2) === 0; // @todo $arg1 is used?
-            }
+            return match ($option) {
+                default                    => throw new \Exception(),
+                STREAM_OPTION_BLOCKING     => stream_set_blocking($this->handle, $arg1),
+                STREAM_OPTION_READ_TIMEOUT => stream_set_timeout($this->handle, $arg1, $arg2),
+                STREAM_OPTION_READ_BUFFER  => stream_set_read_buffer($this->handle, $arg2) === 0,  // @todo $arg1 is used?
+                STREAM_OPTION_WRITE_BUFFER => stream_set_write_buffer($this->handle, $arg2) === 0, // @todo $arg1 is used?
+            };
             // @codeCoverageIgnoreEnd
         }
 
-        /**
-         * @codeCoverageIgnore
-         */
         public function stream_cast(int $cast_as)
         {
             assert(is_int($cast_as));
-            assert($this->handle, 'never call this method');
             return $this->handle;
         }
 
@@ -218,20 +210,15 @@ function include_stream()
         public function stream_metadata($path, $option, $value)
         {
             return $this->call_original(function () use ($path, $option, $value) {
-                switch ($option) {
-                    default:
-                        throw new \Exception(); // @codeCoverageIgnore
-                    case STREAM_META_TOUCH:
-                        return touch($path, ...$value);
-                    case STREAM_META_ACCESS:
-                        return chmod($path, $value);
-                    case STREAM_META_OWNER_NAME:
-                    case STREAM_META_OWNER:
-                        return chown($path, $value);
-                    case STREAM_META_GROUP_NAME:
-                    case STREAM_META_GROUP:
-                        return chgrp($path, $value);
-                }
+                return match ($option) {
+                    default            => throw new \Exception(),
+                    STREAM_META_TOUCH  => touch($path, ...$value),
+                    STREAM_META_ACCESS => chmod($path, $value),
+                    STREAM_META_OWNER_NAME,
+                    STREAM_META_OWNER  => chown($path, $value),
+                    STREAM_META_GROUP_NAME,
+                    STREAM_META_GROUP  => chgrp($path, $value),
+                };
             });
         }
 

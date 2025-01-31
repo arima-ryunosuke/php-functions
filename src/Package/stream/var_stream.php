@@ -133,26 +133,16 @@ function var_stream(&$var, $initial = '')
 
             public function stream_seek(int $offset, int $whence = SEEK_SET): bool
             {
-                $strlen = strlen($this->entry);
-                switch ($whence) {
-                    case SEEK_SET:
-                        if ($offset < 0) {
-                            return false;
-                        }
-                        $this->position = $offset;
-                        break;
-
-                    // stream_tell を定義していると SEEK_CUR が呼ばれない？（計算されて SEEK_SET に移譲されているような気がする）
-                    // @codeCoverageIgnoreStart
-                    case SEEK_CUR:
-                        $this->position += $offset;
-                        break;
-                    // @codeCoverageIgnoreEnd
-
-                    case SEEK_END:
-                        $this->position = $strlen + $offset;
-                        break;
+                if ($whence === SEEK_SET && $offset < 0) {
+                    return false;
                 }
+
+                $strlen = strlen($this->entry);
+                $this->position = match ($whence) {
+                    SEEK_SET => $offset,
+                    SEEK_CUR => $this->position + $offset,
+                    SEEK_END => $strlen + $offset,
+                };
                 // ファイルの終端から数えた位置に移動するには、負の値を offset に渡して whence を SEEK_END に設定しなければなりません。
                 if ($this->position < 0) {
                     $this->position = $strlen + $this->position;

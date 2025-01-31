@@ -29,12 +29,9 @@ function str_exists(?string $haystack, $needle, $case_insensitivity = false, $an
         $needle = [$needle];
     }
 
-    $needle = array_map('strval', $needle);
+    $needle = array_filter(array_map('strval', $needle), 'strlen');
 
     foreach ($needle as $str) {
-        if ($str === '') {
-            continue;
-        }
         $pos = $case_insensitivity ? stripos($haystack, $str) : strpos($haystack, $str);
         if ($and_flag && $pos === false) {
             return false;

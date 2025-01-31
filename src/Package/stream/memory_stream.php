@@ -221,26 +221,16 @@ function memory_stream($path = '')
 
             public function stream_seek(int $offset, int $whence = SEEK_SET): bool
             {
-                $strlen = strlen($this->entry->content);
-                switch ($whence) {
-                    case SEEK_SET:
-                        if ($offset < 0) {
-                            return false;
-                        }
-                        $this->position = $offset;
-                        break;
-
-                    // stream_tell を定義していると SEEK_CUR が呼ばれない？（計算されて SEEK_SET に移譲されているような気がする）
-                    // @codeCoverageIgnoreStart
-                    case SEEK_CUR:
-                        $this->position += $offset;
-                        break;
-                    // @codeCoverageIgnoreEnd
-
-                    case SEEK_END:
-                        $this->position = $strlen + $offset;
-                        break;
+                if ($whence === SEEK_SET && $offset < 0) {
+                    return false;
                 }
+
+                $strlen = strlen($this->entry->content);
+                $this->position = match ($whence) {
+                    SEEK_SET => $offset,
+                    SEEK_CUR => $this->position + $offset,
+                    SEEK_END => $strlen + $offset,
+                };
                 // ファイルの終端から数えた位置に移動するには、負の値を offset に渡して whence を SEEK_END に設定しなければなりません。
                 if ($this->position < 0) {
                     $this->position = $strlen + $this->position;
@@ -260,49 +250,48 @@ function memory_stream($path = '')
             public function stream_metadata($path, $option, $var)
             {
                 $id = self::id($path);
-                switch ($option) {
-                    case STREAM_META_TOUCH:
-                        if (!isset(self::$entries[$id])) {
-                            self::create($id, 010_0000);
-                        }
-                        $mtime = $var[0] ?? time();
-                        $atime = $var[1] ?? $mtime;
-                        self::$entries[$id]->mtime = $mtime;
-                        self::$entries[$id]->atime = $atime;
-                        break;
-
-                    case STREAM_META_ACCESS:
-                        if (!isset(self::$entries[$id])) {
-                            return false;
-                        }
-                        self::$entries[$id]->mode &= 077_0000;
-                        self::$entries[$id]->mode |= $var & ~umask();
-                        self::$entries[$id]->ctime = time();
-                        break;
-
-                    /** @noinspection PhpMissingBreakStatementInspection */
-                    case STREAM_META_OWNER_NAME:
-                        $nam = function_exists('posix_getpwnam') ? posix_getpwnam($var) : [];
-                        $var = $nam['uid'] ?? 0;
-                    case STREAM_META_OWNER:
-                        if (!isset(self::$entries[$id])) {
-                            return false;
-                        }
-                        self::$entries[$id]->owner = $var;
-                        self::$entries[$id]->ctime = time();
-                        break;
-
-                    /** @noinspection PhpMissingBreakStatementInspection */
-                    case STREAM_META_GROUP_NAME:
-                        $var = function_exists('posix_getgrnam') ? posix_getgrnam($var)['gid'] : 0;
-                    case STREAM_META_GROUP:
-                        if (!isset(self::$entries[$id])) {
-                            return false;
-                        }
-                        self::$entries[$id]->group = $var;
-                        self::$entries[$id]->ctime = time();
-                        break;
+                if (!isset(self::$entries[$id])) {
+                    if ($option === STREAM_META_TOUCH) {
+                        self::create($id, 010_0000);
+                    }
+                    else {
+                        return false;
+                    }
                 }
+
+                $now = time();
+                $set_entry = function (...$props) use ($id) {
+                    foreach ($props as $prop => $value) {
+                        self::$entries[$id]->$prop = $value;
+                    }
+                };
+                match ($option) {
+                    STREAM_META_TOUCH      => $set_entry(
+                        mtime: $var[0] ?? $now,
+                        atime: $var[1] ?? $var[0] ?? $now,
+                    ),
+                    STREAM_META_ACCESS     => $set_entry(
+                        mode: (self::$entries[$id]->mode & 077_0000) | $var & ~umask(),
+                        ctime: $now,
+                    ),
+                    STREAM_META_OWNER_NAME => $set_entry(
+                        owner: function_exists('posix_getpwnam') ? posix_getpwnam($var)['uid'] ?? 0 : 0,
+                        ctime: $now,
+                    ),
+                    STREAM_META_OWNER      => $set_entry(
+                        owner: $var,
+                        ctime: $now,
+                    ),
+                    STREAM_META_GROUP_NAME => $set_entry(
+                        group: function_exists('posix_getgrnam') ? posix_getgrnam($var)['gid'] ?? 0 : 0,
+                        ctime: $now,
+                    ),
+                    STREAM_META_GROUP      => $set_entry(
+                        group: $var,
+                        ctime: $now,
+                    ),
+                };
+
                 // https://qiita.com/hnw/items/3af76d3d7ec2cf52fff8
                 clearstatcache(true, $path);
                 return true;

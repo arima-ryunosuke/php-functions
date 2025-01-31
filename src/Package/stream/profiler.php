@@ -78,17 +78,10 @@ function profiler($options = [])
 
                         foreach (['callee', 'location'] as $key) {
                             $condition = $options[$key];
-                            $value = $$key;
                             if ($condition !== null) {
-                                if ($condition instanceof \Closure) {
-                                    if (!$condition($value)) {
-                                        continue 2;
-                                    }
-                                }
-                                else {
-                                    if (!preg_match($condition, $value)) {
-                                        continue 2;
-                                    }
+                                $condition = $condition instanceof \Closure ? $condition : fn($v) => preg_match($condition, $v);
+                                if (!$condition($$key)) {
+                                    continue 2;
                                 }
                             }
                         }

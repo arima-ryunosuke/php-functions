@@ -502,12 +502,10 @@ function var_pretty($value, $options = [])
                 else {
                     $this->plain("static");
                 }
-                $this->plain(') use ');
+                $this->plain(')');
                 if ($properties) {
+                    $this->plain(' use ');
                     $this->export($properties, $nest, $parents, $keys, false);
-                }
-                else {
-                    $this->plain('{}');
                 }
             }
             elseif (is_object($value)) {
