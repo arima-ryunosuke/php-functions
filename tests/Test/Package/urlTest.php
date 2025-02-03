@@ -2,12 +2,16 @@
 
 namespace ryunosuke\Test\Package;
 
+use SplFileInfo;
 use function ryunosuke\Functions\Package\base62_decode;
 use function ryunosuke\Functions\Package\base62_encode;
 use function ryunosuke\Functions\Package\base64url_decode;
 use function ryunosuke\Functions\Package\base64url_encode;
 use function ryunosuke\Functions\Package\dataurl_decode;
 use function ryunosuke\Functions\Package\dataurl_encode;
+use function ryunosuke\Functions\Package\file_set_contents;
+use function ryunosuke\Functions\Package\formdata_build;
+use function ryunosuke\Functions\Package\formdata_parse;
 use function ryunosuke\Functions\Package\query_build;
 use function ryunosuke\Functions\Package\query_parse;
 use function ryunosuke\Functions\Package\uri_build;
@@ -187,6 +191,106 @@ class urlTest extends AbstractTestCase
 
         that(dataurl_decode('invalid dataurl'))->isNull();
         that(dataurl_decode('data:;base64,invalid & base64 & string'))->isNull();
+    }
+
+    function test_formdata()
+    {
+        $workingdir = self::$TMPDIR . '/rf-formdata';
+        file_set_contents("$workingdir/testfile.txt", 'plain');
+        $v = fn($v) => $v;
+
+        $data = [
+            'scalar' => 123,
+            'array'  => [1, 2, 3],
+            'a'      => [
+                'b' => [
+                    'c' => [1, 2, 3],
+                ],
+            ],
+            'x'      => [
+                'y' => [
+                    'z' => new SplFileInfo("$workingdir/testfile.txt"),
+                ],
+            ],
+        ];
+        $boundary = 'plain';
+
+        // build
+        $formdata = formdata_build($data, $boundary);
+        that($formdata)->is(strtr(<<<FORMDATA
+        --$boundary
+        Content-Disposition: form-data; name="scalar"
+        
+        123
+        --$boundary
+        Content-Disposition: form-data; name="array[0]"
+        
+        1
+        --$boundary
+        Content-Disposition: form-data; name="array[1]"
+        
+        2
+        --$boundary
+        Content-Disposition: form-data; name="array[2]"
+        
+        3
+        --$boundary
+        Content-Disposition: form-data; name="a[b][c][0]"
+
+        1
+        --$boundary
+        Content-Disposition: form-data; name="a[b][c][1]"
+        
+        2
+        --$boundary
+        Content-Disposition: form-data; name="a[b][c][2]"
+        
+        3
+        --$boundary
+        Content-Disposition: form-data; name="x[y][z]"; filename="testfile.txt"
+        Content-Type: text/plain
+        
+        {$v(file_get_contents("$workingdir/testfile.txt"))}
+        --$boundary--
+        FORMDATA, ["\n" => "\r\n"]));
+
+        // parse
+        $parseddata = formdata_parse($formdata, $boundary);
+        that($parseddata)->is($data);
+        that($parseddata['x']['y']['z'])->fileEquals(file_get_contents("$workingdir/testfile.txt"));
+
+        // empty
+        that($formdata = formdata_build([]))->is('');
+        that(formdata_parse($formdata))->is([]);
+        that($formdata = formdata_build(['a' => ['b' => ['c' => null]]]))->is('');
+        that(formdata_parse($formdata))->is([]);
+
+        // priority
+        $content1 = <<<FORMDATA
+        --hogefugapiyo
+        Content-Disposition: form-data; name="a"
+        
+        1
+        FORMDATA;
+        $content2 = <<<FORMDATA
+        --hogefugapiyo
+        Content-Disposition: form-data; name="a[]"
+        
+        2
+        FORMDATA;
+
+        that(formdata_parse(<<<FORMDATA
+        $content1
+        $content2
+        --hogefugapiyo--
+        FORMDATA, 'hogefugapiyo'))->is(['a' => [2]]);
+        that(formdata_parse(<<<FORMDATA
+        $content2
+        $content1
+        --hogefugapiyo--
+        FORMDATA, 'hogefugapiyo'))->is(['a' => 1]);
+
+        that(self::resolveFunction('formdata_build'))(['x' => new SplFileInfo("$workingdir/notfoundfile.txt")])->wasThrown();
     }
 
     function test_query()
