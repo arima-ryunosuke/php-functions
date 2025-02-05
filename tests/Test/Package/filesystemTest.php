@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\cp_rf;
 use function ryunosuke\Functions\Package\csv_export;
+use function ryunosuke\Functions\Package\dir_clean;
 use function ryunosuke\Functions\Package\dir_diff;
 use function ryunosuke\Functions\Package\dirmtime;
 use function ryunosuke\Functions\Package\dirname_r;
@@ -103,6 +104,43 @@ class filesystemTest extends AbstractTestCase
         cp_rf("$src/", $dst);
         that("$dst/a.txt")->fileExists();
         that("$dst/dir/a.txt")->fileExists();
+    }
+
+    function test_dir_clean()
+    {
+        $root = self::$TMPDIR . '/dir_clean';
+        rm_rf($root);
+        mkdir("$root/directory", 0777, true);
+
+        touch("$root/atime", time() - 60, time() - 30);
+        touch("$root/mtime", time() - 30, time() - 60);
+        touch("$root/exclude", time() - 60, time() - 60);
+        touch("$root/directory", time() - 60, time() - 60);
+        touch("$root/directory/subitem", time() - 60, time() - 60);
+
+        that(dir_clean($root,
+            atime: 45,
+            mtime: 45,
+            excludePattern: "*/ex*"
+        ))->is([
+            "$root/directory/subitem",
+            "$root/directory",
+        ]);
+
+        that(dir_clean($root,
+            atime: 45,
+            excludePattern: "*/ex*"
+        ))->is([
+            "$root/mtime",
+        ]);
+
+        that(dir_clean($root,
+            excludePattern: "*/ex*"
+        ))->is([
+            "$root/atime",
+        ]);
+
+        that(dir_clean("$root/notfound",))->is([]);
     }
 
     function test_dir_diff()
