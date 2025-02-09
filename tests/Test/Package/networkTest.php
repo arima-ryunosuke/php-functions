@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 use function ryunosuke\Functions\Package\array_flatten;
 use function ryunosuke\Functions\Package\cacheobject;
 use function ryunosuke\Functions\Package\cidr2ip;
+use function ryunosuke\Functions\Package\dns_resolve;
 use function ryunosuke\Functions\Package\fcgi_request;
 use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\getipaddress;
@@ -58,6 +59,80 @@ class networkTest extends AbstractTestCase
             $expected = array_map('long2ip', range(ip2long($min), ip2long($max)));
             $actual = array_flatten(array_map(self::resolveFunction('cidr2ip'), self::resolveFunction('ip2cidr')($min, $max)));
             that($actual)->isSame($expected);
+        }
+    }
+
+    function test_dns_resolve()
+    {
+        srand(time());
+
+        $hosts = [
+            // SOA
+            ['host' => 'localdomain', 'type' => 'SOA', 'rname' => 'localdomain', 'minimum-ttl' => 33],
+            // A
+            ['host' => 'localhost.localdomain', 'type' => 'A', 'ip' => '127.0.0.1'],
+            ['host' => 'localhost.localdomain', 'type' => 'A', 'ip' => '127.0.0.2'],
+            // AAAA
+            ['host' => 'localhost.localdomain', 'type' => 'AAAA', 'ipv6' => '2001:db8::0001', 'ttl' => 1],
+            ['host' => 'localhost.localdomain', 'type' => 'AAAA', 'ipv6' => '2001:db8::0002', 'ttl' => 1],
+            // MX
+            ['host' => 'localhost.localdomain', 'type' => 'MX', 'target' => 'smtp1', 'pri' => 1],
+            ['host' => 'localhost.localdomain', 'type' => 'MX', 'target' => 'smtp2', 'pri' => 2],
+            // SRV
+            ['host' => 'localhost.localdomain', 'type' => 'SRV', 'target' => 'srv11', 'port' => 80, 'pri' => 1, 'weight' => 1],
+            ['host' => 'localhost.localdomain', 'type' => 'SRV', 'target' => 'srv12', 'port' => 80, 'pri' => 1, 'weight' => 2],
+            ['host' => 'localhost.localdomain', 'type' => 'SRV', 'target' => 'srv21', 'port' => 80, 'pri' => 2, 'weight' => 1],
+            // HINFO
+            ['host' => 'localhost.localdomain', 'type' => 'HINFO', 'cpu' => 'intel', 'os' => 'windows'],
+        ];
+
+        // 普通の問い合わせ
+        that(dns_resolve('localdomain', DNS_SOA, flush: true, hosts: $hosts))->is('localdomain');
+        that(dns_resolve('localhost.localdomain', DNS_A, flush: true, hosts: $hosts))->isAny(['127.0.0.1', '127.0.0.2']);
+        that(dns_resolve('localhost.localdomain', DNS_MX, flush: true, hosts: $hosts))->is('smtp1');
+        that(dns_resolve('localhost.localdomain', DNS_SRV, flush: true, hosts: $hosts))->isAny(['srv11:80', 'srv12:80']);
+        that(dns_resolve('localhost.localdomain', DNS_HINFO, flush: true, hosts: $hosts))->objectHasPropertyAll(['cpu', 'os']);
+
+        // 特殊
+        that(dns_resolve('192.168.1.1', DNS_A, flush: true, hosts: $hosts))->is('192.168.1.1');
+        that(dns_resolve('2001:db8::', DNS_AAAA, flush: true, hosts: $hosts))->is('2001:db8::');
+        that(dns_resolve('undefined.localdomain', DNS_A, flush: true, hosts: $hosts))->is(null);
+        that(dns_resolve('undefined.localdomain', DNS_A, 'values', flush: true, hosts: $hosts))->is([]);
+
+        // 各種 TTL
+        that(dns_resolve('localdomain', DNS_SOA, 'raw', 11, 22, flush: true, hosts: $hosts))[0]['ttl']->is(11);
+        that(dns_resolve('localdomain', DNS_SOA, 'raw', 11, 22, flush: false, hosts: $hosts))[0]['ttl']->is(11);
+        that(dns_resolve('localdomain', DNS_A, 'raw', 11, 22, flush: false, hosts: $hosts))[0]['ttl']->is(33);
+        that(dns_resolve('localdomain', DNS_A, 'raw', 11, 22, flush: true, hosts: $hosts))[0]['ttl']->is(33);
+        // hosts にあるので $ttl0 が使用される
+        that(dns_resolve('localhost.localdomain', DNS_A, 'raw', 11, 22, hosts: $hosts))[0]['ttl']->is(11);
+        // hosts にないので $nxdomainTtl が使用される
+        that(dns_resolve('undefined', DNS_A, 'raw', 11, 22, hosts: $hosts))[0]['ttl']->is(22);
+        // 親に SOA があるので minimum-ttl が使用される
+        that(dns_resolve('undefined.localdomain', DNS_A, 'raw', 11, 22, hosts: $hosts))[0]['ttl']->is(33);
+        // 自身にも親にも SOA がないので $nxdomainTtl が使用される
+        that(dns_resolve('undefined.hogera', DNS_A, 'raw', 11, 22, hosts: $hosts))[0]['ttl']->is(22);
+
+        // values&all
+        $actual = dns_resolve('localhost.localdomain', DNS_ALL, 'values', flush: true, hosts: $hosts);
+        that($actual)['A']->is(['127.0.0.1', '127.0.0.2'], 0, true);
+        that($actual)['AAAA']->is(['2001:db8::0001', '2001:db8::0002'], 0, true);
+        that($actual)['MX']->is(['smtp1', 'smtp2'], 0, true);
+        that($actual)['SRV']->is(['srv11:80', 'srv12:80', 'srv21:80'], 0, true);
+
+        // cache
+        that(dns_resolve('localhost.localdomain', DNS_A, ttl0: 10, hosts: $hosts))->isAny(['127.0.0.1', '127.0.0.2']);
+        that(dns_resolve('localhost.localdomain', DNS_AAAA, ttl0: 10, hosts: $hosts))->isAny(['2001:db8::0001', '2001:db8::0002']);
+        $hosts[1]['ip'] = '127.0.0.9';
+        $hosts[2]['ip'] = '127.0.0.9';
+        sleep(2);
+        that(dns_resolve('localhost.localdomain', DNS_A, ttl0: 10, hosts: $hosts))->isAny(['127.0.0.1', '127.0.0.2']);
+        that(dns_resolve('localhost.localdomain', DNS_AAAA, ttl0: 10, flush: true, hosts: $hosts))->isAny(['2001:db8::0001', '2001:db8::0002']);
+
+        that(self::resolveFunction('dns_resolve'))("local,host")->wasThrown('is not a valid DNS name');
+        // dns_resolve に変更があったのかバージョンによってエラーが出たりでなかったりする
+        if (version_compare(PHP_VERSION, '8.1') <= 0) {
+            that(self::resolveFunction('dns_resolve'))("192.168")->wasThrown('dns_get_record');
         }
     }
 
