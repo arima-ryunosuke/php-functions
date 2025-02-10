@@ -8,7 +8,7 @@ require_once __DIR__ . '/../array/last_key.php';
 require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../strings/concat.php';
 require_once __DIR__ . '/../strings/namespace_split.php';
-require_once __DIR__ . '/../utility/cacheobject.php';
+require_once __DIR__ . '/../utility/json_storage.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -82,16 +82,14 @@ function namespace_parse($filename, $options = [])
         'cache' => null,
     ];
 
-    $cacheobject = cacheobject(__FUNCTION__);
+    $storage = json_storage(__FUNCTION__);
 
-    if ($options['cache'] === null) {
-        $options['cache'] = $cacheobject->hash([$filename, 'mtime'], fn() => $filemtime) >= $filemtime;
-    }
+    $options['cache'] ??= ($storage['mtime'] ?? $filemtime) >= $filemtime;
     if (!$options['cache']) {
-        $cacheobject->hash([$filename, 'mtime'], null, 0);
-        $cacheobject->hash([$filename, 'result'], null, 0);
+        unset($storage['mtime']);
+        unset($storage[$filename]);
     }
-    return $cacheobject->hash([$filename, 'result'], function () use ($filename) {
+    return $storage[$filename] ??= (function () use ($filename) {
         $stringify = function ($tokens) {
             return trim(implode('', array_column(array_filter($tokens, function ($token) {
                 return in_array($token->id, [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true);
@@ -201,5 +199,5 @@ function namespace_parse($filename, $options = [])
             }
         }
         return $result;
-    });
+    })();
 }

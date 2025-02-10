@@ -20,6 +20,7 @@ use function ryunosuke\Functions\Package\incidr;
 use function ryunosuke\Functions\Package\ip2cidr;
 use function ryunosuke\Functions\Package\ip_info;
 use function ryunosuke\Functions\Package\ip_normalize;
+use function ryunosuke\Functions\Package\json_storage;
 use function ryunosuke\Functions\Package\ping;
 use function ryunosuke\Functions\Package\rm_rf;
 
@@ -61,8 +62,8 @@ class networkTest extends AbstractTestCase
     function test_getipaddress()
     {
         // 差し替えないとテストにならない
-        $cacheobject = cacheobject(self::resolveFunction('getipaddress'));
-        $cacheobject->set('net_get_interfaces', [
+        $storage = json_storage(self::resolveFunction('getipaddress'));
+        $storage['net_get_interfaces'] = [
             'lo'   => [
                 'unicast' => [
                     [
@@ -100,7 +101,7 @@ class networkTest extends AbstractTestCase
                     ],
                 ],
             ],
-        ]);
+        ];
 
         that(getipaddress())->isValidIpv4();
         that(getipaddress(AF_INET))->isValidIpv4();
@@ -127,12 +128,10 @@ class networkTest extends AbstractTestCase
         that(getipaddress('0001:0203:0405:0607:0809:0a0b:ffff:ffff'))->is('0001:0203:0405:0607:0809:0a0b:0c0d:5678');
         that(getipaddress('0001:0203:0405:0607:0809:0a0c:1111:1111'))->is('0001:0203:0405:0607:0809:0a0b:0c0d:1234');
 
-        $cacheobject->set('net_get_interfaces', []);
+        $storage['net_get_interfaces'] = [];
 
         that(getipaddress())->isNull();
         that(self::resolveFunction('getipaddress'))('256.256.256.256')->wasThrown('is invalid ip address');
-
-        $cacheobject->clear();
     }
 
     function test_http_benchmark()

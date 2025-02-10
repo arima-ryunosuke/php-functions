@@ -4,7 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../misc/php_parse.php';
 require_once __DIR__ . '/../strings/strtr_escaped.php';
-require_once __DIR__ . '/../utility/cacheobject.php';
+require_once __DIR__ . '/../utility/json_storage.php';
 require_once __DIR__ . '/../var/attr_exists.php';
 require_once __DIR__ . '/../var/is_arrayable.php';
 require_once __DIR__ . '/../var/phpval.php';
@@ -46,7 +46,7 @@ function render_template(?string $template, $vars, $tag = null)
         return $result;
     };
 
-    [$blocks, $stmts] = cacheobject(__FUNCTION__)->hash($template, function () use ($template) {
+    [$blocks, $stmts] = json_storage(__FUNCTION__)[$template] ??= (function () use ($template) {
         $tokens = array_slice(php_parse("<?php <<<PHPTEMPLATELITERAL\n" . $template . "\nPHPTEMPLATELITERAL;", [
             'backtick' => false,
         ]), 2, -2);
@@ -76,7 +76,7 @@ function render_template(?string $template, $vars, $tag = null)
 
         array_walk_recursive($stmts, fn(&$token) => $token = (array) $token);
         return [$blocks, $stmts];
-    });
+    })();
 
     $values = [];
     foreach ($stmts as $stmt) {

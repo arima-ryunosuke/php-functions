@@ -7,7 +7,7 @@ require_once __DIR__ . '/../filesystem/file_list.php';
 require_once __DIR__ . '/../filesystem/path_is_absolute.php';
 require_once __DIR__ . '/../filesystem/path_normalize.php';
 require_once __DIR__ . '/../strings/namespace_split.php';
-require_once __DIR__ . '/../utility/cacheobject.php';
+require_once __DIR__ . '/../utility/json_storage.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -31,12 +31,12 @@ function class_map(
 {
     $loader ??= class_loader();
     $basePath ??= dirname((new \ReflectionClass($loader))->getFileName(), 3);
-    $cacheobject = cacheobject(__FUNCTION__);
+    $storage = json_storage(__FUNCTION__);
     $cachekey = [spl_object_id($loader), $basePath];
     if (!$cache) {
-        $cacheobject->hash($cachekey, null, 0);
+        unset($storage[$cachekey]);
     }
-    return $cacheobject->hash($cachekey, function () use ($loader, $basePath) {
+    return $storage[$cachekey] ??= (function () use ($loader, $basePath) {
         $result = [];
 
         // psr0+4
@@ -112,5 +112,5 @@ function class_map(
         }
 
         return $result;
-    });
+    })();
 }

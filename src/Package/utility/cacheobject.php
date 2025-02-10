@@ -279,6 +279,7 @@ function cacheobject($directory = null, $clean_probability = 0, $clean_execution
             public function hash($key, $provider, $ttl = null)
             {
                 $now = time();
+                $args = is_iterable($key) ? $key : [$key];
                 $key = is_stringable($key) ? "$key" : json_encode($key);
                 $cacheid = "hash." . hash('fnv164', $key);
                 $ttl = $ttl === null ? null : $this->_normalizeTtl($ttl);
@@ -306,7 +307,7 @@ function cacheobject($directory = null, $clean_probability = 0, $clean_execution
                 }
 
                 if (!array_key_exists($key, $cache)) {
-                    $cache[$key] = [$provider(), $now, $ttl];
+                    $cache[$key] = [$provider(...$args), $now, $ttl];
                     $ttls = array_filter(array_column($cache, 2), fn($v) => $v !== null);
                     $this->set($cacheid, $cache, $ttls ? max($ttls) : null);
                 }

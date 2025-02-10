@@ -11,6 +11,7 @@ use function ryunosuke\Functions\Package\cache_fetch;
 use function ryunosuke\Functions\Package\cacheobject;
 use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\function_resolve;
+use function ryunosuke\Functions\Package\json_storage;
 use function ryunosuke\Functions\Package\number_serial;
 use function ryunosuke\Functions\Package\rm_rf;
 
@@ -303,6 +304,58 @@ class utilityTest extends AbstractTestCase
 
         // exportClass で動くことを担保
         that(Utility::function_resolve('arrayize'))->is(Utility::class . '::arrayize');
+    }
+
+    function test_json_storage()
+    {
+        $called = 0;
+
+        $storage = json_storage('hoge');
+        unset($storage[['a']]);
+        $storage[['a']] ??= (function () use (&$called) {
+            $called++;
+            return 'A1';
+        })();
+        $storage[['a']] ??= (function () use (&$called) {
+            $called++;
+            return 'XXX';
+        })();
+        that($storage[['a']])->is('A1');
+        unset($storage[['a']]);
+        $storage[['a']] ??= (function () use (&$called) {
+            $called++;
+            return 'XXX';
+        })();
+        that($storage[['a']])->is('XXX');
+
+        $storage = json_storage('fuga');
+        unset($storage[['a']]);
+        $storage[['a']] ??= (function () use (&$called) {
+            $called++;
+            return 'A2';
+        })();
+        $storage[['a']] ??= (function () use (&$called) {
+            $called++;
+            return 'XXX';
+        })();
+        that($storage[['a']])->is('A2');
+
+        that($called)->is(3);
+
+        $storage = json_storage('piyo');
+        $storage['x'] = 'X';
+        $storage->exchangeArray([]);
+        that($storage['x'])->is('X');
+
+        $storage = json_storage('other');
+        $stdclass = new \stdClass();
+        $storage[$stdclass] = 'stdclass';
+        that($storage[$stdclass])->is('stdclass');
+
+        if (ini_get('zend.assertions') == 1) {
+            that($storage)->try('offsetUnset', STDOUT, 'resource')->wasThrown('is resource');
+            that($storage)->try('offsetUnset', fn() => null, 'object')->wasThrown('is not JsonSerializable');
+        }
     }
 
     function test_number_serial()

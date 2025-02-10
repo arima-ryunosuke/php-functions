@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../filesystem/dirname_r.php';
-require_once __DIR__ . '/../utility/cacheobject.php';
+require_once __DIR__ . '/../utility/json_storage.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -23,7 +23,7 @@ require_once __DIR__ . '/../utility/cacheobject.php';
  */
 function auto_loader($startdir = null)
 {
-    return cacheobject(__FUNCTION__)->hash($startdir, function () use ($startdir) {
+    return json_storage(__FUNCTION__)[$startdir] ??= (function () use ($startdir) {
         $cache = dirname_r($startdir ?: __DIR__, function ($dir) {
             if (file_exists($file = "$dir/autoload.php") || file_exists($file = "$dir/vendor/autoload.php")) {
                 return $file;
@@ -33,5 +33,5 @@ function auto_loader($startdir = null)
             throw new \DomainException('autoloader is not found.');
         }
         return $cache;
-    });
+    })();
 }
