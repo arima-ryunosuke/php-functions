@@ -2323,6 +2323,20 @@ class arrayTest extends AbstractTestCase
             6 => ['string' => 'cc', 'integer' => 2],
             4 => ['string' => 'dd', 'integer' => 2],
         ]);
+
+        // 第2引数でオーダーを渡せる & キー比較関数
+        that(array_order($data, [
+            'integer' => fn($v, $o = SORT_DESC) => $v,
+            ''        => fn($a, $b, $array) => -($a <=> $b),
+        ], true))->isSame([
+            0 => ['string' => 'aa', 'integer' => 7],
+            5 => ['string' => 'cc', 'integer' => 6],
+            3 => ['string' => 'bb', 'integer' => 6],
+            6 => ['string' => 'cc', 'integer' => 2],
+            4 => ['string' => 'dd', 'integer' => 2],
+            2 => ['string' => 'aa', 'integer' => 2],
+            1 => ['string' => 'cc', 'integer' => 1],
+        ]);
     }
 
     function test_array_order_closure2()
