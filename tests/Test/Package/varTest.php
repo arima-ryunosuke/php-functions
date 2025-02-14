@@ -42,6 +42,7 @@ use function ryunosuke\Functions\Package\var_applys;
 use function ryunosuke\Functions\Package\var_export2;
 use function ryunosuke\Functions\Package\var_export3;
 use function ryunosuke\Functions\Package\var_hash;
+use function ryunosuke\Functions\Package\var_mimetype;
 use function ryunosuke\Functions\Package\var_pretty;
 use function ryunosuke\Functions\Package\var_type;
 use function ryunosuke\Functions\Package\varcmp;
@@ -1516,6 +1517,21 @@ class varTest extends AbstractTestCase
             'recur'       => $recur,
         ];
         that(self::resolveFunction('var_html'))->fn($value)->outputMatches('#<pre class=\'var_html\'>#');
+    }
+
+    function test_var_mimetype()
+    {
+        that(var_mimetype('plain', $parameters))->is('text/plain');
+        that($parameters)->is(['charset' => 'us-ascii']);
+
+        that(var_mimetype('<?php echo "あいう";', $parameters))->is('text/x-php');
+        that($parameters)->is(['charset' => 'utf-8']);
+
+        that(var_mimetype(new \SplFileInfo(__DIR__ . '/files/image/test.png'), $parameters))->is('image/png');
+        that($parameters)->is(['charset' => 'binary']);
+
+        that(@var_mimetype(new \SplFileInfo('notfound-dummy-file'), $parameters))->is(null);
+        that($parameters)->is([]);
     }
 
     function test_var_pretty()
