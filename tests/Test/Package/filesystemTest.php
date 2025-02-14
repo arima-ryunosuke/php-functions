@@ -743,9 +743,10 @@ class filesystemTest extends AbstractTestCase
             'csv' => 'application/ms-office',
         ]))->is('application/ms-office');
 
-        that(file_mimetype(__FILE__))->is('text/x-php');
+        that(file_mimetype(__FILE__, [], $parameters))->is('text/x-php');
+        that($parameters)->is(['charset' => 'utf-8']);
         that(@(fn(...$args) => file_mimetype(...$args))('notfound'))->isNull();
-        that(error_get_last()['message'])->contains('mime_content_type(notfound)');
+        that(error_get_last()['message'])->contains('No such file or directory');
 
         if (!defined('TESTWEBSERVER')) {
             return;
