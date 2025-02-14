@@ -25,6 +25,7 @@ use function ryunosuke\Functions\Package\ip_normalize;
 use function ryunosuke\Functions\Package\json_storage;
 use function ryunosuke\Functions\Package\ping;
 use function ryunosuke\Functions\Package\rm_rf;
+use function ryunosuke\Functions\Package\snmp_trap;
 use function ryunosuke\Functions\Package\str_array;
 
 class networkTest extends AbstractTestCase
@@ -1104,5 +1105,20 @@ class networkTest extends AbstractTestCase
         that($err)->isNotEmpty();
 
         that(self::resolveFunction('ping'))("http://hostname")->wasThrown('is not supported');
+    }
+
+    function test_snmp_trap()
+    {
+        // 基本的に失敗しないし返り値もないのでカバレッジ目的
+        that(snmp_trap(1, '127.0.0.1', 'public', '1.3.6.1.4.1.8072.3.2.10', 99, variables: [
+            '1.1' => 123,
+            '1.2' => 3.14,
+            '1.3' => 'hoge',
+        ]))->is(null);
+        that(snmp_trap(2, '127.0.0.1', 'public', '1.3.6.1.4.1.8072.3.2.10', 99, variables: [
+            '1.1' => 123,
+            '1.2' => 3.14,
+            '1.3' => 'hoge',
+        ]))->is(null);
     }
 }
