@@ -7,9 +7,9 @@ require_once __DIR__ . '/../filesystem/file_list.php';
 require_once __DIR__ . '/../filesystem/file_set_contents.php';
 require_once __DIR__ . '/../filesystem/path_is_absolute.php';
 require_once __DIR__ . '/../utility/function_configure.php';
-require_once __DIR__ . '/../utility/function_resolve.php';
 require_once __DIR__ . '/../var/is_exportable.php';
 require_once __DIR__ . '/../var/is_stringable.php';
+require_once __DIR__ . '/../var/var_export3.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -239,13 +239,11 @@ function cacheobject($directory = null, $clean_probability = 0, $clean_execution
                 // var_export3 はあらゆる出力を可能にしているので **読み込み時** のオーバーヘッドがでかく、もし var_export が使えるならその方が格段に速い
                 // しかし要素を再帰的に全舐め（is_exportable）しないと「var_export できるか？」は分からないというジレンマがある
                 // このコンテキストは「キャッシュ」なので書き込み時のオーバーヘッドよりも読み込み時のオーバーヘッドを優先して判定を行っている
-                // ただし、 var_export3 は非常に依存がでかいので明示指定時のみ
-                $var_export3 = function_resolve('var_export3');
-                if ($var_export3 === null || is_exportable($this->entries[$key])) {
+                if (is_exportable($this->entries[$key])) {
                     $code = var_export($this->entries[$key], true);
                 }
                 else {
-                    $code = $var_export3($this->entries[$key], true);
+                    $code = var_export3($this->entries[$key], true);
                 }
                 return !!file_set_contents($this->_getFilename($key), "<?php # $meta\nreturn $code;\n");
             }
