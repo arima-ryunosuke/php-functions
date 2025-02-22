@@ -11,6 +11,24 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.18
+
+- [feature] snmp_trap を追加
+- [feature] var_mimetype を追加
+- [feature] file_mimetype で引数情報を得られる機能
+- [feature] dir_clean を追加
+- [feature] dns_resolve を追加
+- [feature] fcgi_request を追加
+- [feature] multipart formdata_build/parse を追加
+- [feature] opcache 用の関数を追加
+- [feature] array_order にキー比較とシュワルツ降順機能を追加
+- [refactor] function_resolve は chain でも使える
+- [refactor] opcache を有効にしたらカバレッジに抜けが生じたのでついでにリファクタ
+- [change] cacheobject の var_export3 の特別扱いを revert
+- [change] 内部キャッシュを cacheobject から json_storage に変更
+- [refactor] var_export3 のリファクタ
+- [fixbug] var_export3 で無名クラスを含む内部クラスがエラーになる不具合
+
 ## 2.0.17
 
 - [change] cacheobject の依存から var_export3 を除去
