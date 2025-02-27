@@ -1108,6 +1108,14 @@ class varTest extends AbstractTestCase
             'closure1'  => \Closure::fromCallable([$anonymous, 'method']),
             'closure2'  => (new \ReflectionMethod($anonymous, 'method'))->getClosure($anonymous),
             'resolve'   => new class ( ) extends ArrayObject { },
+            'wrapping'  => (object) [
+                'o' => new class () {
+                    public function method()
+                    {
+                        return 'wrapping';
+                    }
+                },
+            ],
             'internal'  => (function () {
                 $object = new class () {
                     private \PDO $private_pdo;
@@ -1138,6 +1146,7 @@ class varTest extends AbstractTestCase
         that($objects2['closure1']())->is([1, 2, 3]);
         that($objects2['closure2']())->is([1, 2, 3]);
         that($objects2['resolve'])->isInstanceOf(ArrayObject::class);
+        that($objects2['wrapping'])->o->method()->is('wrapping');
         that($objects2['internal'])->getPDO()->getAttribute(\PDO::ATTR_DRIVER_NAME)->is('sqlite');
         that($objects2['internal'])->pdo1->getAttribute(\PDO::ATTR_DRIVER_NAME)->is('sqlite');
         that($objects2['internal'])->pdo2->getAttribute(\PDO::ATTR_DRIVER_NAME)->is('sqlite');

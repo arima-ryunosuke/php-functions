@@ -93,6 +93,14 @@ function var_export3($value, $return = false)
                 return $id;
             }
             // 配列は明確な ID が存在しないので、貯めて検索して ID を振る（参照さえ含まなければ ID に意味はないので参照込みのみ）
+            // 何度か検証してしまったので備忘:
+            // ID を振らない方が格段に速いのでそのための分岐の目的もある
+            // ID を振ると参照は関係なく・・・
+            // - return $this->array1 = [$this->array2 = [$this->array3 = [...]]];
+            // のようになり、（多分プロパティの動的作成で）結構遅くなる
+            // ID を振らなければ・・・
+            // - return [[[...]]];
+            // のようになり、実質的に opcache を返すだけになる
             if (is_array($var) && $this->arrayHasReference($var)) {
                 $id = array_search($var, $this->vars, true);
                 if (!$id) {
@@ -378,8 +386,11 @@ function var_export3($value, $return = false)
                     serialize($value);
                 }
             }
-            catch (\Exception) {
-                return "\$this->$vid = new \\__PHP_Incomplete_Class()";
+            catch (\Exception $e) {
+                // ただし無名クラス由来の失敗なら何とかできる（かもしれない。やってみないと分からない）のでスルー
+                if (!str_contains($e->getMessage(), '@anonymous')) {
+                    return "\$this->$vid = new \\__PHP_Incomplete_Class()";
+                }
             }
 
             // 無名クラスは定義がないのでパースが必要
