@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\annotation_parse;
+use function ryunosuke\Functions\Package\callable_code;
 use function ryunosuke\Functions\Package\console_log;
 use function ryunosuke\Functions\Package\evaluate;
 use function ryunosuke\Functions\Package\function_configure;
@@ -14,6 +15,7 @@ use function ryunosuke\Functions\Package\php_indent;
 use function ryunosuke\Functions\Package\php_opcode;
 use function ryunosuke\Functions\Package\php_parse;
 use function ryunosuke\Functions\Package\php_strip;
+use function ryunosuke\Functions\Package\php_tokens;
 use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\process;
 use function ryunosuke\Functions\Package\process_parallel;
@@ -1061,6 +1063,8 @@ $colA
             'end'   => '}',
         ]);
         that(implode('', array_column($tokens, 'text')))->is('class C {function m(){if(false){return function(){};}}}');
+
+        that(self::resolveFunction('php_parse'))('<?php a(123', TOKEN_PARSE)->wasThrown('ParseError');
     }
 
     function test_php_parse_short_open_tag()
@@ -1133,6 +1137,51 @@ aplain text
         $mapping = [];
         $html = php_strip($code, [], $mapping);
         that(strtr($html, $mapping))->is($code);
+    }
+
+    function test_php_tokens()
+    {
+        define(__NAMESPACE__ . '\\PHP_TOKENS_DUMMY_CONST', 1);
+        function php_tokens_dummy_function($id)
+        {
+            return $id + 1;
+        }
+
+        $closure = function () {
+            return [1, 2, 3];
+        };
+        $tokens = php_tokens('<?php return ' . callable_code($closure)[1]);
+        //\ryunosuke\Functions\Package\var_pretty($tokens);
+        that($tokens[0])->name()->is('T_OPEN_TAG');
+        that($tokens[0])->prev()->is(null);
+        that($tokens[11])->text->is('2');
+        that($tokens[11])->prev()->prev()->text->is('1');
+        that($tokens[11])->next()->next()->text->is('3');
+        that($tokens[count($tokens) - 1])->next()->is(null);
+        that($tokens[0])->clone(id: T_CLOSE_TAG)->name()->is('T_CLOSE_TAG');
+
+        // 循環や前後参照等を含まず、バカでかい文字列になっていないことが担保できればそれで十分
+        //print_r($tokens);
+        that(strlen(print_r($tokens, true)))->lt(10000);
+
+        $magics = function () {
+            return [__DIR__, __FILE__, __NAMESPACE__];
+        };
+        $ref = new \ReflectionFunction($magics);
+        $tokens = php_tokens('<?php return ' . callable_code($magics)[1]);
+        //\ryunosuke\Functions\Package\var_pretty($tokens);
+        that($tokens[8]->resolve($ref))->is(var_export(__DIR__, true));
+        that($tokens[11]->resolve($ref))->is(var_export(__FILE__, true));
+        that($tokens[14]->resolve($ref))->is(var_export(__NAMESPACE__, true));
+
+        $alias = function () {
+            return php_tokens_dummy_function(PHP_TOKENS_DUMMY_CONST);
+        };
+        $ref = new \ReflectionFunction($alias);
+        $tokens = php_tokens('<?php return ' . callable_code($alias)[1]);
+        //\ryunosuke\Functions\Package\var_pretty($tokens);
+        that($tokens[7]->resolve($ref))->is('\\' . __NAMESPACE__ . '\\' . 'php_tokens_dummy_function');
+        that($tokens[9]->resolve($ref))->is('\\' . __NAMESPACE__ . '\\' . 'PHP_TOKENS_DUMMY_CONST');
     }
 
     function test_unique_id()

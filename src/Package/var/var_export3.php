@@ -4,12 +4,10 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_and.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
-require_once __DIR__ . '/../classobj/const_exists.php';
 require_once __DIR__ . '/../classobj/object_properties.php';
 require_once __DIR__ . '/../funchand/is_bindable_closure.php';
-require_once __DIR__ . '/../misc/namespace_resolve.php';
 require_once __DIR__ . '/../misc/php_indent.php';
-require_once __DIR__ . '/../misc/php_parse.php';
+require_once __DIR__ . '/../misc/php_tokens.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
 require_once __DIR__ . '/../strings/starts_with.php';
 require_once __DIR__ . '/../var/is_primitive.php';
@@ -146,61 +144,6 @@ function var_export3($value, $return = false)
         $spacer1 = str_repeat(" ", 4 * max(0, $nest + 1));
         $raw_export = fn($v) => $v;
         $var_export = fn($v) => var_export($v, true);
-        $neighborToken = function ($n, $d, $tokens) {
-            for ($i = $n + $d; isset($tokens[$i]); $i += $d) {
-                if ($tokens[$i]->id !== T_WHITESPACE) {
-                    return $tokens[$i];
-                }
-            }
-        };
-        $resolveSymbol = function ($token, $prev, $next, $ref) use ($var_export) {
-            $text = $token->text;
-            if ($token->id === T_STRING) {
-                $namespaces = [$ref->getNamespaceName()];
-                if ($ref instanceof \ReflectionFunctionAbstract) {
-                    $namespaces[] = $ref->getClosureScopeClass()?->getNamespaceName();
-                }
-                if ($prev->id === T_NEW || $next->id === T_DOUBLE_COLON || $next->id === T_VARIABLE || $next->text === '{') {
-                    $text = namespace_resolve($text, $ref->getFileName(), 'alias') ?? $text;
-                }
-                elseif ($next->text === '(') {
-                    $text = namespace_resolve($text, $ref->getFileName(), 'function') ?? $text;
-                    // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
-                    foreach ($namespaces as $namespace) {
-                        if (!function_exists($text) && function_exists($nstext = "\\$namespace\\$text")) {
-                            $text = $nstext;
-                            break;
-                        }
-                    }
-                }
-                else {
-                    $text = namespace_resolve($text, $ref->getFileName(), 'const') ?? $text;
-                    // 関数・定数は use しなくてもグローバルにフォールバックされる（=グローバルと名前空間の区別がつかない）
-                    foreach ($namespaces as $namespace) {
-                        if (!const_exists($text) && const_exists($nstext = "\\$namespace\\$text")) {
-                            $text = $nstext;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // マジック定数の解決（__CLASS__, __TRAIT__ も書き換えなければならないが、非常に大変なので下記のみ）
-            if ($token->id === T_FILE) {
-                $text = $var_export($ref->getFileName());
-            }
-            if ($token->id === T_DIR) {
-                $text = $var_export(dirname($ref->getFileName()));
-            }
-            if ($token->id === T_NS_C) {
-                $text = $var_export($ref->getNamespaceName());
-            }
-            if ($text !== null) {
-                $token = clone $token;
-                $token->text = $text;
-            }
-            return $token;
-        };
 
         $vid = $var_manager->varId($value);
         if ($vid) {
@@ -274,7 +217,7 @@ function var_export3($value, $return = false)
 
             [$meta, $body] = callable_code($value);
             $arrow = starts_with($meta, 'fn') ? ' => ' : ' ';
-            $tokens = array_slice(php_parse("<?php $meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
+            $tokens = array_slice(php_tokens("<?php $meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
 
             $uses = [];
             $context = [
@@ -282,8 +225,9 @@ function var_export3($value, $return = false)
                 'brace' => 0,
             ];
             foreach ($tokens as $n => $token) {
-                $prev = $neighborToken($n, -1, $tokens) ?? (object) ['id' => null, 'text' => null, 'line' => null];
-                $next = $neighborToken($n, +1, $tokens) ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                $prev = $token->prev() ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                $next = $token->next() ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                assert([$prev, $next]); // あらかじめ取得しておかないとズレるかもしれない
 
                 // クロージャは何でもかける（クロージャ・無名クラス・ジェネレータ etc）のでネスト（ブレース）レベルを記録しておく
                 if ($token->text === '{') {
@@ -318,7 +262,7 @@ function var_export3($value, $return = false)
                     }
                 }
 
-                $tokens[$n] = $resolveSymbol($token, $prev, $next, $ref);
+                $tokens[$n] = $token->clone(text: $token->resolve($ref));
             }
 
             $code = php_indent(implode('', array_column($tokens, 'text')), [
@@ -399,15 +343,16 @@ function var_export3($value, $return = false)
                 $fname = $ref->getFileName();
                 $sline = $ref->getStartLine();
                 $eline = $ref->getEndLine();
-                $tokens = php_parse('<?php ' . implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
+                $tokens = php_tokens('<?php ' . implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
 
                 $block = [];
                 $starting = false;
                 $constructing = 0;
                 $nesting = 0;
-                foreach ($tokens as $n => $token) {
-                    $prev = $neighborToken($n, -1, $tokens) ?? [null, null, null];
-                    $next = $neighborToken($n, +1, $tokens) ?? [null, null, null];
+                foreach ($tokens as $token) {
+                    $prev = $token->prev() ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                    $next = $token->next() ?? (object) ['id' => null, 'text' => null, 'line' => null];
+                    assert([$prev, $next]); // あらかじめ取得しておかないとズレるかもしれない
 
                     // 無名クラスは new class か new #[Attribute] で始まるはず（new #[A] ClassName は許可されていない）
                     if (($token->id === T_NEW && $next->id === T_CLASS) || ($token->id === T_NEW && $next->id === T_ATTRIBUTE)) {
@@ -441,7 +386,7 @@ function var_export3($value, $return = false)
                         $token->text = "replaced__construct";
                     }
 
-                    $block[] = $resolveSymbol($token, $prev, $next, $ref);
+                    $block[] = $token->clone(text: $token->resolve($ref));
 
                     if ($token->text === '{') {
                         $nesting++;
