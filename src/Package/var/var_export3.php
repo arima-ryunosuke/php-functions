@@ -269,6 +269,13 @@ function var_export3($value, $return = false)
                 'indent'   => $spacer1,
                 'baseline' => -1,
             ]);
+
+            $attrs = [];
+            foreach ($ref->getAttributes() as $attr) {
+                $attrs[] = "#[{$raw_export($attr->getName())}({$raw_export(implode(', ', array_map($export, $attr->getArguments())))})]";
+            }
+            $attrs = $attrs ? (implode(' ', $attrs) . ' ') : '';
+
             if ($bind) {
                 $instance = $export($bind, $nest + 1);
                 if ($class->isAnonymous()) {
@@ -277,10 +284,10 @@ function var_export3($value, $return = false)
                 else {
                     $scope = $var_export($class?->getName() === 'Closure' ? 'static' : $class?->getName());
                 }
-                $code = "\Closure::bind($code, $instance, $scope)";
+                $code = "\Closure::bind({$attrs}$code, $instance, $scope)";
             }
             elseif (!is_bindable_closure($value)) {
-                $code = "static $code";
+                $code = "{$attrs}static $code";
             }
 
             return "\$this->$vid = (function () {\n{$raw_export(implode('', $uses))}{$spacer1}return $code;\n$spacer0})->call(\$this)";

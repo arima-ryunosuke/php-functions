@@ -177,7 +177,7 @@ function php_tokens(string $code, int $flags = 0)
                 if ($ref instanceof \ReflectionFunctionAbstract) {
                     $namespaces[] = $ref->getClosureScopeClass()?->getNamespaceName();
                 }
-                if ($prev->id === T_NEW || $next->id === T_DOUBLE_COLON || $next->id === T_VARIABLE || $next->text === '{') {
+                if ($prev->id === T_NEW || $prev->id === T_ATTRIBUTE || $next->id === T_DOUBLE_COLON || $next->id === T_VARIABLE || $next->text === '{') {
                     $text = namespace_resolve($text, $ref->getFileName(), 'alias') ?? $text;
                 }
                 elseif ($next->text === '(') {

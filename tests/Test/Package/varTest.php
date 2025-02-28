@@ -1475,6 +1475,27 @@ class varTest extends AbstractTestCase
         fwrite($values2['output'], 'this is output string');
     }
 
+    /**
+     * @noinspection PhpUndefinedClassInspection
+     * @noinspection PhpUndefinedNamespaceInspection
+     */
+    function test_var_export3_attribute()
+    {
+        $values = [
+            'object'  => new #[Local] class ( ) { },
+            'closure' => #[Bound] static fn() => null,
+            'misc'    => [#[A] #[A\B(true, SORT_ASC)] static fn() => null],
+        ];
+        $exported = var_export3($values, ['outmode' => 'eval']);
+        $values2 = eval($exported);
+
+        that(new \ReflectionObject($values2['object']))->getAttributes()[0]->getName()->is(Local::class);
+        that(new \ReflectionFunction($values2['closure']))->getAttributes()[0]->getName()->is(Bound::class);
+        that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[0]->getName()->is(A::class);
+        that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[1]->getName()->is(A\B::class);
+        that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[1]->getArguments()->is([true, SORT_ASC]);
+    }
+
     function test_var_hash()
     {
         that(var_hash([1, 2, 3], ['md5'], false))->isSame('262bbc0aa0dc62a93e350f1f7df792b9');
