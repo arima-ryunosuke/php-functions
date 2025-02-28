@@ -84,7 +84,8 @@ function namespace_parse($filename, $options = [])
 
     $storage = json_storage(__FUNCTION__);
 
-    $options['cache'] ??= ($storage['mtime'] ?? $filemtime) >= $filemtime;
+    $storage['mtime'] ??= $filemtime;
+    $options['cache'] ??= $storage['mtime'] >= $filemtime;
     if (!$options['cache']) {
         unset($storage['mtime']);
         unset($storage[$filename]);
