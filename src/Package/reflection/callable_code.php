@@ -47,7 +47,7 @@ function callable_code($callable, bool $return_token = false)
     if ($end->id === T_DOUBLE_ARROW) {
         $body = php_parse("<?php $codeblock", [
             'begin'  => T_DOUBLE_ARROW,
-            'end'    => [';', ',', ')'],
+            'end'    => [';', ',', ')', ']'],
             'offset' => last_key($meta),
             'greedy' => true,
         ]);

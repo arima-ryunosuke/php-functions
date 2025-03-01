@@ -58,9 +58,10 @@ function php_parse($phpcode, $option = [])
         'greedy'         => false,// end と nest か一致したときに処理を継続するか
         'backtick'       => true, // `` もパースするか
         'nest_token'     => [
-            ')' => '(',
-            '}' => '{',
-            ']' => '[',
+            [')', '('],
+            ['}', '{'],
+            [']', '['],
+            [']', '#['],
         ],
     ];
     $option += $default;
@@ -184,7 +185,16 @@ function php_parse($phpcode, $option = [])
     $positions = $option['position'] + [-PHP_INT_MAX, PHP_INT_MAX];
     $begin_tokens = (array) $option['begin'];
     $end_tokens = (array) $option['end'];
-    $nest_tokens = $option['nest_token'];
+    // for compatible
+    $nest_tokens = [];
+    foreach ($option['nest_token'] as $k => $v) {
+        if (is_string($k)) {
+            $v = [$v, $k]; // @codeCoverageIgnore for compatible
+        }
+        $nest_tokens[] = $v;
+    }
+    $nest_start_tokens = array_column($nest_tokens, 1);
+    $nest_end_tokens = array_column($nest_tokens, 0);
     $greedy = $option['greedy'];
 
     $result = [];
@@ -221,19 +231,21 @@ function php_parse($phpcode, $option = [])
 
         $result[$i] = $token;
 
-        foreach ($nest_tokens as $end_nest => $start_nest) {
+        foreach ($nest_tokens as [$end_nest, $start_nest]) {
             if ($token->id === $start_nest || $token->text === $start_nest) {
                 $nesting++;
+                break;
             }
             if ($token->id === $end_nest || $token->text === $end_nest) {
                 $nesting--;
+                break;
             }
         }
 
         foreach ($end_tokens as $t) {
             if ($t === $token->id || $t === $token->text) {
-                if ($nesting <= 0 || ($nesting === 1 && in_array($t, $nest_tokens, true))) {
-                    if ($nesting === 0 && $greedy && isset($nest_tokens[$t])) {
+                if ($nesting <= 0 || ($nesting === 1 && in_array($t, $nest_start_tokens, true))) {
+                    if ($nesting === 0 && $greedy && in_array($t, $nest_end_tokens, true)) {
                         break;
                     }
                     break 2;
