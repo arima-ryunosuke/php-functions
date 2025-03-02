@@ -11,6 +11,16 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.19
+
+- [feature] ip_info を完全リライト
+- [feature] var_export3 で属性も出力される機能
+- [feature] namespace_parse を完全リライト
+- [refactor] php_token に置換できそうなところは置換
+- [feature] php_tokens の改良
+- [fixbug] namespace_parse で自動キャッシュ判定が効いていない不具合
+- [fixbug] callable_code が属性と配列で誤作動する不具合
+
 ## 2.0.18
 
 - [feature] snmp_trap を追加
