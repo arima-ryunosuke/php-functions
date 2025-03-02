@@ -957,6 +957,8 @@ class networkTest extends AbstractTestCase
             memory_reset_peak_usage();
         }
         $current = memory_get_usage(true);
+        $array = ip_info(null, ['cache' => false, 'readonly' => true] + $options);
+        that($array)->count(0);
         $generator = ip_info(null, ['cache' => false, 'generate' => true] + $options);
         that($generator)->isInstanceOf(\Generator::class);
         $c = 0;
@@ -1016,9 +1018,27 @@ class networkTest extends AbstractTestCase
         that(ip_info('100.64.0.0', $options))->is(null); // キャッシュミスのテスト
         that(count(ip_info(null, $options)))->gt(100000);
 
+        that(@ip_info("1.2.3.4", [
+            'cache' => false,
+            'throw' => false,
+            'rir'   => [
+                'afrinic' => TESTRIRSERVER . '/notfound.csv',
+                'apnic'   => TESTRIRSERVER . '/notfound.csv',
+                'arin'    => TESTRIRSERVER . '/notfound.csv',
+                'lacnic'  => TESTRIRSERVER . '/notfound.csv',
+                'ripe'    => TESTRIRSERVER . '/notfound.csv',
+            ],
+        ]))->is(null);
+
         that(self::resolveFunction('ip_info'))("1.2.3.4", [
+            'cache' => false,
+            'throw' => true,
             'rir' => [
-                'dummy' => TESTRIRSERVER . '/notfound.csv',
+                'afrinic' => TESTRIRSERVER . '/notfound.csv',
+                'apnic'   => TESTRIRSERVER . '/notfound.csv',
+                'arin'    => TESTRIRSERVER . '/notfound.csv',
+                'lacnic'  => TESTRIRSERVER . '/notfound.csv',
+                'ripe'    => TESTRIRSERVER . '/notfound.csv',
             ],
         ])->wasThrown('404');
         that(self::resolveFunction('ip_info'))("hogera", $options)->wasThrown('is invalid');
