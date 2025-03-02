@@ -6330,7 +6330,7 @@ if (!function_exists('ryunosuke\\Functions\\class_extends')) {
             $rtype = $rtype ? ": $rtype" : '';
 
             [, $codeblock] = callable_code($override);
-            $tokens = php_parse('<?php ' . $codeblock);
+            $tokens = php_tokens('<?php ' . $codeblock);
             array_shift($tokens);
             $parented = null;
             foreach ($tokens as $n => $token) {
@@ -6636,23 +6636,15 @@ if (!function_exists('ryunosuke\\Functions\\class_replace')) {
         }
         // 配列はメソッド定義のクロージャ配列とする
         if (is_array($newclass)) {
-            $content = file_get_contents($fname);
-            $origspace = php_parse($content, [
-                'begin' => T_NAMESPACE,
-                'end'   => ';',
-            ]);
-            array_shift($origspace);
-            array_pop($origspace);
+            $tokens = php_tokens(file_get_contents($fname));
 
-            $origclass = php_parse($content, [
-                'begin'  => T_CLASS,
-                'end'    => T_STRING,
-                'offset' => count($origspace),
-            ]);
-            array_shift($origclass);
+            $begin = $tokens[0]->next(T_NAMESPACE);
+            $end = $begin->next(';');
+            $origspace = trim(implode('', array_column(array_slice($tokens, $begin->index + 1, $end->index - $begin->index - 1), 'text')));
 
-            $origspace = trim(implode('', array_column($origspace, 'text')));
-            $origclass = trim(implode('', array_column($origclass, 'text')));
+            $begin = $end->next(T_CLASS);
+            $end = $begin->next(T_STRING);
+            $origclass = trim(implode('', array_column(array_slice($tokens, $begin->index + 1, $end->index - $begin->index + 1), 'text')));
 
             $classcode = '';
             foreach ($newclass as $name => $member) {
@@ -10042,9 +10034,7 @@ if (!function_exists('ryunosuke\\Functions\\json_import')) {
 
             public function parse($options)
             {
-                $tokens = @php_parse($this->json_string, [
-                    'cache' => false,
-                ]);
+                $tokens = php_tokens($this->json_string);
                 array_shift($tokens);
 
                 $braces = [];
@@ -17120,7 +17110,7 @@ if (!function_exists('ryunosuke\\Functions\\func_eval')) {
         $args = array_sprintf($variadic, '$%s', ',');
         $cachekey = "$expression($args)";
         if (!isset($cache[$cachekey])) {
-            $tmp = php_parse("<?php $expression");
+            $tmp = php_tokens("<?php $expression");
             array_shift($tmp);
             $stmt = '';
             for ($i = 0; $i < count($tmp); $i++) {
@@ -19294,9 +19284,7 @@ if (!function_exists('ryunosuke\\Functions\\calculate_formula')) {
     function calculate_formula($formula)
     {
         // TOKEN_PARSE を渡せばシンタックスチェックも行ってくれる
-        $tokens = php_parse("<?php ($formula);", [
-            'flags' => TOKEN_PARSE,
-        ]);
+        $tokens = php_tokens("<?php ($formula);", TOKEN_PARSE);
         array_shift($tokens);
         array_pop($tokens);
 
@@ -19307,13 +19295,13 @@ if (!function_exists('ryunosuke\\Functions\\calculate_formula')) {
         $constant = '';
         $expression = '';
         foreach ($tokens as $token) {
-            if (in_array($token->id, [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+            if ($token->isIgnorable()) {
                 continue;
             }
-            if (in_array($token->id, $constants, true)) {
+            if ($token->is($constants)) {
                 $constant .= $token->text;
             }
-            elseif (in_array($token->id, $operands, true) || in_array($token->text, $operators, true)) {
+            elseif ($token->is($operands) || $token->is($operators)) {
                 if (strlen($constant)) {
                     $expression .= constant($constant) + 0;
                     $constant = '';
@@ -19959,6 +19947,13 @@ if (!function_exists('ryunosuke\\Functions\\namespace_parse')) {
      * php ファイルをパースして名前空間配列を返す
      *
      * ファイル内で use/use const/use function していたり、シンボルを定義していたりする箇所を検出して名前空間単位で返す。
+     * クラスコンテキストでの解決できないシンボルはその名前空間として返す。
+     * つまり、 use せずに いきなり new Hoge() などとしてもその同一名前空間の Hoge として返す。
+     * これは同一名前空間であれば use せずとも使用できる php の仕様に合わせるため。
+     * 対象はクラスのみであり、定数・関数は対象外。
+     * use せずに hoge_function() などとしても、それが同一名前空間なのかグローバルにフォールバックされるのかは静的には決して分からないため。
+     *
+     * その他、#[AttributeName]や ClassName::class など、おおよそクラス名が必要とされるコンテキストでのシンボルは全て返される。
      *
      * Example:
      * ```php
@@ -19977,6 +19972,9 @@ if (!function_exists('ryunosuke\\Functions\\namespace_parse')) {
      * use const COUNT_RECURSIVE as CR;
      * class InnerClass{}
      * const InnerConst = 123;
+     *
+     * // いきなり Hoge を new してみる
+     * new Hoge();
      * ');
      * // このような名前空間配列が得られる
      * that(namespace_parse(sys_get_temp_dir() . '/namespace.php'))->isSame([
@@ -20007,6 +20005,7 @@ if (!function_exists('ryunosuke\\Functions\\namespace_parse')) {
      *         'alias'    => [
      *             'RE'         => 'RuntimeException',
      *             'InnerClass' => 'NS2\\InnerClass',
+     *             'Hoge'       => 'NS2\\Hoge', // 同一名前空間として返される
      *         ],
      *     ],
      * ]);
@@ -20028,120 +20027,220 @@ if (!function_exists('ryunosuke\\Functions\\namespace_parse')) {
 
         $storage = json_storage(__FUNCTION__);
 
-        $options['cache'] ??= ($storage['mtime'] ?? $filemtime) >= $filemtime;
+        $storage['mtime'] ??= $filemtime;
+        $options['cache'] ??= $storage['mtime'] >= $filemtime;
         if (!$options['cache']) {
             unset($storage['mtime']);
             unset($storage[$filename]);
         }
         return $storage[$filename] ??= (function () use ($filename) {
-            $stringify = function ($tokens) {
-                return trim(implode('', array_column(array_filter($tokens, function ($token) {
-                    return in_array($token->id, [T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE, T_STRING], true);
-                }), 'text')), '\\');
-            };
-
-            $keys = [
-                null        => 'alias', // for use
-                T_CLASS     => 'alias',
-                T_INTERFACE => 'alias',
-                T_TRAIT     => 'alias',
-                T_STRING    => 'const', // for define
-                T_CONST     => 'const',
-                T_FUNCTION  => 'function',
-            ];
-
-            $contents = file_get_contents($filename);
             $namespace = '';
-            $tokens = [-1 => null];
+            $classend = null;
+
+            $tokens = php_tokens(file_get_contents($filename));
+            $token = $tokens[0];
+
+            $T_ENUM = defined('T_ENUM') ? T_ENUM : -1; // for compatible
             $result = [];
             while (true) {
-                $tokens = php_parse($contents, [
-                    'flags'  => TOKEN_PARSE,
-                    'begin'  => ["define", T_NAMESPACE, T_USE, T_CONST, T_FUNCTION, T_CLASS, T_INTERFACE, T_TRAIT],
-                    'end'    => ['{', ';', '(', T_EXTENDS, T_IMPLEMENTS],
-                    'offset' => last_key($tokens) + 1,
-                ]);
-                if (!$tokens) {
+                $token = $token->next(["define", T_NAMESPACE, T_USE, T_CONST, T_FUNCTION, T_CLASS, T_INTERFACE, T_TRAIT, $T_ENUM, T_EXTENDS, T_IMPLEMENTS, T_ATTRIBUTE, T_NAME_QUALIFIED, T_STRING]);
+                if ($token === null) {
                     break;
                 }
-                $token = reset($tokens);
-                // define は現在の名前空間とは無関係に名前空間定数を宣言することができる
-                if ($token->id === T_STRING && $token->text === "define") {
-                    $tokens = php_parse($contents, [
-                        'flags'  => TOKEN_PARSE,
-                        'begin'  => [T_CONSTANT_ENCAPSED_STRING],
-                        'end'    => [T_CONSTANT_ENCAPSED_STRING],
-                        'offset' => last_key($tokens),
-                    ]);
-                    $cname = substr(implode('', array_column($tokens, 'text')), 1, -1);
-                    $define = trim(json_decode("\"$cname\""), '\\');
-                    [$ns, $nm] = namespace_split($define);
-                    if (!isset($result[$ns])) {
-                        $result[$ns] = [
-                            'const'    => [],
-                            'function' => [],
-                            'alias'    => [],
-                        ];
-                    }
-                    $result[$ns][$keys[$token->id]][$nm] = $define;
+                if ($classend !== null && $token->index >= $classend) {
+                    $classend = null;
                 }
-                switch ($token->id) {
-                    case T_NAMESPACE:
-                        $namespace = $stringify($tokens);
-                        $result[$namespace] = [
+
+                // define は現在の名前空間とは無関係に名前空間定数を宣言することができる
+                if ($token->is(T_STRING) && $token->is("define")) {
+                    // ただし実行されないと定義されないので class 内は無視
+                    if ($classend !== null) {
+                        continue;
+                    }
+
+                    // しかも変数が使えたりして静的には決まらないので "" or '' のみとする
+                    $token = $token->next([T_CONSTANT_ENCAPSED_STRING, ',']);
+                    if ($token->is(T_CONSTANT_ENCAPSED_STRING)) {
+                        $define = trim(stripslashes(substr($token, 1, -1)), '\\');
+                        [$ns, $nm] = namespace_split($define);
+                        $result[$ns] ??= [
                             'const'    => [],
                             'function' => [],
                             'alias'    => [],
                         ];
-                        break;
-                    case T_USE:
-                        $tokenCorF = array_find_first($tokens, fn($token) => ($token->id === T_CONST || $token->id === T_FUNCTION) ? $token->id : 0, false);
+                        $result[$ns]['const'][$nm] = $define;
+                    }
+                }
+                // 識別子。多岐に渡るので文脈を見て無視しなければならない
+                if ($token->is(T_STRING)) {
+                    if ($token->prev()->is([
+                        T_OBJECT_OPERATOR,          // $object->member
+                        T_NULLSAFE_OBJECT_OPERATOR, // $object?->member
+                        T_CONST,                    // const CONST = 'dummy'
+                        T_GOTO,                     // goto LABEL
+                    ])) {
+                        continue;
+                    }
+                    // hoge_function(named: $argument)
+                    if ($token->next()->is(':')) {
+                        continue;
+                    }
+                    // hoge_function()
+                    if (!$token->prev()->is(T_NEW) && $token->next()->is('(')) {
+                        continue;
+                    }
+                    if ($token->is([
+                        // typehint
+                        ...['never', 'void', 'null', 'false', 'true', 'bool', 'int', 'float', 'string', 'object', 'iterable', 'mixed'],
+                        // specials
+                        ...['self', 'static', 'parent'],
+                    ])) {
+                        continue;
+                    }
+                    if (defined($token->text)) {
+                        continue;
+                    }
 
-                        $prefix = '';
-                        if (end($tokens)->text === '{') {
-                            $prefix = $stringify($tokens);
-                            $tokens = php_parse($contents, [
-                                'flags'  => TOKEN_PARSE,
-                                'begin'  => ['{'],
-                                'end'    => ['}'],
-                                'offset' => last_key($tokens),
-                            ]);
+                    if (false
+                        || $token->prev()->is(T_NEW)           // new ClassName
+                        || $token->prev()->is(':')             // function method(): ClassName
+                        || $token->next()->is(T_VARIABLE)      // ClassName $argument
+                        || $token->next()->is(T_DOUBLE_COLON)  // ClassName::CONSTANT
+                    ) {
+                        $result[$namespace]['alias'][$token->text] ??= concat($namespace, '\\') . $token->text;
+                    }
+                }
+                // T_STRING とほぼ同じ（修飾版）。T_NAME_QUALIFIED である時点で Space\Name であることはほぼ確定だがいくつか除外するものがある
+                if ($token->is(T_NAME_QUALIFIED)) {
+                    // hoge_function()
+                    if (!$token->prev()->is(T_NEW) && $token->next()->is('(')) {
+                        continue;
+                    }
+                    // 最近の php は標準でも名前空間を持つものがあるので除外しておく
+                    if (defined($token->text)) {
+                        continue;
+                    }
+                    $result[$namespace]['alias'][$token->text] ??= concat($namespace, '\\') . $token->text;
+                }
+                if ($token->is(T_NAMESPACE)) {
+                    $token = $token->next();
+                    $namespace = $token->text;
+                    $result[$namespace] = [
+                        'const'    => [],
+                        'function' => [],
+                        'alias'    => [],
+                    ];
+                }
+                if ($token->is(T_USE)) {
+                    // function () **use** ($var) {...}
+                    if ($token->prev()?->is(')')) {
+                        continue;
+                    }
+                    // class {**use** Trait;}
+                    if ($classend !== null) {
+                        while (!$token->is(['{', ';'])) {
+                            $token = $token->next(['{', ';', ',']);
+                            if (!$token->prev()->is(T_NAME_FULLY_QUALIFIED)) {
+                                $result[$namespace]['alias'][$token->prev()->text] ??= concat($namespace, '\\') . $token->prev()->text;
+                            }
                         }
+                        continue;
+                    }
 
-                        $multi = array_explode($tokens, fn($token) => $token->text === ',');
-                        foreach ($multi as $ttt) {
-                            $as = array_explode($ttt, fn($token) => $token->id === T_AS);
+                    $next = $token->next();
+                    $key = 'alias';
+                    if ($next->is(T_CONST)) {
+                        $key = 'const';
+                        $token = $next;
+                    }
+                    if ($next->is(T_FUNCTION)) {
+                        $key = 'function';
+                        $token = $next;
+                    }
 
-                            $alias = $stringify($as[0]);
-                            if (isset($as[1])) {
-                                $result[$namespace][$keys[$tokenCorF]][$stringify($as[1])] = concat($prefix, '\\') . $alias;
+                    $token = $token->next();
+                    $qualified = trim($token->text, '\\');
+
+                    $next = $token->next();
+                    if ($next->is(T_NS_SEPARATOR)) {
+                        while (!$token->is('}')) {
+                            $token = $token->next(['}', ',', T_AS]);
+                            if ($token->is(T_AS)) {
+                                $qualified2 = $qualified . "\\" . $token->prev()->text;
+                                $result[$namespace][$key][$token->next()->text] = $qualified2;
+                                $token = $token->next()->next();
                             }
                             else {
-                                $result[$namespace][$keys[$tokenCorF]][namespace_split($alias)[1]] = concat($prefix, '\\') . $alias;
+                                $qualified2 = $qualified . "\\" . $token->prev()->text;
+                                $result[$namespace][$key][namespace_split($qualified2)[1]] = $qualified2;
                             }
                         }
-                        break;
-                    case T_CONST:
-                    case T_FUNCTION:
-                    case T_CLASS:
-                    case T_INTERFACE:
-                    case T_TRAIT:
-                        $alias = $stringify($tokens);
-                        if (strlen($alias)) {
-                            $result[$namespace][$keys[$token->id]][$alias] = concat($namespace, '\\') . $alias;
+                    }
+                    elseif ($next->is(T_AS)) {
+                        $token = $next->next();
+                        $result[$namespace][$key][$token->text] = $qualified;
+                    }
+                    else {
+                        $result[$namespace][$key][namespace_split($qualified)[1]] = $qualified;
+                    }
+                }
+                if ($token->is([T_CLASS, T_TRAIT, T_INTERFACE, $T_ENUM])) {
+                    // class ClassName {...}, $anonymous = new class() {...}
+                    if ($token->next()->is(T_STRING) || $token->prev()->is(T_NEW) || $token->prev(T_ATTRIBUTE)?->prev()->is(T_NEW)) {
+                        // new class {}, new class(new class {}) {}
+                        $next = $token->next(['{', '(']);
+                        if ($next->is('(')) {
+                            $next = $next->end()->next('{');
                         }
-                        // ブロック内に興味はないので進めておく（function 内 function などはあり得るが考慮しない）
-                        if ($token->id !== T_CONST) {
-                            $tokens = php_parse($contents, [
-                                'flags'  => TOKEN_PARSE,
-                                'begin'  => ['{'],
-                                'end'    => ['}'],
-                                'offset' => last_key($tokens),
-                            ]);
-                            break;
+                        $classend = max($classend ?? -1, $next->end()->index);
+                    }
+                    // class ClassName
+                    if ($token->next()->is(T_STRING)) {
+                        $result[$namespace]['alias'][$token->next()->text] = concat($namespace, '\\') . $token->next()->text;
+                    }
+                }
+                if ($token->is(T_EXTENDS)) {
+                    while (!$token->is([T_IMPLEMENTS, '{'])) {
+                        $token = $token->next([T_IMPLEMENTS, '{', ',']);
+                        if (!$token->prev()->is(T_NAME_FULLY_QUALIFIED)) {
+                            $result[$namespace]['alias'][$token->prev()->text] ??= concat($namespace, '\\') . $token->prev()->text;
                         }
+                    }
+                }
+                if ($token->is(T_IMPLEMENTS)) {
+                    while (!$token->is(['{'])) {
+                        $token = $token->next(['{', ',']);
+                        if (!$token->prev()->is(T_NAME_FULLY_QUALIFIED)) {
+                            $result[$namespace]['alias'][$token->prev()->text] ??= concat($namespace, '\\') . $token->prev()->text;
+                        }
+                    }
+                }
+                if ($token->is(T_CONST)) {
+                    // class {**const** HOGE=1;}
+                    if ($classend !== null) {
+                        continue;
+                    }
+                    $result[$namespace]['const'][$token->next()->text] ??= concat($namespace, '\\') . $token->next()->text;
+                }
+                if ($token->is(T_FUNCTION)) {
+                    // class {**function** hoge() {}}
+                    if ($classend !== null) {
+                        continue;
+                    }
+                    // $closure = function () {};
+                    if ($token->next()->is('(')) {
+                        continue;
+                    }
+                    $result[$namespace]['function'][$token->next()->text] ??= concat($namespace, '\\') . $token->next()->text;
+                }
+                if ($token->is(T_ATTRIBUTE)) {
+                    $token = $token->next([T_NAME_FULLY_QUALIFIED, T_NAME_QUALIFIED, T_STRING]);
+                    if (!$token->is(T_NAME_FULLY_QUALIFIED)) {
+                        $result[$namespace]['alias'][$token->text] ??= concat($namespace, '\\') . $token->text;
+                    }
                 }
             }
+
             return $result;
         })();
     }
@@ -20623,9 +20722,10 @@ if (!function_exists('ryunosuke\\Functions\\php_parse')) {
             'greedy'         => false,// end と nest か一致したときに処理を継続するか
             'backtick'       => true, // `` もパースするか
             'nest_token'     => [
-                ')' => '(',
-                '}' => '{',
-                ']' => '[',
+                [')', '('],
+                ['}', '{'],
+                [']', '['],
+                [']', '#['],
             ],
         ];
         $option += $default;
@@ -20749,7 +20849,16 @@ if (!function_exists('ryunosuke\\Functions\\php_parse')) {
         $positions = $option['position'] + [-PHP_INT_MAX, PHP_INT_MAX];
         $begin_tokens = (array) $option['begin'];
         $end_tokens = (array) $option['end'];
-        $nest_tokens = $option['nest_token'];
+        // for compatible
+        $nest_tokens = [];
+        foreach ($option['nest_token'] as $k => $v) {
+            if (is_string($k)) {
+                $v = [$v, $k]; // @codeCoverageIgnore for compatible
+            }
+            $nest_tokens[] = $v;
+        }
+        $nest_start_tokens = array_column($nest_tokens, 1);
+        $nest_end_tokens = array_column($nest_tokens, 0);
         $greedy = $option['greedy'];
 
         $result = [];
@@ -20786,19 +20895,21 @@ if (!function_exists('ryunosuke\\Functions\\php_parse')) {
 
             $result[$i] = $token;
 
-            foreach ($nest_tokens as $end_nest => $start_nest) {
+            foreach ($nest_tokens as [$end_nest, $start_nest]) {
                 if ($token->id === $start_nest || $token->text === $start_nest) {
                     $nesting++;
+                    break;
                 }
                 if ($token->id === $end_nest || $token->text === $end_nest) {
                     $nesting--;
+                    break;
                 }
             }
 
             foreach ($end_tokens as $t) {
                 if ($t === $token->id || $t === $token->text) {
-                    if ($nesting <= 0 || ($nesting === 1 && in_array($t, $nest_tokens, true))) {
-                        if ($nesting === 0 && $greedy && isset($nest_tokens[$t])) {
+                    if ($nesting <= 0 || ($nesting === 1 && in_array($t, $nest_start_tokens, true))) {
+                        if ($nesting === 0 && $greedy && in_array($t, $nest_end_tokens, true)) {
                             break;
                         }
                         break 2;
@@ -20935,8 +21046,14 @@ if (!function_exists('ryunosuke\\Functions\\php_tokens')) {
      * - __debugInfo: デバッグしやすい情報で吐き出す
      * - clone: 新プロパティを指定して clone する
      * - name: getTokenName のエイリアス
-     * - prev: ignorable ではない直前のトークンを返す
-     * - next: ignorable ではない直後のトークンを返す
+     * - prev: 条件一致した直前のトークンを返す
+     *   - 引数未指定時は isIgnorable でないもの
+     * - next: 条件一致した直後のトークンを返す
+     *   - 引数未指定時は isIgnorable でないもの
+     * - find: ブロック内部を読み飛ばしつつ指定トークンを探す
+     * - end: 自身の対応するペアトークンまで飛ばして返す
+     *   - 要するに { や (, " などの中途半端ではない終わりのトークンを返す
+     * - contents: 自身と end 間のトークンを文字列化する
      * - resolve: text が名前空間を解決して完全修飾になったトークンを返す
      *
      * Example:
@@ -20973,8 +21090,6 @@ if (!function_exists('ryunosuke\\Functions\\php_tokens')) {
             public array $tokens;
             public int   $index;
 
-            private $cache = [];
-
             public function __debugInfo(): array
             {
                 $result = get_object_vars($this);
@@ -20994,23 +21109,89 @@ if (!function_exists('ryunosuke\\Functions\\php_tokens')) {
                 foreach ($newparams as $param => $value) {
                     $that->{$param} = $value;
                 }
-                $that->cache = [];
                 return $that;
             }
 
             public function name(): string
             {
-                return $this->cache['name'] ??= $this->getTokenName();
+                return $this->getTokenName();
             }
 
-            public function prev(): ?self
+            public function prev($condition = null): ?self
             {
-                return $this->cache['prev'] ??= $this->sibling($this->index, -1);
+                $condition ??= fn($token) => !$token->isIgnorable();
+                return $this->sibling(-1, $condition);
             }
 
-            public function next(): ?self
+            public function next($condition = null): ?self
             {
-                return $this->cache['next'] ??= $this->sibling($this->index, +1);
+                $condition ??= fn($token) => !$token->isIgnorable();
+                return $this->sibling(+1, $condition);
+            }
+
+            public function find($condition): ?self
+            {
+                $condition = (array) $condition;
+                $token = $this;
+                while (true) {
+                    $token = $token->sibling(+1, array_merge($condition, ['{', '${', '"', T_START_HEREDOC, '#[', '[', '(']));
+                    if ($token === null) {
+                        return null;
+                    }
+                    if ($token->is($condition)) {
+                        return $token;
+                    }
+                    $token = $token->end();
+                }
+            }
+
+            public function end(): self
+            {
+                $skip = function ($starts, $ends) {
+                    $token = $this;
+                    while (true) {
+                        $token = $token->sibling(+1, array_merge($starts, $ends)) ?? throw new \DomainException(sprintf("token mismatch(line:%d, pos:%d, '%s')", $token->line, $token->pos, $token->text));
+                        if ($token->is($starts)) {
+                            $token = $token->end();
+                        }
+                        elseif ($token->is($ends)) {
+                            return $token;
+                        }
+                    }
+                };
+
+                if ($this->is('"')) {
+                    return $skip(['{', '${'], ['"']);
+                }
+                if ($this->is('`')) {
+                    return $skip(['{', '${'], ['`']);
+                }
+                if ($this->is(T_START_HEREDOC)) {
+                    return $skip(['{', '${'], [T_END_HEREDOC]);
+                }
+                if ($this->is('#[')) {
+                    return $skip(['#[', '['], [']']);
+                }
+                if ($this->is('[')) {
+                    return $skip(['#[', '['], [']']);
+                }
+                if ($this->is('${')) {
+                    return $skip(['${'], ['}']); // @codeCoverageIgnore deprecated php8.2
+                }
+                if ($this->is('{')) {
+                    return $skip(['{', '"'], ['}']);
+                }
+                if ($this->is('(')) {
+                    return $skip(['('], [')']);
+                }
+
+                throw new \DomainException(sprintf("token is not pairable(line:%d, pos:%d, '%s')", $this->line, $this->pos, $this->text));
+            }
+
+            public function contents(?int $end = null): string
+            {
+                $end ??= $this->end()->index;
+                return implode('', array_column(array_slice($this->tokens, $this->index, $end - $this->index + 1), 'text'));
             }
 
             public function resolve($ref): string
@@ -21025,7 +21206,7 @@ if (!function_exists('ryunosuke\\Functions\\php_tokens')) {
                     if ($ref instanceof \ReflectionFunctionAbstract) {
                         $namespaces[] = $ref->getClosureScopeClass()?->getNamespaceName();
                     }
-                    if ($prev->id === T_NEW || $next->id === T_DOUBLE_COLON || $next->id === T_VARIABLE || $next->text === '{') {
+                    if ($prev->id === T_NEW || $prev->id === T_ATTRIBUTE || $next->id === T_DOUBLE_COLON || $next->id === T_VARIABLE || $next->text === '{') {
                         $text = namespace_resolve($text, $ref->getFileName(), 'alias') ?? $text;
                     }
                     elseif ($next->text === '(') {
@@ -21063,10 +21244,13 @@ if (!function_exists('ryunosuke\\Functions\\php_tokens')) {
                 return $text;
             }
 
-            private function sibling($n, $d)
+            private function sibling(int $step, $condition)
             {
-                for ($i = $n + $d; isset($this->tokens[$i]); $i += $d) {
-                    if (!$this->tokens[$i]->isIgnorable()) {
+                if (is_array($condition) || !is_callback($condition)) {
+                    $condition = fn($token) => $token->is($condition);
+                }
+                for ($i = $this->index + $step; isset($this->tokens[$i]); $i += $step) {
+                    if ($condition($this->tokens[$i])) {
                         return $this->tokens[$i];
                     }
                 }
@@ -22999,7 +23183,7 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
      * Example:
      * ```php
      * // apnic 管轄
-     * that(ip_info(gethostbyname('www.nic.ad.jp'), ['timeout' => 300]))->is([
+     * that(ip_info(gethostbyname('www.nic.ad.jp'), ['timeout' => 300, 'throw' => false]))->is([
      *     'cidr'      => '192.41.192.0/24',
      *     'ipaddress' => '192.41.192.0',
      *     'netmask'   => 24,
@@ -23008,7 +23192,7 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
      *     'date'      => '19880620',
      * ]);
      * // arin 管轄
-     * that(ip_info(gethostbyname('www.internic.net'), ['timeout' => 300]))->is([
+     * that(ip_info(gethostbyname('www.internic.net'), ['timeout' => 300, 'throw' => false]))->is([
      *     'cidr'      => '192.0.32.0/20',
      *     'ipaddress' => '192.0.32.0',
      *     'netmask'   => 20,
@@ -23047,6 +23231,7 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
         }
 
         $options += [
+            'readonly' => false, // for compatible. 接続や更新を行わずに今あるデータだけで返すか（通常は true, 裏で更新するときに false にするとよい）
             'cachedir' => function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__),
             'ttl'      => 60 * 60 * 24 + 120, // 120 は1日1回バッチで叩くことを前提としたバッファ
             'cache'    => true, // false を指定すると ttl が 0 扱いになり、内部キャッシュもクリアされる
@@ -23067,189 +23252,243 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
             @mkdir($options['cachedir'], 0777, true);
         }
 
-        $sqlfile = "{$options['cachedir']}/ip_infov001.sqlite";
-        if (!$options['cache']) {
-            @unlink($sqlfile);
-        }
+        $client = new class($options) {
+            private \PDO $pdo;
 
-        // PDO(sqlite)取得
-        $initial = !file_exists($sqlfile);
-        $pdo = new \PDO("sqlite:$sqlfile", null, null, [
-            \PDO::ATTR_ERRMODE           => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_STRINGIFY_FETCHES => false,
-            \PDO::ATTR_EMULATE_PREPARES  => false,
-        ]);
-        if ($initial) {
-            $pdo->exec(<<<SQL
-                CREATE TABLE IF NOT EXISTS rir_meta(
-                    registry VARCHAR(32) NOT NULL,
-                    expire   INT         NOT NULL,
-                    PRIMARY KEY (registry)
-                )
-                SQL
-            );
-            $pdo->exec(<<<SQL
-                CREATE TABLE IF NOT EXISTS rir_data(
-                    ipaddress VARCHAR(16) NOT NULL,
-                    netmask   INT         NOT NULL,
-                    registry  VARCHAR(32) NOT NULL,
-                    cc        VARCHAR(16),
-                    date      VARCHAR(8),
-                    PRIMARY KEY (ipaddress, netmask)
-                )
-                SQL
-            );
-        }
+            public function __construct(private array $options) { }
 
-        // コールバックをトランザクションで実行するクロージャ
-        $transaction = function ($callback) use ($pdo) {
-            $pdo->beginTransaction();
-            // @codeCoverageIgnoreStart かなりしんどいので ignore
-            try {
-                $callback();
-                $pdo->commit();
-            }
-            catch (\Exception $e) {
-                $pdo->rollBack();
-                throw $e;
-                // @codeCoverageIgnoreEnd
-            }
-        };
+            public function register()
+            {
+                $pdo = $this->pdo();
 
-        // expire を更新するクロージャ
-        $refresh = function ($registry) use ($pdo, $options) {
-            $pdo->prepare('REPLACE INTO rir_meta VALUES (:registry, :expire)')->execute([
-                'registry' => $registry,
-                'expire'   => time() + $options['ttl'] + rand(0, 60), // 同時に走らないようにバラす
-            ]);
-            $pdo->prepare('DELETE FROM rir_data WHERE registry = :registry')->execute([
-                'registry' => $registry,
-            ]);
-        };
+                $meta = $pdo->query("SELECT registry, expire FROM rir_meta")->fetchAll(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE);
 
-        // IPアドレスと個数で CIDR を生成するクロージャ
-        $cidrize = function ($ipaddr, $count) {
-            $main = function (int $longip, int $count) use (&$main) {
-                if ($count > 0) {
-                    for ($bit = (int) ceil(log($count, 2)); $bit > 1; $bit--) {
-                        $bitcount = (int) pow(2, $bit);
-                        if (($longip & $bitcount - 1) === 0 && $count >= $bitcount) {
-                            yield [long2ip($longip), (32 - $bit)];
-                            yield from $main($longip + $bitcount, $count - $bitcount);
-                            break;
-                        }
-                    }
-                }
-            };
-            yield from $main(ip2long($ipaddr), $count);
-        };
-
-        $meta = $pdo->query("SELECT registry, expire FROM rir_meta")->fetchAll(\PDO::FETCH_ASSOC | \PDO::FETCH_UNIQUE);
-
-        // RFC アドレス
-        if (($meta['reserved']['expire'] ?? 0) < time()) {
-            $transaction(function () use ($pdo, $refresh) {
-                $refresh('reserved');
-                foreach ([
-                    ['RFC1700', '0.0.0.0', 8],         // wildcard
-                    ['RFC919', '255.255.255.255', 32], // broadcast
-                    ['RFC5771', '224.0.0.0', 4],       // multicast
-                    ['RFC1122', '127.0.0.0', 8],       // loopback
-                    ['RFC3927', '169.254.0.0', 16],    // link-local
-                    ['RFC1918', '10.0.0.0', 8],        // private
-                    ['RFC1918', '172.16.0.0', 12],     // private
-                    ['RFC1918', '192.168.0.0', 16],    // private
-                ] as [$name, $ip, $mask]) {
-                    $pdo->prepare('REPLACE INTO rir_data VALUES (:ipaddress, :netmask, :registry, :cc, :date)')->execute([
-                        'ipaddress' => $ip,
-                        'netmask'   => $mask,
-                        'registry'  => $name,
-                        'cc'        => null,
-                        'date'      => null,
-                    ]);
-                }
-            });
-        }
-
-        // RIR アドレス
-        if ($urls = array_filter($options['rir'], fn($registry) => ($meta[$registry]['expire'] ?? 0) < time(), ARRAY_FILTER_USE_KEY)) {
-            $responses = http_requests($urls, [
-                'cachedir'             => $options['cachedir'],
-                CURLOPT_CONNECTTIMEOUT => $options['timeout'],
-                CURLOPT_TIMEOUT        => $options['timeout'],
-            ], [
-                'throw' => $options['throw'],
-            ], $infos);
-            foreach ($responses as $registry => $response) {
-                if ($options['throw'] && ($response === null || $infos[$registry][1]['http_code'] >= 400)) {
-                    throw new \UnexpectedValueException(sprintf("request %s failed. caused by %s(error [%s] %s)",
-                        $infos[$registry][1]['url'],
-                        $infos[$registry][1]['http_code'],
-                        $infos[$registry][1]['errno'],
-                        curl_strerror($infos[$registry][1]['errno']),
-                    ));
-                }
-
-                $fp = tmpfile();
-                fwrite($fp, $response);
-                rewind($fp);
-
-                $transaction(function () use ($pdo, $fp, $registry, $cidrize, $refresh) {
-                    $refresh($registry);
-                    while (($fields = fgetcsv($fp, 0, "|")) !== false) {
-                        if (($fields[2] ?? '') === 'ipv4' && in_array($fields[6] ?? '', ['assigned', 'allocated'], true)) {
-                            foreach ($cidrize($fields[3], $fields[4]) as $cidr) {
-                                $pdo->prepare('REPLACE INTO rir_data VALUES (:ipaddress, :netmask, :registry, :cc, :date)')->execute([
-                                    'ipaddress' => $cidr[0],
-                                    'netmask'   => $cidr[1],
-                                    'registry'  => $fields[0],
-                                    'cc'        => $fields[1],
-                                    'date'      => $fields[5],
-                                ]);
+                // RFC アドレス
+                if (($meta['reserved']['expire'] ?? 0) < time()) {
+                    $this->transaction(function () {
+                        // reserved は options.ttl は見ず多少長めで良い
+                        $this->refresh('reserved', 60 * 60 * 24 * 7, (function () {
+                            foreach ([
+                                ['RFC1700', '0.0.0.0', 8],         // wildcard
+                                ['RFC919', '255.255.255.255', 32], // broadcast
+                                ['RFC5771', '224.0.0.0', 4],       // multicast
+                                ['RFC1122', '127.0.0.0', 8],       // loopback
+                                ['RFC3927', '169.254.0.0', 16],    // link-local
+                                ['RFC1918', '10.0.0.0', 8],        // private
+                                ['RFC1918', '172.16.0.0', 12],     // private
+                                ['RFC1918', '192.168.0.0', 16],    // private
+                            ] as [$name, $ip, $mask]) {
+                                yield [
+                                    'ipaddress' => $ip,
+                                    'netmask'   => $mask,
+                                    'registry'  => $name,
+                                    'cc'        => null,
+                                    'date'      => null,
+                                ];
                             }
+                        })());
+                    });
+                }
+
+                // RIR アドレス
+                if ($urls = array_filter($this->options['rir'], fn($registry) => ($meta[$registry]['expire'] ?? 0) < time(), ARRAY_FILTER_USE_KEY)) {
+                    $responses = http_requests($urls, [
+                        'cachedir'             => $this->options['cachedir'],
+                        CURLOPT_CONNECTTIMEOUT => $this->options['timeout'],
+                        CURLOPT_TIMEOUT        => $this->options['timeout'],
+                    ], [
+                        'throw' => $this->options['throw'],
+                    ], $infos);
+                    foreach ($responses as $registry => $response) {
+                        if ($response === null || $infos[$registry][1]['http_code'] >= 400) {
+                            $this->transaction(function () use ($registry) {
+                                // 失敗状態なので少し短めにする
+                                $this->refresh($registry, (int) ($this->options['ttl'] / 2), []);
+                            });
+                            $message = sprintf("request %s failed. caused by %s(error [%s] %s)",
+                                $infos[$registry][1]['url'],
+                                $infos[$registry][1]['http_code'],
+                                $infos[$registry][1]['errno'],
+                                curl_strerror($infos[$registry][1]['errno']),
+                            );
+                            if ($this->options['throw']) {
+                                throw new \UnexpectedValueException($message);
+                            }
+                            trigger_error($message, E_USER_WARNING);
                         }
+
+                        $fp = tmpfile();
+                        fwrite($fp, $response);
+                        rewind($fp);
+
+                        $this->transaction(function () use ($fp, $registry) {
+                            // 同時に走らないように rand でバラす
+                            $this->refresh($registry, time() + $this->options['ttl'] + rand(0, 60), (function () use ($fp) {
+                                while (($fields = fgetcsv($fp, 0, "|")) !== false) {
+                                    if (($fields[2] ?? '') === 'ipv4' && in_array($fields[6] ?? '', ['assigned', 'allocated'], true)) {
+                                        foreach ($this->cidr($fields[3], $fields[4]) as $cidr) {
+                                            yield [
+                                                'ipaddress' => $cidr[0],
+                                                'netmask'   => $cidr[1],
+                                                'registry'  => $fields[0],
+                                                'cc'        => $fields[1],
+                                                'date'      => $fields[5],
+                                            ];
+                                        }
+                                    }
+                                }
+                            })());
+                        });
                     }
-                });
+                }
             }
-        }
 
-        $query = 'SELECT ipaddress || "/" || netmask AS cidr, * FROM rir_data';
-
-        // 全取得モード
-        if ($ipaddr === null) {
-            $generator = (function () use ($pdo, $query) {
-                $stmt = $pdo->query($query, \PDO::FETCH_ASSOC);
+            public function generate(): iterable
+            {
+                $pdo = $this->pdo();
+                $stmt = $pdo->query('SELECT ipaddress || "/" || netmask AS cidr, * FROM rir_data', \PDO::FETCH_ASSOC);
                 foreach ($stmt as $row) {
                     $row['netmask'] = (int) $row['netmask'];
                     yield $row;
                 }
-            })();
+            }
+
+            public function query(string $ipaddr): ?array
+            {
+                $pdo = $this->pdo();
+                $stmt = $pdo->prepare('SELECT ipaddress || "/" || netmask AS cidr, * FROM rir_data WHERE ipaddress = :ipaddress AND netmask = :netmask');
+                for ($i = 32; $i > 0; $i--) {
+                    $subnet = (32 - $i);
+                    $ip = ip2long($ipaddr);
+                    $ip = $ip >> $subnet;
+                    $ip = $ip << $subnet;
+                    $ip = long2ip($ip);
+
+                    $stmt->execute([
+                        'ipaddress' => $ip,
+                        'netmask'   => $i,
+                    ]);
+                    $infos = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                    foreach ($infos as $info) {
+                        $info['netmask'] = (int) $info['netmask'];
+                        return $info;
+                    }
+                }
+                return null;
+            }
+
+            private function pdo(): \PDO
+            {
+                return $this->pdo ??= (function () {
+                    $sqlfile = "{$this->options['cachedir']}/ip_infov001.sqlite";
+                    if (!$this->options['cache']) {
+                        @unlink($sqlfile);
+                    }
+
+                    // PDO(sqlite)取得
+                    $initial = !file_exists($sqlfile);
+                    $pdo = new \PDO("sqlite:$sqlfile", null, null, [
+                        \PDO::ATTR_ERRMODE           => \PDO::ERRMODE_EXCEPTION,
+                        \PDO::ATTR_STRINGIFY_FETCHES => false,
+                        \PDO::ATTR_EMULATE_PREPARES  => false,
+                    ]);
+                    if ($initial) {
+                        $pdo->exec(<<<SQL
+                            CREATE TABLE IF NOT EXISTS rir_meta(
+                                registry VARCHAR(32) NOT NULL,
+                                expire   INT         NOT NULL,
+                                PRIMARY KEY (registry)
+                            )
+                            SQL
+                        );
+                        $pdo->exec(<<<SQL
+                            CREATE TABLE IF NOT EXISTS rir_data(
+                                ipaddress VARCHAR(16) NOT NULL,
+                                netmask   INT         NOT NULL,
+                                registry  VARCHAR(32) NOT NULL,
+                                cc        VARCHAR(16),
+                                date      VARCHAR(8),
+                                PRIMARY KEY (ipaddress, netmask)
+                            )
+                            SQL
+                        );
+                    }
+                    return $pdo;
+                })();
+            }
+
+            private function transaction(callable $callback)
+            {
+                $pdo = $this->pdo();
+                $pdo->beginTransaction();
+                // @codeCoverageIgnoreStart かなりしんどいので ignore
+                try {
+                    $return = $callback($pdo);
+                    $pdo->commit();
+                    return $return;
+                }
+                catch (\Exception $e) {
+                    $pdo->rollBack();
+                    throw $e;
+                    // @codeCoverageIgnoreEnd
+                }
+            }
+
+            private function refresh(string $registry, int $expire, iterable $data)
+            {
+                $pdo = $this->pdo();
+                $pdo->prepare('REPLACE INTO rir_meta VALUES (:registry, :expire)')->execute([
+                    'registry' => $registry,
+                    'expire'   => $expire,
+                ]);
+                if ($data) {
+                    $pdo->prepare('DELETE FROM rir_data WHERE registry = :registry')->execute([
+                        'registry' => $registry,
+                    ]);
+                    foreach ($data as $values) {
+                        $pdo->prepare('REPLACE INTO rir_data VALUES (:ipaddress, :netmask, :registry, :cc, :date)')->execute($values);
+                    }
+                }
+            }
+
+            private function cidr(string $ipaddr, int $count): iterable
+            {
+                $main = function (int $longip, int $count) use (&$main) {
+                    if ($count > 0) {
+                        for ($bit = (int) ceil(log($count, 2)); $bit > 1; $bit--) {
+                            $bitcount = (int) pow(2, $bit);
+                            if (($longip & $bitcount - 1) === 0 && $count >= $bitcount) {
+                                yield [long2ip($longip), (32 - $bit)];
+                                yield from $main($longip + $bitcount, $count - $bitcount);
+                                break;
+                            }
+                        }
+                    }
+                };
+                yield from $main(ip2long($ipaddr), $count);
+            }
+        };
+
+        if (!$options['readonly']) {
+            $client->register();
+        }
+
+        if ($ipaddr === null) {
+            $generator = $client->generate();
             if ($options['generate']) {
                 return $generator;
             }
-            return iterator_to_array($generator);
+            return [...$generator];
         }
 
-        // 単一取得モード
-        return cacheobject(__FUNCTION__, 0.01, 1.0)->hash($ipaddr, function () use ($pdo, $query, $ipaddr) {
-            $stmt = $pdo->prepare("$query WHERE ipaddress = :ipaddress AND netmask = :netmask");
-            for ($i = 32; $i > 0; $i--) {
-                $subnet = (32 - $i);
-                $ip = ip2long($ipaddr);
-                $ip = $ip >> $subnet;
-                $ip = $ip << $subnet;
-                $ip = long2ip($ip);
+        $cacheobject = cacheobject(__FUNCTION__, 0.01, 1.0);
 
-                $stmt->execute([
-                    'ipaddress' => $ip,
-                    'netmask'   => $i,
-                ]);
-                $infos = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                foreach ($infos as $info) {
-                    $info['netmask'] = (int) $info['netmask'];
-                    return $info;
-                }
-            }
+        if (!$options['cache']) {
+            $cacheobject->hash($ipaddr, null, 0);
+        }
+
+        return $cacheobject->hash($ipaddr, function () use ($client, $ipaddr) {
+            return $client->query($ipaddr);
         }, $options['ttl']);
     }
 }
@@ -25018,27 +25257,38 @@ if (!function_exists('ryunosuke\\Functions\\callable_code')) {
         $end = $ref->getEndLine();
         $codeblock = implode('', array_slice($contents, $start - 1, $end - $start + 1));
 
-        $meta = php_parse("<?php $codeblock", [
-            'begin' => [T_FN, T_FUNCTION],
-            'end'   => ['{', T_DOUBLE_ARROW],
-        ]);
-        $end = array_pop($meta);
+        $tokens = php_tokens("<?php $codeblock");
 
-        if ($end->id === T_DOUBLE_ARROW) {
-            $body = php_parse("<?php $codeblock", [
-                'begin'  => T_DOUBLE_ARROW,
-                'end'    => [';', ',', ')'],
-                'offset' => last_key($meta),
-                'greedy' => true,
-            ]);
-            $body = array_slice($body, 1, -1);
+        $begin = $tokens[0]->next([T_FUNCTION, T_FN]);
+        $close = $begin->next(['{', T_DOUBLE_ARROW]);
+
+        if ($begin->is(T_FN)) {
+            $meta = array_slice($tokens, $begin->index, $close->prev()->index - $begin->index + 1);
+            $temp = $close->find([';', ',']);
+            // アロー関数は終了トークンが明確ではない
+            // - $x = fn() => 123;         // セミコロン
+            // - $x = fn() => [123];       // セミコロンであって ] ではない
+            // - $x = [fn() => 123, null]; // こうだとカンマになるし
+            // - $x = [fn() => 123];       // こうだと ] になる
+            // しっかり実装できなくもないが、（多分）戻り読みが必要なのでここでは構文チェックをパスするまでループする実装とした
+            while (true) {
+                $test = array_slice($tokens, $close->next()->index, $temp->index - $close->next()->index);
+                $text = implode('', array_column($test, 'text'));
+                try {
+                    /** @noinspection PhpExpressionResultUnusedInspection */
+                    token_get_all("<?php $text;", TOKEN_PARSE);
+                    break;
+                }
+                catch (\Throwable) {
+                    $temp = $temp->prev();
+                }
+            }
+            $body = array_slice($tokens, $close->next()->index, $temp->index - $close->next()->index);
         }
         else {
-            $body = php_parse("<?php $codeblock", [
-                'begin'  => '{',
-                'end'    => '}',
-                'offset' => last_key($meta),
-            ]);
+            $meta = array_slice($tokens, $begin->index, $close->index - $begin->index);
+            $body = $close->end();
+            $body = array_slice($tokens, $close->index, $body->index - $close->index + 1);
         }
 
         if ($return_token) {
@@ -35465,6 +35715,13 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
                     'indent'   => $spacer1,
                     'baseline' => -1,
                 ]);
+
+                $attrs = [];
+                foreach ($ref->getAttributes() as $attr) {
+                    $attrs[] = "#[{$raw_export($attr->getName())}({$raw_export(implode(', ', array_map($export, $attr->getArguments())))})]";
+                }
+                $attrs = $attrs ? (implode(' ', $attrs) . ' ') : '';
+
                 if ($bind) {
                     $instance = $export($bind, $nest + 1);
                     if ($class->isAnonymous()) {
@@ -35473,10 +35730,10 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
                     else {
                         $scope = $var_export($class?->getName() === 'Closure' ? 'static' : $class?->getName());
                     }
-                    $code = "\Closure::bind($code, $instance, $scope)";
+                    $code = "\Closure::bind({$attrs}$code, $instance, $scope)";
                 }
                 elseif (!is_bindable_closure($value)) {
-                    $code = "static $code";
+                    $code = "{$attrs}static $code";
                 }
 
                 return "\$this->$vid = (function () {\n{$raw_export(implode('', $uses))}{$spacer1}return $code;\n$spacer0})->call(\$this)";
