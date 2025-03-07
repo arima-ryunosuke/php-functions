@@ -6,7 +6,7 @@ require_once __DIR__ . '/../array/array_explode.php';
 require_once __DIR__ . '/../array/array_find_first.php';
 require_once __DIR__ . '/../array/first_value.php';
 require_once __DIR__ . '/../array/last_value.php';
-require_once __DIR__ . '/../misc/php_parse.php';
+require_once __DIR__ . '/../misc/php_tokens.php';
 require_once __DIR__ . '/../constants.php';
 // @codeCoverageIgnoreEnd
 
@@ -103,9 +103,7 @@ function json_import($value, $options = [])
 
         public function parse($options)
         {
-            $tokens = @php_parse($this->json_string, [
-                'cache' => false,
-            ]);
+            $tokens = php_tokens($this->json_string);
             array_shift($tokens);
 
             $braces = [];

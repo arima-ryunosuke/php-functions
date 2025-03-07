@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../misc/evaluate.php';
-require_once __DIR__ . '/../misc/php_parse.php';
+require_once __DIR__ . '/../misc/php_tokens.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -29,9 +29,7 @@ require_once __DIR__ . '/../misc/php_parse.php';
 function calculate_formula($formula)
 {
     // TOKEN_PARSE を渡せばシンタックスチェックも行ってくれる
-    $tokens = php_parse("<?php ($formula);", [
-        'flags' => TOKEN_PARSE,
-    ]);
+    $tokens = php_tokens("<?php ($formula);", TOKEN_PARSE);
     array_shift($tokens);
     array_pop($tokens);
 
@@ -42,13 +40,13 @@ function calculate_formula($formula)
     $constant = '';
     $expression = '';
     foreach ($tokens as $token) {
-        if (in_array($token->id, [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+        if ($token->isIgnorable()) {
             continue;
         }
-        if (in_array($token->id, $constants, true)) {
+        if ($token->is($constants)) {
             $constant .= $token->text;
         }
-        elseif (in_array($token->id, $operands, true) || in_array($token->text, $operators, true)) {
+        elseif ($token->is($operands) || $token->is($operators)) {
             if (strlen($constant)) {
                 $expression .= constant($constant) + 0;
                 $constant = '';

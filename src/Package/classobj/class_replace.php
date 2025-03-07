@@ -4,7 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../classobj/class_loader.php';
 require_once __DIR__ . '/../misc/evaluate.php';
-require_once __DIR__ . '/../misc/php_parse.php';
+require_once __DIR__ . '/../misc/php_tokens.php';
 require_once __DIR__ . '/../pcre/preg_replaces.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
 require_once __DIR__ . '/../reflection/function_parameter.php';
@@ -128,23 +128,15 @@ function class_replace($class, $register)
     }
     // 配列はメソッド定義のクロージャ配列とする
     if (is_array($newclass)) {
-        $content = file_get_contents($fname);
-        $origspace = php_parse($content, [
-            'begin' => T_NAMESPACE,
-            'end'   => ';',
-        ]);
-        array_shift($origspace);
-        array_pop($origspace);
+        $tokens = php_tokens(file_get_contents($fname));
 
-        $origclass = php_parse($content, [
-            'begin'  => T_CLASS,
-            'end'    => T_STRING,
-            'offset' => count($origspace),
-        ]);
-        array_shift($origclass);
+        $begin = $tokens[0]->next(T_NAMESPACE);
+        $end = $begin->next(';');
+        $origspace = trim(implode('', array_column(array_slice($tokens, $begin->index + 1, $end->index - $begin->index - 1), 'text')));
 
-        $origspace = trim(implode('', array_column($origspace, 'text')));
-        $origclass = trim(implode('', array_column($origclass, 'text')));
+        $begin = $end->next(T_CLASS);
+        $end = $begin->next(T_STRING);
+        $origclass = trim(implode('', array_column(array_slice($tokens, $begin->index + 1, $end->index - $begin->index + 1), 'text')));
 
         $classcode = '';
         foreach ($newclass as $name => $member) {

@@ -3,7 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_sprintf.php';
-require_once __DIR__ . '/../misc/php_parse.php';
+require_once __DIR__ . '/../misc/php_tokens.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -37,7 +37,7 @@ function func_eval($expression, ...$variadic)
     $args = array_sprintf($variadic, '$%s', ',');
     $cachekey = "$expression($args)";
     if (!isset($cache[$cachekey])) {
-        $tmp = php_parse("<?php $expression");
+        $tmp = php_tokens("<?php $expression");
         array_shift($tmp);
         $stmt = '';
         for ($i = 0; $i < count($tmp); $i++) {
