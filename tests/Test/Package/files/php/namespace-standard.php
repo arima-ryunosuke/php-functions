@@ -44,10 +44,25 @@ echo xC;
 echo C1;
 echo xC2;
 echo Space\C;
+echo Unknown1::CONSTANT;
+echo unknown\Unknown2::CONSTANT;
 
-$closure = function () { };
+$closure = #[GlobalAttr] #[Space\Attr] function () { };
 
-$object = new class ( ) extends AO { };
+$object = new class () extends AO {
+    function __invoke()
+    {
+        return [self::class, static::class, parent::class];
+    }
+
+    private PropertyType $property1;
+    private Sub\PropertyType $property2;
+
+    function typehint(ArgumentType $arg1, ?Sub\ArgumentType $arg2 = null): ReturnType|Sub\ReturnType
+    {
+        $this->typehint(arg1: null);
+    }
+};
 
 define("other\\space\\CONST", 'dummy');
 const nsC = 123;
@@ -59,8 +74,6 @@ function nsF()
 
 class nsC extends \ArrayObject implements \IteratorAggregate
 {
-    use T;
-
     public function m()
     {
         $use = 123;
@@ -75,3 +88,10 @@ interface nsI extends \IteratorAggregate
 trait nsT
 {
 }
+
+class Unknown extends UnknownClass1 implements UnknownInterface1, Sub\UnknownInterface2
+{
+    use UnknownTrait1, Sub\UnknownTrait2;
+}
+
+new Sub\UnknownClass2();
