@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../classobj/const_exists.php';
+require_once __DIR__ . '/../funchand/is_callback.php';
 require_once __DIR__ . '/../misc/namespace_resolve.php';
 // @codeCoverageIgnoreEnd
 
@@ -16,8 +17,14 @@ require_once __DIR__ . '/../misc/namespace_resolve.php';
  * - __debugInfo: デバッグしやすい情報で吐き出す
  * - clone: 新プロパティを指定して clone する
  * - name: getTokenName のエイリアス
- * - prev: ignorable ではない直前のトークンを返す
- * - next: ignorable ではない直後のトークンを返す
+ * - prev: 条件一致した直前のトークンを返す
+ *   - 引数未指定時は isIgnorable でないもの
+ * - next: 条件一致した直後のトークンを返す
+ *   - 引数未指定時は isIgnorable でないもの
+ * - find: ブロック内部を読み飛ばしつつ指定トークンを探す
+ * - end: 自身の対応するペアトークンまで飛ばして返す
+ *   - 要するに { や (, " などの中途半端ではない終わりのトークンを返す
+ * - contents: 自身と end 間のトークンを文字列化する
  * - resolve: text が名前空間を解決して完全修飾になったトークンを返す
  *
  * Example:
@@ -54,8 +61,6 @@ function php_tokens(string $code, int $flags = 0)
         public array $tokens;
         public int   $index;
 
-        private $cache = [];
-
         public function __debugInfo(): array
         {
             $result = get_object_vars($this);
@@ -75,23 +80,89 @@ function php_tokens(string $code, int $flags = 0)
             foreach ($newparams as $param => $value) {
                 $that->{$param} = $value;
             }
-            $that->cache = [];
             return $that;
         }
 
         public function name(): string
         {
-            return $this->cache['name'] ??= $this->getTokenName();
+            return $this->getTokenName();
         }
 
-        public function prev(): ?self
+        public function prev($condition = null): ?self
         {
-            return $this->cache['prev'] ??= $this->sibling($this->index, -1);
+            $condition ??= fn($token) => !$token->isIgnorable();
+            return $this->sibling(-1, $condition);
         }
 
-        public function next(): ?self
+        public function next($condition = null): ?self
         {
-            return $this->cache['next'] ??= $this->sibling($this->index, +1);
+            $condition ??= fn($token) => !$token->isIgnorable();
+            return $this->sibling(+1, $condition);
+        }
+
+        public function find($condition): ?self
+        {
+            $condition = (array) $condition;
+            $token = $this;
+            while (true) {
+                $token = $token->sibling(+1, array_merge($condition, ['{', '${', '"', T_START_HEREDOC, '#[', '[', '(']));
+                if ($token === null) {
+                    return null;
+                }
+                if ($token->is($condition)) {
+                    return $token;
+                }
+                $token = $token->end();
+            }
+        }
+
+        public function end(): self
+        {
+            $skip = function ($starts, $ends) {
+                $token = $this;
+                while (true) {
+                    $token = $token->sibling(+1, array_merge($starts, $ends)) ?? throw new \DomainException(sprintf("token mismatch(line:%d, pos:%d, '%s')", $token->line, $token->pos, $token->text));
+                    if ($token->is($starts)) {
+                        $token = $token->end();
+                    }
+                    elseif ($token->is($ends)) {
+                        return $token;
+                    }
+                }
+            };
+
+            if ($this->is('"')) {
+                return $skip(['{', '${'], ['"']);
+            }
+            if ($this->is('`')) {
+                return $skip(['{', '${'], ['`']);
+            }
+            if ($this->is(T_START_HEREDOC)) {
+                return $skip(['{', '${'], [T_END_HEREDOC]);
+            }
+            if ($this->is('#[')) {
+                return $skip(['#[', '['], [']']);
+            }
+            if ($this->is('[')) {
+                return $skip(['#[', '['], [']']);
+            }
+            if ($this->is('${')) {
+                return $skip(['${'], ['}']); // @codeCoverageIgnore deprecated php8.2
+            }
+            if ($this->is('{')) {
+                return $skip(['{', '"'], ['}']);
+            }
+            if ($this->is('(')) {
+                return $skip(['('], [')']);
+            }
+
+            throw new \DomainException(sprintf("token is not pairable(line:%d, pos:%d, '%s')", $this->line, $this->pos, $this->text));
+        }
+
+        public function contents(?int $end = null): string
+        {
+            $end ??= $this->end()->index;
+            return implode('', array_column(array_slice($this->tokens, $this->index, $end - $this->index + 1), 'text'));
         }
 
         public function resolve($ref): string
@@ -144,10 +215,13 @@ function php_tokens(string $code, int $flags = 0)
             return $text;
         }
 
-        private function sibling($n, $d)
+        private function sibling(int $step, $condition)
         {
-            for ($i = $n + $d; isset($this->tokens[$i]); $i += $d) {
-                if (!$this->tokens[$i]->isIgnorable()) {
+            if (is_array($condition) || !is_callback($condition)) {
+                $condition = fn($token) => $token->is($condition);
+            }
+            for ($i = $this->index + $step; isset($this->tokens[$i]); $i += $step) {
+                if ($condition($this->tokens[$i])) {
                     return $this->tokens[$i];
                 }
             }

@@ -1164,6 +1164,88 @@ aplain text
         //print_r($tokens);
         that(strlen(print_r($tokens, true)))->lt(10000);
 
+        $tokens = php_tokens('<?php return [1,[2,[3]]];');
+        //\ryunosuke\Functions\Package\var_pretty($tokens);
+        that($tokens[0])->find(',')->is(null);
+        that($tokens[4])->find(',')->index->is(5);
+        that($tokens[6])->find(',')->index->is(8);
+
+        $contents = function () {
+            $V = fn($v) => $v;
+            $string = "string";
+
+            $string1 = "a {$string} z";
+            $string2 = "a {${strtolower($string)}} z";
+            $string3 = "a {${$GLOBALS[""]}} z";
+            $string4 = "a {$GLOBALS[""]} z";
+            $string5 = "a {$V(implode("{$string}", array_map(function () { }, [])))} z";
+
+            $backtick1 = `echo $string`;
+
+            $heredoc1 = <<<HERE1
+            $string
+            HERE1;
+            $heredoc2 = <<<HERE2
+            {$V(<<<INHERE
+            {$string}
+            INHERE,)}
+            HERE2;
+
+            $fn = #[A([[[[[1]]]]])] fn($a = [[(1 + 2)]]) => 123;
+            $function = function ($a = [[[[[[1]]]]]]) { };
+
+            $object = new class([[[1]]]) {
+                public function __construct(private array $array)
+                {
+                    if (true) {
+                        return [];
+                    }
+                }
+            };
+            return get_defined_vars();
+        };
+        $tokens = php_tokens('<?php return ' . callable_code($contents)[1]);
+        //\ryunosuke\Functions\Package\var_pretty($tokens);
+
+        that($tokens[0]->next('$string1')->next('"')->contents())->is('"a {$string} z"');
+        that($tokens[0]->next('$string2')->next('"')->contents())->is('"a {${strtolower($string)}} z"');
+        that($tokens[0]->next('$string3')->next('"')->contents())->is('"a {${$GLOBALS[""]}} z"');
+        that($tokens[0]->next('$string4')->next('"')->contents())->is('"a {$GLOBALS[""]} z"');
+        that($tokens[0]->next('$string5')->next('"')->contents())->is('"a {$V(implode("{$string}", array_map(function () { }, [])))} z"');
+
+        that($tokens[0]->next('$backtick1')->next('`')->contents())->is('`echo $string`');
+
+        that($tokens[0]->next("<<<HERE1\n")->contents())->is('<<<HERE1
+            $string
+            HERE1');
+        that($tokens[0]->next("<<<HERE2\n")->contents())->is('<<<HERE2
+            {$V(<<<INHERE
+            {$string}
+            INHERE,)}
+            HERE2');
+
+        $attr = $tokens[0]->next('$fn')->next('#[');
+        that($attr->contents())->is('#[A([[[[[1]]]]])]');
+        that($attr->next('fn')->next('(')->contents())->is('($a = [[(1 + 2)]])');
+        that($tokens[0]->next('$function')->next('{')->contents())->is('{ }');
+
+        $object = $tokens[0]->next('$object')->next('{');
+        that($object->contents())->is(<<<'OBJECT'
+        {
+                        public function __construct(private array $array)
+                        {
+                            if (true) {
+                                return [];
+                            }
+                        }
+                    }
+        OBJECT,);
+        that($object->next('(')->next('{')->contents())->is('{
+                    if (true) {
+                        return [];
+                    }
+                }');
+
         $magics = function () {
             return [__DIR__, __FILE__, __NAMESPACE__];
         };
@@ -1182,6 +1264,10 @@ aplain text
         //\ryunosuke\Functions\Package\var_pretty($tokens);
         that($tokens[7]->resolve($ref))->is('\\' . __NAMESPACE__ . '\\' . 'php_tokens_dummy_function');
         that($tokens[9]->resolve($ref))->is('\\' . __NAMESPACE__ . '\\' . 'PHP_TOKENS_DUMMY_CONST');
+
+        $tokens = php_tokens('<?php return fn() => [');
+        that($tokens[2])->end()->wasThrown('token is not pairable');
+        that($tokens[9])->end()->wasThrown('token mismatch');
     }
 
     function test_unique_id()
