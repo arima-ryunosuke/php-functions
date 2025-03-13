@@ -323,10 +323,12 @@ function ip_info($ipaddr, $options = [])
     $cacheobject = cacheobject(__FUNCTION__, 0.01, 1.0);
 
     if (!$options['cache']) {
-        $cacheobject->hash($ipaddr, null, 0);
+        $cacheobject->delete($ipaddr);
     }
 
-    return $cacheobject->hash($ipaddr, function () use ($client, $ipaddr) {
-        return $client->query($ipaddr);
-    }, $options['ttl']);
+    if (!$cacheobject->has($ipaddr)) {
+        $cacheobject->set($ipaddr, $client->query($ipaddr), $options['ttl']);
+    }
+
+    return $cacheobject->get($ipaddr);
 }
