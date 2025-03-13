@@ -13,6 +13,7 @@ use function ryunosuke\Functions\Package\get_uploaded_files;
 use function ryunosuke\Functions\Package\ini_sets;
 use function ryunosuke\Functions\Package\is_ansi;
 use function ryunosuke\Functions\Package\php_binary;
+use function ryunosuke\Functions\Package\sys_get_memory;
 use function ryunosuke\Functions\Package\sys_set_temp_dir;
 use function ryunosuke\Functions\Package\system_status;
 
@@ -591,6 +592,15 @@ class infoTest extends AbstractTestCase
         that(getenv('ENV_3', true))->is('');
         that(getenv('ENV_X', true))->isFalse();
         that(getenv('undefined', true))->isFalse();
+    }
+
+    function test_sys_get_memory()
+    {
+        // 変更できないので実質的にカバレッジのみ
+
+        $memory = sys_get_memory();
+        that($memory)->isArray();
+        that($memory)->hasKeyAll(['memory_total', 'memory_free', 'memory_available', 'swap_total', 'swap_free']);
     }
 
     function test_sys_set_temp_dir()
