@@ -490,8 +490,8 @@ trait ChainObject0
 
     /** @see json_storage() */
     public self $json_storage;
-    public function json_storage(string $prefix = "global"): self { }
-    public function json_storage(): self { }
+    public function json_storage(string $prefix = "global", int $ttl = PHP_INT_MAX): self { }
+    public function json_storage(int $ttl = PHP_INT_MAX): self { }
 
     /** @see cipher_metadata() */
     public self $cipher_metadata;

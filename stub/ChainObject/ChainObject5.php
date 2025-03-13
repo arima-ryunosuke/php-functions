@@ -629,6 +629,11 @@ TEXT): self { }
     public function is_arrayable($var): self { }
     public function is_arrayable(): self { }
 
+    /** @see is_empty_recursive() */
+    public self $is_empty_recursive;
+    public function is_empty_recursive($var, $empty_stdClass = false): self { }
+    public function is_empty_recursive($empty_stdClass = false): self { }
+
     /** @see is_recursive() */
     public self $is_recursive;
     public function is_recursive($var): self { }

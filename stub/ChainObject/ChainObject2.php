@@ -408,6 +408,11 @@ trait ChainObject2
     public function func_user_func_array(callable $callback): self { }
     public function func_user_func_array(): self { }
 
+    /** @see sys_get_memory() */
+    public self $sys_get_memory;
+    public function sys_get_memory(int $cacheSecond = 0): self { }
+    public function sys_get_memory(): self { }
+
     /** @see php_highlight() */
     public self $php_highlight;
     public function php_highlight($phpcode, $options = []): self { }

@@ -278,6 +278,10 @@ if (!defined('JSON_OBJECT_HANDLER')) {
     define('JSON_OBJECT_HANDLER', -107);
 }
 
+if (!defined('JSON_ESCAPE_SINGLE_QUOTE')) {
+    define('JSON_ESCAPE_SINGLE_QUOTE', -108);
+}
+
 if (!defined('SI_UNITS')) {
     define('SI_UNITS', [
         -8 => ["y"],
@@ -9984,13 +9988,14 @@ if (!function_exists('json_import')) {
     function json_import($value, $options = [])
     {
         $specials = [
-            JSON_OBJECT_AS_ARRAY  => true, // 個人的嗜好だが連想配列のほうが扱いやすい
-            JSON_MAX_DEPTH        => 512,
-            JSON_ES5              => null,
-            JSON_INT_AS_STRING    => false,
-            JSON_FLOAT_AS_STRING  => false,
-            JSON_TEMPLATE_LITERAL => false,
-            JSON_BARE_AS_STRING   => false,
+            JSON_OBJECT_AS_ARRAY     => true, // 個人的嗜好だが連想配列のほうが扱いやすい
+            JSON_MAX_DEPTH           => 512,
+            JSON_ES5                 => null,
+            JSON_INT_AS_STRING       => false,
+            JSON_FLOAT_AS_STRING     => false,
+            JSON_TEMPLATE_LITERAL    => false,
+            JSON_BARE_AS_STRING      => false,
+            JSON_ESCAPE_SINGLE_QUOTE => true,
         ];
         foreach ($specials as $key => $default) {
             $specials[$key] = $options[$key] ?? $default;
@@ -10067,7 +10072,7 @@ if (!function_exists('json_import')) {
                         if ($token->text === '}') {
                             $object = $this->token('object', $tokens[$brace]->pos, $token->pos + strlen($token->text));
                             foreach ($elements as $element) {
-                                $keyandval = array_explode($element, fn($token) => !$token instanceof $this && $token->text === ':');
+                                $keyandval = array_explode($element, fn($token) => !$token instanceof $this && $token->text === ':', 2);
                                 // check no colon (e.g. {123})
                                 if (count($keyandval) !== 2) {
                                     throw $this->exception("Missing object key", first_value($keyandval[0]));
@@ -10144,6 +10149,30 @@ if (!function_exists('json_import')) {
 
             private function value($options = [])
             {
+                $datetimify = function ($token) use ($options) {
+                    /** @var \DateTime $datetimeClass */
+                    $datetimeClass = function_configure('datetime.class');
+                    $rules = [
+                        'Y-m-d\TH:i:s.uP' => true,
+                        'Y-m-d\TH:i:s.u'  => true,
+                        'Y-m-d\TH:i:sP'   => true,
+                        'Y-m-d\TH:i:s'    => true,
+                        'Y-m-d H:i:s.uP'  => true,
+                        'Y-m-d H:i:s.u'   => true,
+                        'Y-m-d H:i:sP'    => true,
+                        'Y-m-d H:i:s'     => true,
+                        'Y-m-d'           => false,
+                    ];
+                    foreach ($rules as $format => $with_time) {
+                        if ($result = $datetimeClass::createFromFormat($format, $token)) {
+                            if (!$with_time) {
+                                $result = $result->setTime(0, 0, 0, 0);
+                            }
+                            return $result;
+                        }
+                    }
+                    return null;
+                };
                 $numberify = function ($token) use ($options) {
                     if (is_numeric($token[0]) || $token[0] === '-' || $token[0] === '+' || $token[0] === '.') {
                         $sign = 1;
@@ -10183,6 +10212,9 @@ if (!function_exists('json_import')) {
                         }
                         $rawtoken = $token;
                         $token = substr($token, 1, -1);
+                        if (!$options[JSON_ESCAPE_SINGLE_QUOTE] && $rawtoken[0] === "'") {
+                            return $token;
+                        }
                         if ($rawtoken[0] === "`" && $rawtoken[1] === "\n" && preg_match('#\n( +)`#u', $rawtoken, $match)) {
                             $token = substr(preg_replace("#\n{$match[1]}#u", "\n", $token), 1, -1);
                         }
@@ -10246,6 +10278,10 @@ if (!function_exists('json_import')) {
                         // literals
                         if (array_key_exists($token, $literals)) {
                             return $literals[$token];
+                        }
+                        // datetime
+                        if (($datetime = $datetimify($token)) !== null) {
+                            return $datetime;
                         }
                         // numbers
                         if (($number = $numberify($token)) !== null) {
@@ -18259,6 +18295,61 @@ if (!function_exists('setenvs')) {
     }
 }
 
+assert(!function_exists('sys_get_memory') || (new \ReflectionFunction('sys_get_memory'))->isUserDefined());
+if (!function_exists('sys_get_memory')) {
+    /**
+     * システムのメモリを取得する
+     *
+     * php にはメモリ情報を返す関数が存在しないので共通のために作成。
+     * Windows 版はかなりやっつけなので過度に呼んではならない。
+     *
+     * $cacheSecond を指定するとその秒数分はキャッシュを返すようになる。
+     *
+     * @codeCoverageIgnore
+     * @package ryunosuke\Functions\Package\info
+     *
+     * @param int $cacheSecond キャッシュ秒数
+     * @return array メモリ情報
+     */
+    function sys_get_memory(int $cacheSecond = 0)
+    {
+        if (DIRECTORY_SEPARATOR === '\\') {
+            $provide = function () {
+                process('powershell', ['-Command', 'ConvertTo-Json (Get-WmiObject win32_operatingsystem | Select-Object *)'], '', $stdout);
+                $memory_info = json_decode($stdout, true);
+
+                $memory_total = $memory_info['TotalVisibleMemorySize'] * 1024;
+                $memory_free = $memory_info['FreePhysicalMemory'] * 1024;
+                $memory_available = $memory_info['FreePhysicalMemory'] * 1024;
+
+                $swap_total = ($memory_info['TotalVirtualMemorySize'] - $memory_info['TotalVisibleMemorySize']) * 1024;
+                $swap_free = $memory_info['FreeVirtualMemory'] * 1024;
+
+                return compact('memory_total', 'memory_free', 'memory_available', 'swap_total', 'swap_free');
+            };
+        }
+        else {
+            $provide = function () {
+                $memory_info = str_array(trim(file_get_contents('/proc/meminfo')), ':', true);
+
+                $memory_total = si_unprefix($memory_info['MemTotal'], 1024, '%d %sB');
+                $memory_free = si_unprefix($memory_info['MemFree'], 1024, '%d %sB');
+                $memory_available = si_unprefix($memory_info['MemAvailable'], 1024, '%d %sB');
+
+                $swap_total = si_unprefix($memory_info['SwapTotal'], 1024, '%d %sB');
+                $swap_free = si_unprefix($memory_info['SwapFree'], 1024, '%d %sB');
+
+                return compact('memory_total', 'memory_free', 'memory_available', 'swap_total', 'swap_free');
+            };
+        }
+
+        $storage = json_storage(__FUNCTION__, $cacheSecond);
+        $storage['result'] ??= $provide();
+
+        return $storage['result'];
+    }
+}
+
 assert(!function_exists('sys_set_temp_dir') || (new \ReflectionFunction('sys_set_temp_dir'))->isUserDefined());
 if (!function_exists('sys_set_temp_dir')) {
     /**
@@ -23483,12 +23574,14 @@ if (!function_exists('ip_info')) {
         $cacheobject = cacheobject(__FUNCTION__, 0.01, 1.0);
 
         if (!$options['cache']) {
-            $cacheobject->hash($ipaddr, null, 0);
+            $cacheobject->delete($ipaddr);
         }
 
-        return $cacheobject->hash($ipaddr, function () use ($client, $ipaddr) {
-            return $client->query($ipaddr);
-        }, $options['ttl']);
+        if (!$cacheobject->has($ipaddr)) {
+            $cacheobject->set($ipaddr, $client->query($ipaddr), $options['ttl']);
+        }
+
+        return $cacheobject->get($ipaddr);
     }
 }
 
@@ -25270,7 +25363,7 @@ if (!function_exists('callable_code')) {
             // - $x = [fn() => 123, null]; // こうだとカンマになるし
             // - $x = [fn() => 123];       // こうだと ] になる
             // しっかり実装できなくもないが、（多分）戻り読みが必要なのでここでは構文チェックをパスするまでループする実装とした
-            while (true) {
+            while ($temp) {
                 $test = array_slice($tokens, $close->next()->index, $temp->index - $close->next()->index);
                 $text = implode('', array_column($test, 'text'));
                 try {
@@ -25282,7 +25375,7 @@ if (!function_exists('callable_code')) {
                     $temp = $temp->prev();
                 }
             }
-            $body = array_slice($tokens, $close->next()->index, $temp->index - $close->next()->index);
+            $body = array_slice($tokens, $close->next()->index, ($temp->index ?? 0) - $close->next()->index);
         }
         else {
             $meta = array_slice($tokens, $begin->index, $close->index - $begin->index);
@@ -33495,13 +33588,15 @@ if (!function_exists('json_storage')) {
     /**
      * キーが json 化されてファイルシステムに永続化される ArrayAccess を返す
      *
-     * 非常にシンプルで PSR-16 も実装せず、TTL もクリア手段も（基本的には）存在しない。
+     * 非常にシンプルで PSR-16 も実装せず、クリア手段も（基本的には）存在しない。
      * ArrayAccess なので `$storage['hoge'] ??= something()` として使うのがほぼ唯一の利用法。
      * その仕様・利用上、値として null を使用することはできない（使用した場合の動作は未定義とする）。
      *
      * キーに指定できるのは json_encode 可能なもののみ。
      * 値に指定できるのは var_export 可能なもののみ。
      * 上記以外を与えたときの動作は未定義。
+     * TTL を指定すると次回読み込み時に期限切れをチェックし、切れていた場合 null を返す。
+     * 一度読み込まれればそのリクエスト中は期限切れになることはない。
      *
      * 得てして簡単な関数・メソッドのメモ化や内部的なキャッシュに使用する。
      *
@@ -33519,9 +33614,10 @@ if (!function_exists('json_storage')) {
      * @package ryunosuke\Functions\Package\utility
      *
      * @param string $directory 永続化ディレクトリ
+     * @param int $ttl TTL
      * @return \ArrayObject
      */
-    function json_storage(string $prefix = 'global')
+    function json_storage(string $prefix = 'global', int $ttl = PHP_INT_MAX)
     {
         $cachedir = function_configure('cachedir') . '/' . strtr(__FUNCTION__, ['\\' => '%']);
         if (!file_exists($cachedir)) {
@@ -33529,7 +33625,9 @@ if (!function_exists('json_storage')) {
         }
 
         static $objects = [];
-        return $objects[$prefix] ??= new class("$cachedir/" . strtr($prefix, ['\\' => '%', '/' => '-'])) extends \ArrayObject {
+        $objects[$prefix] ??= new class("$cachedir/" . strtr($prefix, ['\\' => '%', '/' => '-'])) extends \ArrayObject {
+            public int $defaultTtl = PHP_INT_MAX;
+
             public function __construct(private string $directory)
             {
                 parent::__construct();
@@ -33553,10 +33651,10 @@ if (!function_exists('json_storage')) {
                 $filename = $this->filename($json);
                 clearstatcache(true, $filename);
                 if (file_exists($filename)) {
-                    [$k, $v] = include $filename;
-                    // hash 化してるので万が一競合すると異なるデータを返してしまう
-                    if ($k !== $key) {
-                        return null; // @codeCoverageIgnore
+                    [$k, $v, $t] = include $filename;
+                    // TTL 兼 hash 化してるので万が一競合すると異なるデータを返してしまう
+                    if (($k !== $key) || ((time() - $t) >= $this->defaultTtl)) {
+                        return null;
                     }
                     // ストレージに有ったら内部キャッシュしてそれを使う
                     parent::offsetSet($json, $v);
@@ -33579,7 +33677,7 @@ if (!function_exists('json_storage')) {
                         @unlink($filename);
                     }
                     else {
-                        file_put_contents($filename, '<?php return ' . var_export([$key, $value], true) . ';', LOCK_EX);
+                        file_put_contents($filename, '<?php return ' . var_export([$key, $value, time()], true) . ';', LOCK_EX);
                     }
                 }
 
@@ -33616,7 +33714,15 @@ if (!function_exists('json_storage')) {
                 ]));
                 return "{$this->directory}-$filename.php-cache";
             }
+
+            /** @noinspection PhpUnusedPrivateMethodInspection */
+            private function debug($closure)
+            {
+                return $closure->call($this);
+            }
         };
+        $objects[$prefix]->defaultTtl = $ttl;
+        return $objects[$prefix];
     }
 }
 
@@ -34509,6 +34615,64 @@ if (!function_exists('is_empty')) {
 
         // 上記以外は empty に任せる
         return empty($var);
+    }
+}
+
+assert(!function_exists('is_empty_recursive') || (new \ReflectionFunction('is_empty_recursive'))->isUserDefined());
+if (!function_exists('is_empty_recursive')) {
+    /**
+     * 値が空か再帰的に検査する
+     *
+     * `is_empty` の再帰版。
+     *
+     * クエリパラメータやオプション配列等で「実質値を持っていない」を判定したいことが稀によくある。
+     * Example を参照。
+     *
+     * Example:
+     * ```php
+     * // このような値を空判定したい
+     * that(is_empty_recursive([
+     *     'query' => [
+     *         'param1' => '',
+     *         'param2' => '',
+     *     ],
+     *     'opt' => [
+     *         'key1' => '',
+     *         'key2' => null,
+     *     ],
+     * ]))->isTrue();
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\var
+     *
+     * @param mixed $var 判定する値
+     * @param bool $empty_stdClass 空の stdClass を空とみなすか
+     * @return bool 空なら true
+     */
+    function is_empty_recursive($var, $empty_stdClass = false)
+    {
+        // 見つかった時点で大域脱出するため例外を用いている
+        $ex = new \Exception();
+        try {
+            $var = [$var];
+            array_walk_recursive($var, function ($v) use ($ex, $empty_stdClass) {
+                if ($empty_stdClass && is_object($v) && get_class($v) === 'stdClass') {
+                    if (!is_empty_recursive((array) $v, $empty_stdClass)) {
+                        throw $ex;
+                    }
+                }
+                elseif (!is_empty($v, $empty_stdClass)) {
+                    throw $ex;
+                }
+            });
+        }
+        catch (\Exception $ex2) {
+            if ($ex !== $ex2) {
+                throw $ex2;
+            }
+            return false;
+        }
+        return true;
     }
 }
 
