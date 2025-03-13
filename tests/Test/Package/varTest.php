@@ -24,6 +24,7 @@ use function ryunosuke\Functions\Package\hashvar;
 use function ryunosuke\Functions\Package\is_arrayable;
 use function ryunosuke\Functions\Package\is_decimal;
 use function ryunosuke\Functions\Package\is_empty;
+use function ryunosuke\Functions\Package\is_empty_recursive;
 use function ryunosuke\Functions\Package\is_exportable;
 use function ryunosuke\Functions\Package\is_primitive;
 use function ryunosuke\Functions\Package\is_recursive;
@@ -472,6 +473,34 @@ class varTest extends AbstractTestCase
         // 自明だが継承して空でなければ空ではない
         $stdClassEx->hoge = 123;
         that(is_empty($stdClassEx, true))->isFalse();
+    }
+
+    function test_is_empty_recursive()
+    {
+        that(is_empty_recursive(null))->isSame(empty(null));
+        that(is_empty_recursive(false))->isSame(empty(false));
+        that(is_empty_recursive(0))->isSame(empty(0));
+        that(is_empty_recursive(0.0))->isSame(empty(0.0));
+        that(is_empty_recursive(''))->isSame(empty(''));
+        that(is_empty_recursive([]))->isSame(empty([]));
+
+        that(is_empty_recursive([[['']]]))->isSame(true);
+        that(is_empty_recursive([[['X']]]))->isSame(false);
+        that(is_empty_recursive(['x' => ['y' => ['z' => []]]]))->isSame(true);
+        that(is_empty_recursive(['x' => ['y' => ['z' => '']]]))->isSame(true);
+        that(is_empty_recursive(['x' => ['y' => ['z' => 'X']]]))->isSame(false);
+        that(is_empty_recursive([[[(object) []]]]))->isSame(false);
+        that(is_empty_recursive([[[(object) []]]], true))->isSame(true);
+        that(is_empty_recursive([[[(object) ['']]]], true))->isSame(true);
+        that(is_empty_recursive([[[(object) ['X']]]], true))->isSame(false);
+
+        $countable = new class() implements \Countable {
+            public function count(): int
+            {
+                throw new \Exception('internal exception');
+            }
+        };
+        that(self::resolveFunction('is_empty_recursive'))($countable)->wasThrown('internal exception');
     }
 
     function test_is_exportable()
