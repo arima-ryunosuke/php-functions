@@ -11,13 +11,15 @@ require_once __DIR__ . '/../var/is_resourcable.php';
 /**
  * キーが json 化されてファイルシステムに永続化される ArrayAccess を返す
  *
- * 非常にシンプルで PSR-16 も実装せず、TTL もクリア手段も（基本的には）存在しない。
+ * 非常にシンプルで PSR-16 も実装せず、クリア手段も（基本的には）存在しない。
  * ArrayAccess なので `$storage['hoge'] ??= something()` として使うのがほぼ唯一の利用法。
  * その仕様・利用上、値として null を使用することはできない（使用した場合の動作は未定義とする）。
  *
  * キーに指定できるのは json_encode 可能なもののみ。
  * 値に指定できるのは var_export 可能なもののみ。
  * 上記以外を与えたときの動作は未定義。
+ * TTL を指定すると次回読み込み時に期限切れをチェックし、切れていた場合 null を返す。
+ * 一度読み込まれればそのリクエスト中は期限切れになることはない。
  *
  * 得てして簡単な関数・メソッドのメモ化や内部的なキャッシュに使用する。
  *
@@ -35,9 +37,10 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  * @package ryunosuke\Functions\Package\utility
  *
  * @param string $directory 永続化ディレクトリ
+ * @param int $ttl TTL
  * @return \ArrayObject
  */
-function json_storage(string $prefix = 'global')
+function json_storage(string $prefix = 'global', int $ttl = PHP_INT_MAX)
 {
     $cachedir = function_configure('cachedir') . '/' . strtr(__FUNCTION__, ['\\' => '%']);
     if (!file_exists($cachedir)) {
@@ -45,7 +48,9 @@ function json_storage(string $prefix = 'global')
     }
 
     static $objects = [];
-    return $objects[$prefix] ??= new class("$cachedir/" . strtr($prefix, ['\\' => '%', '/' => '-'])) extends \ArrayObject {
+    $objects[$prefix] ??= new class("$cachedir/" . strtr($prefix, ['\\' => '%', '/' => '-'])) extends \ArrayObject {
+        public int $defaultTtl = PHP_INT_MAX;
+
         public function __construct(private string $directory)
         {
             parent::__construct();
@@ -69,10 +74,10 @@ function json_storage(string $prefix = 'global')
             $filename = $this->filename($json);
             clearstatcache(true, $filename);
             if (file_exists($filename)) {
-                [$k, $v] = include $filename;
-                // hash 化してるので万が一競合すると異なるデータを返してしまう
-                if ($k !== $key) {
-                    return null; // @codeCoverageIgnore
+                [$k, $v, $t] = include $filename;
+                // TTL 兼 hash 化してるので万が一競合すると異なるデータを返してしまう
+                if (($k !== $key) || ((time() - $t) >= $this->defaultTtl)) {
+                    return null;
                 }
                 // ストレージに有ったら内部キャッシュしてそれを使う
                 parent::offsetSet($json, $v);
@@ -95,7 +100,7 @@ function json_storage(string $prefix = 'global')
                     @unlink($filename);
                 }
                 else {
-                    file_put_contents($filename, '<?php return ' . var_export([$key, $value], true) . ';', LOCK_EX);
+                    file_put_contents($filename, '<?php return ' . var_export([$key, $value, time()], true) . ';', LOCK_EX);
                 }
             }
 
@@ -132,5 +137,13 @@ function json_storage(string $prefix = 'global')
             ]));
             return "{$this->directory}-$filename.php-cache";
         }
+
+        /** @noinspection PhpUnusedPrivateMethodInspection */
+        private function debug($closure)
+        {
+            return $closure->call($this);
+        }
     };
+    $objects[$prefix]->defaultTtl = $ttl;
+    return $objects[$prefix];
 }

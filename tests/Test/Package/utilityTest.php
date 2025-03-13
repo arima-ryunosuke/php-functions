@@ -306,6 +306,7 @@ class utilityTest extends AbstractTestCase
         that(Utility::function_resolve('arrayize'))->is(Utility::class . '::arrayize');
     }
 
+    /** @noinspection PhpUndefinedMethodInspection */
     function test_json_storage()
     {
         $called = 0;
@@ -341,6 +342,16 @@ class utilityTest extends AbstractTestCase
         that($storage[['a']])->is('A2');
 
         that($called)->is(3);
+
+        $storage = json_storage('ttl', 1);
+        $storage['a'] = 'A';
+        // 消してもまだある
+        (fn() => $this->debug(fn() => parent::offsetUnset('"a"')))->call($storage);
+        that($storage['a'])->is('A');
+        // 消して1秒経つと消えている
+        (fn() => $this->debug(fn() => parent::offsetUnset('"a"')))->call($storage);
+        sleep(1);
+        that($storage['a'])->is(null);
 
         $storage = json_storage('piyo');
         $storage['x'] = 'X';
