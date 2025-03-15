@@ -27,6 +27,7 @@ use const ryunosuke\Functions\Package\JSON_BARE_AS_STRING;
 use const ryunosuke\Functions\Package\JSON_CLOSURE;
 use const ryunosuke\Functions\Package\JSON_COMMENT_PREFIX;
 use const ryunosuke\Functions\Package\JSON_ES5;
+use const ryunosuke\Functions\Package\JSON_ESCAPE_SINGLE_QUOTE;
 use const ryunosuke\Functions\Package\JSON_FLOAT_AS_STRING;
 use const ryunosuke\Functions\Package\JSON_INDENT;
 use const ryunosuke\Functions\Package\JSON_INLINE_LEVEL;
@@ -1430,6 +1431,18 @@ zzz`,
         that(json_import('12345678901234567890', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => true]))->isString();
         that(json_import('-12345678901234567890', [JSON_ES5 => true, JSON_BIGINT_AS_STRING => true]))->isString();
 
+        that(json_import('"a\n\tz"', [JSON_ES5 => true, JSON_ESCAPE_SINGLE_QUOTE => false]))->is("a\n\tz");
+        that(json_import('\'a\n\tz\'', [JSON_ES5 => true, JSON_ESCAPE_SINGLE_QUOTE => false]))->is('a\n\tz');
+        that(json_import(<<<'TEXT'
+        {
+           path1: "C:\path\to\file",
+           path2: 'C:\path\to\file',
+        }
+        TEXT, [JSON_ES5 => true, JSON_ESCAPE_SINGLE_QUOTE => false]))->is([
+            "path1" => "C:\\path\to\file",
+            "path2" => "C:\\path\\to\\file",
+        ]);
+
         that(json_import('{a: A, abc: A B C, xyz: [X, Y, Z]}', [JSON_ES5 => true, JSON_BARE_AS_STRING => true]))->is([
             "a"   => "A",
             "abc" => "A B C",
@@ -1449,6 +1462,28 @@ zzz`,
             2
             3
         ");
+
+        that(array_map(fn($dt) => $dt->format('Y-m-d\TH:i:s.uP'), json_import('{
+            Ymd:        2014-12-24,
+            YmdTHis:    2014-12-24T12:34:56,
+            YmdTHis.u:  2014-12-24T12:34:56.789,
+            YmdTHisP:   2014-12-24T12:34:56+01:00,
+            YmdTHis.uP: 2014-12-24T12:34:56.789+01:00,
+            Ymd His:    2014-12-24 12:34:56,
+            Ymd His.u:  2014-12-24 12:34:56.789,
+            Ymd HisP:   2014-12-24 12:34:56+01:00,
+            Ymd His.uP: 2014-12-24 12:34:56.789+01:00,
+        }', [JSON_ES5 => true])))->is([
+            "Ymd"        => "2014-12-24T00:00:00.000000+09:00",
+            "YmdTHis"    => "2014-12-24T12:34:56.000000+09:00",
+            "YmdTHis.u"  => "2014-12-24T12:34:56.789000+09:00",
+            "YmdTHisP"   => "2014-12-24T12:34:56.000000+01:00",
+            "YmdTHis.uP" => "2014-12-24T12:34:56.789000+01:00",
+            "Ymd His"    => "2014-12-24T12:34:56.000000+09:00",
+            "Ymd His.u"  => "2014-12-24T12:34:56.789000+09:00",
+            "Ymd HisP"   => "2014-12-24T12:34:56.000000+01:00",
+            "Ymd His.uP" => "2014-12-24T12:34:56.789000+01:00",
+        ]);
 
         that(json_import(chr(0xC2) . chr(0xA0) . ' 3 ', [JSON_ES5 => true]))->isSame(3);
         that(json_import(chr(0xA0) . ' 3 ', [JSON_ES5 => true]))->isSame(3);

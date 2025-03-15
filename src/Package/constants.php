@@ -255,6 +255,9 @@ const JSON_BARE_AS_STRING = -106;
 /** json_*** 関数で特定クラスの独自変換の定数 */
 const JSON_OBJECT_HANDLER = -107;
 
+/** json_*** 関数で ' でエスケープシーケンスを扱うか */
+const JSON_ESCAPE_SINGLE_QUOTE = -108;
+
 const SI_UNITS = [
     -8 => ["y"],
     -7 => ["z"],

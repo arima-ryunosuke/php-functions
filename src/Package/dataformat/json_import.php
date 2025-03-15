@@ -7,6 +7,7 @@ require_once __DIR__ . '/../array/array_find_first.php';
 require_once __DIR__ . '/../array/first_value.php';
 require_once __DIR__ . '/../array/last_value.php';
 require_once __DIR__ . '/../misc/php_tokens.php';
+require_once __DIR__ . '/../utility/function_configure.php';
 require_once __DIR__ . '/../constants.php';
 // @codeCoverageIgnoreEnd
 
@@ -54,13 +55,14 @@ require_once __DIR__ . '/../constants.php';
 function json_import($value, $options = [])
 {
     $specials = [
-        JSON_OBJECT_AS_ARRAY  => true, // 個人的嗜好だが連想配列のほうが扱いやすい
-        JSON_MAX_DEPTH        => 512,
-        JSON_ES5              => null,
-        JSON_INT_AS_STRING    => false,
-        JSON_FLOAT_AS_STRING  => false,
-        JSON_TEMPLATE_LITERAL => false,
-        JSON_BARE_AS_STRING   => false,
+        JSON_OBJECT_AS_ARRAY     => true, // 個人的嗜好だが連想配列のほうが扱いやすい
+        JSON_MAX_DEPTH           => 512,
+        JSON_ES5                 => null,
+        JSON_INT_AS_STRING       => false,
+        JSON_FLOAT_AS_STRING     => false,
+        JSON_TEMPLATE_LITERAL    => false,
+        JSON_BARE_AS_STRING      => false,
+        JSON_ESCAPE_SINGLE_QUOTE => true,
     ];
     foreach ($specials as $key => $default) {
         $specials[$key] = $options[$key] ?? $default;
@@ -137,7 +139,7 @@ function json_import($value, $options = [])
                     if ($token->text === '}') {
                         $object = $this->token('object', $tokens[$brace]->pos, $token->pos + strlen($token->text));
                         foreach ($elements as $element) {
-                            $keyandval = array_explode($element, fn($token) => !$token instanceof $this && $token->text === ':');
+                            $keyandval = array_explode($element, fn($token) => !$token instanceof $this && $token->text === ':', 2);
                             // check no colon (e.g. {123})
                             if (count($keyandval) !== 2) {
                                 throw $this->exception("Missing object key", first_value($keyandval[0]));
@@ -214,6 +216,30 @@ function json_import($value, $options = [])
 
         private function value($options = [])
         {
+            $datetimify = function ($token) use ($options) {
+                /** @var \DateTime $datetimeClass */
+                $datetimeClass = function_configure('datetime.class');
+                $rules = [
+                    'Y-m-d\TH:i:s.uP' => true,
+                    'Y-m-d\TH:i:s.u'  => true,
+                    'Y-m-d\TH:i:sP'   => true,
+                    'Y-m-d\TH:i:s'    => true,
+                    'Y-m-d H:i:s.uP'  => true,
+                    'Y-m-d H:i:s.u'   => true,
+                    'Y-m-d H:i:sP'    => true,
+                    'Y-m-d H:i:s'     => true,
+                    'Y-m-d'           => false,
+                ];
+                foreach ($rules as $format => $with_time) {
+                    if ($result = $datetimeClass::createFromFormat($format, $token)) {
+                        if (!$with_time) {
+                            $result = $result->setTime(0, 0, 0, 0);
+                        }
+                        return $result;
+                    }
+                }
+                return null;
+            };
             $numberify = function ($token) use ($options) {
                 if (is_numeric($token[0]) || $token[0] === '-' || $token[0] === '+' || $token[0] === '.') {
                     $sign = 1;
@@ -253,6 +279,9 @@ function json_import($value, $options = [])
                     }
                     $rawtoken = $token;
                     $token = substr($token, 1, -1);
+                    if (!$options[JSON_ESCAPE_SINGLE_QUOTE] && $rawtoken[0] === "'") {
+                        return $token;
+                    }
                     if ($rawtoken[0] === "`" && $rawtoken[1] === "\n" && preg_match('#\n( +)`#u', $rawtoken, $match)) {
                         $token = substr(preg_replace("#\n{$match[1]}#u", "\n", $token), 1, -1);
                     }
@@ -316,6 +345,10 @@ function json_import($value, $options = [])
                     // literals
                     if (array_key_exists($token, $literals)) {
                         return $literals[$token];
+                    }
+                    // datetime
+                    if (($datetime = $datetimify($token)) !== null) {
+                        return $datetime;
                     }
                     // numbers
                     if (($number = $numberify($token)) !== null) {
