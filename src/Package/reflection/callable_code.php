@@ -51,7 +51,7 @@ function callable_code($callable, bool $return_token = false)
         // - $x = [fn() => 123, null]; // こうだとカンマになるし
         // - $x = [fn() => 123];       // こうだと ] になる
         // しっかり実装できなくもないが、（多分）戻り読みが必要なのでここでは構文チェックをパスするまでループする実装とした
-        while (true) {
+        while ($temp) {
             $test = array_slice($tokens, $close->next()->index, $temp->index - $close->next()->index);
             $text = implode('', array_column($test, 'text'));
             try {
@@ -63,7 +63,7 @@ function callable_code($callable, bool $return_token = false)
                 $temp = $temp->prev();
             }
         }
-        $body = array_slice($tokens, $close->next()->index, $temp->index - $close->next()->index);
+        $body = array_slice($tokens, $close->next()->index, ($temp->index ?? 0) - $close->next()->index);
     }
     else {
         $meta = array_slice($tokens, $begin->index, $close->index - $begin->index);
