@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.20
+
+- [fixbug] callable_code の無限ループと notice を修正
+- [feature] json_import で日時リテラルとエスケープされない文字列を追加
+- [feature] sys_get_memory を追加
+- [feature] is_empty_recursive を追加
+- [refactor] ip_info の cacheobject で hash を使う必要はない
+- [feature] json_storage に TTL を実装
+
 ## 2.0.19
 
 - [feature] ip_info を完全リライト
