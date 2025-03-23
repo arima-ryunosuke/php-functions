@@ -25356,7 +25356,7 @@ if (!function_exists('callable_code')) {
 
         if ($begin->is(T_FN)) {
             $meta = array_slice($tokens, $begin->index, $close->prev()->index - $begin->index + 1);
-            $temp = $close->find([';', ',']);
+            $temp = $close->find([';', ',', T_CLOSE_TAG]);
             // アロー関数は終了トークンが明確ではない
             // - $x = fn() => 123;         // セミコロン
             // - $x = fn() => [123];       // セミコロンであって ] ではない
@@ -25375,7 +25375,7 @@ if (!function_exists('callable_code')) {
                     $temp = $temp->prev();
                 }
             }
-            $body = array_slice($tokens, $close->next()->index, ($temp->index ?? 0) - $close->next()->index);
+            $body = array_slice($tokens, $close->next()->index, $temp ? $temp->index - $close->next()->index : null);
         }
         else {
             $meta = array_slice($tokens, $begin->index, $close->index - $begin->index);
