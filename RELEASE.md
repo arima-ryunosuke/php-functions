@@ -11,6 +11,10 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.21
+
+- [fixbug] callable_code で 終了タグが終了条件になっていない不具合
+
 ## 2.0.20
 
 - [fixbug] callable_code の無限ループと notice を修正
