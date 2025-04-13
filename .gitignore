@@ -1,4 +1,5 @@
 /composer.lock
+/docs/.md
 /src/Utility.php
 /vendor
 /tests/coverage
