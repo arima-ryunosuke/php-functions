@@ -13,7 +13,7 @@ php-function
 
 ## Usage
 
-各リファレンスは https://arima-ryunosuke.github.io/document/php-functions/ を参照してください。
+各リファレンスは https://arima-ryunosuke.github.io/php-functions/ を参照してください。
 変更点は [RELEASE.md](RELEASE.md) です。
 
 ### import
