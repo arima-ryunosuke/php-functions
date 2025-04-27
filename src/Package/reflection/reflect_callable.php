@@ -17,6 +17,7 @@ require_once __DIR__ . '/../reflection/callable_code.php';
  * - getDeclaration: 宣言部のコードを返す
  * - getCode: 定義部のコードを返す
  * - isAnonymous: 無名関数なら true を返す（8.2 の isAnonymous 互換）
+ * - isArrow: アロー演算子で定義されたかを返す（クロージャのみ）
  * - isStatic: $this バインド可能かを返す（クロージャのみ）
  * - getUsedVariables: use している変数配列を返す（クロージャのみ）
  * - getClosure: 元となったオブジェクトを $object としたクロージャを返す（メソッドのみ）
@@ -121,6 +122,12 @@ function reflect_callable($callable)
                 }
 
                 return strpos($this->name, '{closure}') !== false;
+            }
+
+            public function isArrow(): bool
+            {
+                // しっかりやるなら PHPToken を使った方がいいけど今の php 構文ならこれで大丈夫のはず
+                return str_starts_with($this->getDeclaration(), 'fn') !== false;
             }
 
             public function isStatic(): bool

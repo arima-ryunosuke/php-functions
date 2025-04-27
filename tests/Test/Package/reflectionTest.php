@@ -401,6 +401,7 @@ class reflectionTest extends AbstractTestCase
         that($reffunc->getCode())->contains('return $x + $use++;');
         that($reffunc->getUsedVariables())->is(['use' => $use]);
         that($reffunc->isStatic())->is(false);
+        that($reffunc->isArrow())->is(false);
         that($reffunc->call($this, 1))->is(1);
         that($reffunc(1))->is(2);
         that($reffunc(x: 1))->is(3);
@@ -411,9 +412,19 @@ class reflectionTest extends AbstractTestCase
         that($reffunc->getCode())->contains('return $x + $use++;');
         that($reffunc->getUsedVariables())->is(['use' => $use]);
         that($reffunc->isStatic())->is(true);
+        that($reffunc->isArrow())->is(false);
         that($reffunc(1))->is(5);
         that($reffunc(x: 1))->is(6);
         that($reffunc->getClosure()(x: 1))->is(7);
+
+        $reffunc = reflect_callable(fn() => null);
+        that($reffunc->isArrow())->is(true);
+        $reffunc = reflect_callable(static fn() => null);
+        that($reffunc->isArrow())->is(true);
+        $reffunc = reflect_callable(#[Attr] fn() => null);
+        that($reffunc->isArrow())->is(true);
+        $reffunc = reflect_callable(#[Attr] static fn() => null);
+        that($reffunc->isArrow())->is(true);
 
         $reffunc = reflect_callable([new Concrete('hoge'), 'getName']);
         that($reffunc->getDeclaration())->is('function getName($prefix = \'\', $upper = false)');
