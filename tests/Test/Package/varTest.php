@@ -1323,8 +1323,8 @@ class varTest extends AbstractTestCase
 
     function test_var_export3_misc()
     {
-        that(var_export3([1, 2, 3], ['outmode' => 'file', 'return' => true]))->stringStartsWith('<?php return (function () {');
-        that(var_export3([1, 2, 3], ['outmode' => 'eval', 'return' => true]))->stringStartsWith('return (function () {');
+        that(var_export3([1, 2, 3], ['outmode' => 'file', 'return' => true]))->stringStartsWith('<?php return (function ($args) {');
+        that(var_export3([1, 2, 3], ['outmode' => 'eval', 'return' => true]))->stringStartsWith('return (function ($args) {');
         that(var_export3([1, 2, 3], ['format' => 'minify', 'return' => true]))->notContains("\n");
 
         $generator = (function ($a) { yield $a; })(1);
@@ -1523,6 +1523,19 @@ class varTest extends AbstractTestCase
         that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[0]->getName()->is(A::class);
         that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[1]->getName()->is(A\B::class);
         that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[1]->getArguments()->is([true, SORT_ASC]);
+    }
+
+    function test_var_export3_args()
+    {
+        $values = [
+            'curl' => curl_init(),
+            'pdo'  => new \PDO('sqlite::memory:'),
+        ];
+        $exported = var_export3($values, ['outmode' => 'eval', 'args' => $values]);
+        $values2 = (eval($exported))($values);
+
+        that($values2['curl'])->isSame($values['curl']);
+        that($values2['pdo'])->isSame($values['pdo']);
     }
 
     function test_var_hash()

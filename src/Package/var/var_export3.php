@@ -25,6 +25,8 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  * - 特定の内部クラス（PDO など）
  * - 大部分のリソース
  *
+ * ただし args キーに指定した値は出力されず、import 時にそれらを引数とするクロージャを返すようになるため、疑似的に出力することは可能。
+ *
  * オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。
  * ただしコンストラクタが必須引数無しの場合はコールされる。
  * のでクラスによってはおかしな状態で復元されることがある（大体はリソース型のせいだが…）。
@@ -42,6 +44,28 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  * 軽くベンチを取ったところ、オブジェクトを含まない純粋な配列の場合、serialize の 200 倍くらいは速い（それでも var_export の方が速いが…）。
  * オブジェクトを含めば含むほど遅くなり、全要素がオブジェクトになると serialize と同程度になる。
  * 大体 var_export:var_export3:serialize が 1:5:1000 くらい。
+ *
+ * Example:
+ * ```php
+ * // 出力不可を含む配列
+ * $value = [
+ *     'stdout' => STDOUT,
+ *     'pdo'    => new \PDO('sqlite::memory:'),
+ * ];
+ * // args を指定すると実際はエクスポートされず、クロージャ表現を返すようになる（値だけ見るのでキーはなんでもよい）
+ * $exported = var_export3($value, ['outmode' => 'eval', 'args' => ['k1' => STDOUT, 'k2' => $value['pdo']]]);
+ * // import するとクロージャが得られる
+ * $closure = eval($exported);
+ * that($closure)->isInstanceOf(\Closure::class);
+ * // 引数付きで実行すれば値が得られる（この引数のキーは出力時のキーと合わせなければならない）
+ * $imported = $closure(['k1' => STDOUT, 'k2' => $value['pdo']]);
+ * that($imported['stdout'])->isSame($value['stdout']);
+ * that($imported['pdo'])->isSame($value['pdo']);
+ * // 要するに実行時に与えられるわけなので、やる気になれば全く関係ない値でも可能
+ * $imported = $closure(['k1' => 123, 'k2' => 456]);
+ * that($imported['stdout'])->isSame(123);
+ * that($imported['pdo'])->isSame(456);
+ * ```
  *
  * @package ryunosuke\Functions\Package\var
  *
@@ -61,6 +85,7 @@ function var_export3($value, $return = false)
     $options += [
         'format'  => 'pretty', // pretty or minify
         'outmode' => null,     // null: 本体のみ, 'eval': return ...;, 'file': <?php return ...;
+        'args'    => [],       // ここで指定した値は export に含まれず、import 時に引数で要求されるようになる
     ];
     $options['return'] ??= !!$options['outmode'];
 
@@ -139,7 +164,7 @@ function var_export3($value, $return = false)
 
     // 再帰用クロージャ
     $vars = [];
-    $export = function ($value, $nest = 0, $raw = false) use (&$export, &$vars, $var_manager) {
+    $export = function ($value, $nest = 0, $raw = false) use (&$export, &$vars, $var_manager, $options) {
         $spacer0 = str_repeat(" ", 4 * max(0, $nest + 0));
         $spacer1 = str_repeat(" ", 4 * max(0, $nest + 1));
         $raw_export = fn($v) => $v;
@@ -151,6 +176,10 @@ function var_export3($value, $return = false)
                 return "\$this->$vid";
             }
             $vars[$vid] = $value;
+        }
+
+        if (($arg = array_search($value, $options['args'], true)) !== false) {
+            return "\$this->$vid = \$this->args[{$var_export($arg)}]";
         }
 
         if (is_array($value)) {
@@ -558,12 +587,20 @@ function var_export3($value, $return = false)
     }
 
     $E = fn($v) => $v;
-    $result = <<<PHP
-        (function () {
+    $function = <<<PHP
+        function (\$args) {
+            \$this->args = \$args;
             {$E(implode("\n    ", $others))}
             return $exported;
-        })->call($factory)
+        }
         PHP;
+
+    if ($options['args']) {
+        $result = "fn(\$args) => ({$function})->call($factory, \$args)";
+    }
+    else {
+        $result = "({$function})->call($factory, [])";
+    }
 
     if ($options['format'] === 'minify') {
         $tmp = tempnam(sys_get_temp_dir(), 've3');
