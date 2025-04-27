@@ -487,13 +487,24 @@ function var_pretty($value, $options = [])
             elseif ($value instanceof \Closure) {
                 $this->value($value);
 
+                $ref = reflect_callable($value);
+
+                if ($ref->isArrow()) {
+                    $this->plain("(");
+                    if ($ref->isStatic()) {
+                        $this->plain("static ");
+                    }
+                    $this->plain("{$ref->getDeclaration()} => {$ref->getCode()}");
+                    $this->plain(')');
+                    goto FINALLY_;
+                }
+
                 if ($this->options['minify']) {
                     goto FINALLY_;
                 }
 
-                $ref = reflect_callable($value);
                 $that = $ref->getClosureThis();
-                $properties = $ref->getStaticVariables();
+                $properties = $ref->getUsedVariables();
 
                 $this->plain("(");
                 if ($that) {

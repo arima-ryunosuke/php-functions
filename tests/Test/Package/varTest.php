@@ -1590,8 +1590,8 @@ class varTest extends AbstractTestCase
 
         $recur = ['a' => 'A'];
         $recur['r'] = &$recur;
-        $closure = (fn() => $recur)->bindTo(new class ( ) { });
-        $sclosure = static fn() => $recur;
+        $closure = (function () use ($recur) { return $recur; })->bindTo(new class ( ) { });
+        $sclosure = static function () use ($recur) { return $recur; };
         $value = [
             (object) [
                 'A' => (object) [
@@ -1603,6 +1603,8 @@ class varTest extends AbstractTestCase
             'H'     => ['a' => 'A', 'b' => 'B'],
             'C'     => $closure,
             'c1'    => [$sclosure, $sclosure],
+            'ac'    => fn() => null,
+            'sac'   => static fn() => null,
             'g'     => [
                 (function () {
                     yield 1 => 'scalar';
@@ -1630,6 +1632,9 @@ class varTest extends AbstractTestCase
             ->stringContains("  A: [\"str\", 1, 2, 3, true, null]")
             ->stringContains("class@anonymous")
             ->stringContains("    recur: {")
+            ->stringContains("    Closure#")
+            ->stringContains("(fn() => null)")
+            ->stringContains("(static fn() => null)")
             ->stringContains("    Closure#")
             ->stringContains("    Generator#")
             ->stringContains('      yield 1 => "scalar"')
@@ -1940,6 +1945,8 @@ class varTest extends AbstractTestCase
             ["C", "recur"],
             ["C"],
             ["c1"],
+            ["ac"],
+            ["sac"],
             ["g", 0, 2],
             ["g", 0],
             ["g"],
