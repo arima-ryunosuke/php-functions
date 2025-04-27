@@ -273,12 +273,12 @@ function var_pretty($value, $options = [])
             if (is_object($value)) {
                 if ($this->options['debuginfo'] && method_exists($value, '__debugInfo')) {
                     $properties = [];
-                    foreach (array_reverse($value->__debugInfo(), true) as $k => $v) {
+                    foreach ($value->__debugInfo() as $k => $v) {
                         $p = strrpos($k, "\0");
                         if ($p !== false) {
                             $k = substr($k, $p + 1);
                         }
-                        $properties[$k] = $v;
+                        $properties[$k] ??= $v;
                     }
                 }
                 else {
