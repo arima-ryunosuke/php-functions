@@ -424,7 +424,7 @@ function var_pretty($value, $options = [])
                         }
                         $this->plain($spacer1);
                         if ($is_hasharray) {
-                            $this->index($k)->plain(': ');
+                            $this->index($k === '' ? '""' : $k)->plain(': ');
                         }
                         $this->export($v, $nest + 1, $parents, array_merge($keys, [$k]), true);
                         $this->plain(",\n");
@@ -451,7 +451,7 @@ function var_pretty($value, $options = [])
                             $this->plain('...(too length)...')->plain(', ');
                         }
                         if ($is_hasharray && $n !== $k) {
-                            $this->index($k)->plain(':');
+                            $this->index($k === '' ? '""' : $k)->plain(':');
                         }
                         $this->export($v, $nest, $parents, array_merge($keys, [$k]), true);
                         if ($k !== $lastkey) {
@@ -536,7 +536,12 @@ function var_pretty($value, $options = [])
 
                 $this->plain(" ");
                 if ($properties) {
-                    $this->export($properties, $nest, $parents, $keys, false);
+                    if (count($properties) === 1 && array_keys($properties) === [''] && is_string($properties[''])) {
+                        $this->plain($properties['']);
+                    }
+                    else {
+                        $this->export($properties, $nest, $parents, $keys, false);
+                    }
                 }
                 else {
                     $this->plain('{}');

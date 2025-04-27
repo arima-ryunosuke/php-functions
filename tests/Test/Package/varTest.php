@@ -1709,6 +1709,17 @@ class varTest extends AbstractTestCase
             ->stringContains('    "ssssssssssssssssssss",')
             ->stringContains('    a: "ssssssssssssssssssss",');
 
+        $oid = spl_object_id($o = (object) ['' => 'empty']);
+        that(var_pretty([
+            'a' => ['' => 'empty'],
+            'o' => $o,
+        ], [
+            'context' => 'plain',
+            'return'  => true,
+        ]))
+            ->stringContains('"": "empty",')
+            ->stringContains("o: stdClass#$oid empty,");
+
         that(var_pretty([
             'arrays'  => [
                 ['a' => 'A1', 'b' => 'B1', 'c' => 'C1', 'x' => ['y' => ['z' => 1]]],
