@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
     /// アウトラインのクリックイベント
     outline.$on('click', 'a.toc-h', async function (e) {
         e.preventDefault();
-        const anchor = e.target.closest('a.toc-h');
+        const anchor = e.$delegateTarget.closest('a.toc-h');
         const oldURL = location.href;
         const newURL = anchor.href;
         history.replaceState(null, '', newURL);
@@ -340,8 +340,6 @@ document.addEventListener('DOMContentLoaded', function () {
             behavior: 'smooth',
             block: 'start',
         });
-    }, {
-        ownself: true,
     });
 
     // アウトラインのスクロールの自動追従

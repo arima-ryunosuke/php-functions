@@ -6359,7 +6359,7 @@ if (!function_exists('class_extends')) {
 
         $newclassname = "X{$classalias}Class" . md5(uniqid('RF', true));
         $implements = $implements ? 'implements ' . implode(',', $implements) : '';
-        evaluate("class $newclassname extends $classname $implements\n{\nuse X{$classalias}Trait;\n$declares}", [], 10);
+        evaluate("class $newclassname extends $classname $implements\n{\nuse X{$classalias}Trait;\n$declares}");
         return new $newclassname($spawners[$classname]['original'], $object, $fields, $methods);
     }
 }
@@ -19967,9 +19967,6 @@ if (!function_exists('evaluate')) {
      * 関数化してる以上 eval におけるコンテキストの引き継ぎはできない。
      * ただし、引数で変数配列を渡せるようにしてあるので get_defined_vars を併用すれば基本的には同じ（$this はどうしようもない）。
      *
-     * 短いステートメントだと opcode が少ないのでファイルを経由せず直接 eval したほうが速いことに留意。
-     * 一応引数で指定できるようにはしてある。
-     *
      * Example:
      * ```php
      * $a = 1;
@@ -19985,34 +19982,21 @@ if (!function_exists('evaluate')) {
      *
      * @param string $phpcode 実行する php コード
      * @param array $contextvars コンテキスト変数配列
-     * @param int $cachesize キャッシュするサイズ
      * @return mixed eval の return 値
      */
-    function evaluate($phpcode, $contextvars = [], $cachesize = 256)
+    function evaluate($phpcode, $contextvars = [])
     {
-        $cachefile = null;
-        if ($cachesize && strlen($phpcode) >= $cachesize) {
-            $cachefile = function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
-            if (!file_exists($cachefile)) {
-                file_put_contents($cachefile, "<?php $phpcode", LOCK_EX);
-            }
+        $cachefile = function_configure('storagedir') . '/' . rawurlencode(__FUNCTION__) . '-' . sha1($phpcode) . '.php';
+        if (!file_exists($cachefile)) {
+            file_put_contents($cachefile, "<?php $phpcode", LOCK_EX);
         }
 
         try {
-            if ($cachefile) {
-                /** @noinspection PhpMethodParametersCountMismatchInspection */
-                return (static function () {
-                    extract(func_get_arg(1));
-                    return require func_get_arg(0);
-                })($cachefile, $contextvars);
-            }
-            else {
-                /** @noinspection PhpMethodParametersCountMismatchInspection */
-                return (static function () {
-                    extract(func_get_arg(1));
-                    return eval(func_get_arg(0));
-                })($phpcode, $contextvars);
-            }
+            /** @noinspection PhpMethodParametersCountMismatchInspection */
+            return (static function () {
+                extract(func_get_arg(1));
+                return require func_get_arg(0);
+            })($cachefile, $contextvars);
         }
         catch (\ParseError $ex) {
             $errline = $ex->getLine();
@@ -20023,9 +20007,7 @@ if (!function_exists('evaluate')) {
             $N = 5; // 前後の行数
             $message = $ex->getMessage();
             $message .= "\n" . implode("\n", array_slice($codes, max(0, $errline_1 - $N), $N * 2 + 1));
-            if ($cachefile) {
-                $message .= "\n in " . realpath($cachefile) . " on line " . $errline . "\n";
-            }
+            $message .= "\n in " . realpath($cachefile) . " on line " . $errline . "\n";
             throw new \ParseError($message, $ex->getCode(), $ex);
         }
     }
@@ -25837,6 +25819,7 @@ if (!function_exists('reflect_callable')) {
      * - getDeclaration: 宣言部のコードを返す
      * - getCode: 定義部のコードを返す
      * - isAnonymous: 無名関数なら true を返す（8.2 の isAnonymous 互換）
+     * - isArrow: アロー演算子で定義されたかを返す（クロージャのみ）
      * - isStatic: $this バインド可能かを返す（クロージャのみ）
      * - getUsedVariables: use している変数配列を返す（クロージャのみ）
      * - getClosure: 元となったオブジェクトを $object としたクロージャを返す（メソッドのみ）
@@ -25941,6 +25924,12 @@ if (!function_exists('reflect_callable')) {
                     }
 
                     return strpos($this->name, '{closure}') !== false;
+                }
+
+                public function isArrow(): bool
+                {
+                    // しっかりやるなら PHPToken を使った方がいいけど今の php 構文ならこれで大丈夫のはず
+                    return str_starts_with($this->getDeclaration(), 'fn') !== false;
                 }
 
                 public function isStatic(): bool
@@ -35634,6 +35623,8 @@ if (!function_exists('var_export3')) {
      * - 特定の内部クラス（PDO など）
      * - 大部分のリソース
      *
+     * ただし args キーに指定した値は出力されず、import 時にそれらを引数とするクロージャを返すようになるため、疑似的に出力することは可能。
+     *
      * オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。
      * ただしコンストラクタが必須引数無しの場合はコールされる。
      * のでクラスによってはおかしな状態で復元されることがある（大体はリソース型のせいだが…）。
@@ -35651,6 +35642,28 @@ if (!function_exists('var_export3')) {
      * 軽くベンチを取ったところ、オブジェクトを含まない純粋な配列の場合、serialize の 200 倍くらいは速い（それでも var_export の方が速いが…）。
      * オブジェクトを含めば含むほど遅くなり、全要素がオブジェクトになると serialize と同程度になる。
      * 大体 var_export:var_export3:serialize が 1:5:1000 くらい。
+     *
+     * Example:
+     * ```php
+     * // 出力不可を含む配列
+     * $value = [
+     *     'stdout' => STDOUT,
+     *     'pdo'    => new \PDO('sqlite::memory:'),
+     * ];
+     * // args を指定すると実際はエクスポートされず、クロージャ表現を返すようになる（値だけ見るのでキーはなんでもよい）
+     * $exported = var_export3($value, ['outmode' => 'eval', 'args' => ['k1' => STDOUT, 'k2' => $value['pdo']]]);
+     * // import するとクロージャが得られる
+     * $closure = eval($exported);
+     * that($closure)->isInstanceOf(\Closure::class);
+     * // 引数付きで実行すれば値が得られる（この引数のキーは出力時のキーと合わせなければならない）
+     * $imported = $closure(['k1' => STDOUT, 'k2' => $value['pdo']]);
+     * that($imported['stdout'])->isSame($value['stdout']);
+     * that($imported['pdo'])->isSame($value['pdo']);
+     * // 要するに実行時に与えられるわけなので、やる気になれば全く関係ない値でも可能
+     * $imported = $closure(['k1' => 123, 'k2' => 456]);
+     * that($imported['stdout'])->isSame(123);
+     * that($imported['pdo'])->isSame(456);
+     * ```
      *
      * @package ryunosuke\Functions\Package\var
      *
@@ -35670,6 +35683,7 @@ if (!function_exists('var_export3')) {
         $options += [
             'format'  => 'pretty', // pretty or minify
             'outmode' => null,     // null: 本体のみ, 'eval': return ...;, 'file': <?php return ...;
+            'args'    => [],       // ここで指定した値は export に含まれず、import 時に引数で要求されるようになる
         ];
         $options['return'] ??= !!$options['outmode'];
 
@@ -35748,7 +35762,7 @@ if (!function_exists('var_export3')) {
 
         // 再帰用クロージャ
         $vars = [];
-        $export = function ($value, $nest = 0, $raw = false) use (&$export, &$vars, $var_manager) {
+        $export = function ($value, $nest = 0, $raw = false) use (&$export, &$vars, $var_manager, $options) {
             $spacer0 = str_repeat(" ", 4 * max(0, $nest + 0));
             $spacer1 = str_repeat(" ", 4 * max(0, $nest + 1));
             $raw_export = fn($v) => $v;
@@ -35760,6 +35774,10 @@ if (!function_exists('var_export3')) {
                     return "\$this->$vid";
                 }
                 $vars[$vid] = $value;
+            }
+
+            if (($arg = array_search($value, $options['args'], true)) !== false) {
+                return "\$this->$vid = \$this->args[{$var_export($arg)}]";
             }
 
             if (is_array($value)) {
@@ -36167,12 +36185,20 @@ if (!function_exists('var_export3')) {
         }
 
         $E = fn($v) => $v;
-        $result = <<<PHP
-            (function () {
+        $function = <<<PHP
+            function (\$args) {
+                \$this->args = \$args;
                 {$E(implode("\n    ", $others))}
                 return $exported;
-            })->call($factory)
+            }
             PHP;
+
+        if ($options['args']) {
+            $result = "fn(\$args) => ({$function})->call($factory, \$args)";
+        }
+        else {
+            $result = "({$function})->call($factory, [])";
+        }
 
         if ($options['format'] === 'minify') {
             $tmp = tempnam(sys_get_temp_dir(), 've3');
@@ -36624,12 +36650,12 @@ if (!function_exists('var_pretty')) {
                 if (is_object($value)) {
                     if ($this->options['debuginfo'] && method_exists($value, '__debugInfo')) {
                         $properties = [];
-                        foreach (array_reverse($value->__debugInfo(), true) as $k => $v) {
+                        foreach ($value->__debugInfo() as $k => $v) {
                             $p = strrpos($k, "\0");
                             if ($p !== false) {
                                 $k = substr($k, $p + 1);
                             }
-                            $properties[$k] = $v;
+                            $properties[$k] ??= $v;
                         }
                     }
                     else {
@@ -36775,7 +36801,7 @@ if (!function_exists('var_pretty')) {
                             }
                             $this->plain($spacer1);
                             if ($is_hasharray) {
-                                $this->index($k)->plain(': ');
+                                $this->index($k === '' ? '""' : $k)->plain(': ');
                             }
                             $this->export($v, $nest + 1, $parents, array_merge($keys, [$k]), true);
                             $this->plain(",\n");
@@ -36802,7 +36828,7 @@ if (!function_exists('var_pretty')) {
                                 $this->plain('...(too length)...')->plain(', ');
                             }
                             if ($is_hasharray && $n !== $k) {
-                                $this->index($k)->plain(':');
+                                $this->index($k === '' ? '""' : $k)->plain(':');
                             }
                             $this->export($v, $nest, $parents, array_merge($keys, [$k]), true);
                             if ($k !== $lastkey) {
@@ -36838,13 +36864,24 @@ if (!function_exists('var_pretty')) {
                 elseif ($value instanceof \Closure) {
                     $this->value($value);
 
+                    $ref = reflect_callable($value);
+
+                    if ($ref->isArrow()) {
+                        $this->plain("(");
+                        if ($ref->isStatic()) {
+                            $this->plain("static ");
+                        }
+                        $this->plain("{$ref->getDeclaration()} => {$ref->getCode()}");
+                        $this->plain(')');
+                        goto FINALLY_;
+                    }
+
                     if ($this->options['minify']) {
                         goto FINALLY_;
                     }
 
-                    $ref = reflect_callable($value);
                     $that = $ref->getClosureThis();
-                    $properties = $ref->getStaticVariables();
+                    $properties = $ref->getUsedVariables();
 
                     $this->plain("(");
                     if ($that) {
@@ -36876,7 +36913,12 @@ if (!function_exists('var_pretty')) {
 
                     $this->plain(" ");
                     if ($properties) {
-                        $this->export($properties, $nest, $parents, $keys, false);
+                        if (count($properties) === 1 && array_keys($properties) === [''] && is_string($properties[''])) {
+                            $this->plain($properties['']);
+                        }
+                        else {
+                            $this->export($properties, $nest, $parents, $keys, false);
+                        }
                     }
                     else {
                         $this->plain('{}');

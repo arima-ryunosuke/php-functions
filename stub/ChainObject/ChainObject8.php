@@ -351,8 +351,8 @@ TEXT): self { }
 
     /** @see evaluate() */
     public self $evaluate;
-    public function evaluate($phpcode, $contextvars = [], $cachesize = 256): self { }
-    public function evaluate($contextvars = [], $cachesize = 256): self { }
+    public function evaluate($phpcode, $contextvars = []): self { }
+    public function evaluate($contextvars = []): self { }
 
     /** @see cidr2ip() */
     public self $cidr2ip;

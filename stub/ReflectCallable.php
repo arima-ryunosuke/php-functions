@@ -20,6 +20,7 @@ class ReflectCallable extends ReflectionFunction implements Reflector, Stringabl
     public function getDeclaration(): string { }
     public function getCode(): string { }
     public function isAnonymous(): bool { }
+    public function isArrow(): bool { }
     public function isStatic(): bool { }
     public function getUsedVariables(): array { }
     public function __toString(): string { }

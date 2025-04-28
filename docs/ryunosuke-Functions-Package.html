@@ -10,7 +10,7 @@
     <link id="highlight_style" data-cdn-url="https://cdn.jsdelivr.net/npm/highlightjs@9.16.2/styles/" href="" rel="stylesheet">
             <link href="style.css" rel="stylesheet">
         
-    <script defer src="https://cdn.jsdelivr.net/gh/arima-ryunosuke/js-kQuery/dist/kQuery-full.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/gh/arima-ryunosuke/js-kQuery@0.2.1/dist/kQuery-full.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/mermaid@9.1.7/dist/mermaid.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@viz-js/viz@3.12.0/lib/viz-standalone.min.js"></script>
@@ -24,7 +24,7 @@
             <div class="wy-side-nav-search">
                 <a href="" class="icon icon-home"> ryunosuke-Functions-Package.html</a>
                 <div class="version">
-                    最終更新日 2025/04/13 19:07:36                </div>
+                    最終更新日 2025/04/29 12:34:08                </div>
                 <div role="search">
                     <form id="rtd-search-form" class="wy-form hidden-download" method="get">
                         <input type="text" name="query" placeholder="ディレクトリ内検索" value="">
@@ -19903,22 +19903,19 @@ that($annotations)-&gt;is([
 </section><section id="_068c3494b9e65f3e990cce9e680db5495b4ab11c-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-evaluate()" class="anchor"></a>[F] evaluate <small><span class="summary">eval のプロキシ関数</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/misc/evaluate.php#L8-L78" target="_blank">evaluate.php#8~78</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/misc/evaluate.php#L8-L60" target="_blank">evaluate.php#8~60</a></p>
 </div>
 <details>
 <summary class="">eval のプロキシ関数</summary>
 <pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function evaluate(
     string $phpcode,
-    array $contextvars = [],
-    int $cachesize = 256
+    array $contextvars = []
 ): mixed</div></pre>
 <div class="description">
 <p>一度ファイルに吐いてから require した方が opcache が効くので抜群に速い。<span class="implicit-br">
 </span>また、素の eval は ParseError が起こったときの表示がわかりにくすぎるので少し見やすくしてある。</p>
 <p>関数化してる以上 eval におけるコンテキストの引き継ぎはできない。<span class="implicit-br">
 </span>ただし、引数で変数配列を渡せるようにしてあるので get_defined_vars を併用すれば基本的には同じ（$this はどうしようもない）。</p>
-<p>短いステートメントだと opcode が少ないのでファイルを経由せず直接 eval したほうが速いことに留意。<span class="implicit-br">
-</span>一応引数で指定できるようにはしてある。</p>
 <p>Example:</p>
 <pre data-label=""><div class="code language-php php">$a = 1;
 $b = 2;
@@ -19953,11 +19950,6 @@ that(evaluate($phpcode, get_defined_vars()))-&gt;isSame(9);</div></pre>
 <td>​array</td>
 <td>​<code>$contextvars = []</code></td>
 <td>​<span class="summary">コンテキスト変数配列</span></td>
-</tr>
-<tr>
-<td>​int</td>
-<td>​<code>$cachesize = 256</code></td>
-<td>​<span class="summary">キャッシュするサイズ</span></td>
 </tr>
 </tbody>
 </table>
@@ -24659,7 +24651,7 @@ that($params)-&gt;isSame([
 </section><section id="_92fca3fc116884e27f8cb7afe7ead68cf0e940b6-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-reflect_callable()" class="anchor"></a>[F] reflect_callable <small><span class="summary">callable から ReflectionFunctionAbstract を生成する</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/reflection/reflect_callable.php#L10-L251" target="_blank">reflect_callable.php#10~251</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/reflection/reflect_callable.php#L10-L258" target="_blank">reflect_callable.php#10~258</a></p>
 </div>
 <details>
 <summary class="">callable から ReflectionFunctionAbstract を生成する</summary>
@@ -24689,6 +24681,10 @@ that($params)-&gt;isSame([
 <div class="dtdd-container">
 <dt>isAnonymous</dt>
 <dd>無名関数なら true を返す（8.2 の isAnonymous 互換）</dd>
+</div>
+<div class="dtdd-container">
+<dt>isArrow</dt>
+<dd>アロー演算子で定義されたかを返す（クロージャのみ）</dd>
 </div>
 <div class="dtdd-container">
 <dt>isStatic</dt>
@@ -34733,7 +34729,7 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
 </section><section id="_1a2f842298b2340a4faaed7b68cef93564c52dbe-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-var_export3()" class="anchor"></a>[F] var_export3 <small><span class="summary">var_export を色々と出力できるようにしたもの</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/var/var_export3.php#L17-L585" target="_blank">var_export3.php#17~585</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/var/var_export3.php#L17-L622" target="_blank">var_export3.php#17~622</a></p>
 </div>
 <details>
 <summary class="">var_export を色々と出力できるようにしたもの</summary>
@@ -34749,6 +34745,7 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
 <li>特定の内部クラス（PDO など）</li>
 <li>大部分のリソース</li>
 </ul>
+<p>ただし args キーに指定した値は出力されず、import 時にそれらを引数とするクロージャを返すようになるため、疑似的に出力することは可能。</p>
 <p>オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。<span class="implicit-br">
 </span>ただしコンストラクタが必須引数無しの場合はコールされる。<span class="implicit-br">
 </span>のでクラスによってはおかしな状態で復元されることがある（大体はリソース型のせいだが…）。<span class="implicit-br">
@@ -34762,6 +34759,25 @@ that(var_export2(compact('rarray', 'robject'), true))-&gt;isSame('[
 <p>軽くベンチを取ったところ、オブジェクトを含まない純粋な配列の場合、serialize の 200 倍くらいは速い（それでも var_export の方が速いが…）。<span class="implicit-br">
 </span>オブジェクトを含めば含むほど遅くなり、全要素がオブジェクトになると serialize と同程度になる。<span class="implicit-br">
 </span>大体 var_export:var_export3:serialize が 1:5:1000 くらい。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">// 出力不可を含む配列
+$value = [
+    'stdout' =&gt; STDOUT,
+    'pdo'    =&gt; new \PDO('sqlite::memory:'),
+];
+// args を指定すると実際はエクスポートされず、クロージャ表現を返すようになる（値だけ見るのでキーはなんでもよい）
+$exported = var_export3($value, ['outmode' =&gt; 'eval', 'args' =&gt; ['k1' =&gt; STDOUT, 'k2' =&gt; $value['pdo']]]);
+// import するとクロージャが得られる
+$closure = eval($exported);
+that($closure)-&gt;isInstanceOf(\Closure::class);
+// 引数付きで実行すれば値が得られる（この引数のキーは出力時のキーと合わせなければならない）
+$imported = $closure(['k1' =&gt; STDOUT, 'k2' =&gt; $value['pdo']]);
+that($imported['stdout'])-&gt;isSame($value['stdout']);
+that($imported['pdo'])-&gt;isSame($value['pdo']);
+// 要するに実行時に与えられるわけなので、やる気になれば全く関係ない値でも可能
+$imported = $closure(['k1' =&gt; 123, 'k2' =&gt; 456]);
+that($imported['stdout'])-&gt;isSame(123);
+that($imported['pdo'])-&gt;isSame(456);</div></pre>
 </div>
 <div class="wy-table-responsive">
 <table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
@@ -35010,7 +35026,7 @@ that($parameters)-&gt;is(['charset' =&gt; 'us-ascii']);</div></pre>
 </section><section id="_aa210363e2d03938d274f3f5df6b767432ff0447-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-var_pretty()" class="anchor"></a>[F] var_pretty <small><span class="summary">var_dump の出力を見やすくしたもの</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/var/var_pretty.php#L22-L575" target="_blank">var_pretty.php#22~575</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/var/var_pretty.php#L22-L591" target="_blank">var_pretty.php#22~591</a></p>
 </div>
 <details>
 <summary class="">var_dump の出力を見やすくしたもの</summary>
