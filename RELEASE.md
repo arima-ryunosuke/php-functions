@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.22
+
+- [change] evaluate の cachesize を廃止
+- [feature] var_export3 で後から値を与えられる機能
+- [feature] var_pretty の空文字キーの特殊化
+- [feature] var_pretty でアロー関数の中身を表示する
+- [fixbug] var_pretty で debuginfo を使うとキーが逆順になる
+- [feature] クロージャの reflect_callable に isArrow を追加
+
 ## 2.0.21
 
 - [fixbug] callable_code で 終了タグが終了条件になっていない不具合
