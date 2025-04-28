@@ -253,6 +253,6 @@ function class_extends($object, $methods, $fields = [], $implements = [])
 
     $newclassname = "X{$classalias}Class" . md5(uniqid('RF', true));
     $implements = $implements ? 'implements ' . implode(',', $implements) : '';
-    evaluate("class $newclassname extends $classname $implements\n{\nuse X{$classalias}Trait;\n$declares}", [], 10);
+    evaluate("class $newclassname extends $classname $implements\n{\nuse X{$classalias}Trait;\n$declares}");
     return new $newclassname($spawners[$classname]['original'], $object, $fields, $methods);
 }

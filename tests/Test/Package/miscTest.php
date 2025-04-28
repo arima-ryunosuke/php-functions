@@ -258,8 +258,6 @@ class miscTest extends AbstractTestCase
         that(evaluate('return $x * $x;', ['x' => 1]))->is(1);
         that(evaluate('return $x * $x;', ['x' => 2]))->is(4);
         that(evaluate('return $x * $x;', ['x' => 3]))->is(9);
-        // 短すぎするのでキャッシュはされない
-        that(glob("$tmpdir/*.php"))->count(0);
 
         that(evaluate('
 return new class($x)
@@ -284,8 +282,6 @@ return new class($x)
     }
 };
 ', ['x' => 3]))->isObject();
-        // ある程度長ければキャッシュされる
-        that(glob("$tmpdir/*.php"))->count(1);
 
         that(self::resolveFunction('evaluate'))('
 return new class()

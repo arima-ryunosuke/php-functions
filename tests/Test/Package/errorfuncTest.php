@@ -350,7 +350,7 @@ class errorfuncTest extends AbstractTestCase
         function test_stacktrace($that)
         {
             $that->that = $that;
-            $c = fn($that) => phpval('\\ryunosuke\\Test\\Package\\test_stacktrace_in()');
+            $c = fn($that) => eval('return \\ryunosuke\\Test\\Package\\test_stacktrace_in();');
             return $c($that);
         }
 
@@ -367,12 +367,9 @@ class errorfuncTest extends AbstractTestCase
         that($traces[0])->stringContains('test_stacktrace_in');
         that($traces[1])->stringContains('eval');
         that($traces[2])->stringContains('{closure}');
-        that($traces[3])->stringContains('evaluate');
-        that($traces[4])->stringContains('phpval');
-        that($traces[5])->stringContains('{closure}');
-        that($traces[6])->stringContains('test_stacktrace');
-        that($traces[7])->stringContains('::sm');
-        that($traces[8])->stringContains('->im');
+        that($traces[3])->stringContains('test_stacktrace');
+        that($traces[4])->stringContains('::sm');
+        that($traces[5])->stringContains('->im');
 
         // limit
         $traces = stacktrace([
