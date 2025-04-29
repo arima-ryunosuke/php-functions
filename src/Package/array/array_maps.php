@@ -37,7 +37,7 @@ require_once __DIR__ . '/../var/is_arrayable.php';
  *
  * @param iterable $array 対象配列
  * @param callable ...$callbacks 評価クロージャ配列
- * @return iterable 評価クロージャを通した新しい配列
+ * @return iterable|array 評価クロージャを通した新しい配列
  */
 function array_maps($array, ...$callbacks)
 {

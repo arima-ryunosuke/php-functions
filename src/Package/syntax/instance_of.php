@@ -27,7 +27,7 @@ namespace ryunosuke\Functions\Package;
  *
  * @package ryunosuke\Functions\Package\syntax
  *
- * @template T as object
+ * @template T of object
  * @param T $object 調べるオブジェクト
  * @param string|object $class クラス名
  * @return ?T $object が $class のインスタンスなら $object, そうでなければ null

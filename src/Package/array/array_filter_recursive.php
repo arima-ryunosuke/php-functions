@@ -69,7 +69,7 @@ require_once __DIR__ . '/../var/is_empty.php';
  *
  * @package ryunosuke\Functions\Package\array
  *
- * @template T as iterable&\ArrayAccess
+ * @template T of iterable&\ArrayAccess
  */
 function array_filter_recursive(
     /** @var T 対象配列 */ iterable $array,

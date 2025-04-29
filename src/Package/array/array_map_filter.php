@@ -27,7 +27,7 @@ require_once __DIR__ . '/../var/is_arrayable.php';
  * @param iterable $array 対象配列
  * @param callable $callback 評価クロージャ
  * @param bool $strict 厳密比較フラグ。 true だと null のみが偽とみなされる
- * @return iterable $callback が真を返した新しい配列
+ * @return iterable|array $callback が真を返した新しい配列
  */
 function array_map_filter($array, $callback, $strict = false)
 {

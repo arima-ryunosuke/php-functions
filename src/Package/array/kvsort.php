@@ -77,11 +77,10 @@ require_once __DIR__ . '/../var/varcmp.php';
  *
  * @package ryunosuke\Functions\Package\array
  *
- * @template T of iterable|array
- * @param T $array 対象配列
+ * @param iterable|array 対象配列
  * @param callable|int|null $comparator 比較関数。SORT_XXX も使える
  * @param callable|callable[] $schwartzians シュワルツ変換に使用する仮想列
- * @return T ソートされた配列
+ * @return array ソートされた配列
  */
 function kvsort($array, $comparator = null, $schwartzians = [])
 {

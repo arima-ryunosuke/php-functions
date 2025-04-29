@@ -31,7 +31,6 @@ function last_keyvalue($array, $default = null)
         $k = array_key_last($array);
         return [$k, $array[$k]];
     }
-    /** @noinspection PhpStatementHasEmptyBodyInspection */
     foreach ($array as $k => $v) {
         // dummy
     }

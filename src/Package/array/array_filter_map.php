@@ -25,7 +25,7 @@ require_once __DIR__ . '/../var/is_arrayable.php';
  *
  * @param iterable $array 対象配列
  * @param callable $callback 評価クロージャ
- * @return iterable $callback が !false を返し map された配列
+ * @return iterable|array $callback が !false を返し map された配列
  */
 function array_filter_map($array, $callback)
 {

@@ -119,7 +119,6 @@ function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stder
             }
 
             try {
-                /** @noinspection PhpStatementHasEmptyBodyInspection */
                 while ($this->update()) {
                     // noop
                 }
