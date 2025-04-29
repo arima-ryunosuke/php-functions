@@ -56,6 +56,14 @@ select
     {
         that(sql_format("
 -- comment select
+something
+"))->IsEqualTrimming("
+-- comment select
+something
+");
+
+        that(sql_format("
+-- comment select
 select 1 from table_name;
 -- comment insert
 insert into table_name(name) values('hoge');
@@ -551,6 +559,42 @@ set
   name = "hoge"
 where
   id in(1, 2, 3);
+commit;
+');
+
+        // savepoint
+        that(sql_format('begin;
+savepoint SP1;
+update t_table set name = "hoge" where id in (1,2,3);
+savepoint SP2;
+update t_table set name = "fuga" where id in (4,5,6);
+rollback to savepoint SP2;
+update t_table set name = "piyo" where id in (7,8,9);
+release savepoint SP1;
+commit;'))->IsEqualTrimming('
+begin;
+savepoint SP1;
+update
+  t_table
+set
+  name = "hoge"
+where
+  id in(1, 2, 3);
+savepoint SP2;
+update
+  t_table
+set
+  name = "fuga"
+where
+  id in(4, 5, 6);
+rollback to savepoint SP2;
+update
+  t_table
+set
+  name = "piyo"
+where
+  id in(7, 8, 9);
+releasesavepoint SP1;
 commit;
 ');
 

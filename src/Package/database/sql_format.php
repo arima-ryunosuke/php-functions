@@ -176,6 +176,7 @@ function sql_format($sql, $options = [])
         'KEYS'                       => true,
         'KILL'                       => true,
         'LAST_INSERT_ID'             => true,
+        'LATERAL'                    => true,
         'LEADING'                    => true,
         'LEFT'                       => true,
         'LEVEL'                      => true,
@@ -251,6 +252,7 @@ function sql_format($sql, $options = [])
         'READ_WRITE'                 => true,
         'REFERENCES'                 => true,
         'REGEXP'                     => true,
+        'RELEASE'                    => true,
         'RELOAD'                     => true,
         'RENAME'                     => true,
         'REPAIR'                     => true,
@@ -270,6 +272,7 @@ function sql_format($sql, $options = [])
         'ROW'                        => true,
         'ROWS'                       => true,
         'ROW_FORMAT'                 => true,
+        'SAVEPOINT'                  => true,
         'SECOND'                     => true,
         'SECURITY'                   => true,
         'SELECT'                     => true,
@@ -804,10 +807,11 @@ function sql_format($sql, $options = [])
             switch ($uppertoken) {
                 default:
                     _DEFAULT:
+                    // （コメントを含めた）先頭行にスペースがついてしまう
                     // "tablename. columnname" になってしまう
                     // "@ var" になってしまう
                     // ": holder" になってしまう
-                    if (!in_array($prev[1], ['.', '@', ':', ';'])) {
+                    if (!in_array($prev[1], ['', '.', '@', ':', ';'], true)) {
                         $result[] = $MARK_SP;
                     }
 
@@ -896,6 +900,7 @@ function sql_format($sql, $options = [])
                 case "BY":
                 case "ALL":
                 case "RECURSIVE":
+                case "LATERAL":
                     $result[] = $MARK_SP . $virttoken . $MARK_SP . array_pop($result);
                     break;
                 case "SELECT":
@@ -1025,6 +1030,8 @@ function sql_format($sql, $options = [])
                     break;
                 case "COMMIT":
                 case "ROLLBACK":
+                case "SAVEPOINT":
+                case "RELEASE":
                     // begin は begin～end の一部の可能性があるが commit,rollback は俺の知る限りそのような構文はない
                     $result[] = $virttoken;
                     break;
