@@ -76,7 +76,7 @@ function process_closure($closure, $args = [], $throw = true, $autoload = null, 
         foreach ($autoload as $file) {
             require_once $file;
         }
-        $stdin  = eval(stream_get_contents(STDIN));
+        $stdin  = ' . $namespace . 'evaluate(stream_get_contents(STDIN));
         $timer  = ' . $namespace . 'cpu_timer();
         $return = ' . $closure_code . '(...$stdin);
         file_put_contents($argv[1], ' . $namespace . 'var_export3([$return, $timer->result(), memory_get_peak_usage()], ["outmode" => "file"]));

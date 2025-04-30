@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_sprintf.php';
+require_once __DIR__ . '/../misc/evaluate.php';
 require_once __DIR__ . '/../misc/php_tokens.php';
 // @codeCoverageIgnoreEnd
 
@@ -50,7 +51,7 @@ function func_eval($expression, ...$variadic)
                 $stmt .= $tmp[$i]->text;
             }
         }
-        $cache[$cachekey] = eval("return function($args) { return $stmt; };");
+        $cache[$cachekey] = evaluate("return function($args) { return $stmt; };");
     }
     return $cache[$cachekey];
 }

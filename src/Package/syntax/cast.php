@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../misc/evaluate.php';
 require_once __DIR__ . '/../var/is_typeof.php';
 // @codeCoverageIgnoreEnd
 
@@ -66,7 +67,7 @@ function cast($value, string $type, $default = null)
 
     // 判定・変換が複雑極まるため実際に投げてその値を返すのが最も間違いが少ない
     static $test_functions = [];
-    $test_functions[$type] ??= eval("return static fn({$type} \$value) => \$value;");
+    $test_functions[$type] ??= evaluate("return static fn({$type} \$value) => \$value;");
     try {
         return $test_functions[$type]($value);
     }

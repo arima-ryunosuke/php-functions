@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../misc/evaluate.php';
 require_once __DIR__ . '/../strings/str_quote.php';
 // @codeCoverageIgnoreEnd
 
@@ -66,16 +67,7 @@ function render_string(?string $template, $array)
     try {
         /** @noinspection PhpMethodParametersCountMismatchInspection */
         return (function () {
-            // extract は数値キーを展開してくれないので自前ループで展開
-            foreach (func_get_arg(1) as $k => $v) {
-                $$k = $v;
-            }
-            // 現スコープで宣言してしまっているので伏せなければならない
-            unset($k, $v);
-            // かと言って変数配列に k, v キーがあると使えなくなるので更に extract で補完
-            extract(func_get_arg(1));
-            // そして eval. ↑は要するに数値キーのみを展開している
-            return eval(func_get_arg(0));
+            return evaluate(func_get_arg(0), func_get_arg(1));
         })($evalcode, $vars);
     }
     catch (\ParseError $ex) {

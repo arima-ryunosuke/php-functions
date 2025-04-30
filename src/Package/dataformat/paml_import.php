@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_set.php';
+require_once __DIR__ . '/../misc/evaluate.php';
 require_once __DIR__ . '/../strings/quoteexplode.php';
 // @codeCoverageIgnoreEnd
 
@@ -126,13 +127,12 @@ function paml_import($pamlstring, $options = [])
         }
 
         if ($options['expression']) {
-            $semicolon = ';';
             if ($prefix === '`' && $suffix === '`') {
-                $value = eval("return " . substr($value, 1, -1) . $semicolon);
+                $value = evaluate("return " . substr($value, 1, -1) . ';');
                 return true;
             }
             try {
-                $evalue = @eval("return $value$semicolon");
+                $evalue = @evaluate("return $value;");
                 if ($value !== $evalue) {
                     $value = $evalue;
                     return true;
