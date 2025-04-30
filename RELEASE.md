@@ -11,6 +11,11 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.23
+
+- [refactor] fix inspection
+- [fixbug] sql_format の空白調整
+
 ## 2.0.22
 
 - [change] evaluate の cachesize を廃止
