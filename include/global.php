@@ -1701,7 +1701,7 @@ if (!function_exists('array_filter_map')) {
      *
      * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
-     * @return iterable $callback が !false を返し map された配列
+     * @return iterable|array $callback が !false を返し map された配列
      */
     function array_filter_map($array, $callback)
     {
@@ -1789,7 +1789,7 @@ if (!function_exists('array_filter_recursive')) {
      *
      * @package ryunosuke\Functions\Package\array
      *
-     * @template T as iterable&\ArrayAccess
+     * @template T of iterable&\ArrayAccess
      */
     function array_filter_recursive(
         /** @var T 対象配列 */ iterable $array,
@@ -2886,7 +2886,7 @@ if (!function_exists('array_map_filter')) {
      * @param iterable $array 対象配列
      * @param callable $callback 評価クロージャ
      * @param bool $strict 厳密比較フラグ。 true だと null のみが偽とみなされる
-     * @return iterable $callback が真を返した新しい配列
+     * @return iterable|array $callback が真を返した新しい配列
      */
     function array_map_filter($array, $callback, $strict = false)
     {
@@ -3068,7 +3068,7 @@ if (!function_exists('array_maps')) {
      *
      * @param iterable $array 対象配列
      * @param callable ...$callbacks 評価クロージャ配列
-     * @return iterable 評価クロージャを通した新しい配列
+     * @return iterable|array 評価クロージャを通した新しい配列
      */
     function array_maps($array, ...$callbacks)
     {
@@ -5718,11 +5718,10 @@ if (!function_exists('kvsort')) {
      *
      * @package ryunosuke\Functions\Package\array
      *
-     * @template T of iterable|array
-     * @param T $array 対象配列
+     * @param iterable|array 対象配列
      * @param callable|int|null $comparator 比較関数。SORT_XXX も使える
      * @param callable|callable[] $schwartzians シュワルツ変換に使用する仮想列
-     * @return T ソートされた配列
+     * @return array ソートされた配列
      */
     function kvsort($array, $comparator = null, $schwartzians = [])
     {
@@ -5835,7 +5834,6 @@ if (!function_exists('last_keyvalue')) {
             $k = array_key_last($array);
             return [$k, $array[$k]];
         }
-        /** @noinspection PhpStatementHasEmptyBodyInspection */
         foreach ($array as $k => $v) {
             // dummy
         }
@@ -7639,6 +7637,7 @@ if (!function_exists('sql_format')) {
             'KEYS'                       => true,
             'KILL'                       => true,
             'LAST_INSERT_ID'             => true,
+            'LATERAL'                    => true,
             'LEADING'                    => true,
             'LEFT'                       => true,
             'LEVEL'                      => true,
@@ -7714,6 +7713,7 @@ if (!function_exists('sql_format')) {
             'READ_WRITE'                 => true,
             'REFERENCES'                 => true,
             'REGEXP'                     => true,
+            'RELEASE'                    => true,
             'RELOAD'                     => true,
             'RENAME'                     => true,
             'REPAIR'                     => true,
@@ -7733,6 +7733,7 @@ if (!function_exists('sql_format')) {
             'ROW'                        => true,
             'ROWS'                       => true,
             'ROW_FORMAT'                 => true,
+            'SAVEPOINT'                  => true,
             'SECOND'                     => true,
             'SECURITY'                   => true,
             'SELECT'                     => true,
@@ -8267,10 +8268,11 @@ if (!function_exists('sql_format')) {
                 switch ($uppertoken) {
                     default:
                         _DEFAULT:
+                        // （コメントを含めた）先頭行にスペースがついてしまう
                         // "tablename. columnname" になってしまう
                         // "@ var" になってしまう
                         // ": holder" になってしまう
-                        if (!in_array($prev[1], ['.', '@', ':', ';'])) {
+                        if (!in_array($prev[1], ['', '.', '@', ':', ';'], true)) {
                             $result[] = $MARK_SP;
                         }
 
@@ -8359,6 +8361,7 @@ if (!function_exists('sql_format')) {
                     case "BY":
                     case "ALL":
                     case "RECURSIVE":
+                    case "LATERAL":
                         $result[] = $MARK_SP . $virttoken . $MARK_SP . array_pop($result);
                         break;
                     case "SELECT":
@@ -8488,6 +8491,8 @@ if (!function_exists('sql_format')) {
                         break;
                     case "COMMIT":
                     case "ROLLBACK":
+                    case "SAVEPOINT":
+                    case "RELEASE":
                         // begin は begin～end の一部の可能性があるが commit,rollback は俺の知る限りそのような構文はない
                         $result[] = $virttoken;
                         break;
@@ -13633,7 +13638,6 @@ if (!function_exists('process_async')) {
                 }
 
                 try {
-                    /** @noinspection PhpStatementHasEmptyBodyInspection */
                     while ($this->update()) {
                         // noop
                     }
@@ -31494,7 +31498,7 @@ if (!function_exists('instance_of')) {
      *
      * @package ryunosuke\Functions\Package\syntax
      *
-     * @template T as object
+     * @template T of object
      * @param T $object 調べるオブジェクト
      * @param string|object $class クラス名
      * @return ?T $object が $class のインスタンスなら $object, そうでなければ null

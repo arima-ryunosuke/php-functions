@@ -24,7 +24,7 @@
             <div class="wy-side-nav-search">
                 <a href="" class="icon icon-home"> ryunosuke-Functions-Package.html</a>
                 <div class="version">
-                    最終更新日 2025/04/29 12:34:08                </div>
+                    最終更新日 2025/04/30 17:16:38                </div>
                 <div role="search">
                     <form id="rtd-search-form" class="wy-form hidden-download" method="get">
                         <input type="text" name="query" placeholder="ディレクトリ内検索" value="">
@@ -2396,7 +2396,7 @@ that(array_fill_gap($array, 'a', 'c', 'd', 'f'))-&gt;isSame([
 <pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function array_filter_map(
     iterable $array,
     callable $callback
-): iterable</div></pre>
+): iterable|array</div></pre>
 <div class="description">
 <p>コールバックを適用して、結果が !false 要素のみ取り出す。<span class="implicit-br">
 </span>コールバックの第1引数を参照にして書き換えると結果にも反映される。</p>
@@ -2448,7 +2448,7 @@ that(array_fill_gap($array, 'a', 'c', 'd', 'f'))-&gt;isSame([
 </thead>
 <tbody>
 <tr>
-<td>​iterable</td>
+<td>​iterable|​array</td>
 <td>​<span class="summary">$callback が !false を返し map された配列</span></td>
 </tr>
 </tbody>
@@ -4015,7 +4015,7 @@ that(array_lookup($array, ['id', 'status']))-&gt;isSame([
     iterable $array,
     callable $callback,
     bool $strict = false
-): iterable</div></pre>
+): iterable|array</div></pre>
 <div class="description">
 <p>コールバックを適用して、結果が true 相当の要素のみ取り出す。<span class="implicit-br">
 </span>$strict に true を与えると「null でない」要素のみ返される。</p>
@@ -4073,7 +4073,7 @@ that(array_map_filter([' a ', ' b ', ''], 'trim', true))-&gt;isSame(['a', 'b', '
 </thead>
 <tbody>
 <tr>
-<td>​iterable</td>
+<td>​iterable|​array</td>
 <td>​<span class="summary">$callback が真を返した新しい配列</span></td>
 </tr>
 </tbody>
@@ -4287,7 +4287,7 @@ that(array_map_recursive([
 <pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function array_maps(
     iterable $array,
     callable ...$callbacks
-): iterable</div></pre>
+): iterable|array</div></pre>
 <div class="description">
 <p>指定したコールバックで複数回回してマップする。<span class="implicit-br">
 </span><code>array_maps($array, $f, $g)</code> は <code>array_map($g, array_map($f, $array))</code> とほぼ等しい。<span class="implicit-br">
@@ -4351,7 +4351,7 @@ that(array_maps([new \Exception('a'), new \Exception('b')], '@getMessage'))-&gt;
 </thead>
 <tbody>
 <tr>
-<td>​iterable</td>
+<td>​iterable|​array</td>
 <td>​<span class="summary">評価クロージャを通した新しい配列</span></td>
 </tr>
 </tbody>
@@ -7553,15 +7553,15 @@ that(is_indexarray([1 =&gt; 1, 2 =&gt; 2, 3 =&gt; 3]))-&gt;isTrue();</div></pre>
 </section><section id="_405ca486b61223fddd5e71e416e17c2177da5643-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-kvsort()" class="anchor"></a>[F] kvsort <small><span class="summary">比較関数にキーも渡ってくる安定ソート</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/kvsort.php#L10-L136" target="_blank">kvsort.php#10~136</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/kvsort.php#L10-L135" target="_blank">kvsort.php#10~135</a></p>
 </div>
 <details>
 <summary class="">比較関数にキーも渡ってくる安定ソート</summary>
 <pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function kvsort(
-    T $array,
+    $array,
     callable|int|null $comparator = null,
     callable|callable[] $schwartzians = []
-): T</div></pre>
+): array</div></pre>
 <div class="description">
 <p>比較関数は ($valueA, $valueB, $keyA, $keyB) という引数を取る。<span class="implicit-br">
 </span>「値で比較して同値だったらキーも見たい」という状況はまれによくあるはず。<span class="implicit-br">
@@ -7639,9 +7639,9 @@ that(kvsort($array, null, fn($v) =&gt; md5($v)))-&gt;isSame([
 </thead>
 <tbody>
 <tr>
-<td>​<a href="#--T">T</a></td>
+<td>​</td>
 <td>​<code>$array</code></td>
-<td>​<span class="summary">対象配列</span></td>
+<td>​<span class="summary"></span></td>
 </tr>
 <tr>
 <td>​callable|​int|​null</td>
@@ -7671,7 +7671,7 @@ that(kvsort($array, null, fn($v) =&gt; md5($v)))-&gt;isSame([
 </thead>
 <tbody>
 <tr>
-<td>​<a href="#--T">T</a></td>
+<td>​array</td>
 <td>​<span class="summary">ソートされた配列</span></td>
 </tr>
 </tbody>
@@ -7749,7 +7749,7 @@ that(last_key([], 999))-&gt;isSame(999);</div></pre>
 </section><section id="_ddca7931bb9d4dc2d5a378ed8df16afe02890af0-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-last_keyvalue()" class="anchor"></a>[F] last_keyvalue <small><span class="summary">配列の最後のキー/値ペアをタプルで返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/last_keyvalue.php#L8-L44" target="_blank">last_keyvalue.php#8~44</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/last_keyvalue.php#L8-L43" target="_blank">last_keyvalue.php#8~43</a></p>
 </div>
 <details>
 <summary class="">配列の最後のキー/値ペアをタプルで返す</summary>
@@ -9553,7 +9553,7 @@ that(sql_bind('select ?, :hoge', [1, 'hoge' =&gt; 'hoge']))-&gt;isSame("select 1
 </section><section id="_54219aabfbe99edbbdc539071645e258656a3a2a-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-sql_format()" class="anchor"></a>[F] sql_format <small><span class="summary">ものすごく雑に SQL を整形する</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/database/sql_format.php#L9-L1122" target="_blank">sql_format.php#9~1122</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/database/sql_format.php#L9-L1129" target="_blank">sql_format.php#9~1129</a></p>
 </div>
 <details>
 <summary class="">ものすごく雑に SQL を整形する</summary>
@@ -13214,7 +13214,7 @@ that($stderr)-&gt;isSame('err'); // 標準エラーに書き込んでいるの�
 </section><section id="_d74bc4fb7442cd87327a6b1ab8a1032c67f092e7-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-process_async()" class="anchor"></a>[F] process_async <small><span class="summary">proc_open ～ proc_close の一連の処理を行う（非同期版）</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/exec/process_async.php#L8-L251" target="_blank">process_async.php#8~251</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/exec/process_async.php#L8-L250" target="_blank">process_async.php#8~250</a></p>
 </div>
 <details>
 <summary class="">proc_open ～ proc_close の一連の処理を行う（非同期版）</summary>
