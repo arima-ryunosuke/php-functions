@@ -123,7 +123,7 @@ class utilityTest extends AbstractTestCase
 
         $cache = cacheobject('local');
         $cache->set('hoge', '');
-        that(self::$TMPDIR . DIRECTORY_SEPARATOR . 'local' . DIRECTORY_SEPARATOR . 'hoge.php-cache')->fileExists();
+        that(function_configure('cachedir') . DIRECTORY_SEPARATOR . 'local' . DIRECTORY_SEPARATOR . 'hoge.php-cache')->fileExists();
 
         $cache = cacheobject($tmpdir);
 

@@ -259,6 +259,9 @@ class miscTest extends AbstractTestCase
         that(evaluate('return $x * $x;', ['x' => 2]))->is(4);
         that(evaluate('return $x * $x;', ['x' => 3]))->is(9);
 
+        $that = new class ( ) { };
+        that(evaluate('return $this;', ['this' => $that]))->isSame($that);
+
         that(evaluate('
 return new class($x)
 {
