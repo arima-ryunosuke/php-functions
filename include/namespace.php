@@ -4194,6 +4194,75 @@ if (!function_exists('ryunosuke\\Functions\\array_remove')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\array_replace_callback') || (new \ReflectionFunction('ryunosuke\\Functions\\array_replace_callback'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\array_replace_callback')) {
+    /**
+     * array_replace のコールバック版
+     *
+     * 基本的なルールは array_replace と全く同じ（連番の扱いや後方優先など）。
+     * 値が重複している場合に重複している配列でコールバックが呼ばれる。
+     *
+     * コールバックの引数は($重複値配列, $そのキー)であり、$重複値配列には重複しなかった配列の値は含まれない。
+     * ただし、キーは維持されるので歯抜けになっていたり、あるべきキーが無かったりを調べればどれとどれが重複ししていたの判定が可能。
+     * もっとも、普通の使用（2引数の配列）では両方に値が入ってくるという前提で問題ない。
+     *
+     * Example:
+     * ```php
+     * $a1 = [
+     *     'a' => 'a1',
+     *     'b' => 'b1',
+     *     'c' => 'c1',
+     *     'x' => 'x1',
+     * ];
+     * $a2 = [
+     *     'a' => 'a2',
+     *     'b' => 'b2',
+     *     'y' => 'y2',
+     * ];
+     * $a3 = [
+     *     'a' => 'a3',
+     *     'c' => 'c3',
+     *     'z' => 'z3',
+     * ];
+     * that(array_replace_callback(fn($args, $k) => "$k:" . json_encode($args), $a1, $a2, $a3))->isSame([
+     *     "a" => 'a:["a1","a2","a3"]',    // 全てに存在するので3つ全てが渡ってくる
+     *     "b" => 'b:["b1","b2"]',         // 1,2 に存在するので2つ渡ってくる
+     *     "c" => 'c:{"0":"c1","2":"c3"}', // 1,3 に存在するので2つ渡ってくる（2が歯抜けになる）
+     *     "x" => 'x1', // 重複していないのでコールバック自体が呼ばれない
+     *     "y" => 'y2', // 重複していないのでコールバック自体が呼ばれない
+     *     "z" => 'z3', // 重複していないのでコールバック自体が呼ばれない
+     * ]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\array
+     *
+     * @param callable $callback 重複コールバック
+     * @param array ...$arrays マージする配列
+     * @return array マージされた配列
+     */
+    function array_replace_callback(callable $callback, array ...$arrays)
+    {
+        $callback = func_user_func_array($callback);
+
+        // まず普通に呼んで・・・
+        $result = array_replace(...$arrays);
+
+        // 重複値をコールバックすれば順番も乱れずシンプルに上書きできる
+        foreach ($result as $k => $v) {
+            $duplicated = [];
+            foreach ($arrays as $n => $array) {
+                if (array_key_exists($k, $array)) {
+                    $duplicated[$n] = $array[$k];
+                }
+            }
+            if (count($duplicated) > 1) {
+                $result[$k] = $callback($duplicated, $k);
+            }
+        }
+        return $result;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\array_revise') || (new \ReflectionFunction('ryunosuke\\Functions\\array_revise'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\array_revise')) {
     /**
@@ -10873,13 +10942,12 @@ if (!function_exists('ryunosuke\\Functions\\paml_import')) {
             }
 
             if ($options['expression']) {
-                $semicolon = ';';
                 if ($prefix === '`' && $suffix === '`') {
-                    $value = eval("return " . substr($value, 1, -1) . $semicolon);
+                    $value = evaluate("return " . substr($value, 1, -1) . ';');
                     return true;
                 }
                 try {
-                    $evalue = @eval("return $value$semicolon");
+                    $evalue = @evaluate("return $value;");
                     if ($value !== $evalue) {
                         $value = $evalue;
                         return true;
@@ -13836,7 +13904,7 @@ if (!function_exists('ryunosuke\\Functions\\process_closure')) {
         foreach ($autoload as $file) {
             require_once $file;
         }
-        $stdin  = eval(stream_get_contents(STDIN));
+        $stdin  = ' . $namespace . 'evaluate(stream_get_contents(STDIN));
         $timer  = ' . $namespace . 'cpu_timer();
         $return = ' . $closure_code . '(...$stdin);
         file_put_contents($argv[1], ' . $namespace . 'var_export3([$return, $timer->result(), memory_get_peak_usage()], ["outmode" => "file"]));
@@ -17163,7 +17231,7 @@ if (!function_exists('ryunosuke\\Functions\\func_eval')) {
                     $stmt .= $tmp[$i]->text;
                 }
             }
-            $cache[$cachekey] = eval("return function($args) { return $stmt; };");
+            $cache[$cachekey] = evaluate("return function($args) { return $stmt; };");
         }
         return $cache[$cachekey];
     }
@@ -19970,7 +20038,8 @@ if (!function_exists('ryunosuke\\Functions\\evaluate')) {
      * また、素の eval は ParseError が起こったときの表示がわかりにくすぎるので少し見やすくしてある。
      *
      * 関数化してる以上 eval におけるコンテキストの引き継ぎはできない。
-     * ただし、引数で変数配列を渡せるようにしてあるので get_defined_vars を併用すれば基本的には同じ（$this はどうしようもない）。
+     *  ただし、引数で変数配列を渡せるようにしてあるので get_defined_vars を併用すれば基本的には同じ。
+     * コンテキストに $this がある場合は bind して疑似的に模倣する。
      *
      * Example:
      * ```php
@@ -19997,11 +20066,30 @@ if (!function_exists('ryunosuke\\Functions\\evaluate')) {
         }
 
         try {
-            /** @noinspection PhpMethodParametersCountMismatchInspection */
-            return (static function () {
+            $evaler = function () {
+                // extract は数値キーをそのまま展開できない
+                // しかし "${0}" のような記法で数値変数を利用することはできる（可変変数限定だし php8.2 で非推奨になったが）
+                // 要するに数値キーのみをローカルコンテキストに展開しないと完全な eval の代替にならない
+                if (func_get_arg(1)) {
+                    foreach (func_get_arg(1) as $k => $v) {
+                        $$k = $v;
+                    }
+                    // 現スコープで宣言してしまっているので伏せなければならない
+                    unset($k, $v);
+                }
                 extract(func_get_arg(1));
                 return require func_get_arg(0);
-            })($cachefile, $contextvars);
+            };
+
+            // $this を模倣する
+            if (isset($contextvars['this'])) {
+                assert(is_object($contextvars['this']));
+                $evaler = $evaler->bindTo($contextvars['this'], get_class($contextvars['this']));
+                unset($contextvars['this']);
+            }
+
+            /** @noinspection PhpMethodParametersCountMismatchInspection */
+            return $evaler($cachefile, $contextvars);
         }
         catch (\ParseError $ex) {
             $errline = $ex->getLine();
@@ -22244,6 +22332,26 @@ if (!function_exists('ryunosuke\\Functions\\getipaddress')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\http_bechmark') || (new \ReflectionFunction('ryunosuke\\Functions\\http_bechmark'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\http_bechmark')) {
+    /**
+     * @see http_benchmark()
+     * @deprecated スペルミス
+     * @codeCoverageIgnore
+     * @package ryunosuke\Functions\Package\network
+     */
+    function http_bechmark(
+        /** URLs */ array|string $urls,
+        /** 合計リクエスト */ int $requests = 10,
+        /** 同時接続数 */ int $concurrency = 3,
+        /** @param null|resource|bool 出力先（省略時は標準出力） */ $output = null,
+    ): /** 結果配列 */ array
+    {
+        trigger_error(__FUNCTION__ . ' is deprecated. use http_benchmark', E_USER_DEPRECATED);
+        return http_benchmark(...func_get_args());
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\http_benchmark') || (new \ReflectionFunction('ryunosuke\\Functions\\http_benchmark'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\http_benchmark')) {
     /**
@@ -22280,7 +22388,7 @@ if (!function_exists('ryunosuke\\Functions\\http_benchmark')) {
      *
      * @package ryunosuke\Functions\Package\network
      */
-    function http_bechmark(
+    function http_benchmark(
         /** URLs */ array|string $urls,
         /** 合計リクエスト */ int $requests = 10,
         /** 同時接続数 */ int $concurrency = 3,
@@ -28578,16 +28686,7 @@ if (!function_exists('ryunosuke\\Functions\\render_string')) {
         try {
             /** @noinspection PhpMethodParametersCountMismatchInspection */
             return (function () {
-                // extract は数値キーを展開してくれないので自前ループで展開
-                foreach (func_get_arg(1) as $k => $v) {
-                    $$k = $v;
-                }
-                // 現スコープで宣言してしまっているので伏せなければならない
-                unset($k, $v);
-                // かと言って変数配列に k, v キーがあると使えなくなるので更に extract で補完
-                extract(func_get_arg(1));
-                // そして eval. ↑は要するに数値キーのみを展開している
-                return eval(func_get_arg(0));
+                return evaluate(func_get_arg(0), func_get_arg(1));
             })($evalcode, $vars);
         }
         catch (\ParseError $ex) {
@@ -31461,7 +31560,7 @@ if (!function_exists('ryunosuke\\Functions\\cast')) {
 
         // 判定・変換が複雑極まるため実際に投げてその値を返すのが最も間違いが少ない
         static $test_functions = [];
-        $test_functions[$type] ??= eval("return static fn({$type} \$value) => \$value;");
+        $test_functions[$type] ??= evaluate("return static fn({$type} \$value) => \$value;");
         try {
             return $test_functions[$type]($value);
         }
@@ -36871,7 +36970,7 @@ if (!function_exists('ryunosuke\\Functions\\var_pretty')) {
 
                     $ref = reflect_callable($value);
 
-                    if ($ref->isArrow()) {
+                    if (!str_contains($ref->getFileName(), "eval()'d code") && $ref->isArrow()) {
                         $this->plain("(");
                         if ($ref->isStatic()) {
                             $this->plain("static ");

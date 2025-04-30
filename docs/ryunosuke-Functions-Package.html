@@ -24,7 +24,7 @@
             <div class="wy-side-nav-search">
                 <a href="" class="icon icon-home"> ryunosuke-Functions-Package.html</a>
                 <div class="version">
-                    最終更新日 2025/04/30 17:16:38                </div>
+                    最終更新日 2025/05/04 02:07:33                </div>
                 <div role="search">
                     <form id="rtd-search-form" class="wy-form hidden-download" method="get">
                         <input type="text" name="query" placeholder="ディレクトリ内検索" value="">
@@ -5590,6 +5590,100 @@ that(array_remove($array, ['a', 'c']))-&gt;isSame(['b' =&gt; 'B']);</div></pre>
 </table>
 </div>
 </details>
+</section><section id="_29d80d982c73275468ae582bf786133c7b706fa2-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-array_replace_callback()" class="anchor"></a>[F] array_replace_callback <small><span class="summary">array_replace のコールバック版</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/array_replace_callback.php#L8-L72" target="_blank">array_replace_callback.php#8~72</a></p>
+</div>
+<details>
+<summary class="">array_replace のコールバック版</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function array_replace_callback(
+    callable $callback,
+    array ...$arrays
+): array</div></pre>
+<div class="description">
+<p>基本的なルールは array_replace と全く同じ（連番の扱いや後方優先など）。<span class="implicit-br">
+</span>値が重複している場合に重複している配列でコールバックが呼ばれる。</p>
+<p>コールバックの引数は($重複値配列, $そのキー)であり、$重複値配列には重複しなかった配列の値は含まれない。<span class="implicit-br">
+</span>ただし、キーは維持されるので歯抜けになっていたり、あるべきキーが無かったりを調べればどれとどれが重複ししていたの判定が可能。<span class="implicit-br">
+</span>もっとも、普通の使用（2引数の配列）では両方に値が入ってくるという前提で問題ない。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">$a1 = [
+    'a' =&gt; 'a1',
+    'b' =&gt; 'b1',
+    'c' =&gt; 'c1',
+    'x' =&gt; 'x1',
+];
+$a2 = [
+    'a' =&gt; 'a2',
+    'b' =&gt; 'b2',
+    'y' =&gt; 'y2',
+];
+$a3 = [
+    'a' =&gt; 'a3',
+    'c' =&gt; 'c3',
+    'z' =&gt; 'z3',
+];
+that(array_replace_callback(fn($args, $k) =&gt; "$k:" . json_encode($args), $a1, $a2, $a3))-&gt;isSame([
+    "a" =&gt; 'a:["a1","a2","a3"]',    // 全てに存在するので3つ全てが渡ってくる
+    "b" =&gt; 'b:["b1","b2"]',         // 1,2 に存在するので2つ渡ってくる
+    "c" =&gt; 'c:{"0":"c1","2":"c3"}', // 1,3 に存在するので2つ渡ってくる（2が歯抜けになる）
+    "x" =&gt; 'x1', // 重複していないのでコールバック自体が呼ばれない
+    "y" =&gt; 'y2', // 重複していないのでコールバック自体が呼ばれない
+    "z" =&gt; 'z3', // 重複していないのでコールバック自体が呼ばれない
+]);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​callable</td>
+<td>​<code>$callback</code></td>
+<td>​<span class="summary">重複コールバック</span></td>
+</tr>
+<tr>
+<td>​array</td>
+<td>​<code>...$arrays</code></td>
+<td>​<span class="summary">マージする配列</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array</td>
+<td>​<span class="summary">マージされた配列</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
 </section><section id="_41973cf5ad9cdb6d8fbfbd0479e9dbe4aa405a24-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-array_revise()" class="anchor"></a>[F] array_revise <small><span class="summary">配列要素の追加・変更・削除を行う</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
@@ -11138,7 +11232,7 @@ that("\n" . markdown_table([
 </section><section id="_37d2c46c4b468a9e1f4cd771d080820c5c0fe814-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-paml_import()" class="anchor"></a>[F] paml_import <small><span class="summary">paml 的文字列をパースする</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/dataformat/paml_import.php#L9-L168" target="_blank">paml_import.php#9~168</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/dataformat/paml_import.php#L10-L168" target="_blank">paml_import.php#10~168</a></p>
 </div>
 <details>
 <summary class="">paml 的文字列をパースする</summary>
@@ -16496,7 +16590,7 @@ that(chain($rows)-&gt;where['E']('sex', '=== "F"')-&gt;column('salary')-&gt;max(
 </section><section id="_fffdb7612fe05900621a44b39f38e0b7baab65f8-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-func_eval()" class="anchor"></a>[F] func_eval <small><span class="summary">指定コードで eval するクロージャを返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/funchand/func_eval.php#L9-L56" target="_blank">func_eval.php#9~56</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/funchand/func_eval.php#L10-L57" target="_blank">func_eval.php#10~57</a></p>
 </div>
 <details>
 <summary class="">指定コードで eval するクロージャを返す</summary>
@@ -19903,7 +19997,7 @@ that($annotations)-&gt;is([
 </section><section id="_068c3494b9e65f3e990cce9e680db5495b4ab11c-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-evaluate()" class="anchor"></a>[F] evaluate <small><span class="summary">eval のプロキシ関数</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/misc/evaluate.php#L8-L60" target="_blank">evaluate.php#8~60</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/misc/evaluate.php#L8-L80" target="_blank">evaluate.php#8~80</a></p>
 </div>
 <details>
 <summary class="">eval のプロキシ関数</summary>
@@ -19915,7 +20009,8 @@ that($annotations)-&gt;is([
 <p>一度ファイルに吐いてから require した方が opcache が効くので抜群に速い。<span class="implicit-br">
 </span>また、素の eval は ParseError が起こったときの表示がわかりにくすぎるので少し見やすくしてある。</p>
 <p>関数化してる以上 eval におけるコンテキストの引き継ぎはできない。<span class="implicit-br">
-</span>ただし、引数で変数配列を渡せるようにしてあるので get_defined_vars を併用すれば基本的には同じ（$this はどうしようもない）。</p>
+</span>ただし、引数で変数配列を渡せるようにしてあるので get_defined_vars を併用すれば基本的には同じ。<span class="implicit-br">
+</span>コンテキストに $this がある場合は bind して疑似的に模倣する。</p>
 <p>Example:</p>
 <pre data-label=""><div class="code language-php php">$a = 1;
 $b = 2;
@@ -21234,14 +21329,108 @@ that(getipaddress('127.0.0.9'))-&gt;isSame('127.0.0.1');</div></pre>
 </table>
 </div>
 </details>
-</section><section id="_3df5f5167b4ff3bde77a45d7df231c8ea0e8c9ed-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-http_bechmark()" class="anchor"></a>[F] http_bechmark <small><span class="summary">http のベンチマークを取る</span></small></h4>
+</section><section id="_ef47dac2d1c3f148d9578c8c8238eeaf5019cfcd-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-http_bechmark()" class="anchor"></a>[F] http_bechmark <small><span class="summary"></span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><span class="badge alert" data-badge-title="">deprecated </span><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/network/http_bechmark.php#L8-L23" target="_blank">http_bechmark.php#8~23</a></p>
+</div>
+<details>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function http_bechmark(
+    array|string $urls,
+    int $requests = 10,
+    int $concurrency = 3,
+    $output = null
+): array</div></pre>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array|​string</td>
+<td>​<code>$urls</code></td>
+<td>​<span class="summary">URLs</span></td>
+</tr>
+<tr>
+<td>​int</td>
+<td>​<code>$requests = 10</code></td>
+<td>​<span class="summary">合計リクエスト</span></td>
+</tr>
+<tr>
+<td>​int</td>
+<td>​<code>$concurrency = 3</code></td>
+<td>​<span class="summary">同時接続数</span></td>
+</tr>
+<tr>
+<td>​</td>
+<td>​<code>$output = null</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array</td>
+<td>​<span class="summary">結果配列</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">See</caption>
+<colgroup>
+<col style="width:30%">
+<col style="width:70%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​<a href="#--http_benchmark%28%29">http_benchmark()</a></td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section><section id="_b6f7c68fde2cfa09eeeed6438f9a04927ae4405a-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-http_benchmark()" class="anchor"></a>[F] http_benchmark <small><span class="summary">http のベンチマークを取る</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
 <p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/network/http_benchmark.php#L11-L138" target="_blank">http_benchmark.php#11~138</a></p>
 </div>
 <details>
 <summary class="">http のベンチマークを取る</summary>
-<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function http_bechmark(
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function http_benchmark(
     array|string $urls,
     int $requests = 10,
     int $concurrency = 3,
@@ -27017,7 +27206,7 @@ that(quoteexplode(',', 'a,b,{e,f}', null, ['{' =&gt; '}']))-&gt;isSame([
 </section><section id="_06371173fde8d6b50591704eb16cb375eab246cc-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-render_string()" class="anchor"></a>[F] render_string <small><span class="summary">"hoge <span class="badge " data-badge-title="">$hoge</span>" 形式のレンダリング</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/strings/render_string.php#L8-L84" target="_blank">render_string.php#8~84</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/strings/render_string.php#L9-L76" target="_blank">render_string.php#9~76</a></p>
 </div>
 <details>
 <summary class="">"hoge <span class="badge " data-badge-title="">$hoge</span>" 形式のレンダリング</summary>
@@ -30195,7 +30384,7 @@ that(blank_if(array_search('x', ['a', 'b', 'c']), 'default'))-&gt;isSame('defaul
 </section><section id="_7af85c29c0a8f4b9ec4a1e9ac621a741cf1b40cf-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-cast()" class="anchor"></a>[F] cast <small><span class="summary">php の型変換に準じてキャストする</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/syntax/cast.php#L8-L79" target="_blank">cast.php#8~79</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/syntax/cast.php#L9-L80" target="_blank">cast.php#9~80</a></p>
 </div>
 <details>
 <summary class="">php の型変換に準じてキャストする</summary>

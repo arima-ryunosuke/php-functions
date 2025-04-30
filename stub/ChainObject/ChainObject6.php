@@ -548,6 +548,11 @@ trait ChainObject6
     public function by_builtin($class, $function): self { }
     public function by_builtin($function): self { }
 
+    /** @see http_benchmark() */
+    public self $http_benchmark;
+    public function http_benchmark(array|string $urls, int $requests = 10, int $concurrency = 3, $output = null): self { }
+    public function http_benchmark(int $requests = 10, int $concurrency = 3, $output = null): self { }
+
     /** @see http_requests() */
     public self $http_requests;
     public function http_requests($urls, $single_options = [], $multi_options = [], &$infos = []): self { }

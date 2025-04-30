@@ -438,6 +438,16 @@ trait ChainObject9
     public function remove(iterable $array, $keys): self { }
     public function remove($keys): self { }
 
+    /** @see array_replace_callback() */
+    public self $array_replace_callback;
+    public function array_replace_callback(callable $callback, array ...$arrays): self { }
+    public function array_replace_callback(array ...$arrays): self { }
+
+    /** @see array_replace_callback() */
+    public self $replace_callback;
+    public function replace_callback(callable $callback, array ...$arrays): self { }
+    public function replace_callback(array ...$arrays): self { }
+
     /** @see array_select() */
     public self $array_select;
     public function array_select(iterable $array, $columns, $index = null): self { }
