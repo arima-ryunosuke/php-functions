@@ -489,7 +489,7 @@ function var_pretty($value, $options = [])
 
                 $ref = reflect_callable($value);
 
-                if ($ref->isArrow()) {
+                if (!str_contains($ref->getFileName(), "eval()'d code") && $ref->isArrow()) {
                     $this->plain("(");
                     if ($ref->isStatic()) {
                         $this->plain("static ");
