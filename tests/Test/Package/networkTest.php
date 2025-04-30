@@ -9,7 +9,7 @@ use function ryunosuke\Functions\Package\dns_resolve;
 use function ryunosuke\Functions\Package\fcgi_request;
 use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\getipaddress;
-use function ryunosuke\Functions\Package\http_bechmark;
+use function ryunosuke\Functions\Package\http_benchmark;
 use function ryunosuke\Functions\Package\http_delete;
 use function ryunosuke\Functions\Package\http_get;
 use function ryunosuke\Functions\Package\http_head;
@@ -319,7 +319,7 @@ class networkTest extends AbstractTestCase
 
         // 細かなテストはしない。カバレッジのみ
         $output = tmpfile();
-        $result = http_bechmark([
+        $result = http_benchmark([
             "$server/delay/1",
             "$server/delay/2",
         ],

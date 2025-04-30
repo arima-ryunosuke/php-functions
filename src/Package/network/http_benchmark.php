@@ -42,7 +42,7 @@ require_once __DIR__ . '/../network/http_requests.php';
  *
  * @package ryunosuke\Functions\Package\network
  */
-function http_bechmark(
+function http_benchmark(
     /** URLs */ array|string $urls,
     /** 合計リクエスト */ int $requests = 10,
     /** 同時接続数 */ int $concurrency = 3,
