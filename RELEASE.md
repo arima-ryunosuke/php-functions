@@ -11,6 +11,14 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.24
+
+- [feature] array_replace_callback を追加
+- [change] http_benchmark のスペルミスを修正
+- [fixbug] var_pretty で eval 由来のクロージャでエラーが出る不具合
+- [refactor] 内部的に eval している箇所を全て evaluate に置換
+- [feature] evaluate の特殊変数対応
+
 ## 2.0.23
 
 - [refactor] fix inspection
