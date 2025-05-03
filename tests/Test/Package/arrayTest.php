@@ -56,6 +56,7 @@ use function ryunosuke\Functions\Package\array_range;
 use function ryunosuke\Functions\Package\array_rank;
 use function ryunosuke\Functions\Package\array_rekey;
 use function ryunosuke\Functions\Package\array_remove;
+use function ryunosuke\Functions\Package\array_replace_callback;
 use function ryunosuke\Functions\Package\array_revise;
 use function ryunosuke\Functions\Package\array_schema;
 use function ryunosuke\Functions\Package\array_select;
@@ -2777,6 +2778,34 @@ class arrayTest extends AbstractTestCase
 
         that(array_remove(new \ArrayObject(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['a', 'c']))->is(new \ArrayObject(['b' => 'B']));
         that(array_remove(new \ArrayObject(['a' => 'A', 'b' => 'B', 'c' => 'C']), ['c', 'a']))->is(new \ArrayObject(['b' => 'B']));
+    }
+
+    function test_array_replace_callback()
+    {
+        $a1 = [
+            'a' => 'a1',
+            'b' => 'b1',
+            'c' => 'c1',
+            'x' => 'x1',
+        ];
+        $a2 = [
+            'a' => 'a2',
+            'b' => 'b2',
+            'y' => 'y2',
+        ];
+        $a3 = [
+            'a' => 'a3',
+            'c' => 'c3',
+            'z' => 'z3',
+        ];
+        that(array_replace_callback(fn($args, $k) => "$k:" . json_encode($args), $a1, $a2, $a3))->isSame([
+            "a" => 'a:["a1","a2","a3"]',    // 全てに存在するので3つ全てが渡ってくる
+            "b" => 'b:["b1","b2"]',         // 1,2 に存在するので2つ渡ってくる
+            "c" => 'c:{"0":"c1","2":"c3"}', // 1,3 に存在するので2つ渡ってくる（2が歯抜けになる）
+            "x" => 'x1', // 重複していないのでコールバック自体が呼ばれない
+            "y" => 'y2', // 重複していないのでコールバック自体が呼ばれない
+            "z" => 'z3', // 重複していないのでコールバック自体が呼ばれない
+        ]);
     }
 
     function test_array_revise()
