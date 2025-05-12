@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_fill_gap.php';
+require_once __DIR__ . '/../array/first_keyvalue.php';
 require_once __DIR__ . '/../funchand/func_eval.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
 require_once __DIR__ . '/../utility/function_configure.php';
@@ -22,13 +23,19 @@ require_once __DIR__ . '/../var/is_stringable.php';
  * - nullsafe 設定にすると「値が null の場合は呼び出し自体を行わない」という動作になり null をそのまま返す
  * - array_XXX, str_XXX は省略して XXX で呼び出せる
  *   - 省略した結果、他の関数と被る場合は可能な限り型で一致する呼び出しを行う
+ *   - e.g. chain('hoge')->pad(10) // これは str_pad
+ *   - e.g. chain([1, 2])->pad(10) // これは array_pad
  * - func(..., _, ...) で _ で「値があたる位置」を明示できる
- *   - `str_replace('from', 'to', _)` のように呼び出せる
+ *   - e.g. chain('hoge')->str_replace('ho', 'fu', _) // fuge
  * - func[1] で「引数1（0 ベースなので要は2番目）に適用して func を呼び出す」ことができる
  *   - func[2], func[3] 等も呼び出し可能
- * - func['E'] で eval される文字列のクロージャを呼べる
+ *   - e.g. chain('hoge')->str_replace[2]('ho', 'fu') // fuge
+ * - func['code'] で eval される文字列のクロージャを呼べる（旧仕様として func['E']('code') でも同じ）
  *   - 引数名は `$1`, `$2` のような文字列で指定できる
  *   - `$X` が無いときに限り 最左に `$1` が自動付与される
+ *   - () で呼び出せば追加の引数も指定可能
+ *   - e.g. chain([1, 2, 3])->filter['$1 > 1'] // [1 => 2, 2 => 3]
+ *   - e.g. chain([1, 2, 3])->filter['$1 > 1'](ARRAY_FILTER_USE_KEY) // [2 => 3]
  * - 引数が1つの呼び出しは () を省略できる
  *
  * この特殊ルールは普通に使う分にはそこまで気にしなくて良い。
@@ -49,8 +56,8 @@ require_once __DIR__ . '/../var/is_stringable.php';
  * that(array_sum(array_map(fn($v) => $v * 2, array_filter($n1_9, fn($v) => $v <= 5))))->isSame(30);
  * // chain でクロージャを渡したもの。処理の順番が思考どおりだが、 fn() が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
  * that(chain($n1_9)->filter(fn($v) => $v <= 5)->maps(fn($v) => $v * 2)->sum()())->isSame(30);
- * // func['E'] を介したもの。かなり直感的だが eval なので少し不安
- * that(chain($n1_9)->filter['E']('<= 5')->maps['E']('* 2')->sum()())->isSame(30);
+ * // func['eval'] を介したもの。かなり直感的だが eval なので少し不安
+ * that(chain($n1_9)->filter['<= 5']->maps['* 2']->sum()())->isSame(30);
  *
  * # "hello   world" を「" " で分解」して「空文字を除去」してそれぞれに「ucfirst」して「"/" で結合」して「rot13」して「md5」して「大文字化」するシチュエーション
  * $string = 'hello   world';
@@ -67,17 +74,17 @@ require_once __DIR__ . '/../var/is_stringable.php';
  *     ['id' => 9, 'name' => 'hage', 'sex' => 'F', 'age' => 30, 'salary' => 320000],
  * ];
  * // e.g. 男性の平均給料
- * that(chain($rows)->where['E']('sex', '=== "M"')->column('salary')->mean()())->isSame(375000);
+ * that(chain($rows)->where['$1["sex"] === "M"']->column('salary')->mean()())->isSame(375000);
  * // e.g. 女性の平均年齢
- * that(chain($rows)->where['E']('sex', '=== "F"')->column('age')->mean()())->isSame(23.5);
+ * that(chain($rows)->where['$1["sex"] === "F"']->column('age')->mean()())->isSame(23.5);
  * // e.g. 30歳以上の平均給料
- * that(chain($rows)->where['E']('age', '>= 30')->column('salary')->mean()())->isSame(400000);
+ * that(chain($rows)->where['$1["age"] >= 30']->column('salary')->mean()())->isSame(400000);
  * // e.g. 20～30歳の平均給料
- * that(chain($rows)->where['E']('age', '>= 20')->where['E']('age', '<= 30')->column('salary')->mean()())->isSame(295000);
+ * that(chain($rows)->where['$1["age"] >= 20']->where['$1["age"] <= 30']->column('salary')->mean()())->isSame(295000);
  * // e.g. 男性の最小年齢
- * that(chain($rows)->where['E']('sex', '=== "M"')->column('age')->min()())->isSame(21);
+ * that(chain($rows)->where['$1["sex"] === "M"']->column('age')->min()())->isSame(21);
  * // e.g. 女性の最大給料
- * that(chain($rows)->where['E']('sex', '=== "F"')->column('salary')->max()())->isSame(320000);
+ * that(chain($rows)->where['$1["sex"] === "F"']->column('salary')->max()())->isSame(320000);
  * ```
  *
  * @package ryunosuke\Functions\Package\funchand
@@ -94,6 +101,7 @@ function chain($source = null)
 
             private $data;
             private $callback;
+            private $expression;
 
             public function __construct($source)
             {
@@ -113,8 +121,27 @@ function chain($source = null)
                 return $this->$name[0](...$arguments);
             }
 
-            public function __invoke()
+            public function __invoke(...$arguments)
             {
+                if ($this->expression) {
+                    $return_mode = !!$arguments;
+                    $metadata = self::_cache($this->callback);
+
+                    $callables = $metadata['callables'];
+                    assert(count($callables) === 1);
+                    $first_callable = first_keyvalue($callables);
+                    unset($arguments[$first_callable[0]]);
+                    $arguments[$first_callable[1]] = func_eval(preg_match('#\$\d+#u', $this->expression) ? $this->expression : '$1 ' . $this->expression, '_');
+                    $offset = 0;
+
+                    $this->data = $this->_apply($this->callback, $arguments, [$offset => $this->data]);
+                    $this->callback = null;
+                    $this->expression = null;
+
+                    if ($return_mode) {
+                        return $this;
+                    }
+                }
                 return $this[0]()->data;
             }
 
@@ -138,8 +165,17 @@ function chain($source = null)
                 return $this();
             }
 
-            public function offsetGet($offset): callable
+            public function offsetGet($offset): mixed
             {
+                // 直 eval モード
+                if ($this->callback) {
+                    $metadata = self::_cache($this->callback);
+                    if (is_string($offset) && $offset !== 'E' && !isset($metadata['names'][$offset])) {
+                        $this->expression = $offset;
+                        return $this;
+                    }
+                }
+
                 return function (...$arguments) use ($offset) {
                     if ($this->callback !== null) {
                         // E モード
@@ -188,10 +224,9 @@ function chain($source = null)
                 throw new \BadFunctionCallException("function '$name' is not defined");
             }
 
-            private static function _apply($callback, $arguments, $injections)
+            private static function _cache($callback)
             {
-                // 必要なメタデータを採取してキャッシュしておく
-                $metadata = self::$metadata[$callback] ??= (function ($callback) {
+                return self::$metadata[$callback] ??= (function ($callback) {
                     $reffunc = reflect_callable($callback);
                     $parameters = $reffunc->getParameters();
                     $metadata = [
@@ -209,6 +244,16 @@ function chain($source = null)
                         },
                         'variadic'   => $reffunc->isVariadic(),
                         'nullable'   => [],
+                        'callables'  => (function () use ($parameters) {
+                            $result = [];
+                            foreach ($parameters as $parameter) {
+                                $typestring = (string) $parameter->getType();
+                                if (stripos($typestring, 'callable') !== false || stripos($typestring, '\\Closure') !== false || stripos($parameter->getName(), 'callback') !== false) {
+                                    $result[$parameter->getPosition()] = $parameter->getName();
+                                }
+                            }
+                            return $result;
+                        })(),
                         'positions'  => [],
                         'names'      => [],
                     ];
@@ -221,6 +266,11 @@ function chain($source = null)
                     }
                     return $metadata;
                 })($callback);
+            }
+
+            private static function _apply($callback, $arguments, $injections)
+            {
+                $metadata = self::_cache($callback);
 
                 foreach ($injections as $position => $injection) {
                     // 可変じゃないのに位置引数 or 名前引数が存在しないチェック

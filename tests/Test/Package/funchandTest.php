@@ -67,6 +67,15 @@ class funchandTest extends AbstractTestCase
         that($chain($array)->maps['E']('*2')->filter['E']('>5')())->is([2 => 6, 8, 10]);
         that($chain($array)->maps['E']('$1 * $2')->vsprintf[1]('%d,%d,%d,%d,%d')())->is('0,2,6,12,20');
 
+        // maps/filter/funcEval
+        $array = [1, 2, 3, 4, 5];
+        that($chain($array)->maps['-$1']())->is([-1, -2, -3, -4, -5]);
+        that($chain($array)->maps['$1 - 1']->maps['$1 ? 5 : 0']())->is([0, 5, 5, 5, 5]);
+        that($chain($array)->filter['$1 >= 3']->maps['$1 + 5']())->is([2 => 8, 9, 10]);
+        that($chain($array)->filter['$1 >= 3'](ARRAY_FILTER_USE_KEY)())->is([3 => 4, 4 => 5]);
+        that($chain($array)->maps['*2']->filter['>5']())->is([2 => 6, 8, 10]);
+        that($chain($array)->maps['$1 * $2']->vsprintf[1]('%d,%d,%d,%d,%d')())->is('0,2,6,12,20');
+
         // apply
         $string = 'a12345z';
         that($chain($string)
@@ -114,7 +123,7 @@ class funchandTest extends AbstractTestCase
         that($chain($rows)->where('age', fn($v) => $v >= 30)->column('salary')->mean()())->is(400000);
 
         // e.g. 20～30歳の平均給料
-        that($chain($rows)->where['E']('$1["age"] >= 20')->where['E']('$1["age"] <= 30')->column('salary')->mean()())->is(295000);
+        that($chain($rows)->where['$1["age"] >= 20']->where['$1["age"] <= 30']->column('salary')->mean()())->is(295000);
 
         // e.g. 男性の最小年齢
         that($chain($rows)->where('sex', fn($v) => $v === 'M')->column('age')->min()())->is(21);
@@ -129,7 +138,7 @@ class funchandTest extends AbstractTestCase
         ]);
 
         // exportClass で動くことを担保
-        that(Utility::chain($rows)->where['E']('$1["age"] >= 20')->where['E']('$1["age"] <= 30')->column('salary')->mean()())->is(295000);
+        that(Utility::chain($rows)->where['$1["age"] >= 20']->where['$1["age"] <= 30']->column('salary')->mean()())->is(295000);
 
         // 位置指定とか名前付き引数とか
         that($chain('abcdef')->str_replace[2](replace: 'XYZ', search: 'abc')())->is('XYZdef');
@@ -173,7 +182,7 @@ class funchandTest extends AbstractTestCase
             that($chain(null)->concat_abc_z['b']('A', 'C')())->isNull();
             that($chain(null)->concat_abc_z['c']('A', 'B')())->isNull();
 
-            that($chain(''))->concat_abc_z['N']('A', 'B', 'C')->isThrowable('does not exist');
+            that($chain(''))->nullsafe_int_func[999]('A', 'B', 'C')->isThrowable('does not exist');
         }
 
         that($chain('abc')->replace($placeholder, 'XYZ', 'abcdef')())->is('XYZdef');

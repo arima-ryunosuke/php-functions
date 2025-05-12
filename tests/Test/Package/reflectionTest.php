@@ -390,11 +390,11 @@ class reflectionTest extends AbstractTestCase
     function test_reflect_callable_instance()
     {
         $reffunc = reflect_callable('nullsafe_int_func');
-        that($reffunc->getDeclaration())->is('function nullsafe_int_func(int $x, int $y)');
-        that($reffunc->getCode())->contains('return $x - $y;');
-        that($reffunc(4, 1))->is(3);
-        that($reffunc(y: 1, x: 4))->is(3);
-        that($reffunc->getClosure()(y: 1, x: 4))->is(3);
+        that($reffunc->getDeclaration())->is('function nullsafe_int_func(int $x, int $y, ?int $z = null)');
+        that($reffunc->getCode())->contains('return $x - $y + ($z ?? 100);');
+        that($reffunc(4, 1))->is(103);
+        that($reffunc(y: 1, x: 4))->is(103);
+        that($reffunc->getClosure()(y: 1, x: 4))->is(103);
 
         $reffunc = reflect_callable(function ($x) use (&$use): int { return $x + $use++; });
         that($reffunc->getDeclaration())->is('function ($x) use (&$use): int');
