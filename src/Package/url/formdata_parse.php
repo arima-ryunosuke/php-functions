@@ -4,6 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../filesystem/tmpname.php';
 require_once __DIR__ . '/../strings/str_array.php';
+require_once __DIR__ . '/../url/query_parse.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -67,7 +68,7 @@ function formdata_parse(
             $body = $decoder($fields['filename'] ?? null, $headers['content-type'] ?? null, $body);
 
             // @todo いい方法が思い浮かばないので富豪的にやっている
-            parse_str(trim($fields['name'], '"'), $query);               // ここで a[b][c][d] が a:[b:[c:[d:""]]] になる
+            $query = query_parse(trim($fields['name'], '"'), '&');       // ここで a[b][c][d] が a:[b:[c:[d:""]]] になる
             array_walk_recursive($query, fn(&$value) => $value = $body); // ここで a:[b:[c:[d:""]]] が a:[b:[c:[d:$body]]] になる
             $result = array_replace_recursive($result, $query);          // 一つの値しかないのでマージすればよい
         }

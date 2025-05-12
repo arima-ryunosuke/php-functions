@@ -5,6 +5,7 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../pcre/preg_capture.php';
 require_once __DIR__ . '/../pcre/preg_splice.php';
 require_once __DIR__ . '/../strings/concat.php';
+require_once __DIR__ . '/../url/query_parse.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -98,7 +99,7 @@ function uri_parse($uri, $default = [])
     $parts['fragment'] = $parts['fragment'] === null ? null : rawurldecode($parts['fragment']);
 
     if (is_string($parts['query'])) {
-        parse_str($parts['query'], $parts['query']);
+        $parts['query'] = query_parse($parts['query'], '&');
     }
 
     return $parts;

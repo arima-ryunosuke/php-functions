@@ -201,6 +201,7 @@ class urlTest extends AbstractTestCase
 
         $data = [
             'scalar' => 123,
+            'a.b c'  => 456,
             'array'  => [1, 2, 3],
             'a'      => [
                 'b' => [
@@ -222,6 +223,10 @@ class urlTest extends AbstractTestCase
         Content-Disposition: form-data; name="scalar"
         
         123
+        --$boundary
+        Content-Disposition: form-data; name="a.b c"
+        
+        456
         --$boundary
         Content-Disposition: form-data; name="array[0]"
         
@@ -578,6 +583,18 @@ class urlTest extends AbstractTestCase
             'port'     => '',
             'path'     => '/path/to/hoge',
             'query'    => [],
+            'fragment' => '',
+        ]);
+
+        // dot and space
+        that(uri_parse('///path/to/hoge?a.b%20c=1'))->is([
+            'scheme'   => '',
+            'user'     => '',
+            'pass'     => '',
+            'host'     => '',
+            'port'     => '',
+            'path'     => '/path/to/hoge',
+            'query'    => ['a.b c' => '1'],
             'fragment' => '',
         ]);
     }
