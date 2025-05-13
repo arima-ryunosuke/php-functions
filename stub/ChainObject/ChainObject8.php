@@ -424,6 +424,11 @@ TEXT): self { }
     public function strtr_escaped(?string $string, $replace_pairs, $escape = "\\"): self { }
     public function strtr_escaped($replace_pairs, $escape = "\\"): self { }
 
+    /** @see blank_coalesce() */
+    public self $blank_coalesce;
+    public function blank_coalesce(...$args): self { }
+    public function blank_coalesce(): self { }
+
     /** @see base64url_encode() */
     public self $base64url_encode;
     public function base64url_encode($string): self { }

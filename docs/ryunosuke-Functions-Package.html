@@ -24,7 +24,7 @@
             <div class="wy-side-nav-search">
                 <a href="" class="icon icon-home"> ryunosuke-Functions-Package.html</a>
                 <div class="version">
-                    最終更新日 2025/05/04 02:07:33                </div>
+                    最終更新日 2025/05/26 16:00:45                </div>
                 <div role="search">
                     <form id="rtd-search-form" class="wy-form hidden-download" method="get">
                         <input type="text" name="query" placeholder="ディレクトリ内検索" value="">
@@ -6993,7 +6993,7 @@ that(arrayize($object, false, [1, 2, 3]))-&gt;isSame([$object, false, 1, 2, 3]);
 </section><section id="_3d4517a8b81a4eca84b1ef2a3cc0b63654166fe7-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-arrays()" class="anchor"></a>[F] arrays <small><span class="summary">配列をシーケンシャルに走査するジェネレータを返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/arrays.php#L7-L38" target="_blank">arrays.php#7~38</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/arrays.php#L7-L79" target="_blank">arrays.php#7~79</a></p>
 </div>
 <details>
 <summary class="">配列をシーケンシャルに走査するジェネレータを返す</summary>
@@ -7001,16 +7001,28 @@ that(arrayize($object, false, [1, 2, 3]))-&gt;isSame([$object, false, 1, 2, 3]);
 <div class="description">
 <p>「シーケンシャルに」とは要するに数値連番が得られるように走査するということ。<span class="implicit-br">
 </span>0ベースの連番を作ってインクリメントしながら foreach するのと全く変わらない。</p>
-<p>キーは連番、値は [$key, $value] で返す。<span class="implicit-br">
+<p>キーは連番、値は [$key, $value, $array, $first, $last] で返す。<span class="implicit-br">
 </span>つまり、 Example のように foreach の list 構文を使えば「連番、キー、値」でループを回すことが可能になる。<span class="implicit-br">
-</span>「foreach で回したいんだけど連番も欲しい」という状況はまれによくあるはず。</p>
+</span>「foreach で回したいんだけど連番も欲しい」という状況や $first,$last が欲しい状況はまれによくあるはず。</p>
 <p>Example:</p>
 <pre data-label=""><div class="code language-php php">$array = ['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'];
 $nkv = [];
 foreach (arrays($array) as $n =&gt; [$k, $v]) {
     $nkv[] = "$n,$k,$v";
 }
-that($nkv)-&gt;isSame(['0,a,A', '1,b,B', '2,c,C']);</div></pre>
+that($nkv)-&gt;isSame(['0,a,A', '1,b,B', '2,c,C']);
+
+// iterator でも first/last は使用できる
+$iterable = (function () {
+    yield 'a';
+    yield 'b';
+    yield 'c';
+})();
+$nkv = [];
+foreach (arrays($iterable) as $n =&gt; [$k, $v,, $first, $last]) {
+    $nkv[] = json_encode([$k, $v, $first, $last]);
+}
+that($nkv)-&gt;isSame(['[0,"a",true,false]', '[1,"b",false,false]', '[2,"c",false,true]']);</div></pre>
 </div>
 <div class="wy-table-responsive">
 <table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
@@ -7052,7 +7064,7 @@ that($nkv)-&gt;isSame(['0,a,A', '1,b,B', '2,c,C']);</div></pre>
 <tbody>
 <tr>
 <td>​<a href="https://php.net/manual/class.generator.php" target="_blank">Generator</a></td>
-<td>​<span class="summary">[$seq =&gt; [$key, $value]] を返すジェネレータ</span></td>
+<td>​<span class="summary">[$seq =&gt; [$key, $value, $array, $first, $last]] を返すジェネレータ</span></td>
 </tr>
 </tbody>
 </table>
@@ -9986,7 +9998,7 @@ that(csv_export([
 </section><section id="_e184bedafb768fe76b0cd4a599a3e30f15f57049-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-csv_import()" class="anchor"></a>[F] csv_import <small><span class="summary">CSV 的文字列を連想配列の配列に変換する</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/dataformat/csv_import.php#L13-L224" target="_blank">csv_import.php#13~224</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/dataformat/csv_import.php#L14-L223" target="_blank">csv_import.php#14~223</a></p>
 </div>
 <details>
 <summary class="">CSV 的文字列を連想配列の配列に変換する</summary>
@@ -16466,7 +16478,7 @@ that($counter-&gt;count())-&gt;isSame(0);</div></pre>
 </section><section id="_ec1950cb95df049fabc77c9951b8260a42b92cfa-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-chain()" class="anchor"></a>[F] chain <small><span class="summary">関数をメソッドチェーンできるオブジェクトを返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/funchand/chain.php#L12-L271" target="_blank">chain.php#12~271</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/funchand/chain.php#L14-L337" target="_blank">chain.php#14~337</a></p>
 </div>
 <details>
 <summary class="">関数をメソッドチェーンできるオブジェクトを返す</summary>
@@ -16480,19 +16492,25 @@ that($counter-&gt;count())-&gt;isSame(0);</div></pre>
 <li>nullsafe 設定にすると「値が null の場合は呼び出し自体を行わない」という動作になり null をそのまま返す</li>
 <li>array_XXX, str_XXX は省略して XXX で呼び出せる<ul class=" simple">
 <li>省略した結果、他の関数と被る場合は可能な限り型で一致する呼び出しを行う</li>
+<li>e.g. chain('hoge')-&gt;pad(10) // これは str_pad</li>
+<li>e.g. chain([1, 2])-&gt;pad(10) // これは array_pad</li>
 </ul>
 </li>
 <li>func(..., <em>, ...) で </em> で「値があたる位置」を明示できる<ul class=" simple">
-<li><code>str_replace('from', 'to', _)</code> のように呼び出せる</li>
+<li>e.g. chain('hoge')-&gt;str<em>replace('ho', 'fu', </em>) // fuge</li>
 </ul>
 </li>
 <li>func[1] で「引数1（0 ベースなので要は2番目）に適用して func を呼び出す」ことができる<ul class=" simple">
 <li>func[2], func[3] 等も呼び出し可能</li>
+<li>e.g. chain('hoge')-&gt;str_replace<a href="'ho'," title="fu">2</a> // fuge</li>
 </ul>
 </li>
-<li>func['E'] で eval される文字列のクロージャを呼べる<ul class=" simple">
+<li>func['code'] で eval される文字列のクロージャを呼べる（旧仕様として func<a href="'code'">'E'</a> でも同じ）<ul class=" simple">
 <li>引数名は <code>$1</code>, <code>$2</code> のような文字列で指定できる</li>
 <li><code>$X</code> が無いときに限り 最左に <code>$1</code> が自動付与される</li>
+<li>() で呼び出せば追加の引数も指定可能</li>
+<li>e.g. chain([1, 2, 3])-&gt;filter['$1 &gt; 1'] // [1 =&gt; 2, 2 =&gt; 3]</li>
+<li>e.g. chain([1, 2, 3])-&gt;filter<a href="ARRAY_FILTER_USE_KEY">'$1 &gt; 1'</a> // [2 =&gt; 3]</li>
 </ul>
 </li>
 <li>引数が1つの呼び出しは () を省略できる</li>
@@ -16511,8 +16529,8 @@ $n1_9 = range(1, 9);
 that(array_sum(array_map(fn($v) =&gt; $v * 2, array_filter($n1_9, fn($v) =&gt; $v &lt;= 5))))-&gt;isSame(30);
 // chain でクロージャを渡したもの。処理の順番が思考どおりだが、 fn() が微妙にうざい（array_ は省略できるので filter, map, sum のような呼び出しができている）
 that(chain($n1_9)-&gt;filter(fn($v) =&gt; $v &lt;= 5)-&gt;maps(fn($v) =&gt; $v * 2)-&gt;sum()())-&gt;isSame(30);
-// func['E'] を介したもの。かなり直感的だが eval なので少し不安
-that(chain($n1_9)-&gt;filter['E']('&lt;= 5')-&gt;maps['E']('* 2')-&gt;sum()())-&gt;isSame(30);
+// func['eval'] を介したもの。かなり直感的だが eval なので少し不安
+that(chain($n1_9)-&gt;filter['&lt;= 5']-&gt;maps['* 2']-&gt;sum()())-&gt;isSame(30);
 
 # "hello   world" を「" " で分解」して「空文字を除去」してそれぞれに「ucfirst」して「"/" で結合」して「rot13」して「md5」して「大文字化」するシチュエーション
 $string = 'hello   world';
@@ -16529,17 +16547,17 @@ $rows = [
     ['id' =&gt; 9, 'name' =&gt; 'hage', 'sex' =&gt; 'F', 'age' =&gt; 30, 'salary' =&gt; 320000],
 ];
 // e.g. 男性の平均給料
-that(chain($rows)-&gt;where['E']('sex', '=== "M"')-&gt;column('salary')-&gt;mean()())-&gt;isSame(375000);
+that(chain($rows)-&gt;where['$1["sex"] === "M"']-&gt;column('salary')-&gt;mean()())-&gt;isSame(375000);
 // e.g. 女性の平均年齢
-that(chain($rows)-&gt;where['E']('sex', '=== "F"')-&gt;column('age')-&gt;mean()())-&gt;isSame(23.5);
+that(chain($rows)-&gt;where['$1["sex"] === "F"']-&gt;column('age')-&gt;mean()())-&gt;isSame(23.5);
 // e.g. 30歳以上の平均給料
-that(chain($rows)-&gt;where['E']('age', '&gt;= 30')-&gt;column('salary')-&gt;mean()())-&gt;isSame(400000);
+that(chain($rows)-&gt;where['$1["age"] &gt;= 30']-&gt;column('salary')-&gt;mean()())-&gt;isSame(400000);
 // e.g. 20～30歳の平均給料
-that(chain($rows)-&gt;where['E']('age', '&gt;= 20')-&gt;where['E']('age', '&lt;= 30')-&gt;column('salary')-&gt;mean()())-&gt;isSame(295000);
+that(chain($rows)-&gt;where['$1["age"] &gt;= 20']-&gt;where['$1["age"] &lt;= 30']-&gt;column('salary')-&gt;mean()())-&gt;isSame(295000);
 // e.g. 男性の最小年齢
-that(chain($rows)-&gt;where['E']('sex', '=== "M"')-&gt;column('age')-&gt;min()())-&gt;isSame(21);
+that(chain($rows)-&gt;where['$1["sex"] === "M"']-&gt;column('age')-&gt;min()())-&gt;isSame(21);
 // e.g. 女性の最大給料
-that(chain($rows)-&gt;where['E']('sex', '=== "F"')-&gt;column('salary')-&gt;max()())-&gt;isSame(320000);</div></pre>
+that(chain($rows)-&gt;where['$1["sex"] === "F"']-&gt;column('salary')-&gt;max()())-&gt;isSame(320000);</div></pre>
 </div>
 <div class="wy-table-responsive">
 <table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
@@ -21170,14 +21188,14 @@ that(dns_resolve('example.com', DNS_ALL, 'raw'))-&gt;hasKeyAll(['A', 'AAAA', 'SO
 </section><section id="_a1d3be06430728268e6a40c4cbe012189fe59c7e-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-fcgi_request()" class="anchor"></a>[F] fcgi_request <small><span class="summary">FastCGI リクエストを行う</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/network/fcgi_request.php#L12-L276" target="_blank">fcgi_request.php#12~276</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/network/fcgi_request.php#L12-L326" target="_blank">fcgi_request.php#12~326</a></p>
 </div>
 <details>
 <summary class="">FastCGI リクエストを行う</summary>
 <pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function fcgi_request(
     string $url,
     array $params = [],
-    array|string $stdin = "",
+    \Traversable|array|string $stdin = "",
     array $options = []
 ): array</div></pre>
 <div class="description">
@@ -21232,7 +21250,7 @@ that(dns_resolve('example.com', DNS_ALL, 'raw'))-&gt;hasKeyAll(['A', 'AAAA', 'SO
 <td>​<span class="summary">FCGI パラメータ</span></td>
 </tr>
 <tr>
-<td>​array|​string</td>
+<td>​<a href="https://php.net/manual/class.traversable.php" target="_blank">Traversable</a>|​array|​string</td>
 <td>​<code>$stdin = ""</code></td>
 <td>​<span class="summary">FCGI ボディ</span></td>
 </tr>
@@ -22483,7 +22501,7 @@ that(incidr('192.168.1.1', ['192.168.2.0/24', '192.168.3.0/24']))-&gt;isFalse();
 </section><section id="_434b25d4235bf10ae54fe4199173d698e958d8a8-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-ip_info()" class="anchor"></a>[F] ip_info <small><span class="summary">ipv4 の情報を返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/network/ip_info.php#L10-L334" target="_blank">ip_info.php#10~334</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/network/ip_info.php#L11-L333" target="_blank">ip_info.php#11~333</a></p>
 </div>
 <details>
 <summary class="">ipv4 の情報を返す</summary>
@@ -23203,7 +23221,7 @@ This is HOGE.
 </section><section id="_60fd86bdcf4831f5c97158f186b1efbbad50d789-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-glob2regex()" class="anchor"></a>[F] glob2regex <small><span class="summary">glob 記法を正規表現に変換する</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/pcre/glob2regex.php#L10-L138" target="_blank">glob2regex.php#10~138</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/pcre/glob2regex.php#L10-L140" target="_blank">glob2regex.php#10~140</a></p>
 </div>
 <details>
 <summary class="">glob 記法を正規表現に変換する</summary>
@@ -29348,6 +29366,60 @@ that(str_rchop("$PATH/hoge.php", ".php"))-&gt;isSame("$PATH/hoge");</div></pre>
 </table>
 </div>
 </details>
+</section><section id="_7e3acfbf8c4ea47c9877afbc9366a06d4bf8b2d9-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-str_resource()" class="anchor"></a>[F] str_resource <small><span class="summary">文字列をリソース化する</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/strings/str_resource.php#L8-L45" target="_blank">str_resource.php#8~45</a></p>
+</div>
+<details>
+<summary class="">文字列をリソース化する</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function str_resource(
+    string $string,
+    ?int $maxmemory = null,
+    bool $volatile = true
+)</div></pre>
+<div class="description">
+<p>resource で統一的に扱いたいシチュエーションはまれによくある。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">// 文字列からリソースを作る
+$resource = str_resource('hoge');
+that(stream_get_contents($resource))-&gt;is('hoge');</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​string</td>
+<td>​<code>$string</code></td>
+<td>​<span class="summary">対象文字列</span></td>
+</tr>
+<tr>
+<td>​?int</td>
+<td>​<code>$maxmemory = null</code></td>
+<td>​<span class="summary">最大メモリ</span></td>
+</tr>
+<tr>
+<td>​bool</td>
+<td>​<code>$volatile = true</code></td>
+<td>​<span class="summary">自動削除</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
 </section><section id="_c0837d76fd630777830700b872822eed02be12d4-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-str_submap()" class="anchor"></a>[F] str_submap <small><span class="summary">指定文字列を置換する</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
@@ -30261,6 +30333,67 @@ that(strtr_escaped('XYZ ab %% %s', [
 </details>
 </section><section id="_d1536ee991275a8d2e51d04bf605c9c6c51309da-1" class="section section-level-h2" data-section-level="2"><h2 class="section-header"><a id="ryunosuke-Functions-Package-syntax" class="anchor"></a>[N] ryunosuke\Functions\Package\syntax\ <small><span class="summary"></span></small></h2>
 </section><section id="_819cf95d4d38b57293d94a4f4938e69043abd716-22" class="section section-level-h3" data-section-level="3"><h3 class="section-header"><a id="ryunosuke-Functions-Package-syntax--functions" class="anchor"></a>[F] functions</h3>
+</section><section id="_338e36c35e5807fa43cf0340d7575528347ac873-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-blank_coalesce()" class="anchor"></a>[F] blank_coalesce <small><span class="summary">blank_if の可変引数版</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/syntax/blank_coalesce.php#L8-L34" target="_blank">blank_coalesce.php#8~34</a></p>
+</div>
+<details>
+<summary class="">blank_if の可変引数版</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function blank_coalesce(T ...$args): T</div></pre>
+<div class="description">
+<p>blank ではない最初の引数を返す。<span class="implicit-br">
+</span>blank_if は設計が古い &amp; 可変対応すると名前が適切ではなくなってしまうので新設。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">// 処理自体は blank_if と同じ
+that(blank_coalesce(null, false, '', [], 'X'))-&gt;is('X');</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​<a href="#--T">T</a></td>
+<td>​<code>...$args</code></td>
+<td>​<span class="summary">値</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​<a href="#--T">T</a></td>
+<td>​<span class="summary">blank ではない最初の引数</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
 </section><section id="_e0318ecc79ab40d3a3e027a1c5272d450b5c9ac8-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-blank_if()" class="anchor"></a>[F] blank_if <small><span class="summary">値が空なら null を返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
@@ -30716,7 +30849,7 @@ that($finally_count)-&gt;isSame(2); // 呼ばれている</div></pre>
 </section><section id="_c1599b36c81d5c36da12cd7e5ba05ef8de5c948b-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-try_close()" class="anchor"></a>[F] try_close <small><span class="summary">try ～ finally 構文の close 特化版</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/syntax/try_close.php#L9-L122" target="_blank">try_close.php#9~122</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/syntax/try_close.php#L8-L121" target="_blank">try_close.php#8~121</a></p>
 </div>
 <details>
 <summary class="">try ～ finally 構文の close 特化版</summary>
@@ -31417,15 +31550,15 @@ that(dataurl_encode("hello, world", ['mimetype' =&gt; 'text/csv', 'charset' =&gt
 </section><section id="_a62d5c553d0cfde2a8c2abc6b74d76025375ab5e-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-formdata_build()" class="anchor"></a>[F] formdata_build <small><span class="summary">multipart/formdata の構築</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/url/formdata_build.php#L9-L121" target="_blank">formdata_build.php#9~121</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/url/formdata_build.php#L8-L172" target="_blank">formdata_build.php#8~172</a></p>
 </div>
 <details>
 <summary class="">multipart/formdata の構築</summary>
 <pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function formdata_build(
-    array $formdata,
+    iterable $formdata,
     ?string &amp;$boundary = null,
     ?\Closure $encoder = null
-): string</div></pre>
+): \Traversable|\Countable|array|string|(iterable&amp;\Countable)</div></pre>
 <div class="description">
 <p>$boundary 未指定時はランダム文字列が生成され、衝突した場合は無限にリトライされる。<span class="implicit-br">
 </span>SplFileInfo はファイルとみなされるが $encoder を指定すれば CURLFile なども活用可能。</p>
@@ -31467,7 +31600,7 @@ FORMDATA, ["\n" =&gt; "\r\n"]));</div></pre>
 </thead>
 <tbody>
 <tr>
-<td>​array</td>
+<td>​iterable</td>
 <td>​<code>$formdata</code></td>
 <td>​<span class="summary">フォームデータ配列</span></td>
 </tr>
@@ -31499,7 +31632,7 @@ FORMDATA, ["\n" =&gt; "\r\n"]));</div></pre>
 </thead>
 <tbody>
 <tr>
-<td>​string</td>
+<td>​<a href="https://php.net/manual/class.traversable.php" target="_blank">Traversable</a>|​<a href="https://php.net/manual/class.countable.php" target="_blank">Countable</a>|​array|​string|​<a href="#--%28iterable%26-Countable%29">Countable)</a></td>
 <td>​<span class="summary">フォームデータ文字列</span></td>
 </tr>
 </tbody>
@@ -31509,15 +31642,15 @@ FORMDATA, ["\n" =&gt; "\r\n"]));</div></pre>
 </section><section id="_5274b6b7cbe3f7d0bc478ce0781150b430a395f4-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-formdata_parse()" class="anchor"></a>[F] formdata_parse <small><span class="summary">multipart/formdata のパース</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/url/formdata_parse.php#L9-L76" target="_blank">formdata_parse.php#9~76</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/url/formdata_parse.php#L10-L121" target="_blank">formdata_parse.php#10~121</a></p>
 </div>
 <details>
 <summary class="">multipart/formdata のパース</summary>
 <pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function formdata_parse(
-    string $formdata,
+    string|resource $formdata,
     ?string $boundary = null,
     ?\Closure $decoder = null
-): array</div></pre>
+): \Generator|array</div></pre>
 <div class="description">
 <p>Example:</p>
 <pre data-label=""><div class="code language-php php">$data = formdata_parse(&lt;&lt;&lt;FORMDATA
@@ -31553,7 +31686,7 @@ that($data['f'])-&gt;isInstanceOf(\SplFileInfo::class);</div></pre>
 </thead>
 <tbody>
 <tr>
-<td>​string</td>
+<td>​string|​resource</td>
 <td>​<code>$formdata</code></td>
 <td>​<span class="summary">フォームデータ文字列</span></td>
 </tr>
@@ -31585,7 +31718,7 @@ that($data['f'])-&gt;isInstanceOf(\SplFileInfo::class);</div></pre>
 </thead>
 <tbody>
 <tr>
-<td>​array</td>
+<td>​<a href="https://php.net/manual/class.generator.php" target="_blank">Generator</a>|​array</td>
 <td>​<span class="summary">フォームデータ配列</span></td>
 </tr>
 </tbody>
@@ -31879,7 +32012,7 @@ that(uri_build([
 </section><section id="_2a18277cf5942b71832e70820470f0e0810f97a3-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-uri_parse()" class="anchor"></a>[F] uri_parse <small><span class="summary">parse_url の仕様を少しいじったもの</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/url/uri_parse.php#L10-L105" target="_blank">uri_parse.php#10~105</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/url/uri_parse.php#L11-L106" target="_blank">uri_parse.php#11~106</a></p>
 </div>
 <details>
 <summary class="">parse_url の仕様を少しいじったもの</summary>

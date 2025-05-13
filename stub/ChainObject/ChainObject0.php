@@ -448,6 +448,16 @@ trait ChainObject0
     public function diff($xstring, $ystring, $options = []): self { }
     public function diff($ystring, $options = []): self { }
 
+    /** @see str_resource() */
+    public self $str_resource;
+    public function str_resource(string $string, ?int $maxmemory = null, bool $volatile = true): self { }
+    public function str_resource(?int $maxmemory = null, bool $volatile = true): self { }
+
+    /** @see str_resource() */
+    public self $resource;
+    public function resource(string $string, ?int $maxmemory = null, bool $volatile = true): self { }
+    public function resource(?int $maxmemory = null, bool $volatile = true): self { }
+
     /** @see strposr() */
     public self $strposr;
     public function strposr(string $haystack, string $needle, ?int $offset = null): self { }

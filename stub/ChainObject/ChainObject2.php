@@ -425,8 +425,8 @@ trait ChainObject2
 
     /** @see fcgi_request() */
     public self $fcgi_request;
-    public function fcgi_request(string $url, array $params = [], array|string $stdin = "", array $options = []): self { }
-    public function fcgi_request(array $params = [], array|string $stdin = "", array $options = []): self { }
+    public function fcgi_request(string $url, array $params = [], \Traversable|array|string $stdin = "", array $options = []): self { }
+    public function fcgi_request(array $params = [], \Traversable|array|string $stdin = "", array $options = []): self { }
 
     /** @see http_delete() */
     public self $http_delete;

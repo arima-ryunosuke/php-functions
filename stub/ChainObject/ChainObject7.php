@@ -431,7 +431,7 @@ TEXT): self { }
 
     /** @see formdata_parse() */
     public self $formdata_parse;
-    public function formdata_parse(string $formdata, ?string $boundary = null, ?\Closure $decoder = null): self { }
+    public function formdata_parse($formdata, ?string $boundary = null, ?\Closure $decoder = null): self { }
     public function formdata_parse(?string $boundary = null, ?\Closure $decoder = null): self { }
 
     /** @see benchmark() */

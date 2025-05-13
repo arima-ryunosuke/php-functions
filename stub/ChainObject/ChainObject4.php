@@ -430,7 +430,7 @@ trait ChainObject4
 
     /** @see formdata_build() */
     public self $formdata_build;
-    public function formdata_build(array $formdata, ?string &$boundary = null, ?\Closure $encoder = null): self { }
+    public function formdata_build(iterable $formdata, ?string &$boundary = null, ?\Closure $encoder = null): self { }
     public function formdata_build(?string &$boundary = null, ?\Closure $encoder = null): self { }
 
     /** @see decrypt() */
