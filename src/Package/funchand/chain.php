@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../array/array_fill_gap.php';
 require_once __DIR__ . '/../funchand/func_eval.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
 require_once __DIR__ . '/../utility/function_configure.php';
@@ -242,28 +243,42 @@ function chain($source = null)
                     $injections = [];
                 }
 
-                $icount = count($injections);
-                $realargs = [];
+                $positions = $namedargs = $variadics = [];
                 foreach ($metadata['parameters']() as $pos => $parameter) {
-                    $pos -= $icount - count($injections);
-                    $nam = $parameter->getName();
-                    $variadic = $parameter->isVariadic();
-
                     if (!$injections && !$arguments) {
                         break;
                     }
-                    // inject argument
-                    elseif (array_key_exists($i = $pos, $injections) || array_key_exists($i = $nam, $injections)) {
-                        $realargs = array_merge($realargs, $variadic && is_array($injections[$i]) ? $injections[$i] : [$injections[$i]]);
-                        unset($injections[$i]);
+
+                    $nam = $parameter->getName();
+
+                    if ($parameter->isVariadic()) {
+                        if (array_key_exists($i = $pos, $injections) || array_key_exists($i = $nam, $injections)) {
+                            $variadics = array_merge($variadics, is_array($injections[$i]) ? $injections[$i] : [$injections[$i]]);
+                        }
+                        if (array_key_exists($i = $pos, $arguments) || array_key_exists($i = $nam, $arguments)) {
+                            $variadics = array_merge($variadics, is_array($arguments[$i]) ? $arguments[$i] : [$arguments[$i]]);
+                        }
                     }
-                    // named or positional argument
-                    elseif (array_key_exists($i = $pos, $arguments) || array_key_exists($i = $nam, $arguments)) {
-                        $realargs = array_merge($realargs, $variadic && is_array($arguments[$i]) ? $arguments[$i] : [$arguments[$i]]);
-                        unset($arguments[$i]);
+                    else {
+                        if (array_key_exists($i = $pos, $injections)) {
+                            $positions[] = $injections[$i];
+                        }
+                        if (array_key_exists($i = $pos, $arguments)) {
+                            $positions[] = $arguments[$i];
+                        }
+                        if (array_key_exists($i = $nam, $injections)) {
+                            $namedargs[$pos] = $injections[$i];
+                        }
+                        if (array_key_exists($i = $nam, $arguments)) {
+                            $namedargs[$pos] = $arguments[$i];
+                        }
                     }
+
+                    unset($injections[$pos], $arguments[$pos]);
+                    unset($injections[$nam], $arguments[$nam]);
                 }
-                return $callback(...$realargs);
+
+                return $callback(...array_fill_gap($namedargs, ...$positions), ...$variadics);
             }
         };
         $chain_object::$__CLASS__ = __CLASS__;

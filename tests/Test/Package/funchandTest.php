@@ -131,8 +131,12 @@ class funchandTest extends AbstractTestCase
         // exportClass で動くことを担保
         that(Utility::chain($rows)->where['E']('$1["age"] >= 20')->where['E']('$1["age"] <= 30')->column('salary')->mean()())->is(295000);
 
+        // 位置指定とか名前付き引数とか
         that($chain('abcdef')->str_replace[2](replace: 'XYZ', search: 'abc')())->is('XYZdef');
         that($chain('abcdef')->str_replace['subject'](replace: 'XYZ', search: 'abc')())->is('XYZdef');
+        that($chain([1, 2, 3])->implode[1](',')())->is('1,2,3');
+        that($chain([1, 2, 3])->implode['array'](',')())->is('1,2,3');
+        that($chain([1, 2, 3])->implode(separator: ',')())->is('1,2,3');
 
         $backup = function_configure([
             'chain.nullsafe' => true,
@@ -155,7 +159,7 @@ class funchandTest extends AbstractTestCase
             that($chain('C')->concat_abc_z[2]('A', 'B')())->is("ABC()");
             that($chain('Z')->concat_abc_z[2]('A', 'B', 'C')())->is("ABZ(C)");
             that($chain('Z')->concat_abc_z[3]('A', 'B', 'C')())->is("ABC(Z)");
-            that($chain('Z')->concat_abc_z[9]('A', 'B', 'C')())->is("ABC(Z)");
+            that($chain('Z')->concat_abc_z[9]('A', 'B', 'C', 'D')())->is("ABC(D,Z)");
             that($chain(['X', 'Y', 'Z'])->concat_abc_z[9]('A', 'B', 'C')())->is("ABC(X,Y,Z)");
             that($chain('A')->concat_abc_z['a']('B', 'C')())->is("ABC()");
             that($chain('B')->concat_abc_z['b']('A', 'C')())->is("ABC()");
