@@ -132,6 +132,7 @@ class funchandTest extends AbstractTestCase
         that(Utility::chain($rows)->where['E']('$1["age"] >= 20')->where['E']('$1["age"] <= 30')->column('salary')->mean()())->is(295000);
 
         that($chain('abcdef')->str_replace[2](replace: 'XYZ', search: 'abc')())->is('XYZdef');
+        that($chain('abcdef')->str_replace['subject'](replace: 'XYZ', search: 'abc')())->is('XYZdef');
 
         $backup = function_configure([
             'chain.nullsafe' => true,
@@ -140,10 +141,13 @@ class funchandTest extends AbstractTestCase
         $placeholder = constant(function_configure('placeholder'));
         /** @noinspection PhpUndefinedMethodInspection */
         {
-            that($chain(6)->nullsafe_int_func(3)())->is(3);
-            that($chain(3)->nullsafe_int_func[1](6)())->is(3);
+            that($chain(6)->nullsafe_int_func(3)())->is(103);
+            that($chain(3)->nullsafe_int_func[1](6)())->is(103);
             that($chain(null)->nullsafe_int_func(6)())->isNull();
             that($chain(null)->nullsafe_int_func[1](3)())->isNull();
+            that($chain(null)->nullsafe_int_func['y'](3)())->isNull();
+            that($chain(null)->nullsafe_int_func[2](3, 4)())->is(99);
+            that($chain(null)->nullsafe_int_func['z'](3, 4)())->is(99);
 
             that($chain('A')->concat_abc_z('B', 'C')())->is("ABC()");
             that($chain('A')->concat_abc_z[0]('B', 'C')())->is("ABC()");

@@ -73,9 +73,9 @@ if (!function_exists('posix_getgrnam')) {
 }
 
 // ダミー関数
-function nullsafe_int_func(int $x, int $y)
+function nullsafe_int_func(int $x, int $y, ?int $z = null)
 {
-    return $x - $y;
+    return $x - $y + ($z ?? 100);
 }
 
 function concat_abc_z(string $a, string $b, string $c, string ...$z)

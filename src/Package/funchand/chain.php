@@ -86,7 +86,7 @@ require_once __DIR__ . '/../var/is_stringable.php';
  */
 function chain($source = null)
 {
-    if (function_configure('chain.version') === 2) {
+    if (function_configure('chain.version') >= 2) {
         $chain_object = new class($source) implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable {
             public static  $__CLASS__;
             private static $metadata = [];
@@ -198,7 +198,7 @@ function chain($source = null)
                         'parameters' => function () use ($parameters) {
                             foreach ($parameters as $parameter) {
                                 if ($parameter->isVariadic()) {
-                                    for ($i = 0; 999; $i++) {
+                                    for ($i = 0; $i < 999; $i++) {
                                         yield $parameter->getPosition() + $i => $parameter;
                                     }
                                     throw new \ArgumentCountError("parameter length is too long(>=$i)"); // @codeCoverageIgnore
@@ -214,6 +214,7 @@ function chain($source = null)
                     foreach ($parameters as $parameter) {
                         $type = $parameter->getType();
                         $metadata['nullable'][$parameter->getPosition()] = $type ? $type->allowsNull() : null;
+                        $metadata['nullable'][$parameter->getName()] = $type ? $type->allowsNull() : null;
                         $metadata['positions'][$parameter->getPosition()] = $parameter->getName();
                         $metadata['names'][$parameter->getName()] = $parameter->getPosition();
                     }
