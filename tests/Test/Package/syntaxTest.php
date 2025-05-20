@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use stdClass;
+use function ryunosuke\Functions\Package\blank_coalesce;
 use function ryunosuke\Functions\Package\blank_if;
 use function ryunosuke\Functions\Package\cast;
 use function ryunosuke\Functions\Package\instance_of;
@@ -16,6 +17,22 @@ use function ryunosuke\Functions\Package\try_return;
 
 class syntaxTest extends AbstractTestCase
 {
+    function test_blank_coalesce()
+    {
+        $countableF = new \ArrayObject([]);
+        $stringableF = new \SplFileInfo('');
+        $countableT = new \ArrayObject(['hoge']);
+        $stringableT = new \SplFileInfo('hoge');
+
+        that(blank_coalesce('', null, false, [], $countableF, $stringableF))->isSame(null);
+        that(blank_coalesce('', null, false, [], true))->isSame(true);
+        that(blank_coalesce('', null, false, [], 0))->isSame(0);
+        that(blank_coalesce('', null, false, [], 's'))->isSame('s');
+        that(blank_coalesce('', null, false, [], [0]))->isSame([0]);
+        that(blank_coalesce('', null, false, $countableF, $countableT))->isSame($countableT);
+        that(blank_coalesce('', null, false, $stringableF, $stringableT))->isSame($stringableT);
+    }
+
     function test_blank_if()
     {
         $stdclass = new stdClass();
