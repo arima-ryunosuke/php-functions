@@ -2,7 +2,6 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../array/arrays.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
 // @codeCoverageIgnoreEnd
 
@@ -38,7 +37,7 @@ function try_close($callback, ...$resources)
     // hash to array
     foreach ($resources as $n => $resource) {
         if (is_array($resource) && is_hasharray($resource)) {
-            array_splice($resources, $n, 1, iterator_to_array(arrays($resource)));
+            array_splice($resources, $n, 1, array_values(array_map(fn($k) => [$k, $resource[$k]], array_keys($resource))));
         }
     }
     // array to resource

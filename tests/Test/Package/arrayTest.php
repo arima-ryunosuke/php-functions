@@ -3501,7 +3501,31 @@ class arrayTest extends AbstractTestCase
 
     function test_arrays()
     {
-        that(iterator_to_array(arrays(['a' => 'A', 'b' => 'B', 'c' => 'C'])))->is([['a', 'A'], ['b', 'B'], ['c', 'C']]);
+        $array = ['a' => 'A', 'b' => 'B', 'c' => 'C'];
+        that(iterator_to_array(arrays($array)))->is([
+            ['a', 'A', $array, true, false],
+            ['b', 'B', $array, false, false],
+            ['c', 'C', $array, false, true],
+        ]);
+
+        $object = (object) $array;
+        /** @noinspection PhpParamsInspection */
+        that(iterator_to_array(arrays($object)))->is([
+            ['a', 'A', $object, true, false],
+            ['b', 'B', $object, false, false],
+            ['c', 'C', $object, false, true],
+        ]);
+
+        $iterator = (function (){
+            yield 'a' => 'A';
+            yield 'b' => 'B';
+            yield 'c' => 'C';
+        })();
+        that(iterator_to_array(arrays($iterator)))->is([
+            ['a', 'A', $iterator, true, false],
+            ['b', 'B', $iterator, false, false],
+            ['c', 'C', $iterator, false, true],
+        ]);
     }
 
     function test_first_key()
