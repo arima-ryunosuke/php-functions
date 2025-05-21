@@ -77,9 +77,11 @@ function glob2regex($pattern, $flags = 0)
 {
     $replacer = [
         // target glob character
-        '*'  => '.*',
-        '?'  => '.',
-        '[!' => '[^',
+        '*'  => '(.*)',
+        '?'  => '(.)',
+        '[!' => '([^',
+        '['  => '([',
+        ']'  => '])',
         // quote regex character
         '.'  => '\\.',
         //'\\' => '\\\\',
@@ -105,8 +107,8 @@ function glob2regex($pattern, $flags = 0)
     ];
 
     if ($flags & GLOB_RECURSIVE) {
-        $replacer['**'] = '.*';
-        $replacer['*'] = '[^/]*';
+        $replacer['**'] = '(.*)';
+        $replacer['*'] = '([^/]*)';
     }
 
     if (!($flags & GLOB_BRACE)) {

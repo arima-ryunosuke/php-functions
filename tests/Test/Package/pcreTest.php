@@ -13,8 +13,8 @@ class pcreTest extends AbstractTestCase
 {
     function test_glob2regex()
     {
-        that(glob2regex('\\{hoge\\}*test??[ABC][!XYZ].{jp{e,}g,png}'))->is('\\{hoge\\}.*test..[ABC][^XYZ]\\.\\{jp\\{e,\\}g,png\\}');
-        that(glob2regex('\\{hoge\\}*test??[ABC][!XYZ].{jp{e,}g,png}', GLOB_BRACE))->is('\\{hoge\\}.*test..[ABC][^XYZ]\\.(jp(e|)g|png)');
+        that(glob2regex('\\{hoge\\}*test??[ABC][!XYZ].{jp{e,}g,png}'))->is('\\{hoge\\}(.*)test(.)(.)([ABC])([^XYZ])\\.\\{jp\\{e,\\}g,png\\}');
+        that(glob2regex('\\{hoge\\}*test??[ABC][!XYZ].{jp{e,}g,png}', GLOB_BRACE))->is('\\{hoge\\}(.*)test(.)(.)([ABC])([^XYZ])\\.(jp(e|)g|png)');
         that(glob2regex('noclose brace{jp{e,\\}g,png', GLOB_BRACE))->is('noclose brace{jp{e,\\}g,png');
 
         $cases = [
