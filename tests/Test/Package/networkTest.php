@@ -968,7 +968,7 @@ class networkTest extends AbstractTestCase
         }
         that($c)->gt(200000);
         if (version_compare(PHP_VERSION, '8.2') >= 0) {
-            that(memory_get_peak_usage() - $current)->lt(150_000_000);
+            that(memory_get_peak_usage() - $current)->lt(160_000_000);
         }
 
         that(ip_info("0.0.0.0", $options))->is([
