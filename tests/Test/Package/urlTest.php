@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use SplFileInfo;
+use function ryunosuke\Functions\Package\array_unset;
 use function ryunosuke\Functions\Package\base62_decode;
 use function ryunosuke\Functions\Package\base62_encode;
 use function ryunosuke\Functions\Package\base64url_decode;
@@ -14,6 +15,8 @@ use function ryunosuke\Functions\Package\formdata_build;
 use function ryunosuke\Functions\Package\formdata_parse;
 use function ryunosuke\Functions\Package\query_build;
 use function ryunosuke\Functions\Package\query_parse;
+use function ryunosuke\Functions\Package\random_string;
+use function ryunosuke\Functions\Package\str_resource;
 use function ryunosuke\Functions\Package\uri_build;
 use function ryunosuke\Functions\Package\uri_parse;
 
@@ -214,11 +217,9 @@ class urlTest extends AbstractTestCase
                 ],
             ],
         ];
-        $boundary = 'plain';
+        $boundary = random_string(64);
 
-        // build
-        $formdata = formdata_build($data, $boundary);
-        that($formdata)->is(strtr(<<<FORMDATA
+        $expected = strtr(<<<FORMDATA
         --$boundary
         Content-Disposition: form-data; name="scalar"
         
@@ -257,12 +258,46 @@ class urlTest extends AbstractTestCase
         
         {$v(file_get_contents("$workingdir/testfile.txt"))}
         --$boundary--
-        FORMDATA, ["\n" => "\r\n"]));
+        FORMDATA, ["\n" => "\r\n"]);
+
+        // build
+        $formdata = formdata_build($data, $boundary);
+        that($formdata)->is($expected);
 
         // parse
         $parseddata = formdata_parse($formdata, $boundary);
-        that($parseddata)->is($data);
         that($parseddata['x']['y']['z'])->fileEquals(file_get_contents("$workingdir/testfile.txt"));
+        that($parseddata['x']['y']['z'])->getHeader('filename')->is('testfile.txt');
+        that($parseddata['x']['y']['z'])->getHeader('mimetype')->is('text/plain');
+        $data2 = $data;
+        unset($data2['x']['y']['z']);
+        unset($parseddata['x']['y']['z']);
+        that($parseddata)->is($data2);
+
+        // generator(parse)
+        $parseddata = formdata_parse(str_resource($formdata), $boundary);
+        that($parseddata)->isIterable();
+        $parseddata = iterator_to_array($parseddata);
+        that($parseddata["x[y][z]"])->fileEquals(file_get_contents("$workingdir/testfile.txt"));
+        unset($parseddata["x[y][z]"]);
+        that($parseddata)->is([
+            "scalar"     => "123",
+            "a.b c"      => "456",
+            "array[0]"   => "1",
+            "array[1]"   => "2",
+            "array[2]"   => "3",
+            "a[b][c][0]" => "1",
+            "a[b][c][1]" => "2",
+            "a[b][c][2]" => "3",
+        ]);
+
+        // generator(build)
+        $formgenerator = formdata_build((function () use ($data) {
+            yield from $data;
+        })(), $boundary);
+        that($formgenerator)->count(strlen($formdata));
+        that($formgenerator)->isIterable();
+        that(implode('', [...$formgenerator]))->is($expected);
 
         // empty
         that($formdata = formdata_build([]))->is('');
@@ -294,6 +329,10 @@ class urlTest extends AbstractTestCase
         $content1
         --hogefugapiyo--
         FORMDATA, 'hogefugapiyo'))->is(['a' => 1]);
+
+        // retry
+        $boundary = 'hoge';
+        that(formdata_build(['a' => 'hoge'], $boundary))->notContains('--hoge');
 
         that(self::resolveFunction('formdata_build'))(['x' => new SplFileInfo("$workingdir/notfoundfile.txt")])->wasThrown();
     }
