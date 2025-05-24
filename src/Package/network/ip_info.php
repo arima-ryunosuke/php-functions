@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../network/http_requests.php';
+require_once __DIR__ . '/../strings/str_resource.php';
 require_once __DIR__ . '/../utility/cacheobject.php';
 require_once __DIR__ . '/../utility/function_configure.php';
 // @codeCoverageIgnoreEnd
@@ -156,9 +157,7 @@ function ip_info($ipaddr, $options = [])
                         trigger_error($message, E_USER_WARNING);
                     }
 
-                    $fp = tmpfile();
-                    fwrite($fp, $response);
-                    rewind($fp);
+                    $fp = str_resource($response);
 
                     $this->transaction(function () use ($fp, $registry) {
                         // 同時に走らないように rand でバラす

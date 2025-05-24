@@ -49,6 +49,7 @@ use function ryunosuke\Functions\Package\str_patch;
 use function ryunosuke\Functions\Package\str_putcsv;
 use function ryunosuke\Functions\Package\str_quote;
 use function ryunosuke\Functions\Package\str_rchop;
+use function ryunosuke\Functions\Package\str_resource;
 use function ryunosuke\Functions\Package\str_submap;
 use function ryunosuke\Functions\Package\str_subreplace;
 use function ryunosuke\Functions\Package\strcat;
@@ -1739,6 +1740,40 @@ that is <del>a</del><ins>the</ins> pen
         that(str_quote("a\nb\rc\tz", ['escape-character' => [], 'control-character' => 'oct']))->is("\"a\\12b\\15c\\11z\"");
         that(str_quote("a\nb\rc\tz", ['escape-character' => [], 'control-character' => 'hex']))->is("\"a\\x0ab\\x0dc\\x09z\"");
         that(str_quote("a\nb\rc\tz", ['escape-character' => [], 'control-character' => 'HEX']))->is("\"a\\x0Ab\\x0Dc\\x09z\"");
+    }
+
+    function test_str_resource()
+    {
+        that(stream_get_contents(str_resource('')))->is('');
+        that(stream_get_contents(str_resource('hoge')))->is('hoge');
+        that(stream_get_meta_data(str_resource('hoge', 0))['stream_type'])->is('STDIO');
+
+        // 揮発
+        $fp = str_resource('hoge', 0);
+        $path = stream_get_meta_data($fp)['uri'];
+        that($path)->fileExists();
+        unset($fp);
+        that($path)->fileNotExists();
+
+        // 不揮発
+        $fp = str_resource('hoge', 0, false);
+        $path = stream_get_meta_data($fp)['uri'];
+        that($path)->fileExists();
+        unset($fp);
+        that($path)->fileExists();
+
+        // コール時点では inode なし
+        $fp = str_resource('hoge', 100);
+        that(stream_get_meta_data($fp)['uri'])->contains('100');
+        that(fstat($fp)['ino'])->is(0);
+
+        // 指定サイズ直前までは inode なし
+        fwrite($fp, str_repeat('x', 99));
+        that(fstat($fp)['ino'])->is(0);
+
+        // 指定サイズを超えると inode あり
+        fwrite($fp, 'x');
+        that(fstat($fp)['ino'])->isNot(0);
     }
 
     function test_str_submap()

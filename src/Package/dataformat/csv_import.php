@@ -7,6 +7,7 @@ require_once __DIR__ . '/../array/array_map_recursive.php';
 require_once __DIR__ . '/../array/array_pickup.php';
 require_once __DIR__ . '/../array/is_indexarray.php';
 require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
+require_once __DIR__ . '/../strings/str_resource.php';
 require_once __DIR__ . '/../url/query_parse.php';
 // @codeCoverageIgnoreEnd
 
@@ -113,9 +114,7 @@ function csv_import($csvstring, $options = [])
         $fp = $csvstring;
     }
     else {
-        $fp = fopen('php://temp', 'r+b');
-        fwrite($fp, $csvstring);
-        rewind($fp);
+        $fp = str_resource($csvstring);
     }
 
     $restore = set_error_exception_handler();
