@@ -3,7 +3,6 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\array_flatten;
-use function ryunosuke\Functions\Package\cacheobject;
 use function ryunosuke\Functions\Package\cidr2ip;
 use function ryunosuke\Functions\Package\dns_resolve;
 use function ryunosuke\Functions\Package\fcgi_request;
@@ -199,6 +198,45 @@ class networkTest extends AbstractTestCase
         that($body)['GET']['q']->is('123');
         that($body)['FILES']['file']['name']->is(basename(__FILE__));
         that($body)['FILES']['file']['size']->is(filesize(__FILE__));
+
+        // generator
+        $response = fcgi_request("$server/var/www/html/echo.php?q=123", [], (function () {
+            yield from [
+                'p'    => '456',
+                'file' => new \SplFileInfo(__FILE__),
+            ];
+        })());
+        [, $body] = preg_split("#(\r?\n){2}#", $response['stdout'], 2);
+        $body = json_decode($body, true);
+
+        that($body)['GET']['q']->is('123');
+        that($body)['FILES']['file']['name']->is(basename(__FILE__));
+        that($body)['FILES']['file']['size']->is(filesize(__FILE__));
+
+        // misc
+        ['client' => $client, 'params' => $params, 'stdin' => $stdin] = fcgi_request("$server/var/www/html/echo.php?q=123", [], (function () {
+            yield from [
+                'p'    => '456',
+                'file' => new \SplFileInfo(__FILE__),
+            ];
+        })(), ['debug' => true]);
+
+        that($client)->split('', 1)->is(['']);
+        that($client)->split('abc', 1)->is(['a', 'b', 'c']);
+        that($client)->split((function () { yield from []; })(), 1)->is(['']);
+        that($client)->split((function () { yield from ['a', 'b', 'c']; })(), 1)->is(['a', 'b', 'c']);
+        that($client)->split((function () { yield from ['a', 'bc', 'def']; })(), 2)->is(['ab', 'cd', 'ef']);
+
+        that($params)->subsetEquals([
+            "SCRIPT_FILENAME"   => "/var/www/html/echo.php",
+            "QUERY_STRING"      => "q=123",
+            "REQUEST_METHOD"    => "POST",
+            "GATEWAY_INTERFACE" => "CGI/1.1",
+        ]);
+        that($params['CONTENT_TYPE'])->stringStartsWith("multipart/form-data; boundary=--");
+        that($params['CONTENT_LENGTH'])->isNumeric();
+
+        that($stdin)->isIterable();
 
         that(self::resolveFunction('fcgi_request'))("unix://run%2Fnotfound-dummy.socket", [], [], [])->wasThrown('Unable to connect to unix://');
 
@@ -1033,7 +1071,7 @@ class networkTest extends AbstractTestCase
         that(self::resolveFunction('ip_info'))("1.2.3.4", [
             'cache' => false,
             'throw' => true,
-            'rir' => [
+            'rir'   => [
                 'afrinic' => TESTRIRSERVER . '/notfound.csv',
                 'apnic'   => TESTRIRSERVER . '/notfound.csv',
                 'arin'    => TESTRIRSERVER . '/notfound.csv',

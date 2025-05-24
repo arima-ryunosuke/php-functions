@@ -34,7 +34,7 @@ require_once __DIR__ . '/../url/uri_parse.php';
 function fcgi_request(
     /** URL */ string $url,
     /** FCGI パラメータ */ array $params = [],
-    /** FCGI ボディ */ array|string $stdin = '',
+    /** FCGI ボディ */ iterable|string $stdin = '',
     /** その他のオプション */ array $options = [],
 ): /** FCGI レスポンス */ array
 {
@@ -44,6 +44,7 @@ function fcgi_request(
         'socketTimeout'  => 60.0,
         'udsFile'        => '/run/php-fpm/www.sock',
         'fpmConf'        => '/etc/php-fpm.d/www.conf',
+        'debug'          => false, // デバッグ用に Client そのものを返す
     ];
 
     $parts = uri_parse($url, [
@@ -83,20 +84,31 @@ function fcgi_request(
     }
 
     // リクエスト本文が配列ならよしなにする
-    if (is_array($stdin)) {
-        if (($params['CONTENT_TYPE'] ?? '') === 'multipart/form-data' || array_find_recursive($stdin, fn($v) => $v instanceof \SplFileInfo)) {
+    if (is_iterable($stdin)) {
+        if (is_array($stdin)) {
+            if (($params['CONTENT_TYPE'] ?? '') === 'multipart/form-data' || array_find_recursive($stdin, fn($v) => $v instanceof \SplFileInfo)) {
+                $stdin = formdata_build($stdin, $boundary);
+                $params['CONTENT_TYPE'] ??= "multipart/form-data; boundary=$boundary";
+            }
+            else {
+                $stdin = http_build_query($stdin);
+                $params['CONTENT_TYPE'] ??= "application/x-www-form-urlencoded";
+            }
+        }
+        else {
             $stdin = formdata_build($stdin, $boundary);
             $params['CONTENT_TYPE'] ??= "multipart/form-data; boundary=$boundary";
         }
-        else {
-            $stdin = http_build_query($stdin);
-            $params['CONTENT_TYPE'] ??= "application/x-www-form-urlencoded";
-        }
     }
     // $stdin が来てるならある程度決め打ちできる
-    if (strlen($stdin)) {
+    if ($stdin || strlen($stdin)) {
         $params['REQUEST_METHOD'] ??= 'POST';
-        $params['CONTENT_LENGTH'] ??= strlen($stdin);
+        if (is_string($stdin)) {
+            $params['CONTENT_LENGTH'] ??= strlen($stdin);
+        }
+        if ($stdin instanceof \Countable) {
+            $params['CONTENT_LENGTH'] ??= count($stdin);
+        }
     }
 
     // 完全なるデフォルト値で埋めて null フィルタ
@@ -179,10 +191,40 @@ function fcgi_request(
             }
         }
 
-        private function write(int $type, string $content, int $requestId = 1)
+        private function split(string|iterable $content, int $chunk): \Generator
+        {
+            if (is_string($content)) {
+                if (!strlen($content)) {
+                    yield '';
+                    return;
+                }
+                // str_split だと配列化されて瞬間的にメモリ使用量が倍増するので素朴に yield する
+                // yield from str_split($content, $chunk) ?: [""];
+                for ($offset = 0; $offset < strlen($content); $offset += $chunk) {
+                    yield substr($content, $offset, $chunk);
+                }
+            }
+            else {
+                $empty = true;
+                $buffer = '';
+                foreach ($content as $part) {
+                    $empty = false;
+                    $buffer .= $part;
+                    if (strlen($buffer) >= $chunk) {
+                        yield substr($buffer, 0, $chunk);
+                        $buffer = substr($buffer, $chunk);
+                    }
+                }
+                if ($empty || strlen($buffer)) {
+                    yield $buffer;
+                }
+            }
+        }
+
+        private function write(int $type, string|iterable $content, int $requestId = 1)
         {
             // https://fastcgi-archives.github.io/FastCGI_Specification.html#S3.3
-            foreach (str_split($content, 0xFFFF) ?: [""] as $chunk) {
+            foreach ($this->split($content, 0xFFFF) as $chunk) {
                 $fcgi_header = pack(implode('', self::RECORD_FORMAT), self::FCGI_VERSION_1, $type, $requestId, strlen($chunk), ...[0, 0]) . $chunk;
                 fwrite($this->socket, $fcgi_header) === strlen($fcgi_header) or throw new \RuntimeException('failed to fwrite');
             }
@@ -222,10 +264,10 @@ function fcgi_request(
             $this->write(self::FCGI_PARAMS, '');
         }
 
-        public function writeStdin(string $stdin)
+        public function writeStdin(string|iterable $stdin)
         {
             // https://fastcgi-archives.github.io/FastCGI_Specification.html#S5.3
-            if (strlen($stdin)) {
+            if ($stdin || strlen($stdin)) {
                 $this->write(self::FCGI_STDIN, $stdin);
             }
             $this->write(self::FCGI_STDIN, '');
@@ -260,6 +302,14 @@ function fcgi_request(
             return $response;
         }
     };
+
+    if ($options['debug']) {
+        return [
+            'client' => $client,
+            'params' => $params,
+            'stdin'  => $stdin,
+        ];
+    }
 
     $restore = set_error_exception_handler();
     try {
