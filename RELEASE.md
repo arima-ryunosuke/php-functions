@@ -11,6 +11,19 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.25
+
+- [feature] fcgi_request の generator 対応
+- [feature] formdata の generator 対応
+- [feature] str_resource を追加
+- [feature] glob2regex の括弧で包む機能
+- [feature] blank_coalesce を追加
+- [feature] arrays の属性を追加
+- [feature] chain のEモード廃止の準備
+- [feature] chain の位置指定や名前付きの強化
+- [fixbug] chain の些細なバグ
+- [fixbug] parse_str の使用箇所で . が _ になる不具合
+
 ## 2.0.24
 
 - [feature] array_replace_callback を追加
