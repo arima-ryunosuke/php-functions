@@ -97,6 +97,12 @@ class reflectionTest extends AbstractTestCase
             '[[$a + $b]]',
         ]);
 
+        $code = callable_code(fn($x = ['x' => 'X']) => [[$x]]);
+        that($code)->is([
+            "fn(\$x = ['x' => 'X'])",
+            '[[$x]]',
+        ]);
+
         $code = callable_code(fn() => [#[A] fn() => []]);
         that($code)->is([
             'fn()',

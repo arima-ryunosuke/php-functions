@@ -40,7 +40,10 @@ function callable_code($callable, bool $return_token = false)
     $tokens = php_tokens("<?php $codeblock");
 
     $begin = $tokens[0]->next([T_FUNCTION, T_FN]);
-    $close = $begin->next(['{', T_DOUBLE_ARROW]);
+    $close = $begin->next(['{', T_DOUBLE_ARROW, '[']);
+    if ($close->is('[')) {
+        $close = $close->end()->next(['{', T_DOUBLE_ARROW]);
+    }
 
     if ($begin->is(T_FN)) {
         $meta = array_slice($tokens, $begin->index, $close->prev()->index - $begin->index + 1);
