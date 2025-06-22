@@ -11,6 +11,12 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.26
+
+- [feature] unique_id の設定を外出し
+- [fixbug] callable_code に標準関数由来のクロージャを与えると即死する不具合
+- [fixbug] callable_code がデフォルト引数配列の => に反応する不具合
+
 ## 2.0.25
 
 - [feature] fcgi_request の generator 対応
