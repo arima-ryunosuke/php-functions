@@ -3,7 +3,9 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../misc/php_tokens.php';
+require_once __DIR__ . '/../reflection/function_parameter.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
+require_once __DIR__ . '/../reflection/reflect_type_resolve.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -32,6 +34,15 @@ require_once __DIR__ . '/../reflection/reflect_callable.php';
 function callable_code($callable, bool $return_token = false)
 {
     $ref = $callable instanceof \ReflectionFunctionAbstract ? $callable : reflect_callable($callable);
+    if ($ref->getFileName() === false) {
+        $reference = $ref->returnsReference() ? '&' : '';
+        $return = reflect_type_resolve($ref->getReturnType()) ?? 'void';
+        $params = function_parameter($ref);
+        $keys = implode(', ', array_map(fn($v) => ltrim($v, '&'), array_keys($params)));
+        $vals = implode(', ', $params);
+        return ["fn$reference($vals): $return", "\\$ref->name($keys)"];
+    }
+
     $contents = file($ref->getFileName());
     $start = $ref->getStartLine();
     $end = $ref->getEndLine();

@@ -24,6 +24,22 @@ class reflectionTest extends AbstractTestCase
             return true;
         }
 
+        $code = callable_code(\Closure::fromCallable('var_dump'));
+        that($code)->is([
+            'fn(mixed $value, mixed ...$values): void',
+            '\\var_dump($value, $values)',
+        ]);
+        $code = callable_code(\Closure::fromCallable('str_replace'));
+        that($code)->is([
+            'fn(array|string $search, array|string $replace, array|string $subject, &$count = null): array|string',
+            '\\str_replace($search, $replace, $subject, $count)',
+        ]);
+        $code = callable_code(\Closure::fromCallable('date_create'));
+        that($code)->is([
+            'fn(string $datetime = "now", ?\DateTimeZone $timezone = null): \DateTime|false',
+            '\\date_create($datetime, $timezone)',
+        ]);
+
         $code = callable_code(__NAMESPACE__ . "\\hoge_callable_code");
         that($code)->is([
             'function hoge_callable_code()',
