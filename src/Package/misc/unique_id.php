@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../utility/function_configure.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -60,16 +61,19 @@ function unique_id(&$id_info = [], $debug = [])
 {
     $id_info = [];
 
+    static $config = null;
+    $config ??= function_configure('unique_id.config');
+
+    $TIMESTAMP_BASE = $config['timestamp_base'];
+    $TIMESTAMP_PRECISION = $config['timestamp_precision'];
+    $TIMESTAMP_BIT = $config['timestamp_bit'];
+    $SEQUENCE_BIT = $config['sequence_bit'];
+    $IPADDRESS_BIT = $config['ipaddress_bit'];
     assert(PHP_INT_SIZE === 8);
-    static $TIMESTAMP_BASE = 1704034800; // 2024-01-01 00:00:00
-    static $TIMESTAMP_PRECISION = 1;
-    static $TIMESTAMP_BIT = 41;
-    static $SEQUENCE_BIT = 7;
-    static $IPADDRESS_BIT = 16;
     assert(($TIMESTAMP_BIT + $SEQUENCE_BIT + $IPADDRESS_BIT) === 64);
 
     static $ipaddress = null;
-    $ipaddress ??= (function () {
+    $ipaddress ??= (function () use ($IPADDRESS_BIT) {
         $addrs = [];
         foreach (net_get_interfaces() as $interface) {
             foreach ($interface['unicast'] as $addr) {
@@ -77,7 +81,7 @@ function unique_id(&$id_info = [], $debug = [])
                 if ($addr['family'] === AF_INET) {
                     // subnet/16 以上のもの
                     $subnet = strrpos(decbin((ip2long($addr['netmask']))), '1') + 1;
-                    if ($subnet >= 16) {
+                    if ($subnet >= $IPADDRESS_BIT) {
                         $addrs[] = [$addr['address'], $subnet];
                     }
                 }

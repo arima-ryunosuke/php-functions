@@ -30,6 +30,13 @@ function function_configure($option)
     $config['chain.nullsafe'] ??= false;
     $config['process.autoload'] ??= [];
     $config['datetime.class'] ??= \DateTimeImmutable::class;
+    $config['unique_id.config'] ??= [
+        'timestamp_base'      => 1704034800, // 2024-01-01 00:00:00
+        'timestamp_precision' => 1,
+        'timestamp_bit'       => 41,
+        'sequence_bit'        => 7,
+        'ipaddress_bit'       => 16,
+    ];
 
     // setting
     if (is_array($option)) {
