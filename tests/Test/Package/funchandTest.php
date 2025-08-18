@@ -8,6 +8,7 @@ use function ryunosuke\Functions\Package\func_eval;
 use function ryunosuke\Functions\Package\func_method;
 use function ryunosuke\Functions\Package\func_new;
 use function ryunosuke\Functions\Package\func_operator;
+use function ryunosuke\Functions\Package\func_throttle;
 use function ryunosuke\Functions\Package\func_user_func_array;
 use function ryunosuke\Functions\Package\func_wiring;
 use function ryunosuke\Functions\Package\function_alias;
@@ -340,6 +341,40 @@ class funchandTest extends AbstractTestCase
 
         // 例外系
         that(self::resolveFunction('func_operator'))('hogera')->wasThrown('is not defined');
+    }
+
+    function test_func_throttle()
+    {
+        $calls = [];
+        $callback = func_throttle(function ($arg) use (&$calls) {
+            $calls[] = $arg;
+            return $arg;
+        },
+            interval: 0.1,
+        );
+        foreach (range(0, 30) as $i) {
+            that($callback($i))->isSameAny([null, $i]);
+            usleep(16_000);
+        }
+        that(count($calls))->lt(15); // 環境によって異なるが、まぁ半分個以上呼ばれることはまずないだろう
+
+        $calls = [];
+        $callback = func_throttle(function ($arg) use (&$calls) {
+            $calls[] = $arg;
+            return $arg;
+        },
+            interval: 0.1,
+            leading_arguments: [-1],
+            trailing_arguments: [999],
+        );
+        foreach (range(0, 30) as $i) {
+            that($callback($i))->isSameAny([null, $i]);
+            usleep(16_000);
+        }
+        unset($callback);
+        that(count($calls))->lt(15); // 環境によって異なるが、まぁ半分個以上呼ばれることはまずないだろう
+        that(reset($calls))->is(-1);
+        that(end($calls))->is(999);
     }
 
     function test_func_user_func_array()
