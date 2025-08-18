@@ -8,6 +8,7 @@ use function ryunosuke\Functions\Package\console_log;
 use function ryunosuke\Functions\Package\evaluate;
 use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\mean;
+use function ryunosuke\Functions\Package\msleep;
 use function ryunosuke\Functions\Package\namespace_parse;
 use function ryunosuke\Functions\Package\namespace_resolve;
 use function ryunosuke\Functions\Package\php_highlight;
@@ -387,6 +388,31 @@ syntax error
         // 12
         ERR
         ));
+    }
+
+    function test_msleep()
+    {
+        $time = microtime(true);
+        that(msleep(0))->isSame(0.0);
+        that(microtime(true) - $time)->isBetween(0.0, 0.01);
+
+        $time = microtime(true);
+        that(msleep(0.1))->isSame(0.0);
+        that(microtime(true) - $time)->isBetween(0.1, 0.12);
+
+        $time = microtime(true);
+        that(msleep(0.1, false))->isSame(0.0);
+        that(microtime(true) - $time)->isBetween(0.1, 0.12);
+
+        $time = microtime(true);
+        that(msleep(new \DateTime('2000-01-01 00:00:00')))->isSame(0.0);
+        that(microtime(true) - $time)->isBetween(0.0, 0.01);
+
+        $time = microtime(true);
+        that(msleep(new \DateTime('@' . (microtime(true) + 0.1)), false))->isSame(0.0);
+        that(microtime(true) - $time)->isBetween(0.1, 0.12);
+
+        // signal はテスト不可
     }
 
     function test_namespace_parse()
