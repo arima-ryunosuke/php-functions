@@ -369,6 +369,11 @@ TEXT): self { }
     public function func_method($methodname, ...$defaultargs): self { }
     public function func_method(...$defaultargs): self { }
 
+    /** @see func_throttle() */
+    public self $func_throttle;
+    public function func_throttle(callable $callback, float $interval, ?array $leading_arguments = null, ?array $trailing_arguments = null): self { }
+    public function func_throttle(float $interval, ?array $leading_arguments = null, ?array $trailing_arguments = null): self { }
+
     /** @see iterator_chunk() */
     public self $iterator_chunk;
     public function iterator_chunk($iterator, $length, $preserve_keys = false): self { }

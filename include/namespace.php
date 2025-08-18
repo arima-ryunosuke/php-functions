@@ -14524,27 +14524,15 @@ if (!function_exists('ryunosuke\\Functions\\file_equals')) {
         //return sha1_file($file1) === sha1_file($file2);
 
         // 少しづつ読んで比較する
-        try {
-            $fp1 = fopen($file1, 'r');
-            $fp2 = fopen($file2, 'r');
-
-            while (!(feof($fp1) || feof($fp2))) {
-                $line1 = fread($fp1, $chunk_size);
-                $line2 = fread($fp2, $chunk_size);
-                if ($line1 !== $line2) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        finally {
-            if (isset($fp1)) {
-                fclose($fp1);
-            }
-            if (isset($fp2)) {
-                fclose($fp2);
+        $iterator = new \MultipleIterator(\MultipleIterator::MIT_NEED_ANY);
+        $iterator->attachIterator(file_generator($file1, $chunk_size));
+        $iterator->attachIterator(file_generator($file2, $chunk_size));
+        foreach ($iterator as $buffers) {
+            if ($buffers[0] !== $buffers[1]) {
+                return false;
             }
         }
+        return true;
     }
 }
 
@@ -14586,6 +14574,77 @@ if (!function_exists('ryunosuke\\Functions\\file_extension')) {
         }
 
         return $pathinfo['dirname'] . DIRECTORY_SEPARATOR . $basename;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\file_generator') || (new \ReflectionFunction('ryunosuke\\Functions\\file_generator'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\file_generator')) {
+    /**
+     * ファイルを少しずつ読む Generator を返す
+     *
+     * $stopper で読み込み単位を指定できる
+     * - null: fgets で1行読み込み
+     * - int: fread でサイズ指定
+     * - string: stream_get_line で特定文字列指定
+     *
+     * $stopper が文字列の場合、$with_stopper でその文字列自体を含むかを指定できる。
+     * というよりも stream_get_line だとデフォルトで含まないので、含むようにするフラグに近い。
+     * 処理を合わせるためデフォルトは true になっている。
+     *
+     * Generator は返り値として「返した文字列長の合計」を返す。
+     * 区切り文字を捨てる場合、単純なファイルサイズとは一致しないので注意。
+     *
+     * Example:
+     * ```php
+     * // 適当にファイルを用意
+     * $testpath = sys_get_temp_dir() . '/file_generator.txt';
+     * file_put_contents($testpath, "hoge\n---\nhogefuga\n---\nhogefugapiyo\n");
+     * // 改行で generator
+     * that(file_generator($testpath))->is(["hoge\n", "---\n", "hogefuga\n", "---\n", "hogefugapiyo\n"]);
+     * // 3文字で generator
+     * that(file_generator($testpath, 3))->is(["hog", "e\n-", "--\n", "hog", "efu", "ga\n", "---", "\nho", "gef", "uga", "piy", "o\n"]);
+     * // 区切り文字で generator
+     * that(file_generator($testpath, "---\n"))->is(["hoge\n---\n", "hogefuga\n---\n", "hogefugapiyo\n"]);
+     * // 区切り文字で generator（そのものを含まない）
+     * that(file_generator($testpath, "---\n", false))->is(["hoge\n", "hogefuga\n", "hogefugapiyo\n"]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\filesystem
+     */
+    function file_generator(
+        /** @var string|resource ファイル名|リソース */ $filename,
+        /** チャンク/区切り文字 */ null|int|string $stopper = null,
+        /** 区切り文字を含めるか */ bool $with_stopper = true,
+    ): \Generator {
+        $fp = is_resource($filename) ? $filename : fopen($filename, 'rb');
+
+        try {
+            $result = 0;
+            while (!feof($fp)) {
+                $buffer = match (true) {
+                    is_null($stopper)   => fgets($fp),
+                    is_int($stopper)    => fread($fp, $stopper),
+                    is_string($stopper) => stream_get_line($fp, PHP_INT_MAX, $stopper),
+                };
+                if ($buffer === false) {
+                    break;
+                }
+
+                if (is_string($stopper) && $with_stopper) {
+                    // 読み込み途中なら $stopper で終了したと言える（stream_get_line はそのものを含まないので付け足す）
+                    if (!feof($fp)) {
+                        $buffer .= $stopper;
+                    }
+                }
+
+                $result += strlen($buffer);
+                yield $buffer;
+            }
+            return $result;
+        }
+        finally {
+            fclose($fp);
+        }
     }
 }
 
@@ -15095,7 +15154,7 @@ if (!function_exists('ryunosuke\\Functions\\file_pos')) {
      * that(file_pos($testpath, 'fuga'))->is(5);
      * // 2つ目の fuga の位置を返す
      * that(file_pos($testpath, 'fuga', 6))->is(15);
-     * // 見つからない場合は false を返す
+     * // 見つからない場合は null を返す
      * that(file_pos($testpath, 'hogera'))->is(null);
      * ```
      *
@@ -15134,31 +15193,27 @@ if (!function_exists('ryunosuke\\Functions\\file_pos')) {
         assert($chunksize >= $maxlength);
 
         $fp = fopen($filename, 'rb');
-        try {
-            fseek($fp, $start);
-            while (!feof($fp)) {
-                if ($start > $end) {
-                    break;
-                }
-                $last = $part ?? '';
-                $part = fread($fp, $chunksize);
-                if (($p = strpos_array($part, $needle))) {
-                    $min = min($p);
-                    $result = $start + $min;
-                    return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
-                }
-                if (($p = strpos_array($last . $part, $needle))) {
-                    $min = min($p);
-                    $result = $start + $min - strlen($last);
-                    return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
-                }
-                $start += strlen($part);
+        fseek($fp, $start);
+
+        $last = '';
+        foreach (file_generator($fp, $chunksize) as $part) {
+            if ($start > $end) {
+                break;
             }
-            return null;
+            if (($p = strpos_array($part, $needle))) {
+                $min = min($p);
+                $result = $start + $min;
+                return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
+            }
+            if (($p = strpos_array($last . $part, $needle))) {
+                $min = min($p);
+                $result = $start + $min - strlen($last);
+                return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
+            }
+            $start += strlen($part);
+            $last = $part;
         }
-        finally {
-            fclose($fp);
-        }
+        return null;
     }
 }
 
@@ -15562,28 +15617,24 @@ if (!function_exists('ryunosuke\\Functions\\file_slice')) {
             $end_line = -$length + 1;
         }
 
-        $fp = fopen($filename, 'r', $FILE_USE_INCLUDE_PATH, $context);
-        try {
-            $result = [];
-            for ($i = 1; ($line = fgets($fp)) !== false; $i++) {
-                if (isset($end_line) && $i >= $end_line) {
-                    break;
-                }
-                if ($i >= $start_line) {
-                    if ($FILE_IGNORE_NEW_LINES) {
-                        $line = rtrim($line);
-                    }
-                    if ($FILE_SKIP_EMPTY_LINES && trim($line) === '') {
-                        continue;
-                    }
-                    $result[$i] = $line;
-                }
+        $fp = fopen($filename, 'rb', $FILE_USE_INCLUDE_PATH, $context);
+        $result = [];
+        foreach (file_generator($fp) as $i => $line) {
+            $i++;
+            if (isset($end_line) && $i >= $end_line) {
+                break;
             }
-            return $result;
+            if ($i >= $start_line) {
+                if ($FILE_IGNORE_NEW_LINES) {
+                    $line = rtrim($line);
+                }
+                if ($FILE_SKIP_EMPTY_LINES && trim($line) === '') {
+                    continue;
+                }
+                $result[$i] = $line;
+            }
         }
-        finally {
-            fclose($fp);
-        }
+        return $result;
     }
 }
 
@@ -17499,6 +17550,80 @@ if (!function_exists('ryunosuke\\Functions\\func_operator')) {
         }
 
         return $opefunc;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\func_throttle') || (new \ReflectionFunction('ryunosuke\\Functions\\func_throttle'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\func_throttle')) {
+    /**
+     * callable の実行間隔を間引いた callable を返す
+     *
+     * 進捗状況や SSE などで間引きたいケースはある。
+     * ループ内で呼んでもいいし、tick に仕込んでもよい。
+     * とにかく高頻度で呼ばれ得る状況においてコール回数を減らしたい場合に使う。
+     *
+     * $leading_arguments を指定するとその引数で初回にコールされる。
+     * $trailing_arguments を指定するとその引数で最後にコールされる。
+     * ただし $trailing_arguments はデストラクタで実装されており、実行タイミングは不確定なので注意（そもそもあまり使われる想定がない）。
+     *
+     * 返り値は実行可能オブジェクトであり、本来の返り値を返す。ただし間引かれた場合は null を返す。
+     * よって正常系で null を返す callable では返り値は使えない。
+     * なお「callable である」という前提以外は置かないこと。
+     *
+     * Example:
+     * ```php
+     * $called = 0;
+     * $callback = func_throttle(function () use (&$called) { $called++; }, 0.1);
+     * // こんなとんでもないループでも数回程度しか呼ばれない
+     * for ($i=0; $i<3_000_000; $i++) {
+     *     $callback($i);
+     * }
+     * that($called)->isBetween(1, 9);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\funchand
+     */
+    function func_throttle(
+        /** 実行される callable */ callable $callback,
+        /** 間引く間隔 */ float $interval,
+        /** 初回実行時の引数 */ ?array $leading_arguments = null,
+        /** 最後実行時の引数 */ ?array $trailing_arguments = null,
+    ): /** 間隔が間引かれた callable */ callable
+    {
+        return new class(\Closure::fromCallable($callback), $interval, $leading_arguments, $trailing_arguments) {
+            private float $time;
+
+            public function __construct(
+                private \Closure $callback,
+                private float $interval,
+                private ?array $leading_arguments,
+                private ?array $trailing_arguments,
+            ) {
+                if ($this->leading_arguments !== null) {
+                    ($this->callback)(...$this->leading_arguments);
+                }
+
+                $this->time = microtime(true);
+            }
+
+            public function __destruct()
+            {
+                if ($this->trailing_arguments !== null) {
+                    ($this->callback)(...$this->trailing_arguments);
+                }
+            }
+
+            public function __invoke(...$arguments): mixed
+            {
+                $now = microtime(true);
+                $elapsed = $now - $this->time;
+                if ($elapsed >= $this->interval) {
+                    $this->time = $now;
+                    return ($this->callback)(...$arguments);
+                }
+                return null;
+            }
+        };
     }
 }
 
@@ -20206,6 +20331,57 @@ if (!function_exists('ryunosuke\\Functions\\evaluate')) {
             $message .= "\n in " . realpath($cachefile) . " on line " . $errline . "\n";
             throw new \ParseError($message, $ex->getCode(), $ex);
         }
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\msleep') || (new \ReflectionFunction('ryunosuke\\Functions\\msleep'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\msleep')) {
+    /**
+     * float でのミリ秒も指定できる sleep
+     *
+     * ついでに、いくつかある php の sleep 系関数の動作を統一してある。
+     * - sleep: 秒単位で精度が低いが、残り秒数を返してくれる
+     * - usleep: 精度は高いが、返り値がない
+     * - time_nanosleep: 精度が高く（高すぎる）残り秒数も返せるが、シグナルを無視できない
+     * - time_sleep_until: 精度も高くシグナルを無視できるが、逆に言えばシグナルで打ち切れない
+     *
+     * float でのミリ秒で実用上は十分だろうし、上記のような細かな動作差異など覚えていられないので、シグナル無視を引数化し常に「残りミリ秒数」を返すようにした。
+     *
+     * $seconds は DateTime を受け入れ、DateTime の場合は指定日時まで待機という動作になる。
+     * この時、過去日時を指定してもエラーにはならず 0 を返す（用途から考えてスケジューリングの都合で過去になることは多々ある）。
+     * また、$cancel_signal 未指定の場合 false に設定される（time_sleep_until の思想を模した）。
+     * 一方、float 指定の場合は 0 未満だとエラーになる（実装は assert）。
+     *
+     * ちなみに pcntl_signal で php レベルでシグナルをハンドリングしていない場合は $cancel_signal の指定は無意味。
+     * 実際のところ「ミリ秒対応の sleep」という雑な認識で問題ない。
+     *
+     * @package ryunosuke\Functions\Package\misc
+     */
+    function msleep(
+        /** 待機するミリ秒|待機するまでの日時 */ float|\DateTimeInterface $seconds,
+        /** シグナルでキャンセルされるか */ ?bool $cancel_signal = null,
+    ): /** 残りミリ秒数 */ float
+    {
+        $now = microtime(true);
+
+        if ($seconds instanceof \DateTimeInterface) {
+            $cancel_signal ??= false;
+            $seconds = (float) ($seconds->format('U.u') - $now);
+        }
+        else {
+            $cancel_signal ??= true;
+            assert($seconds >= 0);
+        }
+
+        if ($seconds > 0) {
+            if ($cancel_signal) {
+                usleep((int) ($seconds * 1000000));
+            }
+            else {
+                time_sleep_until($now + $seconds);
+            }
+        }
+        return max(0.0, $seconds - (microtime(true) - $now));
     }
 }
 
@@ -26968,6 +27144,161 @@ if (!function_exists('ryunosuke\\Functions\\include_stream')) {
         };
 
         return $declareProtocol;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\iterator_stream') || (new \ReflectionFunction('ryunosuke\\Functions\\iterator_stream'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\iterator_stream')) {
+    /**
+     * iterator を resource に変換する
+     *
+     * iterator(generator) は「ちょっとずつ返す」という性質を持つので resource 的に扱えた方が便利なことがある。
+     * 例えば極々稀に iterator を resource として扱いたい場合が存在する。
+     * - 外部ライブラリのメソッドが resource しか受け付けない
+     * - 手元に SplFileObject しかない（SplFileObject から resource を得る手段は存在しない）
+     * そんな時この関数を使えば resource 化することができる。
+     *
+     * 得られた resource は大抵の fxxxx 関数を呼ぶことができる。
+     * が、呼んだところで効果があるのは非常に限定的で、意味があるのは ftell くらいしかない。
+     * あくまで「resource として扱いたい場合にエラーが出て欲しくない」程度の意味でしかない。
+     *
+     * 実質的には tmpfile に全部書いてそのファイルリソースを返すのと同じ。
+     * ただし、tmpfile が（tmpfs などで）メモリ上にあるかもしれないし全部書いて全部読むのは余計なオーバーヘッドがかかるし途中で打ち切ることもできない。
+     * とは言え size が取れたり seek 出来たりと機能面ではそちらの方が優れているので参考実装として引数分岐で残してある。
+     *
+     * Example:
+     * ```php
+     * // Generator を resource 化する
+     * $stream = iterator_stream((function() {
+     *     yield "a\n";
+     *     yield "ab\n";
+     *     yield "abc\n";
+     * })());
+     * // resource として扱える
+     * that(fgets($stream))->is("a\n");
+     * that(fgets($stream))->is("ab\n");
+     * that(fgets($stream))->is("abc\n");
+     * that(fgets($stream))->is(false);
+     *
+     * // SplFileObject を resource 化する
+     * $testpath = sys_get_temp_dir() . '/iterator_stream.txt';
+     * file_put_contents($testpath, "a\nab\nabc\n");
+     * $file = new \SplFileObject($testpath);
+     * $stream = iterator_stream($file);
+     * // resource として扱える（$file->current,next でも fgets($stream) でも同様の作用・副作用が得られる）
+     * // SplFileObject には resource 取得メソッドが無いので resource を要求されると代替手段が無いに等しい
+     * that($file->current())->is("a\n");
+     * $file->next();
+     * that(fgets($stream))->is("ab\n");
+     * that(fgets($stream))->is("abc\n");
+     * that(fgets($stream))->is(false);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\stream
+     *
+     * @return resource iterator の resource
+     */
+    function iterator_stream(\Iterator $iterator, ?string $tmpdir = null)
+    {
+        if ($tmpdir !== null) {
+            $tmp = fopen(tempnam($tmpdir, 'istream'), 'w+b');
+            foreach ($iterator as $it) {
+                fwrite($tmp, $it);
+            }
+            rewind($tmp);
+            return $tmp;
+        }
+
+        static $STREAM_NAME, $stream_class = null;
+        if ($STREAM_NAME === null) {
+            $STREAM_NAME = 'iterator-stream';
+            if (in_array($STREAM_NAME, stream_get_wrappers())) {
+                throw new \DomainException("$STREAM_NAME is registered already."); // @codeCoverageIgnore
+            }
+
+            stream_wrapper_register($STREAM_NAME, $stream_class = get_class(new class() {
+                public static $objects = [];
+
+                private int       $id;
+                private \Iterator $iterator;
+                private int       $position;
+                private string    $buffer;
+
+                public $context;
+
+                /** @noinspection PhpUnusedParameterInspection */
+                public function stream_open(string $path, string $mode, int $options, &$opened_path): bool
+                {
+                    assert(strpos($mode, 'r') !== false);
+
+                    $parsed = parse_url($path);
+
+                    $this->id = $parsed['host'];
+                    $this->iterator = self::$objects[$parsed['host']];
+                    $this->position = 0;
+                    $this->buffer = '';
+
+                    return true;
+                }
+
+                public function stream_close()
+                {
+                    unset(self::$objects[$this->id]);
+                }
+
+                public function stream_read(int $count): string
+                {
+                    $buffer = $this->buffer;
+                    while (strlen($buffer) < $count && $this->iterator->valid()) {
+                        $buffer .= $this->iterator->current();
+                        $this->iterator->next();
+                    }
+
+                    $result = substr($buffer, 0, $count);
+                    $this->buffer = substr($buffer, $count);
+
+                    $this->position += strlen($result);
+                    return $result;
+                }
+
+                public function stream_eof(): bool
+                {
+                    return !($this->iterator->valid() || strlen($this->buffer));
+                }
+
+                public function stream_tell(): int
+                {
+                    return $this->position;
+                }
+
+                public function stream_seek(int $offset, int $whence = SEEK_SET): bool
+                {
+                    if ($offset === 0 && $whence === SEEK_SET) {
+                        $this->position = 0;
+                        $this->buffer = '';
+                        $this->iterator->rewind();
+                        return true;
+                    }
+                    return false;
+                }
+
+                public function stream_stat()
+                {
+                    return [];
+                }
+
+                /** @noinspection PhpUnusedParameterInspection */
+                public function stream_set_option(int $option, int $arg1, ?int $arg2) { return false; }
+
+                /** @noinspection PhpUnusedParameterInspection */
+                public function stream_lock($operation) { return false; }
+            }));
+        }
+
+        $id = spl_object_id($iterator);
+        $stream_class::$objects[$id] = $iterator;
+
+        return fopen("$STREAM_NAME://$id", 'rb');
     }
 }
 

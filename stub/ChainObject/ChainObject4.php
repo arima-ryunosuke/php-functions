@@ -333,6 +333,11 @@ trait ChainObject4
     public function dir_diff($path1, $path2, $options = []): self { }
     public function dir_diff($path2, $options = []): self { }
 
+    /** @see file_generator() */
+    public self $file_generator;
+    public function file_generator($filename, string|int|null $stopper = null, bool $with_stopper = true): self { }
+    public function file_generator(string|int|null $stopper = null, bool $with_stopper = true): self { }
+
     /** @see strmode2oct() */
     public self $strmode2oct;
     public function strmode2oct($perms): self { }

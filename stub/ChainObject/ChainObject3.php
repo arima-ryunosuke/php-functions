@@ -573,6 +573,11 @@ trait ChainObject3
     public function random_at(...$args): self { }
     public function random_at(): self { }
 
+    /** @see iterator_stream() */
+    public self $iterator_stream;
+    public function iterator_stream(\Iterator $iterator, ?string $tmpdir = null): self { }
+    public function iterator_stream(?string $tmpdir = null): self { }
+
     /** @see namespace_split() */
     public self $namespace_split;
     public function namespace_split(?string $string): self { }

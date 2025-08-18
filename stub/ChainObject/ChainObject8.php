@@ -354,6 +354,11 @@ TEXT): self { }
     public function evaluate($phpcode, $contextvars = []): self { }
     public function evaluate($contextvars = []): self { }
 
+    /** @see msleep() */
+    public self $msleep;
+    public function msleep(\DateTimeInterface|float $seconds, ?bool $cancel_signal = null): self { }
+    public function msleep(?bool $cancel_signal = null): self { }
+
     /** @see cidr2ip() */
     public self $cidr2ip;
     public function cidr2ip($cidr): self { }
