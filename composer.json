@@ -42,8 +42,7 @@
     "build": [
       "@export",
       "@stub",
-      "@test",
-      "@docs"
+      "@test"
     ],
     "stub": [
       "php bin/stub.php"
