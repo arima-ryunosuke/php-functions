@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../filesystem/file_generator.php';
 require_once __DIR__ . '/../filesystem/file_list.php';
 // @codeCoverageIgnoreEnd
 
@@ -60,25 +61,13 @@ function file_equals($file1, $file2, $chunk_size = null)
     //return sha1_file($file1) === sha1_file($file2);
 
     // 少しづつ読んで比較する
-    try {
-        $fp1 = fopen($file1, 'r');
-        $fp2 = fopen($file2, 'r');
-
-        while (!(feof($fp1) || feof($fp2))) {
-            $line1 = fread($fp1, $chunk_size);
-            $line2 = fread($fp2, $chunk_size);
-            if ($line1 !== $line2) {
-                return false;
-            }
-        }
-        return true;
-    }
-    finally {
-        if (isset($fp1)) {
-            fclose($fp1);
-        }
-        if (isset($fp2)) {
-            fclose($fp2);
+    $iterator = new \MultipleIterator(\MultipleIterator::MIT_NEED_ANY);
+    $iterator->attachIterator(file_generator($file1, $chunk_size));
+    $iterator->attachIterator(file_generator($file2, $chunk_size));
+    foreach ($iterator as $buffers) {
+        if ($buffers[0] !== $buffers[1]) {
+            return false;
         }
     }
+    return true;
 }

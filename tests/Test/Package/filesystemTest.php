@@ -11,6 +11,7 @@ use function ryunosuke\Functions\Package\dirmtime;
 use function ryunosuke\Functions\Package\dirname_r;
 use function ryunosuke\Functions\Package\file_equals;
 use function ryunosuke\Functions\Package\file_extension;
+use function ryunosuke\Functions\Package\file_generator;
 use function ryunosuke\Functions\Package\file_get_arrays;
 use function ryunosuke\Functions\Package\file_list;
 use function ryunosuke\Functions\Package\file_matcher;
@@ -426,6 +427,25 @@ class filesystemTest extends AbstractTestCase
         that(file_extension('filename.'))->is('');
         that(file_extension('filename'))->is(null);
         that(file_extension('.ext'))->is('ext');
+    }
+
+    function test_file_generator()
+    {
+        $testpath = self::$TMPDIR . '/file_generator.txt';
+        file_put_contents($testpath, "hoge\n---\nhogefuga\n---\nhogefugapiyo\n");
+
+        that(file_generator($testpath))->is(["hoge\n", "---\n", "hogefuga\n", "---\n", "hogefugapiyo\n"]);
+        that(file_generator($testpath, 3))->is(["hog", "e\n-", "--\n", "hog", "efu", "ga\n", "---", "\nho", "gef", "uga", "piy", "o\n"]);
+        that(file_generator($testpath, "---\n"))->is(["hoge\n---\n", "hogefuga\n---\n", "hogefugapiyo\n"]);
+        that(file_generator($testpath, "---\n", false))->is(["hoge\n", "hogefuga\n", "hogefugapiyo\n"]);
+
+        $g = file_generator($testpath, "---\n", false);
+        iterator_to_array($g);
+        that($g->getReturn())->is(27);
+
+        $g = file_generator($testpath, "---\n", true);
+        iterator_to_array($g);
+        that($g->getReturn())->is(35);
     }
 
     function test_file_get_arrays()

@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../filesystem/file_generator.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -86,26 +87,22 @@ function file_slice($filename, $start_line = 1, $length = null, $flags = 0, $con
         $end_line = -$length + 1;
     }
 
-    $fp = fopen($filename, 'r', $FILE_USE_INCLUDE_PATH, $context);
-    try {
-        $result = [];
-        for ($i = 1; ($line = fgets($fp)) !== false; $i++) {
-            if (isset($end_line) && $i >= $end_line) {
-                break;
-            }
-            if ($i >= $start_line) {
-                if ($FILE_IGNORE_NEW_LINES) {
-                    $line = rtrim($line);
-                }
-                if ($FILE_SKIP_EMPTY_LINES && trim($line) === '') {
-                    continue;
-                }
-                $result[$i] = $line;
-            }
+    $fp = fopen($filename, 'rb', $FILE_USE_INCLUDE_PATH, $context);
+    $result = [];
+    foreach (file_generator($fp) as $i => $line) {
+        $i++;
+        if (isset($end_line) && $i >= $end_line) {
+            break;
         }
-        return $result;
+        if ($i >= $start_line) {
+            if ($FILE_IGNORE_NEW_LINES) {
+                $line = rtrim($line);
+            }
+            if ($FILE_SKIP_EMPTY_LINES && trim($line) === '') {
+                continue;
+            }
+            $result[$i] = $line;
+        }
     }
-    finally {
-        fclose($fp);
-    }
+    return $result;
 }

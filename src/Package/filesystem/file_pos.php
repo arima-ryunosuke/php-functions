@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../filesystem/file_generator.php';
 require_once __DIR__ . '/../strings/strpos_array.php';
 require_once __DIR__ . '/../var/arrayval.php';
 // @codeCoverageIgnoreEnd
@@ -21,7 +22,7 @@ require_once __DIR__ . '/../var/arrayval.php';
  * that(file_pos($testpath, 'fuga'))->is(5);
  * // 2つ目の fuga の位置を返す
  * that(file_pos($testpath, 'fuga', 6))->is(15);
- * // 見つからない場合は false を返す
+ * // 見つからない場合は null を返す
  * that(file_pos($testpath, 'hogera'))->is(null);
  * ```
  *
@@ -60,29 +61,25 @@ function file_pos($filename, $needle, $start = 0, $end = null, $chunksize = null
     assert($chunksize >= $maxlength);
 
     $fp = fopen($filename, 'rb');
-    try {
-        fseek($fp, $start);
-        while (!feof($fp)) {
-            if ($start > $end) {
-                break;
-            }
-            $last = $part ?? '';
-            $part = fread($fp, $chunksize);
-            if (($p = strpos_array($part, $needle))) {
-                $min = min($p);
-                $result = $start + $min;
-                return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
-            }
-            if (($p = strpos_array($last . $part, $needle))) {
-                $min = min($p);
-                $result = $start + $min - strlen($last);
-                return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
-            }
-            $start += strlen($part);
+    fseek($fp, $start);
+
+    $last = '';
+    foreach (file_generator($fp, $chunksize) as $part) {
+        if ($start > $end) {
+            break;
         }
-        return null;
+        if (($p = strpos_array($part, $needle))) {
+            $min = min($p);
+            $result = $start + $min;
+            return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
+        }
+        if (($p = strpos_array($last . $part, $needle))) {
+            $min = min($p);
+            $result = $start + $min - strlen($last);
+            return $result + strlen($needle[array_flip($p)[$min]]) > $end ? false : $result;
+        }
+        $start += strlen($part);
+        $last = $part;
     }
-    finally {
-        fclose($fp);
-    }
+    return null;
 }
