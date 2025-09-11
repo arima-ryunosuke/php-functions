@@ -11,6 +11,14 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.27
+
+- [composer] docs は別ブランチ管理とするため build から除外
+- [feature] file_generator の追加と似ている処理の置換
+- [feature] iterator_stream を追加
+- [feature] func_throttle を追加
+- [feature] msleep を追加
+
 ## 2.0.26
 
 - [feature] unique_id の設定を外出し
