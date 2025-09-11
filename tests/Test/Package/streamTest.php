@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\include_stream;
+use function ryunosuke\Functions\Package\iterator_stream;
 use function ryunosuke\Functions\Package\memory_stream;
 use function ryunosuke\Functions\Package\profiler;
 use function ryunosuke\Functions\Package\var_stream;
@@ -40,6 +41,62 @@ class streamTest extends AbstractTestCase
         @include __DIR__ . '/files/php/notfound.php';
         that(error_get_last()['message'])->stringContains('include(): Failed opening');
         $stream->restore();
+    }
+
+    function test_iterator_stream()
+    {
+        // stream モード
+
+        $fp1 = iterator_stream(new \ArrayIterator(["abcdefg", "\n", "X", "Y", "Z"]));
+        $fp2 = tmpfile();
+        fwrite($fp2, "abcdefg\nXYZ");
+        rewind($fp2);
+
+        that(fseek($fp1, 1))->is(-1);
+        that(fseek($fp1, 1, SEEK_CUR))->is(-1);
+        that(flock($fp1, LOCK_EX))->is(false);
+        that(stream_set_blocking($fp1, false))->is(false);
+        that(fstat($fp1)['size'])->is(0);
+
+        that(fread($fp1, 2))->is(fread($fp2, 2));
+        that(fgets($fp1))->is(fgets($fp2));
+        that(feof($fp1))->is(feof($fp2));
+        that(ftell($fp1))->is(ftell($fp2));
+
+        that(rewind($fp1))->is(rewind($fp2));
+        that(stream_get_contents($fp1, 2))->is(stream_get_contents($fp2, 2));
+        that(fgets($fp1))->is(fgets($fp2));
+        that(feof($fp1))->is(feof($fp2));
+        that(fclose($fp1))->is(fclose($fp2));
+
+        // tmp モード
+
+        $fp1 = iterator_stream(new \ArrayIterator(["abcdefg", "\n", "X", "Y", "Z"]), sys_get_temp_dir());
+        $fp2 = tmpfile();
+        fwrite($fp2, "abcdefg\nXYZ");
+        rewind($fp2);
+
+        that(fstat($fp1)['size'])->is(fstat($fp2)['size']);
+
+        that(fread($fp1, 2))->is(fread($fp2, 2));
+        that(fgets($fp1))->is(fgets($fp2));
+        that(feof($fp1))->is(feof($fp2));
+        that(ftell($fp1))->is(ftell($fp2));
+
+        that(rewind($fp1))->is(rewind($fp2));
+        that(stream_get_contents($fp1, 2))->is(stream_get_contents($fp2, 2));
+        that(fgets($fp1))->is(fgets($fp2));
+        that(feof($fp1))->is(feof($fp2));
+        that(fclose($fp1))->is(fclose($fp2));
+
+        // 8KB の壁
+
+        $array = array_map(fn($n) => "line:$n\n", range(1, 8000));
+        $fp1 = iterator_stream(new \ArrayIterator($array));
+        $fp2 = tmpfile();
+        fwrite($fp2, implode("", $array));
+        rewind($fp2);
+        that(stream_get_contents($fp1, 2))->is(stream_get_contents($fp2, 2));
     }
 
     function test_memory_stream()
