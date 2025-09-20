@@ -8,6 +8,7 @@ require_once __DIR__ . '/../iterator/iterator_join.php';
 require_once __DIR__ . '/../iterator/iterator_split.php';
 require_once __DIR__ . '/../strings/starts_with.php';
 require_once __DIR__ . '/../strings/str_array.php';
+require_once __DIR__ . '/../strings/str_putcsv.php';
 require_once __DIR__ . '/../var/is_stringable.php';
 // @codeCoverageIgnoreEnd
 
@@ -83,6 +84,7 @@ function csv_export($csvarrays, $options = [])
         'escape'    => '\\',
         'encoding'  => ini_get('default_charset'),
         'scrub'     => 'TRANSLIT',
+        'null'      => "",
         'initial'   => '', // "\xEF\xBB\xBF"
         'headers'   => null,
         'structure' => false,
@@ -101,13 +103,14 @@ function csv_export($csvarrays, $options = [])
 
     $restore = set_error_exception_handler();
     try {
-        $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $structure, $callback) {
+        $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $scrub, $null, $initial, $headers, $structure, $callback) {
             $default_charset = ini_get('default_charset');
             if ($default_charset !== $encoding) {
                 // import とは違い、吐き出すときは明確なエラーだろうので TRANSLIT も IGNORE もしない
                 stream_filter_append($fp, "convert.iconv.$default_charset/$encoding" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_WRITE);
             }
 
+            $eol = "\n"; // いつの間にか $eol 引数が生えていたがこの関数自体の対応はしていないので暫定で決め打ちにしてある
             $size = 0;
 
             if (!is_array($csvarrays)) {
@@ -192,10 +195,24 @@ function csv_export($csvarrays, $options = [])
                     }
                 }
                 $row = array_intersect_key(array_replace($default, $array), $default);
-                $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
+                if (strlen($null)) {
+                    $line = [];
+                    foreach ($row as $v) {
+                        if ($v === null) {
+                            $line[] = $null;
+                        }
+                        else {
+                            $line[] = str_putcsv([$v], $delimiter, $enclosure, $escape);
+                        }
+                    }
+                    $size += fwrite($fp, implode($delimiter, $line) . $eol);
+                }
+                else {
+                    $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
+                }
             }
             return $size;
-        })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
+        })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['null'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
         if ($output) {
             return $size;
         }

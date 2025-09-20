@@ -176,6 +176,21 @@ class dataformatTest extends AbstractTestCase
         ])->wasThrown('invalid multibyte sequence');
     }
 
+    function test_csv_null()
+    {
+        $csvarrays = [
+            ['a' => '"A1"', 'b' => null],
+            ['a' => null, 'b' => ',B2,'],
+        ];
+
+        $csv = csv_export($csvarrays, ['null' => "\\N"]);
+        that($csv)->is('a,b
+"""A1""",\\N
+\\N,",B2,"
+');
+        that(csv_import($csv, ['null' => "\\N"]))->is($csvarrays);
+    }
+
     function test_csv_export()
     {
         $csvarrays = [
@@ -363,6 +378,19 @@ x"
 '))->is([
             ['a' => 'a1,x', 'b' => 'b1', 'c' => 'c1'],
             ['a' => 'a3', 'b' => 'b3', 'c' => "c3\nx"],
+        ]);
+
+        // trim
+        that(csv_import('
+a,  b	, " c "
+a1, b1	, "c1"""
+a2, b2	, " c2 "
+a3, b3	, " c3
+ "
+', ['trim' => " 	"]))->is([
+            ["a" => "a1", "b" => "b1", " c " => "c1\""],
+            ["a" => "a2", "b" => "b2", " c " => " c2 "],
+            ["a" => "a3", "b" => "b3", " c " => " c3\n "],
         ]);
 
         // ファイルポインタ

@@ -7,6 +7,7 @@ require_once __DIR__ . '/../array/array_map_recursive.php';
 require_once __DIR__ . '/../array/array_pickup.php';
 require_once __DIR__ . '/../array/is_indexarray.php';
 require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
+require_once __DIR__ . '/../strings/quoteexplode.php';
 require_once __DIR__ . '/../strings/str_resource.php';
 require_once __DIR__ . '/../url/query_parse.php';
 // @codeCoverageIgnoreEnd
@@ -95,6 +96,8 @@ function csv_import($csvstring, $options = [])
         'escape'    => '\\',
         'encoding'  => ini_get('default_charset'),
         'scrub'     => 'IGNORE',
+        'null'      => "",
+        'trim'      => "", // 字の文を trim する文字。true の場合は素の trim（"" されていれば trim されない）
         'initial'   => [],
         'headers'   => [],
         'headermap' => null,
@@ -120,7 +123,7 @@ function csv_import($csvstring, $options = [])
     $restore = set_error_exception_handler();
     try {
         $n = -1;
-        return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $headermap, $structure, $grouping, $callback, $limit) use (&$n) {
+        return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $scrub, $null, $trim, $initial, $headers, $headermap, $structure, $grouping, $callback, $limit) use (&$n) {
             $default_charset = ini_get('default_charset');
             if ($default_charset !== $encoding) {
                 stream_filter_append($fp, "convert.iconv.$encoding/$default_charset" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_READ);
@@ -141,13 +144,36 @@ function csv_import($csvstring, $options = [])
             }
 
             $result = [];
-            while ($row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape)) {
+            while (true) {
+                $tell = ftell($fp);
+                $row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape);
+                if ($row === false) {
+                    break;
+                }
                 if ($row === [null]) {
                     continue;
+                }
+                if (strlen($trim)) {
+                    // 改行を考慮すると fgets で読み込むわけにはいかないが、CSV としての1行も考えると fread も使えない
+                    // 多少無駄だが fgetcsv で読み込んだバイト数で再度 fread して「CSV としての1行」を生のまま得る
+                    $tell2 = ftell($fp);
+                    fseek($fp, $tell);
+                    $line = fread($fp, $tell2 - $tell);
+
+                    // CSV のややこしい仕様に囚われたくないので分割だけ自前でやり、実際のパースは1要素のCSVとして str_getcsv に日和る
+                    $row = [];
+                    foreach (quoteexplode($delimiter, $line, null, $enclosure, $escape) as $field) {
+                        $field = $trim === true ? trim($field) : trim($field, $trim);
+                        $row[] = str_getcsv($field, $delimiter, $enclosure, $escape)[0];
+                    }
                 }
                 if (!$headers) {
                     $headers = $row;
                     continue;
+                }
+
+                if (strlen($null)) {
+                    $row = array_map(fn($v) => $v === $null ? null : $v, $row);
                 }
 
                 $n++;
@@ -207,7 +233,7 @@ function csv_import($csvstring, $options = [])
             }
 
             return $result;
-        })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback'], $options['limit']);
+        })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['null'], $options['trim'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback'], $options['limit']);
     }
     catch (\Throwable $t) {
         // 何行目？ が欲しくなることが非常に多いので例外メッセージを書き換える
