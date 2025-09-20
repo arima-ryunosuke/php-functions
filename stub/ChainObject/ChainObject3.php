@@ -533,6 +533,11 @@ trait ChainObject3
     public function calculate_formula($formula): self { }
     public function calculate_formula(): self { }
 
+    /** @see int_divide() */
+    public self $int_divide;
+    public function int_divide(int $int, int $divisor): self { }
+    public function int_divide(int $divisor): self { }
+
     /** @see median() */
     public self $median;
     public function median(...$variadic): self { }

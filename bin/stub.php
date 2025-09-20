@@ -18,6 +18,7 @@ $targetFunction = [
     'reflect_callable' => [[function () { }], [[PhpToken::class, 'tokenize']]],
     'reflect_types'    => [[]],
     'php_tokens'       => [['<?php return null;']],
+    'sleetflake'       => [[]],
 ];
 
 foreach ($targetFunction as $funcname => $argses) {

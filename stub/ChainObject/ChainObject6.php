@@ -383,6 +383,16 @@ trait ChainObject6
     public function cross(iterable ...$arrays): self { }
     public function cross(): self { }
 
+    /** @see array_divide() */
+    public self $array_divide;
+    public function array_divide(iterable $array, int $divisor, bool $preserve_keys = false): self { }
+    public function array_divide(int $divisor, bool $preserve_keys = false): self { }
+
+    /** @see array_divide() */
+    public self $divide;
+    public function divide(iterable $array, int $divisor, bool $preserve_keys = false): self { }
+    public function divide(int $divisor, bool $preserve_keys = false): self { }
+
     /** @see array_filters() */
     public self $array_filters;
     public function array_filters(iterable $array, callable ...$callbacks): self { }
@@ -577,6 +587,11 @@ trait ChainObject6
     public self $reflect_type_resolve;
     public function reflect_type_resolve(?string $type): self { }
     public function reflect_type_resolve(): self { }
+
+    /** @see stream_describe() */
+    public self $stream_describe;
+    public function stream_describe($stream = null): self { }
+    public function stream_describe(): self { }
 
     /** @see chain_case() */
     public self $chain_case;

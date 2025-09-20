@@ -406,13 +406,13 @@ TEXT): self { }
 
     /** @see array_pos() */
     public self $array_pos;
-    public function array_pos(iterable $array, $position, $return_key = false): self { }
-    public function array_pos($position, $return_key = false): self { }
+    public function array_pos(iterable $array, int $position, $return_key = false): self { }
+    public function array_pos(int $position, $return_key = false): self { }
 
     /** @see array_pos() */
     public self $pos;
-    public function pos(iterable $array, $position, $return_key = false): self { }
-    public function pos($position, $return_key = false): self { }
+    public function pos(iterable $array, int $position, $return_key = false): self { }
+    public function pos(int $position, $return_key = false): self { }
 
     /** @see array_prepend() */
     public self $array_prepend;
@@ -524,11 +524,6 @@ TEXT): self { }
     public function php_tokens(string $code, int $flags = 0): self { }
     public function php_tokens(int $flags = 0): self { }
 
-    /** @see unique_id() */
-    public self $unique_id;
-    public function unique_id(&$id_info = [], $debug = []): self { }
-    public function unique_id($debug = []): self { }
-
     /** @see http_put() */
     public self $http_put;
     public function http_put($url, $data = [], $options = [], &$response_header = [], &$info = []): self { }
@@ -593,6 +588,16 @@ TEXT): self { }
     public self $bytes;
     public function bytes(?string $string, $base = 10): self { }
     public function bytes($base = 10): self { }
+
+    /** @see str_divide() */
+    public self $str_divide;
+    public function str_divide(string $string, int $divisor): self { }
+    public function str_divide(int $divisor): self { }
+
+    /** @see str_divide() */
+    public self $divide;
+    public function divide(string $string, int $divisor): self { }
+    public function divide(int $divisor): self { }
 
     /** @see str_exists() */
     public self $str_exists;

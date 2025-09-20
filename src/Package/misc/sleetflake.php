@@ -110,7 +110,7 @@ function sleetflake(
             $this->machine_id ??= $this->getMachineId();
 
             // この順番は決して変えてはならない（getSequence で待機する可能性があるので microtime はその後でなければならない）
-            $ipsegment = $this->machine_id & ((1 << $this->ipaddress_bit) - 1);
+            $machineid = $this->machine_id & ((1 << $this->ipaddress_bit) - 1);
             $sequence = $this->getSequence();
             $timestamp = (int) ((($this->timestamp ?? microtime(true)) - $this->base_timestamp) * 1000);
 
@@ -118,13 +118,13 @@ function sleetflake(
             $sequence_right_bits = $ipaddress_right_bits + $this->ipaddress_bit;
             $timestamp_right_bits = $sequence_right_bits + $this->sequence_bit;
 
-            $id = ($timestamp << $timestamp_right_bits) | ($sequence << $sequence_right_bits) | ($ipsegment << $ipaddress_right_bits);
+            $id = ($timestamp << $timestamp_right_bits) | ($sequence << $sequence_right_bits) | ($machineid << $ipaddress_right_bits);
 
             $this->debugInfo = [
                 'id'        => $id,
                 'timestamp' => $timestamp,
                 'sequence'  => $sequence,
-                'ipsegment' => $ipsegment,
+                'machineid' => $machineid,
             ];
 
             return $id;

@@ -423,6 +423,11 @@ trait ChainObject2
     public function php_opcode($phpcode, $level = 131072): self { }
     public function php_opcode($level = 131072): self { }
 
+    /** @see sleetflake() */
+    public self $sleetflake;
+    public function sleetflake(int $sequence_bit = 7, int $ipaddress_bit = 16, ?int $base_timestamp = null, ?float $timestamp = null, ?string $lockfile = null): self { }
+    public function sleetflake(int $ipaddress_bit = 16, ?int $base_timestamp = null, ?float $timestamp = null, ?string $lockfile = null): self { }
+
     /** @see fcgi_request() */
     public self $fcgi_request;
     public function fcgi_request(string $url, array $params = [], \Traversable|array|string $stdin = "", array $options = []): self { }

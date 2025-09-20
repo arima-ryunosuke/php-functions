@@ -1254,6 +1254,44 @@ if (!function_exists('ryunosuke\\Functions\\array_dive')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\array_divide') || (new \ReflectionFunction('ryunosuke\\Functions\\array_divide'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\array_divide')) {
+    /**
+     * array_chunk の配列長指定版
+     *
+     * Example:
+     * ```php
+     * // ['A', 'B', 'C', 'D', 'E', 'F', 'G'] を3つに分割（余りを左に分配）
+     * that(array_divide(['A', 'B', 'C', 'D', 'E', 'F', 'G'], 3))->isSame([
+     *     ["A", "B", "C"],
+     *     ["D", "E"],
+     *     ["F", "G"],
+     * ]);
+     * // ['A', 'B', 'C', 'D', 'E', 'F', 'G'] を3つに分割（余りを右に分配）
+     * that(array_divide(['A', 'B', 'C', 'D', 'E', 'F', 'G'], -3))->isSame([
+     *     ["A", "B"],
+     *     ["C", "D"],
+     *     ["E", "F", "G"],
+     * ]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\array
+     */
+    function array_divide(iterable $array, int $divisor, bool $preserve_keys = false): array
+    {
+        $array = is_array($array) ? $array : iterator_to_array($array);
+
+        $last = 0;
+        $result = [];
+        foreach (int_divide(count($array), $divisor) as $int) {
+            $result[] = array_slice($array, $last, $int, $preserve_keys);
+            $last += $int;
+        }
+
+        return $result;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\array_each') || (new \ReflectionFunction('ryunosuke\\Functions\\array_each'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\array_each')) {
     /**
@@ -3607,29 +3645,22 @@ if (!function_exists('ryunosuke\\Functions\\array_pos')) {
      *
      * @package ryunosuke\Functions\Package\array
      *
-     * @param array $array 対象配列
+     * @param iterable&\Countable $array 対象配列
      * @param int $position 取得する位置
      * @param bool $return_key true にすると値ではなくキーを返す
      * @return mixed 指定位置の値
      */
-    function array_pos($array, $position, $return_key = false)
+    function array_pos($array, int $position, $return_key = false)
     {
-        $position = (int) $position;
-        $keys = array_keys($array);
+        $target = $position >= 0 ? $position : count($array) + $position;
 
-        if ($position < 0) {
-            $position = abs($position + 1);
-            $keys = array_reverse($keys);
-        }
-
-        $count = count($keys);
-        for ($i = 0; $i < $count; $i++) {
-            if ($i === $position) {
-                $key = $keys[$i];
+        $i = 0;
+        foreach ($array as $k => $v) {
+            if ($i++ === $target) {
                 if ($return_key) {
-                    return $key;
+                    return $k;
                 }
-                return $array[$key];
+                return $v;
             }
         }
 
@@ -8974,6 +9005,7 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
             'escape'    => '\\',
             'encoding'  => ini_get('default_charset'),
             'scrub'     => 'TRANSLIT',
+            'null'      => "",
             'initial'   => '', // "\xEF\xBB\xBF"
             'headers'   => null,
             'structure' => false,
@@ -8992,13 +9024,14 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
 
         $restore = set_error_exception_handler();
         try {
-            $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $structure, $callback) {
+            $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $scrub, $null, $initial, $headers, $structure, $callback) {
                 $default_charset = ini_get('default_charset');
                 if ($default_charset !== $encoding) {
                     // import とは違い、吐き出すときは明確なエラーだろうので TRANSLIT も IGNORE もしない
                     stream_filter_append($fp, "convert.iconv.$default_charset/$encoding" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_WRITE);
                 }
 
+                $eol = "\n"; // いつの間にか $eol 引数が生えていたがこの関数自体の対応はしていないので暫定で決め打ちにしてある
                 $size = 0;
 
                 if (!is_array($csvarrays)) {
@@ -9083,10 +9116,24 @@ if (!function_exists('ryunosuke\\Functions\\csv_export')) {
                         }
                     }
                     $row = array_intersect_key(array_replace($default, $array), $default);
-                    $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
+                    if (strlen($null)) {
+                        $line = [];
+                        foreach ($row as $v) {
+                            if ($v === null) {
+                                $line[] = $null;
+                            }
+                            else {
+                                $line[] = str_putcsv([$v], $delimiter, $enclosure, $escape);
+                            }
+                        }
+                        $size += fwrite($fp, implode($delimiter, $line) . $eol);
+                    }
+                    else {
+                        $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
+                    }
                 }
                 return $size;
-            })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
+            })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['null'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
             if ($output) {
                 return $size;
             }
@@ -9188,6 +9235,8 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
             'escape'    => '\\',
             'encoding'  => ini_get('default_charset'),
             'scrub'     => 'IGNORE',
+            'null'      => "",
+            'trim'      => "", // 字の文を trim する文字。true の場合は素の trim（"" されていれば trim されない）
             'initial'   => [],
             'headers'   => [],
             'headermap' => null,
@@ -9213,7 +9262,7 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
         $restore = set_error_exception_handler();
         try {
             $n = -1;
-            return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $scrub, $initial, $headers, $headermap, $structure, $grouping, $callback, $limit) use (&$n) {
+            return (function ($fp, $delimiter, $enclosure, $escape, $encoding, $scrub, $null, $trim, $initial, $headers, $headermap, $structure, $grouping, $callback, $limit) use (&$n) {
                 $default_charset = ini_get('default_charset');
                 if ($default_charset !== $encoding) {
                     stream_filter_append($fp, "convert.iconv.$encoding/$default_charset" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_READ);
@@ -9234,13 +9283,36 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
                 }
 
                 $result = [];
-                while ($row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape)) {
+                while (true) {
+                    $tell = ftell($fp);
+                    $row = fgetcsv($fp, 0, $delimiter, $enclosure, $escape);
+                    if ($row === false) {
+                        break;
+                    }
                     if ($row === [null]) {
                         continue;
+                    }
+                    if (strlen($trim)) {
+                        // 改行を考慮すると fgets で読み込むわけにはいかないが、CSV としての1行も考えると fread も使えない
+                        // 多少無駄だが fgetcsv で読み込んだバイト数で再度 fread して「CSV としての1行」を生のまま得る
+                        $tell2 = ftell($fp);
+                        fseek($fp, $tell);
+                        $line = fread($fp, $tell2 - $tell);
+
+                        // CSV のややこしい仕様に囚われたくないので分割だけ自前でやり、実際のパースは1要素のCSVとして str_getcsv に日和る
+                        $row = [];
+                        foreach (quoteexplode($delimiter, $line, null, $enclosure, $escape) as $field) {
+                            $field = $trim === true ? trim($field) : trim($field, $trim);
+                            $row[] = str_getcsv($field, $delimiter, $enclosure, $escape)[0];
+                        }
                     }
                     if (!$headers) {
                         $headers = $row;
                         continue;
+                    }
+
+                    if (strlen($null)) {
+                        $row = array_map(fn($v) => $v === $null ? null : $v, $row);
                     }
 
                     $n++;
@@ -9300,7 +9372,7 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
                 }
 
                 return $result;
-            })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback'], $options['limit']);
+            })($fp, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['null'], $options['trim'], $options['initial'], $options['headers'], $options['headermap'], $options['structure'], $options['grouping'], $options['callback'], $options['limit']);
         }
         catch (\Throwable $t) {
             // 何行目？ が欲しくなることが非常に多いので例外メッセージを書き換える
@@ -10727,7 +10799,7 @@ if (!function_exists('ryunosuke\\Functions\\markdown_table')) {
         })();
         $option['stringify'] ??= fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false]);
 
-        $stringify = fn($v) => strtr(((is_stringable($v) && !is_null($v) ? $v : $option['stringify']($v)) ?? ''), ["\t" => '    ']);
+        $stringify = fn($v) => strtr(((is_stringable($v) && !is_null($v) && !is_bool($v) ? $v : $option['stringify']($v)) ?? ''), ["\t" => '    ']);
         $is_numeric = function ($v) {
             $v = trim($v);
             if (strlen($v) === 0) {
@@ -14008,20 +14080,23 @@ if (!function_exists('ryunosuke\\Functions\\process_parallel')) {
      * // 1000ms かかる処理を3本実行するが、トータル時間は 3000ms ではなくそれ以下になる（多少のオーバーヘッドはある）
      * that(microtime(true) - $t)->break()->lessThan(2.0);
      * // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
-     * that($result)->isSame([
+     * that($result)->subsetEquals([
      *     'a' => [
+     *         // 'pid' => 12345,
      *         'status' => 0,
      *         'stdout' => "this is stdout",
      *         'stderr' => "this is stderr",
      *         'return' => 3,
      *     ],
      *     'b' => [
+     *         // 'pid' => 12345,
      *         'status' => 0,
      *         'stdout' => "this is stdout",
      *         'stderr' => "this is stderr",
      *         'return' => 5,
      *     ],
      *     [
+     *         // 'pid' => 12345,
      *         'status' => 0,
      *         'stdout' => "this is stdout",
      *         'stderr' => "this is stderr",
@@ -14047,20 +14122,23 @@ if (!function_exists('ryunosuke\\Functions\\process_parallel')) {
      * // 300,500,1000ms かかる処理を3本実行するが、トータル時間は 1800ms ではなくそれ以下になる（多少のオーバーヘッドはある）
      * that(microtime(true) - $t)->break()->lessThan(1.5);
      * // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
-     * that($result)->isSame([
+     * that($result)->subsetEquals([
      *     'a' => [
+     *       // 'pid' => 12345,
      *         'status' => 0,
      *         'stdout' => "",
      *         'stderr' => "",
      *         'return' => 3,
      *     ],
      *     'b' => [
+     *         // 'pid' => 12345,
      *         'status' => 0,
      *         'stdout' => "",
      *         'stderr' => "",
      *         'return' => 6,
      *     ],
      *     [
+     *         // 'pid' => 12345,
      *         'status' => 127,  // 終了コードが入ってくる
      *         'stdout' => "",
      *         'stderr' => "",
@@ -14103,8 +14181,10 @@ if (!function_exists('ryunosuke\\Functions\\process_parallel')) {
         $results = [];
         foreach ($processes as $key => $process) {
             $return = $process();
+            $status = $process->status();
             $results[$key] = [
-                'status' => $process->status()['exitcode'],
+                'pid'    => $status['pid'],
+                'status' => $status['exitcode'],
                 'stdout' => $process->stdout,
                 'stderr' => $process->stderr,
                 'return' => $return,
@@ -19827,6 +19907,53 @@ if (!function_exists('ryunosuke\\Functions\\decimal')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\int_divide') || (new \ReflectionFunction('ryunosuke\\Functions\\int_divide'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\int_divide')) {
+    /**
+     * 整数を除算した配列を返す
+     *
+     * 割り切れるときは array_pad([], $divisor, $int/$divisor) と同じ。
+     * 割り切れないときは余剰を各要素に分配する。
+     * $length が正の場合は左から埋められる。負の場合は右から埋められる。
+     *
+     * Example:
+     * ```php
+     * // 13を3つに分割（余りを左に分配）
+     * that(int_divide(13, 3))->isSame([5, 4, 4]);
+     * // 13を3つに分割（余りを右に分配）
+     * that(int_divide(13, -3))->isSame([4, 4, 5]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\math
+     */
+    function int_divide(int $int, int $divisor): array
+    {
+        $minus = $divisor < 0;
+        $divisor = abs($divisor);
+
+        $div = intdiv($int, $divisor);
+        $mod = abs((int) ($int % $divisor));
+
+        $result = array_pad([], $divisor, $div);
+
+        for ($i = 0; $i < $mod; $i++) {
+            $n = $i;
+            if ($minus) {
+                $n = $divisor - $i - 1;
+            }
+
+            if ($int > 0) {
+                $result[$n]++;
+            }
+            else {
+                $result[$n]--;
+            }
+        }
+
+        return $result;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\maximum') || (new \ReflectionFunction('ryunosuke\\Functions\\maximum'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\maximum')) {
     /**
@@ -21711,16 +21838,16 @@ if (!function_exists('ryunosuke\\Functions\\php_tokens')) {
     }
 }
 
-assert(!function_exists('ryunosuke\\Functions\\unique_id') || (new \ReflectionFunction('ryunosuke\\Functions\\unique_id'))->isUserDefined());
-if (!function_exists('ryunosuke\\Functions\\unique_id')) {
+assert(!function_exists('ryunosuke\\Functions\\sleetflake') || (new \ReflectionFunction('ryunosuke\\Functions\\sleetflake'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\sleetflake')) {
     /**
-     * 一意な文字列を返す
+     * 一意な id を生成するオブジェクトを返す
      *
      * 最大でも8バイト（64ビット）に収まるようにしてある。
      *
-     * - 41bit: 1ミリ秒単位
-     * - 7bit: シーケンス
-     * - 16bit: IPv4ホストアドレス
+     * - 41bit: 1ミリ秒単位（固定）
+     * - 7bit: シーケンス（引数指定可能）
+     * - 16bit: IPv4ホストアドレス（引数指定可能）
      *
      * いわゆる snowflake 系で sonyflake が近い。
      *
@@ -21761,143 +21888,175 @@ if (!function_exists('ryunosuke\\Functions\\unique_id')) {
      *
      * @package ryunosuke\Functions\Package\misc
      *
-     * @param array $id_info 元になった生成データのレシーバ引数
-     * @param array $debug デバッグ用引数（配列で内部の動的な値を指定できる）
-     * @return string 一意なバイナリ文字列
+     * @return \Sleetflake|object
      */
-    function unique_id(&$id_info = [], $debug = [])
-    {
-        $id_info = [];
+    function sleetflake(
+        int $sequence_bit = 7,
+        int $ipaddress_bit = 16,
+        ?int $base_timestamp = null,
+        ?float $timestamp = null,
+        ?string $lockfile = null,
+    ) {
+        return new class($sequence_bit, $ipaddress_bit, $base_timestamp, $timestamp, $lockfile) {
+            private int    $sequence_bit;
+            private int    $ipaddress_bit;
+            private int    $machine_id;
+            private int    $base_timestamp;
+            private ?float $timestamp;
+            private        $lock_handle;
 
-        static $config = null;
-        $config ??= function_configure('unique_id.config');
+            private array $debugInfo;
 
-        $TIMESTAMP_BASE = $config['timestamp_base'];
-        $TIMESTAMP_PRECISION = $config['timestamp_precision'];
-        $TIMESTAMP_BIT = $config['timestamp_bit'];
-        $SEQUENCE_BIT = $config['sequence_bit'];
-        $IPADDRESS_BIT = $config['ipaddress_bit'];
-        assert(PHP_INT_SIZE === 8);
-        assert(($TIMESTAMP_BIT + $SEQUENCE_BIT + $IPADDRESS_BIT) === 64);
+            public function __construct(
+                int $sequence_bit,
+                int $ipaddress_bit,
+                ?int $base_timestamp,
+                ?float $timestamp,
+                ?string $lockfile,
+            ) {
+                $this->sequence_bit = $sequence_bit;
+                $this->ipaddress_bit = $ipaddress_bit;
+                $this->base_timestamp = $base_timestamp ?? strtotime('2025/06/01');
+                $this->timestamp = $timestamp;
+                $this->lock_handle = fopen($lockfile ?? (function_configure('cachedir') . "/sleetflake-sequence"), 'c+');
 
-        static $ipaddress = null;
-        $ipaddress ??= (function () use ($IPADDRESS_BIT) {
-            $addrs = [];
-            foreach (net_get_interfaces() as $interface) {
-                foreach ($interface['unicast'] as $addr) {
-                    // IPv4 で・・・
-                    if ($addr['family'] === AF_INET) {
-                        // subnet/16 以上のもの
-                        $subnet = strrpos(decbin((ip2long($addr['netmask']))), '1') + 1;
-                        if ($subnet >= $IPADDRESS_BIT) {
-                            $addrs[] = [$addr['address'], $subnet];
+                assert(($this->sequence_bit + $this->ipaddress_bit) <= 23);
+            }
+
+            public function __destruct()
+            {
+                fclose($this->lock_handle);
+            }
+
+            public function __debugInfo(): array
+            {
+                return $this->debugInfo;
+            }
+
+            public function binaryToInt(string $binary): int
+            {
+                return unpack('J', $binary)[1];
+            }
+
+            public function int(): int
+            {
+                $this->machine_id ??= $this->getMachineId();
+
+                // この順番は決して変えてはならない（getSequence で待機する可能性があるので microtime はその後でなければならない）
+                $machineid = $this->machine_id & ((1 << $this->ipaddress_bit) - 1);
+                $sequence = $this->getSequence();
+                $timestamp = (int) ((($this->timestamp ?? microtime(true)) - $this->base_timestamp) * 1000);
+
+                $ipaddress_right_bits = 0;
+                $sequence_right_bits = $ipaddress_right_bits + $this->ipaddress_bit;
+                $timestamp_right_bits = $sequence_right_bits + $this->sequence_bit;
+
+                $id = ($timestamp << $timestamp_right_bits) | ($sequence << $sequence_right_bits) | ($machineid << $ipaddress_right_bits);
+
+                $this->debugInfo = [
+                    'id'        => $id,
+                    'timestamp' => $timestamp,
+                    'sequence'  => $sequence,
+                    'machineid' => $machineid,
+                ];
+
+                return $id;
+            }
+
+            public function binary(): string
+            {
+                return pack('J', $this->int());
+            }
+
+            public function base62(): string
+            {
+                return base62_encode($this->binary());
+            }
+
+            public function base64(): string
+            {
+                return base64_encode($this->binary());
+            }
+
+            public function base64url(): string
+            {
+                return base64url_encode($this->binary());
+            }
+
+            private function getMachineId(): int
+            {
+                $addrs = [];
+                foreach (net_get_interfaces() as $interface) {
+                    foreach ($interface['unicast'] as $addr) {
+                        // IPv4 で・・・
+                        if ($addr['family'] === AF_INET) {
+                            // subnet/16 以上のもの
+                            $subnet = strrpos(decbin((ip2long($addr['netmask']))), '1') + 1;
+                            if ($subnet >= $this->ipaddress_bit) {
+                                $addrs[] = [$addr['address'], $subnet];
+                            }
+                        }
+                        // @todo subnet が /104 なら IPv6 でもいける？
+                    }
+                }
+                if ($addrs) {
+                    usort($addrs, fn($a, $b) => -($a[1] <=> $b[1]));
+                    return ip2long(reset($addrs)[0]);
+                }
+                throw new \UnexpectedValueException("ip address is not found"); // @codeCoverageIgnore
+            }
+
+            private function getSequence(): int
+            {
+                set_error_handler(function ($severity, $message, $file, $line) { throw new \ErrorException($message, 0, $severity, $file, $line); });
+                flock($this->lock_handle, LOCK_EX);
+
+                try {
+                    rewind($this->lock_handle);
+                    $sequence = 1 + (int) stream_get_contents($this->lock_handle);
+                    if (($sequence >= (1 << $this->sequence_bit))) {
+                        $sequence = 0;
+                        usleep(1000);
+                        if (isset($this->timestamp)) {
+                            $this->timestamp += 0.001;
                         }
                     }
-                    // @todo subnet が /104 なら IPv6 でもいける？
-                }
-            }
-            if ($addrs) {
-                usort($addrs, fn($a, $b) => -($a[1] <=> $b[1]));
-                return reset($addrs)[0];
-            }
-            throw new \UnexpectedValueException("ip address is not found"); // @codeCoverageIgnore
-        })();
-        $ipaddress = $debug['ipaddress'] ?? $ipaddress;
 
-        // プロセスを跨いだ連番生成器（何かに使えそうなのでクラスにまとめて少し冗長になっている）
-        static $sequencer = null;
-        $sequencer ??= new class (sys_get_temp_dir() . "/id-sequence") {
-            private     $handle;
-            private int $lockcount = 0;
-
-            public function __construct(string $lockfile)
-            {
-                $this->handle = fopen($lockfile, 'c+');
-            }
-
-            public function lock(): int
-            {
-                if (flock($this->handle, LOCK_EX)) {
-                    $this->lockcount++;
-                }
-                return $this->lockcount;
-            }
-
-            public function unlock(): int
-            {
-                if (flock($this->handle, LOCK_UN)) {
-                    $this->lockcount--;
-                }
-                return $this->lockcount;
-            }
-
-            public function reset(int $sequence): void
-            {
-                assert($this->lockcount > 0, 'must be lock');
-
-                set_error_handler(function ($severity, $message, $file, $line) { throw new \ErrorException($message, 0, $severity, $file, $line); });
-                try {
-                    rewind($this->handle);
-                    ftruncate($this->handle, 0);
-                    fwrite($this->handle, $sequence);
-                }
-                finally {
-                    restore_error_handler();
-                }
-            }
-
-            public function add(int $increment = 1): int
-            {
-                assert($this->lockcount > 0, 'must be lock');
-
-                set_error_handler(function ($severity, $message, $file, $line) { throw new \ErrorException($message, 0, $severity, $file, $line); });
-                try {
-                    rewind($this->handle);
-                    $sequence = (int) stream_get_contents($this->handle);
-
-                    $next = $sequence + $increment;
-                    $this->reset(is_float($next) ? 0 : $next);
+                    rewind($this->lock_handle);
+                    ftruncate($this->lock_handle, 0);
+                    fwrite($this->lock_handle, $sequence);
 
                     return $sequence;
                 }
                 finally {
                     restore_error_handler();
+                    flock($this->lock_handle, LOCK_UN);
                 }
             }
         };
+    }
+}
 
-        $sequencer->lock();
-        try {
-            $timestamp = $debug['timestamp'] ?? microtime(true);
-            if (isset($debug['sequence'])) {
-                $sequencer->reset($debug['sequence']);
-            }
-
-            $sequence = $sequencer->add() % (1 << $SEQUENCE_BIT);
-            if ($sequence === 0) {
-                usleep(1000 * $TIMESTAMP_PRECISION);
-                $timestamp = microtime(true);
-            }
-        }
-        finally {
-            $sequencer->unlock();
-        }
-
-        $id_info = [
-            'timestamp' => (int) (($timestamp - $TIMESTAMP_BASE) * 1000 / $TIMESTAMP_PRECISION),
-            'sequence'  => $sequence,
-            'ipsegment' => ip2long($ipaddress) & ((1 << $IPADDRESS_BIT) - 1),
-        ];
-
-        assert(($id_info['timestamp'] & ((1 << $TIMESTAMP_BIT) - 1)) === $id_info['timestamp']);
-        assert(($id_info['sequence'] & ((1 << $SEQUENCE_BIT) - 1)) === $id_info['sequence']);
-        assert(($id_info['ipsegment'] & ((1 << $IPADDRESS_BIT) - 1)) === $id_info['ipsegment']);
-
-        $ipaddress_right_bits = 0;
-        $sequence_right_bits = $ipaddress_right_bits + $IPADDRESS_BIT;
-        $timestamp_right_bits = $sequence_right_bits + $SEQUENCE_BIT;
-
-        return pack('J', ($id_info['timestamp'] << $timestamp_right_bits) | ($id_info['sequence'] << $sequence_right_bits) | ($id_info['ipsegment'] << $ipaddress_right_bits));
+assert(!function_exists('ryunosuke\\Functions\\unique_id') || (new \ReflectionFunction('ryunosuke\\Functions\\unique_id'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\unique_id')) {
+    /**
+     * sleetflake::binary へのエイリアス
+     *
+     * @see sleetflake()
+     * @package ryunosuke\Functions\Package\misc
+     */
+    function unique_id(): string
+    {
+        static $sleetflake = null;
+        $sleetflake ??= (function () {
+            $config = function_configure('unique_id.config');
+            return sleetflake(
+                base_timestamp: $config['timestamp_base'],
+                sequence_bit: $config['sequence_bit'],
+                ipaddress_bit: $config['ipaddress_bit'],
+            );
+        })();
+        return $sleetflake->binary();
     }
 }
 
@@ -27828,6 +27987,101 @@ if (!function_exists('ryunosuke\\Functions\\profiler')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\stream_describe') || (new \ReflectionFunction('ryunosuke\\Functions\\stream_describe'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\stream_describe')) {
+    /**
+     * ストリームの雑多な情報を返す
+     *
+     * - descriptor: ファイルデスクリプタ番号
+     * - inode: ファイル inode
+     * - realpath: 現在のファイル名（ファイスシステム上に残っておらず、デスクリプタだけが存在する場合は null）
+     * - filename: 開いた時のファイル名
+     *
+     * procfs を用いていて Windows はテスト用に模倣しているだけなので使用してはならない。
+     *
+     * @package ryunosuke\Functions\Package\stream
+     */
+    function stream_describe($stream = null): ?array
+    {
+        // fd の蒐集（同じファイルを複数のリソースで開いていることもあるので inode 単位で集約する）
+        $descriptors = [];
+        if (DIRECTORY_SEPARATOR === '\\') {
+            exec('handle -v -p ' . getmypid(), $output);
+            foreach (array_slice($output, 6) as $descriptor) {
+                [, , , $fd, $type, , $realpath] = str_getcsv($descriptor);
+                if ($type === 'File') {
+                    clearstatcache(true, $realpath);
+                    if (file_exists($realpath)) {
+                        $inode = hexdec(trim(explode(' ', shell_exec('fsutil file queryfileid ' . escapeshellarg($realpath)))[3]));
+                        $descriptors[$inode][] = [
+                            'realpath'   => $realpath,
+                            'descriptor' => hexdec($fd),
+                        ];
+                    }
+                }
+            }
+        }
+        else {
+            // @codeCoverageIgnoreStart
+            foreach (glob("/proc/self/fd/*") as $descriptor) {
+                clearstatcache(true, $descriptor);
+                $fd = (int) basename($descriptor);
+                // always failing
+                // $stat = stat("php://fd/$fd");
+
+                // fd は残っているがファイルが消されていると realpath は失敗する
+                // もはやファイル名が存在しないので fileinode は使えない（幸いにも fd から resource を開く機能があるので代替する）
+                $realpath = realpath($descriptor);
+                if ($realpath === false) {
+                    $fp = @fopen("php://fd/$fd", "r");
+                    if ($fp === false) {
+                        continue;
+                    }
+                    $fstat = fstat($fp);
+                    $inode = $fstat['ino'];
+                    $realpath = null;
+                    fclose($fp);
+                }
+                else {
+                    $inode = fileinode($realpath);
+                }
+
+                $descriptors[$inode][] = [
+                    'realpath'   => $realpath,
+                    'descriptor' => $fd,
+                ];
+            }
+            // @codeCoverageIgnoreEnd
+        }
+
+        $results = [];
+        foreach (get_resources('stream') as $resource) {
+            $metadata = stream_get_meta_data($resource);
+            if (isset($metadata['uri'])) {
+                $fstat = fstat($resource);
+                if ($fstat != false) {
+                    if (isset($descriptors[$fstat['ino']])) {
+                        // resource と fd は id は一致しないが時系列での増減は同じなので順番に取り出せば一致する
+                        $descriptor = array_shift($descriptors[$fstat['ino']]);
+                        $results[(int) $resource] = [
+                            'type'       => $metadata['wrapper_type'],
+                            'descriptor' => $descriptor['descriptor'],
+                            'inode'      => $fstat['ino'],
+                            'realpath'   => $descriptor['realpath'],
+                            'filename'   => $metadata['uri'],
+                        ];
+                        if ($stream === $resource) {
+                            return $results[(int) $resource];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $results;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\var_stream') || (new \ReflectionFunction('ryunosuke\\Functions\\var_stream'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\var_stream')) {
     /**
@@ -30449,6 +30703,34 @@ if (!function_exists('ryunosuke\\Functions\\str_diff')) {
         };
 
         return $differ($xstring, $ystring);
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\str_divide') || (new \ReflectionFunction('ryunosuke\\Functions\\str_divide'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\str_divide')) {
+    /**
+     * str_split の配列長指定版
+     *
+     * Example:
+     * ```php
+     * // "abcdefg" を3つに分割（余りを左に分配）
+     * that(str_divide("abcdefg", 3))->isSame(["abc", "de", "fg"]);
+     * // "abcdefg" を3つに分割（余りを右に分配）
+     * that(str_divide("abcdefg", -3))->isSame(["ab", "cd", "efg"]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     */
+    function str_divide(string $string, int $divisor): array
+    {
+        $last = 0;
+        $result = [];
+        foreach (int_divide(strlen($string), $divisor) as $int) {
+            $result[] = substr($string, $last, $int);
+            $last += $int;
+        }
+
+        return $result;
     }
 }
 
