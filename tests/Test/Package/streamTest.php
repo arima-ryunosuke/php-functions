@@ -2,10 +2,13 @@
 
 namespace ryunosuke\Test\Package;
 
+use function ryunosuke\Functions\Package\array_count;
 use function ryunosuke\Functions\Package\include_stream;
 use function ryunosuke\Functions\Package\iterator_stream;
 use function ryunosuke\Functions\Package\memory_stream;
 use function ryunosuke\Functions\Package\profiler;
+use function ryunosuke\Functions\Package\rm_rf;
+use function ryunosuke\Functions\Package\stream_describe;
 use function ryunosuke\Functions\Package\var_stream;
 
 class streamTest extends AbstractTestCase
@@ -366,6 +369,92 @@ class streamTest extends AbstractTestCase
         unset($profiler);
         unset($result);
 
+        gc_collect_cycles();
+    }
+
+    function test_stream_describe()
+    {
+        $root = self::$TMPDIR . '/stream_describe';
+        rm_rf($root);
+        mkdir($root, 0777, true);
+
+        // ストリームではないリソースが悪さをしないように適当に開いておく
+        $dummy_resource = [];
+        $dummy_resource[] = opendir(__DIR__);
+        $dummy_resource[] = bzopen(__FILE__, 'r');
+        $dummy_resource[] = gzopen(__FILE__, 'r');
+        $dummy_resource[] = popen(PHP_BINARY . ' -v', 'r');
+        if (defined('TESTWEBSERVER')) {
+            $dummy_resource[] = fopen(TESTWEBSERVER, 'r');
+        }
+
+        // resource と fd の関係を乱すために同じファイルを乱雑に開いておく
+        foreach (range(0, 10) as $i) {
+            $dummy_resource[] = $single = fopen("$root/single.txt", 'a');
+            if ($i % 2 === 0) {
+                fclose($single);
+            }
+        }
+        $single = fopen("$root/single.txt", 'a');
+
+        $double1 = fopen("$root/double.txt", 'a');
+        $double2 = fopen("$root/double.txt", 'a');
+        $rename = fopen("$root/rename.txt", 'w');
+        $delete = fopen("$root/delete.txt", 'c');
+        $deleted_inode = fileinode("$root/delete.txt");
+
+        rename("$root/rename.txt", "$root/rename2.txt");
+        unlink("$root/delete.txt");
+
+        $descriptors = stream_describe();
+        that(array_count($descriptors, fn($d) => $d['filename'] === "$root/single.txt"))->is(6);
+        that(array_count($descriptors, fn($d) => $d['filename'] === "$root/double.txt"))->is(2);
+        that($descriptors[(int) $single])->subsetEquals([
+            "type"     => "plainfile",
+            "inode"    => fileinode("$root/single.txt"),
+            "realpath" => realpath("$root/single.txt"),
+            "filename" => "$root/single.txt",
+        ]);
+        that($descriptors[(int) $double1])->subsetEquals([
+            "type"     => "plainfile",
+            "inode"    => fileinode("$root/double.txt"),
+            "realpath" => realpath("$root/double.txt"),
+            "filename" => "$root/double.txt",
+        ]);
+        that($descriptors[(int) $double2])->subsetEquals([
+            "type"     => "plainfile",
+            "inode"    => fileinode("$root/double.txt"),
+            "realpath" => realpath("$root/double.txt"),
+            "filename" => "$root/double.txt",
+        ]);
+        that($descriptors[(int) $rename])->subsetEquals([
+            "type"     => "plainfile",
+            "inode"    => fileinode("$root/rename2.txt"),
+            "realpath" => realpath("$root/rename2.txt"),
+            "filename" => "$root/rename.txt",
+        ]);
+        if (DIRECTORY_SEPARATOR === '/') {
+            that($descriptors[(int) $delete])->subsetEquals([
+                "type"     => "plainfile",
+                "inode"    => $deleted_inode,
+                "realpath" => null,
+                "filename" => "$root/delete.txt",
+            ]);
+        }
+
+        that(stream_describe($double1))->is($descriptors[(int) $double1]);
+        that(stream_describe($double2))->is($descriptors[(int) $double2]);
+        that(stream_describe($rename))->is($descriptors[(int) $rename]);
+        if (DIRECTORY_SEPARATOR === '/') {
+            that(stream_describe($delete))->is($descriptors[(int) $delete]);
+        }
+
+        fclose($double1);
+        fclose($double2);
+        fclose($rename);
+        fclose($delete);
+
+        unset($dummy_resource);
         gc_collect_cycles();
     }
 
