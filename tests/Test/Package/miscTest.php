@@ -3,6 +3,8 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\annotation_parse;
+use function ryunosuke\Functions\Package\base62_encode;
+use function ryunosuke\Functions\Package\base64url_encode;
 use function ryunosuke\Functions\Package\callable_code;
 use function ryunosuke\Functions\Package\console_log;
 use function ryunosuke\Functions\Package\evaluate;
@@ -21,6 +23,7 @@ use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\process;
 use function ryunosuke\Functions\Package\process_parallel;
 use function ryunosuke\Functions\Package\rm_rf;
+use function ryunosuke\Functions\Package\sleetflake;
 use function ryunosuke\Functions\Package\unique_id;
 use function ryunosuke\Functions\Package\var_export2;
 
@@ -1329,86 +1332,76 @@ aplain text
         that($tokens[9])->end()->wasThrown('token mismatch');
     }
 
-    function test_unique_id()
+    function test_sleetflake()
     {
-        $now = time();
-
         // 重複しない
+        $sleetflake = sleetflake();
         $ids = [];
         for ($i = 0; $i < 10; $i++) {
             for ($j = 0; $j < 1000; $j++) {
-                $ids[] = unique_id();
+                $ids[] = $sleetflake->int();
             }
             usleep(10 * 1000);
         }
         that(count($ids))->is(count(array_unique($ids)));
 
-        // 例え同じ時刻・IPでも7bitまでは重複しない
+        // 各種型（ほぼただのカバレッジ）
+        that($sleetflake->binary())->is(pack('J', $sleetflake->__debugInfo()['id']));
+        that($sleetflake->base62())->is(base62_encode(pack('J', $sleetflake->__debugInfo()['id'])));
+        that($sleetflake->base64())->is(base64_encode(pack('J', $sleetflake->__debugInfo()['id'])));
+        that($sleetflake->base64url())->is(base64url_encode(pack('J', $sleetflake->__debugInfo()['id'])));
+        that($sleetflake->binaryToInt($sleetflake->binary()))->is($sleetflake->__debugInfo()['id']);
+
+        // sequence が 0 の時は必ず timestamp が進んでいる
+        $sleetflake = sleetflake(sequence_bit: 4);
+        $ids = [];
+        $infos = [];
+        for ($i = 0; $i < 1000; $i++) {
+            $ids[] = $sleetflake->int();
+            $infos[] = $sleetflake->__debugInfo();
+        }
+        that(count($ids))->is(count(array_unique($ids)));
+        foreach ($infos as $i => $info) {
+            if ($i > 0 && $info['sequence'] === 0) {
+                that($info['timestamp'])->gt($infos[$i - 1]['timestamp']);
+            }
+        }
+
+        // 例え同じ時刻でも7bitまでは重複しない
+        @unlink(sys_get_temp_dir() . '/sleetflake-dummy1');
+        $sleetflake = sleetflake(timestamp: microtime(true), lockfile: sys_get_temp_dir() . '/sleetflake-dummy1');
         $ids = [];
         for ($i = 0; $i < 128; $i++) {
-            $ids[] = unique_id($id_info, [
-                'timestamp' => $now,
-                'ipaddress' => '127.0.0.1',
-                'sequence'  => $i === 0 ? 0 : null,
-            ]);
+            $ids[] = $sleetflake->int();
         }
         that(count($ids))->is(count(array_unique($ids)));
 
         // そもそも7bitを超えても sleep が入って timestamp が進むので結局重複しない
-        $ids[] = unique_id($id_info, [
-            'timestamp' => $now,
-            'ipaddress' => '127.0.0.1',
-        ]);
+        $ids[] = $sleetflake->int();
         that(count($ids))->is(count(array_unique($ids)));
-        that($id_info['timestamp'])->gt($now);
-        that($id_info['sequence'])->isSame(0);
+        $info = $sleetflake->__debugInfo();
+        that($info['sequence'])->isSame(1);
 
-        // 同じ時刻・IPなら sequence が進んでいる
-        unique_id($id_info, [
-            'sequence' => 0,
-        ]);
+        // 同じ時刻なら sequence が進んでいる
+        @unlink(sys_get_temp_dir() . '/sleetflake-dummy2');
+        $sleetflake = sleetflake(timestamp: microtime(true), lockfile: sys_get_temp_dir() . '/sleetflake-dummy2');
         $ids = [];
-        $ids[] = unique_id($id_info1, [
-            'timestamp' => $now,
-            'ipaddress' => '127.0.0.1',
-        ]);
-        $ids[] = unique_id($id_info2, [
-            'timestamp' => $now,
-            'ipaddress' => '127.0.0.1',
-        ]);
+        $ids[] = $sleetflake->int();
+        $info1 = $sleetflake->__debugInfo();
+        $ids[] = $sleetflake->int();
+        $info2 = $sleetflake->__debugInfo();
         that(count($ids))->is(count(array_unique($ids)));
-        that($id_info1['sequence'])->isSame($id_info2['sequence'] - 1);
-
-        // 同じ時刻でも異なるIPなら重複しない
-        $ids = [];
-        unique_id($id_info, [
-            'sequence' => 0,
-        ]);
-        $ids[] = unique_id($id_info1, [
-            'timestamp' => $now,
-            'ipaddress' => '127.0.0.1',
-        ]);
-        unique_id($id_info, [
-            'sequence' => 0,
-        ]);
-        $ids[] = unique_id($id_info2, [
-            'timestamp' => $now,
-            'ipaddress' => '127.0.0.2',
-        ]);
-        that(count($ids))->is(count(array_unique($ids)));
-        that($id_info1['timestamp'])->isSame($id_info2['timestamp']);
-        that($id_info1['sequence'])->isSame($id_info2['sequence']);
-        that($id_info1['ipsegment'])->isNotSame($id_info2['ipsegment']);
+        that($info1['sequence'])->isSame($info2['sequence'] - 1);
 
         // 別プロセス
         $now = time();
         $returns = process_parallel(static function ($index) use ($now) {
             time_sleep_until($now + 2);
+            $sleetflake = sleetflake(lockfile: sys_get_temp_dir() . '/sleetflake-heaby');
             $ids = [];
             for ($i = 0; $i < 1000; $i++) {
-                $id = unique_id($id_info);
-                $id_info['id'] = $id;
-                $ids[] = $id_info;
+                $sleetflake->int();
+                $ids[] = $sleetflake->__debugInfo();
             }
             return $ids;
         }, [0, 1, 2, 3], options: [
@@ -1427,5 +1420,18 @@ aplain text
         that(mean(array_count_values($tss)))->gt(2);
         // その中でも5回生成があればまぁよしとする
         that(max(array_count_values($tss)))->gt(5);
+    }
+
+    function test_unique_id()
+    {
+        // 重複しない
+        $ids = [];
+        for ($i = 0; $i < 10; $i++) {
+            for ($j = 0; $j < 1000; $j++) {
+                $ids[] = unique_id();
+            }
+            usleep(10 * 1000);
+        }
+        that(count($ids))->is(count(array_unique($ids)));
     }
 }
