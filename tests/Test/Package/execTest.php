@@ -202,7 +202,7 @@ class execTest extends AbstractTestCase
             fwrite(STDOUT, "out:$result");
             fwrite(STDERR, "err:$result");
             return $result;
-        }, ['x' => 1, [2], []])->isSame([
+        }, ['x' => 1, [2], []])->subsetEquals([
             'x' => [
                 'status' => 0,
                 'stdout' => 'out:55',
@@ -247,7 +247,7 @@ class execTest extends AbstractTestCase
             'e' => static function () {
                 exit(127);
             },
-        ], [1, 'y' => []])->isSame([
+        ], [1, 'y' => []])->subsetEquals([
             [
                 'status' => 0,
                 'stdout' => 'out:55',

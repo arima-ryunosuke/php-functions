@@ -25,20 +25,23 @@ require_once __DIR__ . '/../reflection/parameter_length.php';
  * // 1000ms かかる処理を3本実行するが、トータル時間は 3000ms ではなくそれ以下になる（多少のオーバーヘッドはある）
  * that(microtime(true) - $t)->break()->lessThan(2.0);
  * // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
- * that($result)->isSame([
+ * that($result)->subsetEquals([
  *     'a' => [
+ *         // 'pid' => 12345,
  *         'status' => 0,
  *         'stdout' => "this is stdout",
  *         'stderr' => "this is stderr",
  *         'return' => 3,
  *     ],
  *     'b' => [
+ *         // 'pid' => 12345,
  *         'status' => 0,
  *         'stdout' => "this is stdout",
  *         'stderr' => "this is stderr",
  *         'return' => 5,
  *     ],
  *     [
+ *         // 'pid' => 12345,
  *         'status' => 0,
  *         'stdout' => "this is stdout",
  *         'stderr' => "this is stderr",
@@ -64,20 +67,23 @@ require_once __DIR__ . '/../reflection/parameter_length.php';
  * // 300,500,1000ms かかる処理を3本実行するが、トータル時間は 1800ms ではなくそれ以下になる（多少のオーバーヘッドはある）
  * that(microtime(true) - $t)->break()->lessThan(1.5);
  * // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
- * that($result)->isSame([
+ * that($result)->subsetEquals([
  *     'a' => [
+ *       // 'pid' => 12345,
  *         'status' => 0,
  *         'stdout' => "",
  *         'stderr' => "",
  *         'return' => 3,
  *     ],
  *     'b' => [
+ *         // 'pid' => 12345,
  *         'status' => 0,
  *         'stdout' => "",
  *         'stderr' => "",
  *         'return' => 6,
  *     ],
  *     [
+ *         // 'pid' => 12345,
  *         'status' => 127,  // 終了コードが入ってくる
  *         'stdout' => "",
  *         'stderr' => "",
@@ -120,8 +126,10 @@ function process_parallel($tasks, $args = [], $autoload = null, $workdir = null,
     $results = [];
     foreach ($processes as $key => $process) {
         $return = $process();
+        $status = $process->status();
         $results[$key] = [
-            'status' => $process->status()['exitcode'],
+            'pid'    => $status['pid'],
+            'status' => $status['exitcode'],
             'stdout' => $process->stdout,
             'stderr' => $process->stderr,
             'return' => $return,
