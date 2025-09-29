@@ -2560,6 +2560,7 @@ class arrayTest extends AbstractTestCase
 
         // 範囲外は例外が飛ぶ
         that(self::resolveFunction('array_pos'))(['x', 'y', 'z'], 9, true)->wasThrown('OutOfBoundsException');
+        that(self::resolveFunction('array_pos'))(['x', 'y', 'z'], -9, true)->wasThrown('-9 is not found');
     }
 
     function test_array_pos_key()

@@ -19,29 +19,22 @@ namespace ryunosuke\Functions\Package;
  *
  * @package ryunosuke\Functions\Package\array
  *
- * @param array $array 対象配列
+ * @param iterable&\Countable $array 対象配列
  * @param int $position 取得する位置
  * @param bool $return_key true にすると値ではなくキーを返す
  * @return mixed 指定位置の値
  */
-function array_pos($array, $position, $return_key = false)
+function array_pos($array, int $position, $return_key = false)
 {
-    $position = (int) $position;
-    $keys = array_keys($array);
+    $target = $position >= 0 ? $position : count($array) + $position;
 
-    if ($position < 0) {
-        $position = abs($position + 1);
-        $keys = array_reverse($keys);
-    }
-
-    $count = count($keys);
-    for ($i = 0; $i < $count; $i++) {
-        if ($i === $position) {
-            $key = $keys[$i];
+    $i = 0;
+    foreach ($array as $k => $v) {
+        if ($i++ === $target) {
             if ($return_key) {
-                return $key;
+                return $k;
             }
-            return $array[$key];
+            return $v;
         }
     }
 
