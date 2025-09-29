@@ -7,6 +7,7 @@ use function ryunosuke\Functions\Package\base_convert_array;
 use function ryunosuke\Functions\Package\calculate_formula;
 use function ryunosuke\Functions\Package\clamp;
 use function ryunosuke\Functions\Package\decimal;
+use function ryunosuke\Functions\Package\int_divide;
 use function ryunosuke\Functions\Package\maximum;
 use function ryunosuke\Functions\Package\mean;
 use function ryunosuke\Functions\Package\median;
@@ -417,6 +418,65 @@ class mathTest extends AbstractTestCase
 
         that(self::resolveFunction('decimal'))(1, 1, 'hoge')->wasThrown('$precision must be either');
         that(self::resolveFunction('decimal'))(9007199254740991.0, 1, $NINF)->wasErrored('it exceeds the valid values');
+    }
+
+    function test_int_divide()
+    {
+        that(int_divide(11, 1))->is([11]);
+        that(int_divide(11, 2))->is([6, 5]);
+        that(int_divide(11, 3))->is([4, 4, 3]);
+        that(int_divide(11, 4))->is([3, 3, 3, 2]);
+        that(int_divide(11, 5))->is([3, 2, 2, 2, 2]);
+        that(int_divide(11, 6))->is([2, 2, 2, 2, 2, 1]);
+        that(int_divide(11, 7))->is([2, 2, 2, 2, 1, 1, 1]);
+        that(int_divide(11, 8))->is([2, 2, 2, 1, 1, 1, 1, 1]);
+        that(int_divide(11, 9))->is([2, 2, 1, 1, 1, 1, 1, 1, 1]);
+        that(int_divide(11, 10))->is([2, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+        that(int_divide(11, 11))->is([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+        that(int_divide(11, 12))->is([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]);
+        that(int_divide(11, 13))->is([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0]);
+
+        that(int_divide(11, -1))->is([11]);
+        that(int_divide(11, -2))->is([5, 6]);
+        that(int_divide(11, -3))->is([3, 4, 4]);
+        that(int_divide(11, -4))->is([2, 3, 3, 3]);
+        that(int_divide(11, -5))->is([2, 2, 2, 2, 3]);
+        that(int_divide(11, -6))->is([1, 2, 2, 2, 2, 2]);
+        that(int_divide(11, -7))->is([1, 1, 1, 2, 2, 2, 2]);
+        that(int_divide(11, -8))->is([1, 1, 1, 1, 1, 2, 2, 2]);
+        that(int_divide(11, -9))->is([1, 1, 1, 1, 1, 1, 1, 2, 2]);
+        that(int_divide(11, -10))->is([1, 1, 1, 1, 1, 1, 1, 1, 1, 2]);
+        that(int_divide(11, -11))->is([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+        that(int_divide(11, -12))->is([0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+        that(int_divide(11, -13))->is([0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+
+        that(int_divide(-11, 1))->is([-11]);
+        that(int_divide(-11, 2))->is([-6, -5]);
+        that(int_divide(-11, 3))->is([-4, -4, -3]);
+        that(int_divide(-11, 4))->is([-3, -3, -3, -2]);
+        that(int_divide(-11, 5))->is([-3, -2, -2, -2, -2]);
+        that(int_divide(-11, 6))->is([-2, -2, -2, -2, -2, -1]);
+        that(int_divide(-11, 7))->is([-2, -2, -2, -2, -1, -1, -1]);
+        that(int_divide(-11, 8))->is([-2, -2, -2, -1, -1, -1, -1, -1]);
+        that(int_divide(-11, 9))->is([-2, -2, -1, -1, -1, -1, -1, -1, -1]);
+        that(int_divide(-11, 10))->is([-2, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+        that(int_divide(-11, 11))->is([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+        that(int_divide(-11, 12))->is([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0]);
+        that(int_divide(-11, 13))->is([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0]);
+
+        that(int_divide(-11, -1))->is([-11]);
+        that(int_divide(-11, -2))->is([-5, -6]);
+        that(int_divide(-11, -3))->is([-3, -4, -4]);
+        that(int_divide(-11, -4))->is([-2, -3, -3, -3]);
+        that(int_divide(-11, -5))->is([-2, -2, -2, -2, -3]);
+        that(int_divide(-11, -6))->is([-1, -2, -2, -2, -2, -2]);
+        that(int_divide(-11, -7))->is([-1, -1, -1, -2, -2, -2, -2]);
+        that(int_divide(-11, -8))->is([-1, -1, -1, -1, -1, -2, -2, -2]);
+        that(int_divide(-11, -9))->is([-1, -1, -1, -1, -1, -1, -1, -2, -2]);
+        that(int_divide(-11, -10))->is([-1, -1, -1, -1, -1, -1, -1, -1, -1, -2]);
+        that(int_divide(-11, -11))->is([-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+        that(int_divide(-11, -12))->is([0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
+        that(int_divide(-11, -13))->is([0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]);
     }
 
     function test_maximum()
