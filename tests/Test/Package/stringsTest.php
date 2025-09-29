@@ -39,6 +39,7 @@ use function ryunosuke\Functions\Package\str_chunk;
 use function ryunosuke\Functions\Package\str_common_prefix;
 use function ryunosuke\Functions\Package\str_control_apply;
 use function ryunosuke\Functions\Package\str_diff;
+use function ryunosuke\Functions\Package\str_divide;
 use function ryunosuke\Functions\Package\str_ellipsis;
 use function ryunosuke\Functions\Package\str_embed;
 use function ryunosuke\Functions\Package\str_equals;
@@ -1459,6 +1460,29 @@ that is <del>a</del><ins>the</ins> pen
             that(str_patch(file_get_contents($x), $patchXtoY))->is(file_get_contents($y));
             that(str_patch(file_get_contents($y), $patchXtoY, ['reverse' => true]))->is(file_get_contents($x));
         }
+    }
+
+    function test_str_divide()
+    {
+        that(str_divide('abcdefg', 1))->is(["abcdefg"]);
+        that(str_divide('abcdefg', 2))->is(["abcd", "efg"]);
+        that(str_divide('abcdefg', 3))->is(["abc", "de", "fg"]);
+        that(str_divide('abcdefg', 4))->is(["ab", "cd", "ef", "g"]);
+        that(str_divide('abcdefg', 5))->is(["ab", "cd", "e", "f", "g"]);
+        that(str_divide('abcdefg', 6))->is(["ab", "c", "d", "e", "f", "g"]);
+        that(str_divide('abcdefg', 7))->is(["a", "b", "c", "d", "e", "f", "g"]);
+        that(str_divide('abcdefg', 8))->is(["a", "b", "c", "d", "e", "f", "g", ""]);
+        that(str_divide('abcdefg', 9))->is(["a", "b", "c", "d", "e", "f", "g", "", ""]);
+
+        that(str_divide('abcdefg', -1))->is(["abcdefg"]);
+        that(str_divide('abcdefg', -2))->is(["abc", "defg"]);
+        that(str_divide('abcdefg', -3))->is(["ab", "cd", "efg"]);
+        that(str_divide('abcdefg', -4))->is(["a", "bc", "de", "fg"]);
+        that(str_divide('abcdefg', -5))->is(["a", "b", "c", "de", "fg"]);
+        that(str_divide('abcdefg', -6))->is(["a", "b", "c", "d", "e", "fg"]);
+        that(str_divide('abcdefg', -7))->is(["a", "b", "c", "d", "e", "f", "g"]);
+        that(str_divide('abcdefg', -8))->is(["", "a", "b", "c", "d", "e", "f", "g"]);
+        that(str_divide('abcdefg', -9))->is(["", "", "a", "b", "c", "d", "e", "f", "g"]);
     }
 
     function test_str_ellipsis()

@@ -15,6 +15,7 @@ use function ryunosuke\Functions\Package\array_depth;
 use function ryunosuke\Functions\Package\array_difference;
 use function ryunosuke\Functions\Package\array_distinct;
 use function ryunosuke\Functions\Package\array_dive;
+use function ryunosuke\Functions\Package\array_divide;
 use function ryunosuke\Functions\Package\array_each;
 use function ryunosuke\Functions\Package\array_explode;
 use function ryunosuke\Functions\Package\array_extend;
@@ -892,6 +893,139 @@ class arrayTest extends AbstractTestCase
         that(array_dive($ao, 'a.b.c'))->is('vvv');
         that(array_dive($ao, 'a.b.x', 9))->is(9);
         that(array_dive($ao, ['a', 'b', 'c']))->is('vvv');
+    }
+
+    function test_array_divide()
+    {
+        $array = [1 => 'A', 'B', 'C', 'D', 'E', 9 => 'F', 'g' => ['G1', 'G2']];
+
+        that(array_divide($array, 1))->is([
+            ["A", "B", "C", "D", "E", "F", "g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, 2))->is([
+            ["A", "B", "C", "D"],
+            ["E", "F", "g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, 3))->is([
+            ["A", "B", "C"],
+            ["D", "E"],
+            ["F", "g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, 4))->is([
+            ["A", "B"],
+            ["C", "D"],
+            ["E", "F"],
+            ["g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, 5))->is([
+            ["A", "B"],
+            ["C", "D"],
+            ["E"],
+            ["F"],
+            ["g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, 6))->is([
+            ["A", "B"],
+            ["C"],
+            ["D"],
+            ["E"],
+            ["F"],
+            ["g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, 7))->is([
+            ["A"],
+            ["B"],
+            ["C"],
+            ["D"],
+            ["E"],
+            ["F"],
+            ["g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, 8))->is([
+            ["A"],
+            ["B"],
+            ["C"],
+            ["D"],
+            ["E"],
+            ["F"],
+            ["g" => ["G1", "G2"]],
+            [],
+        ]);
+        that(array_divide($array, 9))->is([
+            ["A"],
+            ["B"],
+            ["C"],
+            ["D"],
+            ["E"],
+            ["F"],
+            ["g" => ["G1", "G2"]],
+            [],
+            [],
+        ]);
+
+        that(array_divide($array, -1, true))->is([
+            [1 => "A", "B", "C", "D", "E", 9 => "F", "g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, -2, true))->is([
+            [1 => "A", "B", "C"],
+            [4 => "D", "E", 9 => "F", "g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, -3, true))->is([
+            [1 => "A", "B"],
+            [3 => "C", "D"],
+            [5 => "E", 9 => "F", "g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, -4, true))->is([
+            [1 => "A"],
+            [2 => "B", "C"],
+            [4 => "D", "E",],
+            [9 => "F", "g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, -5, true))->is([
+            [1 => "A"],
+            [2 => "B"],
+            [3 => "C"],
+            [4 => "D", "E"],
+            [9 => "F", "g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, -6, true))->is([
+            [1 => "A"],
+            [2 => "B"],
+            [3 => "C"],
+            [4 => "D"],
+            [5 => "E"],
+            [9 => "F", "g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, -7, true))->is([
+            [1 => "A"],
+            [2 => "B"],
+            [3 => "C"],
+            [4 => "D"],
+            [5 => "E"],
+            [9 => "F"],
+            ["g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, -8, true))->is([
+            [],
+            [1 => "A"],
+            [2 => "B"],
+            [3 => "C"],
+            [4 => "D"],
+            [5 => "E"],
+            [9 => "F"],
+            ["g" => ["G1", "G2"]],
+        ]);
+        that(array_divide($array, -9, true))->is([
+            [],
+            [],
+            [1 => "A"],
+            [2 => "B"],
+            [3 => "C"],
+            [4 => "D"],
+            [5 => "E"],
+            [9 => "F"],
+            ["g" => ["G1", "G2"]],
+        ]);
     }
 
     function test_array_each()
