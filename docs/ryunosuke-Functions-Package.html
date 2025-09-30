@@ -24,7 +24,7 @@
             <div class="wy-side-nav-search">
                 <a href="" class="icon icon-home"> ryunosuke-Functions-Package.html</a>
                 <div class="version">
-                    最終更新日 2025/06/22 15:36:42                </div>
+                    最終更新日 2025/11/17 22:57:09                </div>
                 <div role="search">
                     <form id="rtd-search-form" class="wy-form hidden-download" method="get">
                         <input type="text" name="query" placeholder="ディレクトリ内検索" value="">
@@ -1870,6 +1870,89 @@ that(array_dive($array, ['a', 'b', 'c']))-&gt;isSame('vvv');</div></pre>
 </table>
 </div>
 </details>
+</section><section id="_645e32a1f6dcb7f3016c8396881825c0f48328c1-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-array_divide()" class="anchor"></a>[F] array_divide <small><span class="summary">array_chunk の配列長指定版</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/array_divide.php#L8-L41" target="_blank">array_divide.php#8~41</a></p>
+</div>
+<details>
+<summary class="">array_chunk の配列長指定版</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function array_divide(
+    iterable $array,
+    int $divisor,
+    bool $preserve_keys = false
+): array</div></pre>
+<div class="description">
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">// ['A', 'B', 'C', 'D', 'E', 'F', 'G'] を3つに分割（余りを左に分配）
+that(array_divide(['A', 'B', 'C', 'D', 'E', 'F', 'G'], 3))-&gt;isSame([
+    ["A", "B", "C"],
+    ["D", "E"],
+    ["F", "G"],
+]);
+// ['A', 'B', 'C', 'D', 'E', 'F', 'G'] を3つに分割（余りを右に分配）
+that(array_divide(['A', 'B', 'C', 'D', 'E', 'F', 'G'], -3))-&gt;isSame([
+    ["A", "B"],
+    ["C", "D"],
+    ["E", "F", "G"],
+]);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​iterable</td>
+<td>​<code>$array</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+<tr>
+<td>​int</td>
+<td>​<code>$divisor</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+<tr>
+<td>​bool</td>
+<td>​<code>$preserve_keys = false</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array</td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
 </section><section id="_96d3ea515ff1d0c30ca40f0e3d5532b10b427bfb-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-array_each()" class="anchor"></a>[F] array_each <small><span class="summary">array_reduce の参照版（のようなもの）</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
@@ -3475,6 +3558,145 @@ that(array_insert([1, 2, 3], ['a' =&gt; 'A', 'b' =&gt; 'B'], 1))-&gt;isSame([1, 
 </table>
 </div>
 </details>
+</section><section id="_e5ee36539564a92e5303fbae8256ad9c8a64f164-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-array_intersection_differences()" class="anchor"></a>[F] array_intersection_differences <small><span class="summary">array_intersect+array_diff の組み合わせ</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/array_intersection_differences.php#L7-L141" target="_blank">array_intersection_differences.php#7~141</a></p>
+</div>
+<details>
+<summary class="">array_intersect+array_diff の組み合わせ</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function array_intersection_differences(array|callable ...$arrays): array</div></pre>
+<div class="description">
+<p>集合演算系の標準関数がカオスすぎるのである程度使いやすくしたもの。<span class="implicit-br">
+</span>(u)intersect,(u)diff,(u)key,(u)assoc の組み合わせで16通りもある。</p>
+<ul class=" simple">
+<li>array_intersect</li>
+<li>array_uintersect</li>
+<li>array_intersect_key</li>
+<li>array_intersect_ukey</li>
+<li>array_intersect_assoc</li>
+<li>array_uintersect_assoc</li>
+<li>array_intersect_uassoc</li>
+<li>array_uintersect_uassoc</li>
+<li>array_diff</li>
+<li>array_udiff</li>
+<li>array_diff_key</li>
+<li>array_diff_ukey</li>
+<li>array_diff_assoc</li>
+<li>array_udiff_assoc</li>
+<li>array_diff_uassoc</li>
+<li>array_udiff_uassoc</li>
+</ul>
+<p>ドキュメントはアルファベット順であり一覧性が悪いので、どれを使えばいいのかぱっと見では全く分からない。<span class="implicit-br">
+</span>そして intersect,diff は往々にして両方欲しいことが多いので、この関数でコールバックを工夫すれば一発で済む。<span class="implicit-br">
+</span>ただし php レイヤーでの実装なので猛烈に遅い。単純な結果でよい場合は普通に標準関数を使うこと。</p>
+<p>コールバックは ([値, キー, 連番], [値, キー, 連番]) を受け取る。<span class="implicit-br">
+</span>キーで比較をしたければキーだけを見ればよいし、値で比較したければ値だけを見ればよい（もちろん両方でもよい）。<span class="implicit-br">
+</span>このコールバックを工夫するだけで上記16関数全ての大体となりうる。<span class="implicit-br">
+</span>コールバック省略時はキー・値の両方を見る（array_u(intersect|diff)_uassoc に相当する）。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">// 単純な配列
+$a = [
+    1 =&gt; 'hoge',
+    2 =&gt; 'fuga',
+    3 =&gt; 'foo',
+    4 =&gt; 'bar',
+    5 =&gt; 'common',
+    6 =&gt; 'onlyA',
+];
+$b = [
+    1 =&gt; 'foo',
+    2 =&gt; 'bar',
+    3 =&gt; 'hoge',
+    4 =&gt; 'fuga',
+    5 =&gt; 'common',
+    7 =&gt; 'onlyB',
+];
+// array_* 相当
+$result = array_intersection_differences($a, $b, fn($avkn, $bvkn) =&gt; $avkn[0] &lt;=&gt; $bvkn[0]);
+that($result[''])-&gt;isSame(array_intersect($a, $b));
+that($result[0])-&gt;isSame(array_diff($a, $b));
+that($result[1])-&gt;isSame(array_diff($b, $a));
+// array_*_key 相当
+$result = array_intersection_differences($a, $b, fn($avkn, $bvkn) =&gt; $avkn[1] &lt;=&gt; $bvkn[1]);
+that($result[''])-&gt;isSame(array_intersect_key($a, $b));
+that($result[0])-&gt;isSame(array_diff_key($a, $b));
+that($result[1])-&gt;isSame(array_diff_key($b, $a));
+// array_*_assoc 相当
+$result = array_intersection_differences($a, $b, fn($avkn, $bvkn) =&gt; $avkn[0] &lt;=&gt; $bvkn[0] ?: $avkn[1] &lt;=&gt; $bvkn[1]);
+that($result[''])-&gt;isSame(array_intersect_assoc($a, $b));
+that($result[0])-&gt;isSame(array_diff_assoc($a, $b));
+that($result[1])-&gt;isSame(array_diff_assoc($b, $a));
+
+// レコード的な配列（標準関数は基本的に文字列比較なので、u 系が必須。こういう使い分けをしたくないがための関数）
+$a = [
+    ['id' =&gt; 1, 'name' =&gt; 'hoge'],
+    ['id' =&gt; 2, 'name' =&gt; 'fuga'],
+    ['id' =&gt; 3, 'name' =&gt; 'foo'],
+    ['id' =&gt; 4, 'name' =&gt; 'bar'],
+    ['id' =&gt; 5, 'name' =&gt; 'common'],
+    ['id' =&gt; 6, 'name' =&gt; 'onlyA'],
+];
+$b = [
+    ['id' =&gt; 1, 'name' =&gt; 'foo'],
+    ['id' =&gt; 2, 'name' =&gt; 'bar'],
+    ['id' =&gt; 3, 'name' =&gt; 'hoge'],
+    ['id' =&gt; 4, 'name' =&gt; 'fuga'],
+    ['id' =&gt; 5, 'name' =&gt; 'common'],
+    ['id' =&gt; 7, 'name' =&gt; 'onlyB'],
+];
+// array_* 相当
+$result = array_intersection_differences($a, $b, fn($avkn, $bvkn) =&gt; $avkn[0]['id'] &lt;=&gt; $bvkn[0]['id']);
+that($result[''])-&gt;isSame(array_uintersect($a, $b, fn($a, $b) =&gt; $a['id'] &lt;=&gt; $b['id']));
+that($result[0])-&gt;isSame(array_udiff($a, $b, fn($a, $b) =&gt; $a['id'] &lt;=&gt; $b['id']));
+that($result[1])-&gt;isSame(array_udiff($b, $a, fn($a, $b) =&gt; $a['id'] &lt;=&gt; $b['id']));</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array|​callable</td>
+<td>​<code>...$arrays</code></td>
+<td>​<span class="summary">対象配列（最後の要素のみ callable を受け付ける）</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array</td>
+<td>​<span class="summary">['' =&gt; 共通配列, $array1 にしかない配列, $array2にしかない配列, ..., $arrayNにしかない配列]</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
 </section><section id="_1cca5d1af555cdf24c2b4dee445b57f63be57486-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-array_join()" class="anchor"></a>[F] array_join <small><span class="summary">配列の SQL 的な JOIN を行う</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
@@ -4921,12 +5143,12 @@ that(array_pickup($array, ['c' =&gt; fn($k, $v) =&gt; "$k-$v"]))-&gt;isSame(['c-
 </section><section id="_4748aeea2b50749fba2596e9504a801d254984e9-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-array_pos()" class="anchor"></a>[F] array_pos <small><span class="summary">配列・連想配列を問わず「N番目(0ベース)」の要素を返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/array_pos.php#L7-L49" target="_blank">array_pos.php#7~49</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/array/array_pos.php#L7-L42" target="_blank">array_pos.php#7~42</a></p>
 </div>
 <details>
 <summary class="">配列・連想配列を問わず「N番目(0ベース)」の要素を返す</summary>
 <pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function array_pos(
-    array $array,
+    iterable&amp;\Countable $array,
     int $position,
     bool $return_key = false
 ): mixed</div></pre>
@@ -4955,7 +5177,7 @@ that(array_pos(['a' =&gt; 'A', 'b' =&gt; 'B', 'c' =&gt; 'C'], 1, true))-&gt;isSa
 </thead>
 <tbody>
 <tr>
-<td>​array</td>
+<td>​<a href="#--iterable%26-Countable">Countable</a></td>
 <td>​<code>$array</code></td>
 <td>​<span class="summary">対象配列</span></td>
 </tr>
@@ -9656,6 +9878,112 @@ that(sql_bind('select ?, :hoge', [1, 'hoge' =&gt; 'hoge']))-&gt;isSame("select 1
 </table>
 </div>
 </details>
+</section><section id="_8855c1209439fd3fceb5ffa66c3a6577b5c868f2-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-sql_export()" class="anchor"></a>[F] sql_export <small><span class="summary">連想配列の配列を SQL 的文字列に変換する</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/database/sql_export.php#L8-L150" target="_blank">sql_export.php#8~150</a></p>
+</div>
+<details>
+<summary class="">連想配列の配列を SQL 的文字列に変換する</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function sql_export(
+    iterable $sqlarrays,
+    array $options = []
+): string</div></pre>
+<div class="description">
+<p>xlsx か何かで提供されたファイルを SQL に変換したい状況はままある。<span class="implicit-br">
+</span>保守運用などでの使用を想定しており、この関数で得られた SQL を<strong>確認せずに実行してはならない</strong>。</p>
+<p>カラムの読み替えやエンコーディングの変換などは行わない（それは入力元である $array の前処理の仕事）。<span class="implicit-br">
+</span>とはいえ iterable が来ることもあるので callback で簡単なフィルタ・変換は可能。</p>
+<p>識別子のエスケープは一切しないので留意。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">$arrays = [
+    ['id' =&gt; 1, 'name' =&gt; 'hoge'],
+    ['id' =&gt; 2, 'name' =&gt; 'fuga'],
+    ['id' =&gt; 3, 'name' =&gt; 'piyo'],
+];
+// insert
+that(sql_export($arrays, ['table' =&gt; 't_table']))-&gt;isSame(&lt;&lt;&lt;SQL
+INSERT INTO t_table(id, name) VALUES(1, 'hoge');
+INSERT INTO t_table(id, name) VALUES(2, 'fuga');
+INSERT INTO t_table(id, name) VALUES(3, 'piyo');
+
+SQL,);
+// upsert
+that(sql_export($arrays, ['table' =&gt; 't_table', 'upsert' =&gt; 'id']))-&gt;isSame(&lt;&lt;&lt;SQL
+INSERT INTO t_table(id, name) VALUES(1, 'hoge') ON CONFLICT(id) DO UPDATE SET id = excluded.id, name = excluded.name;
+INSERT INTO t_table(id, name) VALUES(2, 'fuga') ON CONFLICT(id) DO UPDATE SET id = excluded.id, name = excluded.name;
+INSERT INTO t_table(id, name) VALUES(3, 'piyo') ON CONFLICT(id) DO UPDATE SET id = excluded.id, name = excluded.name;
+
+SQL,);
+// bulk insert
+that(sql_export($arrays, ['table' =&gt; 't_table', 'bulk' =&gt; true]))-&gt;isSame(&lt;&lt;&lt;SQL
+INSERT INTO t_table(id, name) VALUES
+  (1, 'hoge'),
+  (2, 'fuga'),
+  (3, 'piyo');
+
+SQL,);
+// bulk upsert
+that(sql_export($arrays, ['table' =&gt; 't_table', 'bulk' =&gt; true, 'upsert' =&gt; 'id']))-&gt;isSame(&lt;&lt;&lt;SQL
+INSERT INTO t_table(id, name) VALUES
+  (1, 'hoge'),
+  (2, 'fuga'),
+  (3, 'piyo')
+ON CONFLICT(id) DO UPDATE SET id = excluded.id, name = excluded.name;
+
+SQL,);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​iterable</td>
+<td>​<code>$sqlarrays</code></td>
+<td>​<span class="summary">連想配列の配列</span></td>
+</tr>
+<tr>
+<td>​array</td>
+<td>​<code>$options = []</code></td>
+<td>​<span class="summary">オプション配列</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​string</td>
+<td>​<span class="summary">SQL 的文字列</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
 </section><section id="_54219aabfbe99edbbdc539071645e258656a3a2a-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-sql_format()" class="anchor"></a>[F] sql_format <small><span class="summary">ものすごく雑に SQL を整形する</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
@@ -9885,7 +10213,7 @@ that(sql_quote([1, 2, 3]))-&gt;isSame("1,2,3");</div></pre>
 </section><section id="_54e954fdd6c39e241c01a595b3bea9001fd4a783-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-csv_export()" class="anchor"></a>[F] csv_export <small><span class="summary">連想配列の配列を CSV 的文字列に変換する</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/dataformat/csv_export.php#L14-L211" target="_blank">csv_export.php#14~211</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/dataformat/csv_export.php#L15-L228" target="_blank">csv_export.php#15~228</a></p>
 </div>
 <details>
 <summary class="">連想配列の配列を CSV 的文字列に変換する</summary>
@@ -9998,7 +10326,7 @@ that(csv_export([
 </section><section id="_e184bedafb768fe76b0cd4a599a3e30f15f57049-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-csv_import()" class="anchor"></a>[F] csv_import <small><span class="summary">CSV 的文字列を連想配列の配列に変換する</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/dataformat/csv_import.php#L14-L223" target="_blank">csv_import.php#14~223</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/dataformat/csv_import.php#L15-L249" target="_blank">csv_import.php#15~249</a></p>
 </div>
 <details>
 <summary class="">CSV 的文字列を連想配列の配列に変換する</summary>
@@ -13563,7 +13891,7 @@ that(microtime(true) - $start)-&gt;break()-&gt;isBetween(2.0, 4.0);</div></pre>
 </section><section id="_e818dc6eee815094b362678ecfa52aadf67be3d7-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-process_parallel()" class="anchor"></a>[F] process_parallel <small><span class="summary">複数の callable を並列で実行する</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/exec/process_parallel.php#L10-L131" target="_blank">process_parallel.php#10~131</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/exec/process_parallel.php#L10-L139" target="_blank">process_parallel.php#10~139</a></p>
 </div>
 <details>
 <summary class="">複数の callable を並列で実行する</summary>
@@ -13589,20 +13917,23 @@ $result = process_parallel(static function ($arg1, $arg2) {
 // 1000ms かかる処理を3本実行するが、トータル時間は 3000ms ではなくそれ以下になる（多少のオーバーヘッドはある）
 that(microtime(true) - $t)-&gt;break()-&gt;lessThan(2.0);
 // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
-that($result)-&gt;isSame([
+that($result)-&gt;subsetEquals([
     'a' =&gt; [
+        // 'pid' =&gt; 12345,
         'status' =&gt; 0,
         'stdout' =&gt; "this is stdout",
         'stderr' =&gt; "this is stderr",
         'return' =&gt; 3,
     ],
     'b' =&gt; [
+        // 'pid' =&gt; 12345,
         'status' =&gt; 0,
         'stdout' =&gt; "this is stdout",
         'stderr' =&gt; "this is stderr",
         'return' =&gt; 5,
     ],
     [
+        // 'pid' =&gt; 12345,
         'status' =&gt; 0,
         'stdout' =&gt; "this is stdout",
         'stderr' =&gt; "this is stderr",
@@ -13628,20 +13959,23 @@ $result = process_parallel([
 // 300,500,1000ms かかる処理を3本実行するが、トータル時間は 1800ms ではなくそれ以下になる（多少のオーバーヘッドはある）
 that(microtime(true) - $t)-&gt;break()-&gt;lessThan(1.5);
 // 実行結果は下記のような配列で返ってくる（その際キーは維持される）
-that($result)-&gt;isSame([
+that($result)-&gt;subsetEquals([
     'a' =&gt; [
+      // 'pid' =&gt; 12345,
         'status' =&gt; 0,
         'stdout' =&gt; "",
         'stderr' =&gt; "",
         'return' =&gt; 3,
     ],
     'b' =&gt; [
+        // 'pid' =&gt; 12345,
         'status' =&gt; 0,
         'stdout' =&gt; "",
         'stderr' =&gt; "",
         'return' =&gt; 6,
     ],
     [
+        // 'pid' =&gt; 12345,
         'status' =&gt; 127,  // 終了コードが入ってくる
         'stdout' =&gt; "",
         'stderr' =&gt; "",
@@ -14162,7 +14496,7 @@ that(dirname_r("$tmp/a/b/c/d/e/f", $callback))-&gt;isSame(realpath("$tmp/a/b/fil
 </section><section id="_18957a1661d304e41384310697c3d10206b11e4f-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-file_equals()" class="anchor"></a>[F] file_equals <small><span class="summary">ファイルが同じ内容か返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/filesystem/file_equals.php#L8-L84" target="_blank">file_equals.php#8~84</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/filesystem/file_equals.php#L9-L73" target="_blank">file_equals.php#9~73</a></p>
 </div>
 <details>
 <summary class="">ファイルが同じ内容か返す</summary>
@@ -14307,6 +14641,108 @@ that(file_extension('filename.ext', ''))-&gt;isSame('filename');</div></pre>
 <tr>
 <td>​string</td>
 <td>​<span class="summary">拡張子変換後のファイル名 or 拡張子</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section><section id="_4ae9f2a5f3286cd7d83ed01d28cbe00454ccf91a-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-file_generator()" class="anchor"></a>[F] file_generator <small><span class="summary">ファイルを少しずつ読む Generator を返す</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/filesystem/file_generator.php#L7-L73" target="_blank">file_generator.php#7~73</a></p>
+</div>
+<details>
+<summary class="">ファイルを少しずつ読む Generator を返す</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function file_generator(
+    string|resource $filename,
+    string|int|null $stopper = null,
+    bool $with_stopper = true
+): \Generator</div></pre>
+<div class="description">
+<p>$stopper で読み込み単位を指定できる</p>
+<dl class="docutils field-list">
+<div class="dtdd-container">
+<dt>null</dt>
+<dd>fgets で1行読み込み</dd>
+</div>
+<div class="dtdd-container">
+<dt>int</dt>
+<dd>fread でサイズ指定</dd>
+</div>
+<div class="dtdd-container">
+<dt>string</dt>
+<dd>stream_get_line で特定文字列指定</dd>
+</div>
+</dl>
+<p>$stopper が文字列の場合、$with_stopper でその文字列自体を含むかを指定できる。<span class="implicit-br">
+</span>というよりも stream_get_line だとデフォルトで含まないので、含むようにするフラグに近い。<span class="implicit-br">
+</span>処理を合わせるためデフォルトは true になっている。</p>
+<p>Generator は返り値として「返した文字列長の合計」を返す。<span class="implicit-br">
+</span>区切り文字を捨てる場合、単純なファイルサイズとは一致しないので注意。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">// 適当にファイルを用意
+$testpath = sys_get_temp_dir() . '/file_generator.txt';
+file_put_contents($testpath, "hoge\n---\nhogefuga\n---\nhogefugapiyo\n");
+// 改行で generator
+that(file_generator($testpath))-&gt;is(["hoge\n", "---\n", "hogefuga\n", "---\n", "hogefugapiyo\n"]);
+// 3文字で generator
+that(file_generator($testpath, 3))-&gt;is(["hog", "e\n-", "--\n", "hog", "efu", "ga\n", "---", "\nho", "gef", "uga", "piy", "o\n"]);
+// 区切り文字で generator
+that(file_generator($testpath, "---\n"))-&gt;is(["hoge\n---\n", "hogefuga\n---\n", "hogefugapiyo\n"]);
+// 区切り文字で generator（そのものを含まない）
+that(file_generator($testpath, "---\n", false))-&gt;is(["hoge\n", "hogefuga\n", "hogefugapiyo\n"]);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​string|​resource</td>
+<td>​<code>$filename</code></td>
+<td>​<span class="summary">ファイル名</span></td>
+</tr>
+<tr>
+<td>​string|​int|​null</td>
+<td>​<code>$stopper = null</code></td>
+<td>​<span class="summary">チャンク/区切り文字</span></td>
+</tr>
+<tr>
+<td>​bool</td>
+<td>​<code>$with_stopper = true</code></td>
+<td>​<span class="summary">区切り文字を含めるか</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​<a href="https://php.net/manual/class.generator.php" target="_blank">Generator</a></td>
+<td>​<span class="summary"></span></td>
 </tr>
 </tbody>
 </table>
@@ -14620,7 +15056,7 @@ that(file_mimetype('http://httpbin.org/get?name=value'))-&gt;is('application/jso
 </section><section id="_e90935fbffcf944eccdf94a1ba89ca90de3fdbd5-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-file_pos()" class="anchor"></a>[F] file_pos <small><span class="summary">範囲指定でファイルを読んで位置を返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/filesystem/file_pos.php#L9-L88" target="_blank">file_pos.php#9~88</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/filesystem/file_pos.php#L10-L85" target="_blank">file_pos.php#10~85</a></p>
 </div>
 <details>
 <summary class="">範囲指定でファイルを読んで位置を返す</summary>
@@ -14642,7 +15078,7 @@ file_put_contents($testpath, "hoge\nfuga\npiyo\nfuga");
 that(file_pos($testpath, 'fuga'))-&gt;is(5);
 // 2つ目の fuga の位置を返す
 that(file_pos($testpath, 'fuga', 6))-&gt;is(15);
-// 見つからない場合は false を返す
+// 見つからない場合は null を返す
 that(file_pos($testpath, 'hogera'))-&gt;is(null);</div></pre>
 </div>
 <div class="wy-table-responsive">
@@ -14706,6 +15142,104 @@ that(file_pos($testpath, 'hogera'))-&gt;is(null);</div></pre>
 <tr>
 <td>​?int</td>
 <td>​<span class="summary">$needle の位置。見つからなかった場合は null</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section><section id="_14bd3bdc2c20da2cd071e9d44afd2fec14e487f5-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-file_rename()" class="anchor"></a>[F] file_rename <small><span class="summary">ファイルをコールバックでリネームする</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/filesystem/file_rename.php#L10-L111" target="_blank">file_rename.php#10~111</a></p>
+</div>
+<details>
+<summary class="">ファイルをコールバックでリネームする</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function file_rename(
+    array $filenames,
+    callable $callback
+): array</div></pre>
+<div class="description">
+<p>ファイルの上書きは決して行われない（もちろん別プロセスでの競合状態などは考慮しない）。<span class="implicit-br">
+</span>対象ファイル名が既に存在する場合は（次の候補でリネームされるかもしれないので）スキップして再試行する。<span class="implicit-br">
+</span>つまり、いわゆる「連番ずらし」の場合でも安全にリネームできる。</p>
+<p>$callback には元ファイル名が渡ってくる。<span class="implicit-br">
+</span>null を返した場合、リネームの対象とはならない。<span class="implicit-br">
+</span>また、相対パスを返すと元ファイルのディレクトリが指定されたものとみなす。</p>
+<p>結果配列として [元ファイル名 =&gt; 新ファイル名] の配列を返す。<span class="implicit-br">
+</span>元ファイルが存在しないなどで rename されなかったファイルは null が設定される。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">$DS = DIRECTORY_SEPARATOR;
+// 適当にファイルを用意
+$root = sys_get_temp_dir(). "{$DS}file_rename";
+rm_rf($root);
+file_set_tree([
+    $root =&gt; [
+        '1.txt'     =&gt; '1',
+        '2.txt'     =&gt; '2',
+        'noise.txt' =&gt; 'noise',
+        '3.txt'     =&gt; '3',
+    ],
+]);
+// 連番ファイルを +1 してrename
+that(file_rename(glob("$root/*"), function ($fn) {
+    $pathinfo = pathinfo($fn);
+    // null を返すと対象にならない
+    if (!is_numeric($pathinfo['filename'])) {
+        return null;
+    }
+    return ($pathinfo['filename'] + '1') . '.' . $pathinfo['extension'];
+}))-&gt;isSame([
+    "$root/3.txt" =&gt; "$root{$DS}4.txt",
+    "$root/2.txt" =&gt; "$root{$DS}3.txt",
+    "$root/1.txt" =&gt; "$root{$DS}2.txt",
+]);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array</td>
+<td>​<code>$filenames</code></td>
+<td>​<span class="summary">対象ファイル名</span></td>
+</tr>
+<tr>
+<td>​callable</td>
+<td>​<code>$callback</code></td>
+<td>​<span class="summary">リネームコールバック</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array</td>
+<td>​<span class="summary">新ファイル名対応配列</span></td>
 </tr>
 </tbody>
 </table>
@@ -15069,7 +15603,7 @@ that("$root/dir1/dir2/piyo.txt")-&gt;fileEquals('PIYO');</div></pre>
 </section><section id="_bf765898be8828226aa5c3be99215ad5fb3958f5-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-file_slice()" class="anchor"></a>[F] file_slice <small><span class="summary">file の行範囲を指定できる板</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/filesystem/file_slice.php#L7-L111" target="_blank">file_slice.php#7~111</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/filesystem/file_slice.php#L8-L108" target="_blank">file_slice.php#8~108</a></p>
 </div>
 <details>
 <summary class="">file の行範囲を指定できる板</summary>
@@ -15633,6 +16167,95 @@ that(fnmatch_or(['*aaa*', '*bbb*'], 'cccX'))-&gt;isFalse();</div></pre>
 <tr>
 <td>​bool</td>
 <td>​<span class="summary">作成したら true</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section><section id="_b5940b7e70fd4c629010144707aa7b7a16f2e05e-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-path_build()" class="anchor"></a>[F] path_build <small><span class="summary">パスをビルドする</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/filesystem/path_build.php#L7-L83" target="_blank">path_build.php#7~83</a></p>
+</div>
+<details>
+<summary class="">パスをビルドする</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function path_build(array $pathinfo): string</div></pre>
+<div class="description">
+<p>pathinfo で得られたパス配列を元にパス文字列を構築する。<span class="implicit-br">
+</span>pathinfo のパス配列は微妙に癖があるし、一部だけを書き換えたい状況も多いのでこういう関数があると便利なことがある。</p>
+<p>basename は一切使用せず filename+extension だけを使用するのでそれは留意。<span class="implicit-br">
+</span>また dirname が "." の場合、それはスルーされる。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">$DS = DIRECTORY_SEPARATOR;
+
+that(path_build(pathinfo('/full/path/name.ext')))-&gt;is("/full/path{$DS}name.ext");
+that(path_build(pathinfo('/full/path/name.')))-&gt;is("/full/path{$DS}name.");
+that(path_build(pathinfo('/full/path/name')))-&gt;is("/full/path{$DS}name");
+that(path_build(pathinfo('/full/path/.ext')))-&gt;is("/full/path{$DS}.ext");
+that(path_build(pathinfo('/full/path/')))-&gt;is("/full{$DS}path");
+that(path_build(pathinfo('/full/path')))-&gt;is("/full{$DS}path");
+
+that(path_build(pathinfo('relative/name.ext')))-&gt;is("relative{$DS}name.ext");
+that(path_build(pathinfo('relative/name.')))-&gt;is("relative{$DS}name.");
+that(path_build(pathinfo('relative/name')))-&gt;is("relative{$DS}name");
+that(path_build(pathinfo('relative/.ext')))-&gt;is("relative{$DS}.ext");
+that(path_build(pathinfo('relative/')))-&gt;is("relative");
+that(path_build(pathinfo('relative')))-&gt;is("relative");
+
+that(path_build(pathinfo('./relative/name.ext')))-&gt;is("relative{$DS}name.ext");
+that(path_build(pathinfo('./relative/name.')))-&gt;is("relative{$DS}name.");
+that(path_build(pathinfo('./relative/name')))-&gt;is("relative{$DS}name");
+that(path_build(pathinfo('./relative/.ext')))-&gt;is("relative{$DS}.ext");
+that(path_build(pathinfo('./relative/')))-&gt;is("relative");
+that(path_build(pathinfo('./relative')))-&gt;is("relative");
+
+that(path_build(pathinfo('/root.ext')))-&gt;is("{$DS}root.ext");
+that(path_build(pathinfo('/root.')))-&gt;is("{$DS}root.");
+that(path_build(pathinfo('/root.')))-&gt;is("{$DS}root.");
+that(path_build(pathinfo('/.ext')))-&gt;is("{$DS}.ext");
+that(path_build(pathinfo('/')))-&gt;is($DS);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array</td>
+<td>​<code>$pathinfo</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​string</td>
+<td>​<span class="summary"></span></td>
 </tr>
 </tbody>
 </table>
@@ -16913,6 +17536,99 @@ that(array_filter([1, 2, 3, 4, 5, 6, 7, 8, 9], $gt5))-&gt;isSame([1, 2, 3, 4, 5]
 <tr>
 <td>​<a href="https://php.net/manual/class.closure.php" target="_blank">Closure</a></td>
 <td>​<span class="summary">演算子のクロージャ</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section><section id="_a87cbda5b607a2f557e77d6d546958a9884abcb3-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-func_throttle()" class="anchor"></a>[F] func_throttle <small><span class="summary">callable の実行間隔を間引いた callable を返す</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/funchand/func_throttle.php#L7-L76" target="_blank">func_throttle.php#7~76</a></p>
+</div>
+<details>
+<summary class="">callable の実行間隔を間引いた callable を返す</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function func_throttle(
+    callable $callback,
+    float $interval,
+    ?array $leading_arguments = null,
+    ?array $trailing_arguments = null
+): callable</div></pre>
+<div class="description">
+<p>進捗状況や SSE などで間引きたいケースはある。<span class="implicit-br">
+</span>ループ内で呼んでもいいし、tick に仕込んでもよい。<span class="implicit-br">
+</span>とにかく高頻度で呼ばれ得る状況においてコール回数を減らしたい場合に使う。</p>
+<p>$leading_arguments を指定するとその引数で初回にコールされる。<span class="implicit-br">
+</span>$trailing_arguments を指定するとその引数で最後にコールされる。<span class="implicit-br">
+</span>ただし $trailing_arguments はデストラクタで実装されており、実行タイミングは不確定なので注意（そもそもあまり使われる想定がない）。</p>
+<p>返り値は実行可能オブジェクトであり、本来の返り値を返す。ただし間引かれた場合は null を返す。<span class="implicit-br">
+</span>よって正常系で null を返す callable では返り値は使えない。<span class="implicit-br">
+</span>なお「callable である」という前提以外は置かないこと。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">$called = 0;
+$callback = func_throttle(function () use (&amp;$called) { $called++; }, 0.1);
+// こんなとんでもないループでも数回程度しか呼ばれない
+for ($i=0; $i&lt;3_000_000; $i++) {
+    $callback($i);
+}
+that($called)-&gt;isBetween(1, 9);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​callable</td>
+<td>​<code>$callback</code></td>
+<td>​<span class="summary">実行される callable</span></td>
+</tr>
+<tr>
+<td>​float</td>
+<td>​<code>$interval</code></td>
+<td>​<span class="summary">間引く間隔</span></td>
+</tr>
+<tr>
+<td>​?array</td>
+<td>​<code>$leading_arguments = null</code></td>
+<td>​<span class="summary">初回実行時の引数</span></td>
+</tr>
+<tr>
+<td>​?array</td>
+<td>​<code>$trailing_arguments = null</code></td>
+<td>​<span class="summary">最後実行時の引数</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​callable</td>
+<td>​<span class="summary">間隔が間引かれた callable</span></td>
 </tr>
 </tbody>
 </table>
@@ -19406,6 +20122,78 @@ that(decimal(3.14, 1, +INF))-&gt;isSame(3.2); // 正の無限大の方向</div><
 </table>
 </div>
 </details>
+</section><section id="_d5c64e711192e5bdfd288f2066714e6488d5d1a3-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-int_divide()" class="anchor"></a>[F] int_divide <small><span class="summary">整数を除算した配列を返す</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/math/int_divide.php#L7-L49" target="_blank">int_divide.php#7~49</a></p>
+</div>
+<details>
+<summary class="">整数を除算した配列を返す</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function int_divide(
+    int $int,
+    int $divisor
+): array</div></pre>
+<div class="description">
+<p>割り切れるときは array_pad([], $divisor, $int/$divisor) と同じ。<span class="implicit-br">
+</span>割り切れないときは余剰を各要素に分配する。<span class="implicit-br">
+</span>$length が正の場合は左から埋められる。負の場合は右から埋められる。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">// 13を3つに分割（余りを左に分配）
+that(int_divide(13, 3))-&gt;isSame([5, 4, 4]);
+// 13を3つに分割（余りを右に分配）
+that(int_divide(13, -3))-&gt;isSame([4, 4, 5]);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​int</td>
+<td>​<code>$int</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+<tr>
+<td>​int</td>
+<td>​<code>$divisor</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array</td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
 </section><section id="_f2f92b99ab182d760195e69b830ecc85fc92684d-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-maximum()" class="anchor"></a>[F] maximum <small><span class="summary">引数の最大値を返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
@@ -20084,6 +20872,96 @@ that(evaluate($phpcode, get_defined_vars()))-&gt;isSame(9);</div></pre>
 <tr>
 <td>​mixed</td>
 <td>​<span class="summary">eval の return 値</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section><section id="_4befebf473db2d889aa27cb0a9282ed42e9b6824-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-msleep()" class="anchor"></a>[F] msleep <small><span class="summary">float でのミリ秒も指定できる sleep</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/misc/msleep.php#L7-L53" target="_blank">msleep.php#7~53</a></p>
+</div>
+<details>
+<summary class="">float でのミリ秒も指定できる sleep</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function msleep(
+    \DateTimeInterface|float $seconds,
+    ?bool $cancel_signal = null
+): float</div></pre>
+<div class="description">
+<p>ついでに、いくつかある php の sleep 系関数の動作を統一してある。</p>
+<dl class="docutils field-list">
+<div class="dtdd-container">
+<dt>sleep</dt>
+<dd>秒単位で精度が低いが、残り秒数を返してくれる</dd>
+</div>
+<div class="dtdd-container">
+<dt>usleep</dt>
+<dd>精度は高いが、返り値がない</dd>
+</div>
+<div class="dtdd-container">
+<dt>time_nanosleep</dt>
+<dd>精度が高く（高すぎる）残り秒数も返せるが、シグナルを無視できない</dd>
+</div>
+<div class="dtdd-container">
+<dt>time_sleep_until</dt>
+<dd>精度も高くシグナルを無視できるが、逆に言えばシグナルで打ち切れない</dd>
+</div>
+</dl>
+<p>float でのミリ秒で実用上は十分だろうし、上記のような細かな動作差異など覚えていられないので、シグナル無視を引数化し常に「残りミリ秒数」を返すようにした。</p>
+<p>$seconds は DateTime を受け入れ、DateTime の場合は指定日時まで待機という動作になる。<span class="implicit-br">
+</span>この時、過去日時を指定してもエラーにはならず 0 を返す（用途から考えてスケジューリングの都合で過去になることは多々ある）。<span class="implicit-br">
+</span>また、$cancel_signal 未指定の場合 false に設定される（time_sleep_until の思想を模した）。<span class="implicit-br">
+</span>一方、float 指定の場合は 0 未満だとエラーになる（実装は assert）。</p>
+<p>ちなみに pcntl_signal で php レベルでシグナルをハンドリングしていない場合は $cancel_signal の指定は無意味。<span class="implicit-br">
+</span>実際のところ「ミリ秒対応の sleep」という雑な認識で問題ない。</p>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​<a href="https://php.net/manual/class.datetimeinterface.php" target="_blank">DateTimeInterface</a>|​float</td>
+<td>​<code>$seconds</code></td>
+<td>​<span class="summary">待機するミリ秒</span></td>
+</tr>
+<tr>
+<td>​?bool</td>
+<td>​<code>$cancel_signal = null</code></td>
+<td>​<span class="summary">シグナルでキャンセルされるか</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​float</td>
+<td>​<span class="summary">残りミリ秒数</span></td>
 </tr>
 </tbody>
 </table>
@@ -20831,31 +21709,34 @@ that($tokens[0])-&gt;next()-&gt;next()-&gt;text-&gt;is('Hogera');</div></pre>
 </table>
 </div>
 </details>
-</section><section id="_7baa7bfc3ca39faa03bb7cebfaaee602044073ef-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-unique_id()" class="anchor"></a>[F] unique_id <small><span class="summary">一意な文字列を返す</span></small></h4>
+</section><section id="_a7901bff5ce73f8da08b024280409ec166b5b209-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-sleetflake()" class="anchor"></a>[F] sleetflake <small><span class="summary">一意な id を生成するオブジェクトを返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
-<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/misc/unique_id.php#L8-L193" target="_blank">unique_id.php#8~193</a></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/misc/sleetflake.php#L10-L204" target="_blank">sleetflake.php#10~204</a></p>
 </div>
 <details>
-<summary class="">一意な文字列を返す</summary>
-<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function unique_id(
-    array &amp;$id_info = [],
-    array $debug = []
-): string</div></pre>
+<summary class="">一意な id を生成するオブジェクトを返す</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function sleetflake(
+    int $sequence_bit = 7,
+    int $ipaddress_bit = 16,
+    ?int $base_timestamp = null,
+    ?float $timestamp = null,
+    ?string $lockfile = null
+): Sleetflake|object</div></pre>
 <div class="description">
 <p>最大でも8バイト（64ビット）に収まるようにしてある。</p>
 <dl class="docutils field-list">
 <div class="dtdd-container">
 <dt>41bit</dt>
-<dd>1ミリ秒単位</dd>
+<dd>1ミリ秒単位（固定）</dd>
 </div>
 <div class="dtdd-container">
 <dt>7bit</dt>
-<dd>シーケンス</dd>
+<dd>シーケンス（引数指定可能）</dd>
 </div>
 <div class="dtdd-container">
 <dt>16bit</dt>
-<dd>IPv4ホストアドレス</dd>
+<dd>IPv4ホストアドレス（引数指定可能）</dd>
 </div>
 </dl>
 <p>いわゆる snowflake 系で sonyflake が近い。</p>
@@ -20925,14 +21806,29 @@ that($tokens[0])-&gt;next()-&gt;next()-&gt;text-&gt;is('Hogera');</div></pre>
 </thead>
 <tbody>
 <tr>
-<td>​array</td>
-<td>​<code>&amp;$id_info = []</code></td>
-<td>​<span class="summary">元になった生成データのレシーバ引数</span></td>
+<td>​int</td>
+<td>​<code>$sequence_bit = 7</code></td>
+<td>​<span class="summary"></span></td>
 </tr>
 <tr>
-<td>​array</td>
-<td>​<code>$debug = []</code></td>
-<td>​<span class="summary">デバッグ用引数（配列で内部の動的な値を指定できる）</span></td>
+<td>​int</td>
+<td>​<code>$ipaddress_bit = 16</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+<tr>
+<td>​?int</td>
+<td>​<code>$base_timestamp = null</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+<tr>
+<td>​?float</td>
+<td>​<code>$timestamp = null</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+<tr>
+<td>​?string</td>
+<td>​<code>$lockfile = null</code></td>
+<td>​<span class="summary"></span></td>
 </tr>
 </tbody>
 </table>
@@ -20952,8 +21848,59 @@ that($tokens[0])-&gt;next()-&gt;next()-&gt;text-&gt;is('Hogera');</div></pre>
 </thead>
 <tbody>
 <tr>
+<td>​<a href="#--Sleetflake">Sleetflake</a>|​object</td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section><section id="_81c76cb5f4f0914164716b393ea2afa724e64c1a-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-unique_id()" class="anchor"></a>[F] unique_id <small><span class="summary">sleetflake::binary へのエイリアス</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/misc/unique_id.php#L9-L27" target="_blank">unique_id.php#9~27</a></p>
+</div>
+<details>
+<summary class="">sleetflake::binary へのエイリアス</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function unique_id(): string</div></pre>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td>​string</td>
-<td>​<span class="summary">一意なバイナリ文字列</span></td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">See</caption>
+<colgroup>
+<col style="width:30%">
+<col style="width:70%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​<a href="#--sleetflake%28%29">sleetflake()</a></td>
+<td>​<span class="summary"></span></td>
 </tr>
 </tbody>
 </table>
@@ -21075,6 +22022,74 @@ that(cidr2ip('192.168.0.255/30'))-&gt;isSame(['192.168.0.252', '192.168.0.253', 
 <tr>
 <td>​array</td>
 <td>​<span class="summary">[$address, $networkBit, $localBit]</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section><section id="_0e2920bcae071177589f5261f6c6a9816fd22bf6-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-cidr_subnet()" class="anchor"></a>[F] cidr_subnet <small><span class="summary">cidr をサブネットに分割する</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/network/cidr_subnet.php#L7-L39" target="_blank">cidr_subnet.php#7~39</a></p>
+</div>
+<details>
+<summary class="">cidr をサブネットに分割する</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function cidr_subnet(
+    string $cidr,
+    int $mask
+): array</div></pre>
+<div class="description">
+<p>ipv6 は今のところ未対応。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">// 192.168.0.0/24 を /26 に分割
+that(cidr_subnet('192.168.0.0/24', 26))-&gt;isSame(['192.168.0.0/26', '192.168.0.64/26', '192.168.0.128/26', '192.168.0.192/26']);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​string</td>
+<td>​<code>$cidr</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+<tr>
+<td>​int</td>
+<td>​<code>$mask</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array</td>
+<td>​<span class="summary"></span></td>
 </tr>
 </tbody>
 </table>
@@ -25200,6 +26215,108 @@ that(count($types))-&gt;is(2);</div></pre>
 </table>
 </div>
 </details>
+</section><section id="_d674b4f40d4b4fec102b36a5b479a73f59c1d408-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-iterator_stream()" class="anchor"></a>[F] iterator_stream <small><span class="summary">iterator を resource に変換する</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/stream/iterator_stream.php#L7-L157" target="_blank">iterator_stream.php#7~157</a></p>
+</div>
+<details>
+<summary class="">iterator を resource に変換する</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function iterator_stream(
+    \Iterator $iterator,
+    ?string $tmpdir = null
+): resource</div></pre>
+<div class="description">
+<p>iterator(generator) は「ちょっとずつ返す」という性質を持つので resource 的に扱えた方が便利なことがある。<span class="implicit-br">
+</span>例えば極々稀に iterator を resource として扱いたい場合が存在する。</p>
+<ul class=" simple">
+<li>外部ライブラリのメソッドが resource しか受け付けない</li>
+<li>手元に SplFileObject しかない（SplFileObject から resource を得る手段は存在しない）<span class="implicit-br">
+</span>そんな時この関数を使えば resource 化することができる。</li>
+</ul>
+<p>得られた resource は大抵の fxxxx 関数を呼ぶことができる。<span class="implicit-br">
+</span>が、呼んだところで効果があるのは非常に限定的で、意味があるのは ftell くらいしかない。<span class="implicit-br">
+</span>あくまで「resource として扱いたい場合にエラーが出て欲しくない」程度の意味でしかない。</p>
+<p>実質的には tmpfile に全部書いてそのファイルリソースを返すのと同じ。<span class="implicit-br">
+</span>ただし、tmpfile が（tmpfs などで）メモリ上にあるかもしれないし全部書いて全部読むのは余計なオーバーヘッドがかかるし途中で打ち切ることもできない。<span class="implicit-br">
+</span>とは言え size が取れたり seek 出来たりと機能面ではそちらの方が優れているので参考実装として引数分岐で残してある。</p>
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">// Generator を resource 化する
+$stream = iterator_stream((function() {
+    yield "a\n";
+    yield "ab\n";
+    yield "abc\n";
+})());
+// resource として扱える
+that(fgets($stream))-&gt;is("a\n");
+that(fgets($stream))-&gt;is("ab\n");
+that(fgets($stream))-&gt;is("abc\n");
+that(fgets($stream))-&gt;is(false);
+
+// SplFileObject を resource 化する
+$testpath = sys_get_temp_dir() . '/iterator_stream.txt';
+file_put_contents($testpath, "a\nab\nabc\n");
+$file = new \SplFileObject($testpath);
+$stream = iterator_stream($file);
+// resource として扱える（$file-&gt;current,next でも fgets($stream) でも同様の作用・副作用が得られる）
+// SplFileObject には resource 取得メソッドが無いので resource を要求されると代替手段が無いに等しい
+that($file-&gt;current())-&gt;is("a\n");
+$file-&gt;next();
+that(fgets($stream))-&gt;is("ab\n");
+that(fgets($stream))-&gt;is("abc\n");
+that(fgets($stream))-&gt;is(false);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​<a href="https://php.net/manual/class.iterator.php" target="_blank">Iterator</a></td>
+<td>​<code>$iterator</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+<tr>
+<td>​?string</td>
+<td>​<code>$tmpdir = null</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​resource</td>
+<td>​<span class="summary">iterator の resource</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
 </section><section id="_042f2d6d5656f18ef77db2557b43798fe008a127-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-memory_stream()" class="anchor"></a>[F] memory_stream <small><span class="summary">ファイルのように扱えるメモリ上のパスを返す</span></small></h4>
 <div class="right sidebar">
 <p class="sidebar-title"></p>
@@ -25341,6 +26458,81 @@ that(file_exists($memory_stream))-&gt;isSame(false);</div></pre>
 <tr>
 <td>​<a href="https://php.net/manual/class.traversable.php" target="_blank">Traversable</a>|​callable</td>
 <td>​<span class="summary">プロファイライテレータ</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section><section id="_efee3cd9b85eca5a4b770b0bcb7ba2c81ec44e40-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-stream_describe()" class="anchor"></a>[F] stream_describe <small><span class="summary">ストリームの雑多な情報を返す</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/stream/stream_describe.php#L7-L97" target="_blank">stream_describe.php#7~97</a></p>
+</div>
+<details>
+<summary class="">ストリームの雑多な情報を返す</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function stream_describe($stream = null): ?array</div></pre>
+<div class="description">
+<dl class="docutils field-list">
+<div class="dtdd-container">
+<dt>descriptor</dt>
+<dd>ファイルデスクリプタ番号</dd>
+</div>
+<div class="dtdd-container">
+<dt>inode</dt>
+<dd>ファイル inode</dd>
+</div>
+<div class="dtdd-container">
+<dt>realpath</dt>
+<dd>現在のファイル名（ファイスシステム上に残っておらず、デスクリプタだけが存在する場合は null）</dd>
+</div>
+<div class="dtdd-container">
+<dt>filename</dt>
+<dd>開いた時のファイル名</dd>
+</div>
+</dl>
+<p>procfs を用いていて Windows はテスト用に模倣しているだけなので使用してはならない。</p>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​</td>
+<td>​<code>$stream = null</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​?array</td>
+<td>​<span class="summary"></span></td>
 </tr>
 </tbody>
 </table>
@@ -28484,6 +29676,75 @@ that(str_diff($old, $new, ['stringify' =&gt; null]))-&gt;isSame([
 <tr>
 <td>​string|​array|​null</td>
 <td>​<span class="summary">差分テキスト。 stringify が null の場合は raw な差分配列</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</details>
+</section><section id="_e0ad1e359d0a39d0755cb97223a9ea0bc9c731cc-1" class="section section-level-h4" data-section-level="4"><h4 class="section-header"><a id="ryunosuke-Functions-Package-str_divide()" class="anchor"></a>[F] str_divide <small><span class="summary">str_split の配列長指定版</span></small></h4>
+<div class="right sidebar">
+<p class="sidebar-title"></p>
+<p><a href="https://github.com/arima-ryunosuke/php-functions/blob/master/src/Package/strings/str_divide.php#L8-L31" target="_blank">str_divide.php#8~31</a></p>
+</div>
+<details>
+<summary class="">str_split の配列長指定版</summary>
+<pre data-label="Definitation"><div class="code language-php:Definitation php:Definitation">function str_divide(
+    string $string,
+    int $divisor
+): array</div></pre>
+<div class="description">
+<p>Example:</p>
+<pre data-label=""><div class="code language-php php">// "abcdefg" を3つに分割（余りを左に分配）
+that(str_divide("abcdefg", 3))-&gt;isSame(["abc", "de", "fg"]);
+// "abcdefg" を3つに分割（余りを右に分配）
+that(str_divide("abcdefg", -3))-&gt;isSame(["ab", "cd", "efg"]);</div></pre>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Parameter</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:30%">
+<col style="width:50%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>name</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​string</td>
+<td>​<code>$string</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+<tr>
+<td>​int</td>
+<td>​<code>$divisor</code></td>
+<td>​<span class="summary"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="wy-table-responsive">
+<table class=" no-border docutils align-default has-colgroup has-caption has-top-caption">
+<caption style="text-align: left;caption-side: top">Return</caption>
+<colgroup>
+<col style="width:20%">
+<col style="width:80%">
+</colgroup>
+<thead>
+<tr>
+<th>type</th>
+<th>summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>​array</td>
+<td>​<span class="summary"></span></td>
 </tr>
 </tbody>
 </table>
