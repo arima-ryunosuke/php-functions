@@ -11,6 +11,17 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.28
+
+- [feature] sleetflake を追加
+- [feature] array/str_divide を追加
+- [feature] int_divide を追加
+- [feature] CSV 入出力の強化
+- [feature] stream_describe を追加
+- [feature] process_parallel の返り値に pid を追加
+- [refactor] array_pos の実装を変更
+- [fixbug] markdown_table で bool が 0/1 になる不具合
+
 ## 2.0.27
 
 - [composer] docs は別ブランチ管理とするため build から除外
