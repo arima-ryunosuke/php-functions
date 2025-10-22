@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\sql_bind;
+use function ryunosuke\Functions\Package\sql_export;
 use function ryunosuke\Functions\Package\sql_format;
 use function ryunosuke\Functions\Package\sql_quote;
 
@@ -24,6 +25,153 @@ class databaseTest extends AbstractTestCase
 -- this is :comment
 'a', 'b'
 ");
+    }
+
+    function test_sql_export()
+    {
+        $records = [
+            ['id' => 1, 'name' => 'hoge', 'tags' => 'A,B'],
+            ['id' => 2, 'name' => 'fuga', 'tags' => 'B'],
+            ['id' => 3, 'name' => 'piyo', 'tags' => null],
+        ];
+
+        // empty
+        that(sql_export([], ['table' => 't_table']))->is('');
+
+        // literal
+        that(sql_export([
+            [
+                'id'   => 1,
+                'name' => new class() implements \Stringable {
+                    public function __toString(): string
+                    {
+                        return 'SELECT 1';
+                    }
+                },
+            ],
+        ], ['table' => 't_table']))->is("INSERT INTO t_table(id, name) VALUES(1, SELECT 1);\n");
+
+        // delimiter
+        that(sql_export($records, ['table' => 't_table', 'delimiter' => '$$$']))->is(<<<SQL
+        INSERT INTO t_table(id, name, tags) VALUES(1, 'hoge', 'A,B')$$$
+        INSERT INTO t_table(id, name, tags) VALUES(2, 'fuga', 'B')$$$
+        INSERT INTO t_table(id, name, tags) VALUES(3, 'piyo', NULL)$$$
+        
+        SQL,);
+
+        // callback
+        that(sql_export($records, [
+            'table'    => 't_table',
+            'callback' => function (&$record, $n) {
+                if ($record['id'] === 2) {
+                    return false;
+                }
+                $record['id'] = $n;
+            },
+        ]))->is(<<<SQL
+        INSERT INTO t_table(id, name, tags) VALUES(0, 'hoge', 'A,B');
+        INSERT INTO t_table(id, name, tags) VALUES(2, 'piyo', NULL);
+        
+        SQL,);
+
+        // bulk
+        that(sql_export($records, ['table' => 't_table', 'bulk' => true]))->is(<<<SQL
+        INSERT INTO t_table(id, name, tags) VALUES
+          (1, 'hoge', 'A,B'),
+          (2, 'fuga', 'B'),
+          (3, 'piyo', NULL);
+        
+        SQL,);
+
+        // mysql set
+        that(sql_export($records, ['table' => 't_table', 'rdbms' => 'mysql']))->is(<<<SQL
+        INSERT INTO t_table SET id = 1, name = 'hoge', tags = 'A,B';
+        INSERT INTO t_table SET id = 2, name = 'fuga', tags = 'B';
+        INSERT INTO t_table SET id = 3, name = 'piyo', tags = NULL;
+        
+        SQL,);
+
+        // mysql upsert
+        that(sql_export($records, ['table' => 't_table', 'rdbms' => 'mysql', 'upsert' => true]))->is(<<<SQL
+        INSERT INTO t_table SET id = 1, name = 'hoge', tags = 'A,B' AS excluded ON DUPLICATE KEY UPDATE id = excluded.id, name = excluded.name, tags = excluded.tags;
+        INSERT INTO t_table SET id = 2, name = 'fuga', tags = 'B' AS excluded ON DUPLICATE KEY UPDATE id = excluded.id, name = excluded.name, tags = excluded.tags;
+        INSERT INTO t_table SET id = 3, name = 'piyo', tags = NULL AS excluded ON DUPLICATE KEY UPDATE id = excluded.id, name = excluded.name, tags = excluded.tags;
+        
+        SQL,);
+
+        // mysql bulk upsert
+        that(sql_export($records, ['table' => 't_table', 'rdbms' => 'mysql', 'upsert' => true, 'bulk' => true]))->is(<<<SQL
+        INSERT INTO t_table(id, name, tags) VALUES
+          (1, 'hoge', 'A,B'),
+          (2, 'fuga', 'B'),
+          (3, 'piyo', NULL)
+        AS excluded ON DUPLICATE KEY UPDATE id = excluded.id, name = excluded.name, tags = excluded.tags;
+        
+        SQL,);
+
+        // sqlite upsert
+        that(sql_export($records, ['table' => 't_table', 'rdbms' => 'sqlite', 'upsert' => true]))->is(<<<SQL
+        INSERT INTO t_table(id, name, tags) VALUES(1, 'hoge', 'A,B') ON CONFLICT(1) DO UPDATE SET id = excluded.id, name = excluded.name, tags = excluded.tags;
+        INSERT INTO t_table(id, name, tags) VALUES(2, 'fuga', 'B') ON CONFLICT(1) DO UPDATE SET id = excluded.id, name = excluded.name, tags = excluded.tags;
+        INSERT INTO t_table(id, name, tags) VALUES(3, 'piyo', NULL) ON CONFLICT(1) DO UPDATE SET id = excluded.id, name = excluded.name, tags = excluded.tags;
+        
+        SQL,);
+
+        // sqlite bulk upsert
+        that(sql_export($records, ['table' => 't_table', 'rdbms' => 'sqlite', 'upsert' => 'id', 'bulk' => true]))->is(<<<SQL
+        INSERT INTO t_table(id, name, tags) VALUES
+          (1, 'hoge', 'A,B'),
+          (2, 'fuga', 'B'),
+          (3, 'piyo', NULL)
+        ON CONFLICT(id) DO UPDATE SET id = excluded.id, name = excluded.name, tags = excluded.tags;
+        
+        SQL,);
+
+        // mismatch column
+        $records2 = [
+            ['id' => 1, 'name' => 'hoge', 'tags' => 'A,B'],
+            ['id' => 2, 'name' => 'fuga', 'tags' => 'B', 'unknown' => null],
+        ];
+        that(self::resolveFunction('sql_export'))($records2, ['table' => 't_table'])->is(<<<SQL
+        INSERT INTO t_table(id, name, tags) VALUES(1, 'hoge', 'A,B');
+        INSERT INTO t_table(id, name, tags, unknown) VALUES(2, 'fuga', 'B', NULL);
+        
+        SQL,);
+        that(self::resolveFunction('sql_export'))($records2, ['table' => 't_table', 'bulk' => true])->wasThrown('columns is mismatch');
+
+        // mysql,pgsql はともかく sqlite は実際に投げられる
+        $pdo = new \PDO('sqlite::memory:');
+        $pdo->exec(<<<SQL
+        CREATE TABLE t_table (
+            id INT UNSIGNED NOT NULL,
+            name VARCHAR(50) NOT NULL,
+            tags VARCHAR(50),
+            PRIMARY KEY (id)
+        )
+        SQL,);
+
+        // insert
+        $pdo->exec(sql_export([
+            ['id' => 1, 'name' => 'hoge', 'tags' => 'A,B'],
+            ['id' => 2, 'name' => 'fuga', 'tags' => 'B'],
+        ], ['table' => 't_table', 'rdbms' => 'sqlite']));
+
+        // upsert
+        $pdo->exec(sql_export([
+            ['id' => 2, 'name' => 'F', 'tags' => 'B'],
+        ], ['table' => 't_table', 'rdbms' => 'sqlite', 'upsert' => 'id']));
+
+        // bulk upsert
+        $pdo->exec(sql_export([
+            ['id' => 1, 'name' => 'H', 'tags' => 'A,B'],
+            ['id' => 3, 'name' => 'P', 'tags' => null],
+        ], ['table' => 't_table', 'rdbms' => 'sqlite', 'upsert' => 'id', 'bulk' => true]));
+
+        that($pdo->query("SELECT * FROM t_table", \PDO::FETCH_ASSOC))->is([
+            ['id' => 1, 'name' => 'H', 'tags' => 'A,B'],
+            ['id' => 2, 'name' => 'F', 'tags' => 'B'],
+            ['id' => 3, 'name' => 'P', 'tags' => null],
+        ]);
     }
 
     function test_sql_format_alter()
