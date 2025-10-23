@@ -294,6 +294,16 @@ TEXT): self { }
     public function insert(iterable $array, $value, $position = null): self { }
     public function insert($value, $position = null): self { }
 
+    /** @see array_intersection_differences() */
+    public self $array_intersection_differences;
+    public function array_intersection_differences(iterable ...$arrays): self { }
+    public function array_intersection_differences(): self { }
+
+    /** @see array_intersection_differences() */
+    public self $intersection_differences;
+    public function intersection_differences(iterable ...$arrays): self { }
+    public function intersection_differences(): self { }
+
     /** @see array_limit() */
     public self $array_limit;
     public function array_limit(iterable $array, $limit, $offset = null, $preserve_keys = null): self { }
@@ -363,6 +373,11 @@ TEXT): self { }
     public self $cidr2ip;
     public function cidr2ip($cidr): self { }
     public function cidr2ip(): self { }
+
+    /** @see cidr_subnet() */
+    public self $cidr_subnet;
+    public function cidr_subnet(string $cidr, int $mask): self { }
+    public function cidr_subnet(int $mask): self { }
 
     /** @see incidr() */
     public self $incidr;

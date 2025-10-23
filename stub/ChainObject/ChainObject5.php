@@ -474,6 +474,11 @@ TEXT): self { }
     public function date_convert($format, $datetimedata = null): self { }
     public function date_convert($datetimedata = null): self { }
 
+    /** @see file_rename() */
+    public self $file_rename;
+    public function file_rename(array $filenames, callable $callback): self { }
+    public function file_rename(callable $callback): self { }
+
     /** @see file_rotate() */
     public self $file_rotate;
     public function file_rotate(string $filename, bool $ifempty = false, bool $copytruncate = false, bool $append = false, ?string $olddir = null, ?string $dateformat = null, ?int $rotate = null, ?int $compress = null): self { }

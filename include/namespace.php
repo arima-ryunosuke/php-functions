@@ -2465,6 +2465,145 @@ if (!function_exists('ryunosuke\\Functions\\array_insert')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\array_intersection_differences') || (new \ReflectionFunction('ryunosuke\\Functions\\array_intersection_differences'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\array_intersection_differences')) {
+    /**
+     * array_intersect+array_diff の組み合わせ
+     *
+     * 集合演算系の標準関数がカオスすぎるのである程度使いやすくしたもの。
+     * (u)intersect,(u)diff,(u)key,(u)assoc の組み合わせで16通りもある。
+     * - array_intersect
+     * - array_uintersect
+     * - array_intersect_key
+     * - array_intersect_ukey
+     * - array_intersect_assoc
+     * - array_uintersect_assoc
+     * - array_intersect_uassoc
+     * - array_uintersect_uassoc
+     * - array_diff
+     * - array_udiff
+     * - array_diff_key
+     * - array_diff_ukey
+     * - array_diff_assoc
+     * - array_udiff_assoc
+     * - array_diff_uassoc
+     * - array_udiff_uassoc
+     *
+     * ドキュメントはアルファベット順であり一覧性が悪いので、どれを使えばいいのかぱっと見では全く分からない。
+     * そして intersect,diff は往々にして両方欲しいことが多いので、この関数でコールバックを工夫すれば一発で済む。
+     * ただし php レイヤーでの実装なので猛烈に遅い。単純な結果でよい場合は普通に標準関数を使うこと。
+     *
+     * コールバックは ([値, キー, 連番], [値, キー, 連番]) を受け取る。
+     * キーで比較をしたければキーだけを見ればよいし、値で比較したければ値だけを見ればよい（もちろん両方でもよい）。
+     * このコールバックを工夫するだけで上記16関数全ての大体となりうる。
+     * コールバック省略時はキー・値の両方を見る（array_u(intersect|diff)_uassoc に相当する）。
+     *
+     * Example:
+     * ```php
+     * // 単純な配列
+     * $a = [
+     *     1 => 'hoge',
+     *     2 => 'fuga',
+     *     3 => 'foo',
+     *     4 => 'bar',
+     *     5 => 'common',
+     *     6 => 'onlyA',
+     * ];
+     * $b = [
+     *     1 => 'foo',
+     *     2 => 'bar',
+     *     3 => 'hoge',
+     *     4 => 'fuga',
+     *     5 => 'common',
+     *     7 => 'onlyB',
+     * ];
+     * // array_* 相当
+     * $result = array_intersection_differences($a, $b, fn($avkn, $bvkn) => $avkn[0] <=> $bvkn[0]);
+     * that($result[''])->isSame(array_intersect($a, $b));
+     * that($result[0])->isSame(array_diff($a, $b));
+     * that($result[1])->isSame(array_diff($b, $a));
+     * // array_*_key 相当
+     * $result = array_intersection_differences($a, $b, fn($avkn, $bvkn) => $avkn[1] <=> $bvkn[1]);
+     * that($result[''])->isSame(array_intersect_key($a, $b));
+     * that($result[0])->isSame(array_diff_key($a, $b));
+     * that($result[1])->isSame(array_diff_key($b, $a));
+     * // array_*_assoc 相当
+     * $result = array_intersection_differences($a, $b, fn($avkn, $bvkn) => $avkn[0] <=> $bvkn[0] ?: $avkn[1] <=> $bvkn[1]);
+     * that($result[''])->isSame(array_intersect_assoc($a, $b));
+     * that($result[0])->isSame(array_diff_assoc($a, $b));
+     * that($result[1])->isSame(array_diff_assoc($b, $a));
+     *
+     * // レコード的な配列（標準関数は基本的に文字列比較なので、u 系が必須。こういう使い分けをしたくないがための関数）
+     * $a = [
+     *     ['id' => 1, 'name' => 'hoge'],
+     *     ['id' => 2, 'name' => 'fuga'],
+     *     ['id' => 3, 'name' => 'foo'],
+     *     ['id' => 4, 'name' => 'bar'],
+     *     ['id' => 5, 'name' => 'common'],
+     *     ['id' => 6, 'name' => 'onlyA'],
+     * ];
+     * $b = [
+     *     ['id' => 1, 'name' => 'foo'],
+     *     ['id' => 2, 'name' => 'bar'],
+     *     ['id' => 3, 'name' => 'hoge'],
+     *     ['id' => 4, 'name' => 'fuga'],
+     *     ['id' => 5, 'name' => 'common'],
+     *     ['id' => 7, 'name' => 'onlyB'],
+     * ];
+     * // array_* 相当
+     * $result = array_intersection_differences($a, $b, fn($avkn, $bvkn) => $avkn[0]['id'] <=> $bvkn[0]['id']);
+     * that($result[''])->isSame(array_uintersect($a, $b, fn($a, $b) => $a['id'] <=> $b['id']));
+     * that($result[0])->isSame(array_udiff($a, $b, fn($a, $b) => $a['id'] <=> $b['id']));
+     * that($result[1])->isSame(array_udiff($b, $a, fn($a, $b) => $a['id'] <=> $b['id']));
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\array
+     *
+     * @param array|callable ...$arrays 対象配列（最後の要素のみ callable を受け付ける）
+     * @return array ['' => 共通配列, $array1 にしかない配列, $array2にしかない配列, ..., $arrayNにしかない配列]
+     */
+    function array_intersection_differences(...$arrays): array
+    {
+        $comparator = null;
+        if ($arrays[count($arrays) - 1] instanceof \Closure) {
+            $comparator = array_pop($arrays);
+        }
+
+        $comparator ??= function (array $avkn, array $bvkn) {
+            [$av, $ak,] = $avkn;
+            [$bv, $bk,] = $bvkn;
+            return $ak <=> $bk ?: $av <=> $bv;
+        };
+
+        $count = count($arrays);
+
+        $result = ['' => [], ...$arrays];
+        foreach ($arrays as $i => $array) {
+            $n1 = -1;
+            foreach ($array as $k1 => $v1) {
+                $n1++;
+                $found = 0;
+                for ($j = $i + 1; $j < $count; $j++) {
+                    $n2 = -1;
+                    foreach ($arrays[$j] as $k2 => $v2) {
+                        $n2++;
+                        if (((int) $comparator([$v1, $k1, $n1], [$v2, $k2, $n2])) === 0) {
+                            $found++;
+                            unset($result[$i][$k1]);
+                            unset($result[$j][$k2]);
+                        }
+                    }
+                }
+                if ($found === $count - 1) {
+                    $result[''][$k1] = $v1;
+                }
+            }
+        }
+
+        return $result;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\array_join') || (new \ReflectionFunction('ryunosuke\\Functions\\array_join'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\array_join')) {
     /**
@@ -7604,6 +7743,153 @@ if (!function_exists('ryunosuke\\Functions\\sql_bind')) {
             '-- ' => "\n",
             '/*'  => "*/",
         ]);
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\sql_export') || (new \ReflectionFunction('ryunosuke\\Functions\\sql_export'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\sql_export')) {
+    /**
+     * 連想配列の配列を SQL 的文字列に変換する
+     *
+     * xlsx か何かで提供されたファイルを SQL に変換したい状況はままある。
+     * 保守運用などでの使用を想定しており、この関数で得られた SQL を**確認せずに実行してはならない**。
+     *
+     * カラムの読み替えやエンコーディングの変換などは行わない（それは入力元である $array の前処理の仕事）。
+     * とはいえ iterable が来ることもあるので callback で簡単なフィルタ・変換は可能。
+     *
+     * 識別子のエスケープは一切しないので留意。
+     *
+     * Example:
+     * ```php
+     * $arrays = [
+     *     ['id' => 1, 'name' => 'hoge'],
+     *     ['id' => 2, 'name' => 'fuga'],
+     *     ['id' => 3, 'name' => 'piyo'],
+     * ];
+     * // insert
+     * that(sql_export($arrays, ['table' => 't_table']))->isSame(<<<SQL
+     * INSERT INTO t_table(id, name) VALUES(1, 'hoge');
+     * INSERT INTO t_table(id, name) VALUES(2, 'fuga');
+     * INSERT INTO t_table(id, name) VALUES(3, 'piyo');
+     *
+     * SQL,);
+     * // upsert
+     * that(sql_export($arrays, ['table' => 't_table', 'upsert' => 'id']))->isSame(<<<SQL
+     * INSERT INTO t_table(id, name) VALUES(1, 'hoge') ON CONFLICT(id) DO UPDATE SET id = excluded.id, name = excluded.name;
+     * INSERT INTO t_table(id, name) VALUES(2, 'fuga') ON CONFLICT(id) DO UPDATE SET id = excluded.id, name = excluded.name;
+     * INSERT INTO t_table(id, name) VALUES(3, 'piyo') ON CONFLICT(id) DO UPDATE SET id = excluded.id, name = excluded.name;
+     *
+     * SQL,);
+     * // bulk insert
+     * that(sql_export($arrays, ['table' => 't_table', 'bulk' => true]))->isSame(<<<SQL
+     * INSERT INTO t_table(id, name) VALUES
+     *   (1, 'hoge'),
+     *   (2, 'fuga'),
+     *   (3, 'piyo');
+     *
+     * SQL,);
+     * // bulk upsert
+     * that(sql_export($arrays, ['table' => 't_table', 'bulk' => true, 'upsert' => 'id']))->isSame(<<<SQL
+     * INSERT INTO t_table(id, name) VALUES
+     *   (1, 'hoge'),
+     *   (2, 'fuga'),
+     *   (3, 'piyo')
+     * ON CONFLICT(id) DO UPDATE SET id = excluded.id, name = excluded.name;
+     *
+     * SQL,);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\database
+     *
+     * @param iterable $sqlarrays 連想配列の配列
+     * @param array $options オプション配列
+     * @return string SQL 的文字列
+     */
+    function sql_export($sqlarrays, $options = []): string
+    {
+        $options += [
+            'table'     => '',       // テーブル名（必須）
+            'rdbms'     => 'sqlite', // 対象 RDBMS(sqlite|mysql|pgsql) これで SET や upsert 構文が変化する
+            'bulk'      => false,    // BULK INSERT モード
+            'upsert'    => '',       // DUPLICATE(mysql), CONFLICT(pgsql) 等の付与
+            'delimiter' => ';',      // 複文のデリミタ
+            'literal'   => \Stringable::class, // エスケープしないオブジェクト
+            'callback'  => null,     // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
+        ];
+
+        assert(strlen($options['table']));
+        assert(strlen($options['delimiter']));
+        assert(in_array($options['rdbms'], ['sqlite', 'mysql', 'pgsql'], true));
+
+        $implode = fn($array, $separator = ', ') => implode($separator, $array);
+
+        $columns = null;
+        $result = [];
+        foreach ($sqlarrays as $n => $sqlarray) {
+            if ($options['callback']) {
+                if ($options['callback']($sqlarray, $n) === false) {
+                    continue;
+                }
+            }
+
+            $vals = array_map(function ($v) use ($options) {
+                if (is_a($v, $options['literal'])) {
+                    return $v;
+                }
+                return sql_quote($v);
+            }, $sqlarray);
+
+            if ($options['bulk']) {
+                $cols = array_keys($vals);
+
+                $comma = ',';
+                if (!isset($columns)) {
+                    $comma = '';
+                    $columns = $cols;
+                    $result[] = "INSERT INTO {$options['table']}({$implode($columns)}) VALUES";
+                }
+                elseif ($columns !== $cols) {
+                    throw new \UnexpectedValueException("columns is mismatch(first:{$implode($columns)} vs $n:{$implode($cols)})");
+                }
+                $result[] = "$comma\n  ({$implode($vals)})";
+            }
+            elseif ($options['rdbms'] === 'mysql') {
+                $sets = array_map(fn($v, $k) => "$k = $v", $vals, array_keys($vals));
+                $result[] = "INSERT INTO {$options['table']} SET {$implode($sets)}";
+
+                if (strlen($options['upsert'])) {
+                    $excludeds = array_map(fn($v) => "$v = excluded.$v", array_keys($vals));
+                    $result[] = array_pop($result) . " AS excluded ON DUPLICATE KEY UPDATE {$implode($excludeds)}";
+                }
+            }
+            else {
+                $cols = array_keys($vals);
+                $result[] = "INSERT INTO {$options['table']}({$implode($cols)}) VALUES({$implode($vals)})";
+
+                if (strlen($options['upsert'])) {
+                    $excludeds = array_map(fn($v) => "$v = excluded.$v", $cols);
+                    $result[] = array_pop($result) . " ON CONFLICT({$options['upsert']}) DO UPDATE SET {$implode($excludeds)}";
+                }
+            }
+        }
+
+        if (!$result) {
+            return '';
+        }
+
+        if ($options['bulk'] && strlen($options['upsert'])) {
+            $excludeds = array_map(fn($v) => "$v = excluded.$v", $columns);
+
+            if ($options['rdbms'] === 'mysql') {
+                $result[] = "\nAS excluded ON DUPLICATE KEY UPDATE {$implode($excludeds)}";
+            }
+            else {
+                $result[] = "\nON CONFLICT({$options['upsert']}) DO UPDATE SET {$implode($excludeds)}";
+            }
+        }
+
+        $delimiter = "{$options['delimiter']}\n";
+        return implode($options['bulk'] ? "" : $delimiter, $result) . $delimiter;
     }
 }
 
@@ -15297,6 +15583,112 @@ if (!function_exists('ryunosuke\\Functions\\file_pos')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\file_rename') || (new \ReflectionFunction('ryunosuke\\Functions\\file_rename'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\file_rename')) {
+    /**
+     * ファイルをコールバックでリネームする
+     *
+     * ファイルの上書きは決して行われない（もちろん別プロセスでの競合状態などは考慮しない）。
+     * 対象ファイル名が既に存在する場合は（次の候補でリネームされるかもしれないので）スキップして再試行する。
+     * つまり、いわゆる「連番ずらし」の場合でも安全にリネームできる。
+     *
+     * $callback には元ファイル名が渡ってくる。
+     * null を返した場合、リネームの対象とはならない。
+     * また、相対パスを返すと元ファイルのディレクトリが指定されたものとみなす。
+     *
+     * 結果配列として [元ファイル名 => 新ファイル名] の配列を返す。
+     * 元ファイルが存在しないなどで rename されなかったファイルは null が設定される。
+     *
+     * Example:
+     * ```php
+     * $DS = DIRECTORY_SEPARATOR;
+     * // 適当にファイルを用意
+     * $root = sys_get_temp_dir(). "{$DS}file_rename";
+     * rm_rf($root);
+     * file_set_tree([
+     *     $root => [
+     *         '1.txt'     => '1',
+     *         '2.txt'     => '2',
+     *         'noise.txt' => 'noise',
+     *         '3.txt'     => '3',
+     *     ],
+     * ]);
+     * // 連番ファイルを +1 してrename
+     * that(file_rename(glob("$root/*"), function ($fn) {
+     *     $pathinfo = pathinfo($fn);
+     *     // null を返すと対象にならない
+     *     if (!is_numeric($pathinfo['filename'])) {
+     *         return null;
+     *     }
+     *     return ($pathinfo['filename'] + '1') . '.' . $pathinfo['extension'];
+     * }))->isSame([
+     *     "$root/3.txt" => "$root{$DS}4.txt",
+     *     "$root/2.txt" => "$root{$DS}3.txt",
+     *     "$root/1.txt" => "$root{$DS}2.txt",
+     * ]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\filesystem
+     */
+    function file_rename(
+        /** 対象ファイル名 */ array $filenames,
+        /** リネームコールバック */ callable $callback,
+    ): /** 新ファイル名対応配列 */ array
+    {
+        // まず対応表を得る（いきなり rename すると対象が存在するときに事故る）
+        $newnames = [];
+        foreach ($filenames as $filename) {
+            $pathinfo = pathinfo($filename);
+            $newname = $callback($filename, $pathinfo);
+            if (is_array($newname)) {
+                $newname = path_build($newname);
+            }
+            if ($newname !== null) {
+                if (!path_is_absolute($newname)) {
+                    $newname = "{$pathinfo['dirname']}/$newname";
+                }
+                $newnames[$filename] = path_normalize($newname);
+            }
+        }
+
+        // rename 前に意図しない移動・上書きが行われないかチェックして例外を飛ばす
+        $realnames = array_fill_keys(array_map(fn($name) => path_normalize($name), array_keys($newnames)), true);
+        foreach ($newnames as $filename => $newname) {
+            // 候補に存在しないのに対象ファイルが存在する（どうあがいても rename できない or 上書きされてしまう）
+            if (!isset($realnames[$newname]) && file_exists($newname)) {
+                throw new \RuntimeException("$filename => $newname failed. $newname is already exists");
+            }
+        }
+
+        // ここまで来てやっと処理ができる
+        $result = [];
+        while ($newnames) {
+            $count = count($newnames);
+            foreach ($newnames as $filename => $newname) {
+                // 存在するなら後回し（いずれチャンスは来る）
+                if (file_exists($newname)) {
+                    continue;
+                }
+
+                unset($newnames[$filename]);
+                if (@rename($filename, $newname)) {
+                    $result[$filename] = $newname;
+                }
+                else {
+                    $result[$filename] = null;
+                }
+            }
+
+            // 数が変わっていない=別プロセスの割り込み等で無限ループになっている可能性がある
+            if ($count === count($newnames)) {
+                throw new \RuntimeException("failed to rename " . implode(',', $newnames)); // @codeCoverageIgnore
+            }
+        }
+
+        return $result;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\file_rewrite_contents') || (new \ReflectionFunction('ryunosuke\\Functions\\file_rewrite_contents'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\file_rewrite_contents')) {
     /**
@@ -15979,6 +16371,87 @@ if (!function_exists('ryunosuke\\Functions\\mkdir_p')) {
         }
 
         return mkdir($dirname, 0777 & (~$umask), true);
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\path_build') || (new \ReflectionFunction('ryunosuke\\Functions\\path_build'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\path_build')) {
+    /**
+     * パスをビルドする
+     *
+     * pathinfo で得られたパス配列を元にパス文字列を構築する。
+     * pathinfo のパス配列は微妙に癖があるし、一部だけを書き換えたい状況も多いのでこういう関数があると便利なことがある。
+     *
+     * basename は一切使用せず filename+extension だけを使用するのでそれは留意。
+     * また dirname が "." の場合、それはスルーされる。
+     *
+     * Example:
+     * ```php
+     * $DS = DIRECTORY_SEPARATOR;
+     *
+     * that(path_build(pathinfo('/full/path/name.ext')))->is("/full/path{$DS}name.ext");
+     * that(path_build(pathinfo('/full/path/name.')))->is("/full/path{$DS}name.");
+     * that(path_build(pathinfo('/full/path/name')))->is("/full/path{$DS}name");
+     * that(path_build(pathinfo('/full/path/.ext')))->is("/full/path{$DS}.ext");
+     * that(path_build(pathinfo('/full/path/')))->is("/full{$DS}path");
+     * that(path_build(pathinfo('/full/path')))->is("/full{$DS}path");
+     *
+     * that(path_build(pathinfo('relative/name.ext')))->is("relative{$DS}name.ext");
+     * that(path_build(pathinfo('relative/name.')))->is("relative{$DS}name.");
+     * that(path_build(pathinfo('relative/name')))->is("relative{$DS}name");
+     * that(path_build(pathinfo('relative/.ext')))->is("relative{$DS}.ext");
+     * that(path_build(pathinfo('relative/')))->is("relative");
+     * that(path_build(pathinfo('relative')))->is("relative");
+     *
+     * that(path_build(pathinfo('./relative/name.ext')))->is("relative{$DS}name.ext");
+     * that(path_build(pathinfo('./relative/name.')))->is("relative{$DS}name.");
+     * that(path_build(pathinfo('./relative/name')))->is("relative{$DS}name");
+     * that(path_build(pathinfo('./relative/.ext')))->is("relative{$DS}.ext");
+     * that(path_build(pathinfo('./relative/')))->is("relative");
+     * that(path_build(pathinfo('./relative')))->is("relative");
+     *
+     * that(path_build(pathinfo('/root.ext')))->is("{$DS}root.ext");
+     * that(path_build(pathinfo('/root.')))->is("{$DS}root.");
+     * that(path_build(pathinfo('/root.')))->is("{$DS}root.");
+     * that(path_build(pathinfo('/.ext')))->is("{$DS}.ext");
+     * that(path_build(pathinfo('/')))->is($DS);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\filesystem
+     */
+    function path_build(array $pathinfo): string
+    {
+        $pathinfo += [
+            "dirname"   => '',
+            "filename"  => '',
+            "extension" => null,
+        ];
+
+        $result = [];
+
+        if (str_starts_with($pathinfo['dirname'], "." . DIRECTORY_SEPARATOR) || str_starts_with($pathinfo['dirname'], "./")) {
+            $pathinfo['dirname'] = substr($pathinfo['dirname'], 2);
+        }
+        if (strlen($pathinfo['dirname']) && $pathinfo['dirname'] !== '.') {
+            $result[] = $pathinfo['dirname'] === DIRECTORY_SEPARATOR ? '' : $pathinfo['dirname'];
+        }
+
+        if (strlen($pathinfo['filename']) && isset($pathinfo['extension'])) {
+            $result[] = $pathinfo['filename'] . '.' . $pathinfo['extension'];
+        }
+        elseif (strlen($pathinfo['filename'])) {
+            $result[] = $pathinfo['filename'];
+        }
+        elseif (isset($pathinfo['extension'])) {
+            $result[] = '.' . $pathinfo['extension'];
+        }
+
+        if (!$result) {
+            return '';
+        }
+
+        $result = implode(DIRECTORY_SEPARATOR, $result);
+        return strlen($result) ? $result : DIRECTORY_SEPARATOR;
     }
 }
 
@@ -22120,6 +22593,43 @@ if (!function_exists('ryunosuke\\Functions\\cidr_parse')) {
 
         $subnet = (int) $subnet;
         return [$address, $subnet, 32 - $subnet];
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\cidr_subnet') || (new \ReflectionFunction('ryunosuke\\Functions\\cidr_subnet'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\cidr_subnet')) {
+    /**
+     * cidr をサブネットに分割する
+     *
+     *  ipv6 は今のところ未対応。
+     *
+     * Example:
+     * ```php
+     * // 192.168.0.0/24 を /26 に分割
+     * that(cidr_subnet('192.168.0.0/24', 26))->isSame(['192.168.0.0/26', '192.168.0.64/26', '192.168.0.128/26', '192.168.0.192/26']);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\network
+     */
+    function cidr_subnet(string $cidr, int $mask): array
+    {
+        [$address, $subnet] = explode('/', trim($cidr), 2) + [1 => 32];
+
+        assert(filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4));
+        assert($subnet <= $mask && $mask <= 32);
+
+        $ip_int = ip2long($address);
+        $hosts = 1 << (32 - $mask);
+        $subnets = 1 << ($mask - $subnet);
+
+        $results = [];
+        for ($i = 0; $i < $subnets; $i++) {
+            $network_int = $ip_int + ($i * $hosts);
+            $network_str = long2ip($network_int);
+
+            $results[] = "{$network_str}/{$mask}";
+        }
+        return $results;
     }
 }
 

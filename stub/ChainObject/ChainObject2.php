@@ -358,6 +358,11 @@ trait ChainObject2
     public function first_value(iterable $array, $default = null): self { }
     public function first_value($default = null): self { }
 
+    /** @see sql_export() */
+    public self $sql_export;
+    public function sql_export(iterable $sqlarrays, $options = []): self { }
+    public function sql_export($options = []): self { }
+
     /** @see html_attr() */
     public self $html_attr;
     public function html_attr(iterable $array, $options = []): self { }

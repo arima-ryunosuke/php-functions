@@ -528,6 +528,11 @@ trait ChainObject9
     public function globstar($pattern, $flags = 0): self { }
     public function globstar($flags = 0): self { }
 
+    /** @see path_build() */
+    public self $path_build;
+    public function path_build(array $pathinfo): self { }
+    public function path_build(): self { }
+
     /** @see path_is_absolute() */
     public self $path_is_absolute;
     public function path_is_absolute($path): self { }
