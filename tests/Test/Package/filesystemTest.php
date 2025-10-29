@@ -17,6 +17,7 @@ use function ryunosuke\Functions\Package\file_list;
 use function ryunosuke\Functions\Package\file_matcher;
 use function ryunosuke\Functions\Package\file_mimetype;
 use function ryunosuke\Functions\Package\file_pos;
+use function ryunosuke\Functions\Package\file_rename;
 use function ryunosuke\Functions\Package\file_rewrite_contents;
 use function ryunosuke\Functions\Package\file_rotate;
 use function ryunosuke\Functions\Package\file_set_contents;
@@ -837,6 +838,94 @@ class filesystemTest extends AbstractTestCase
         that(file_pos($tmpfile, 'あ', 301))->is(null);
 
         that(self::resolveFunction('file_pos'))('not found', 'hoge')->wasThrown('is not found');
+    }
+
+    function test_file_rename()
+    {
+        $root = self::$TMPDIR . '/file_rename';
+        rm_rf($root);
+        file_set_tree([
+            $root => [
+                '1.txt' => '1',
+                '2.txt' => '2',
+                '3.txt' => '3',
+                '4.txt' => '4',
+                '5.txt' => '5',
+                'dir'   => [
+                    '1.txt' => 'dir/1',
+                    '2.txt' => 'dir/2',
+                ],
+            ],
+        ]);
+
+        // これは失敗する（1.txt -> 2.txt にリネームするが 2.txt は既に存在しており、候補にも含まれていない）
+        that(self::resolveFunction('file_rename'))([
+            "$root/1.txt",
+        ], fn($fn) => (pathinfo($fn, PATHINFO_FILENAME) + 1) . '.txt')->wasThrown('2.txt is already exists');
+
+        // 同上（2を含めたところで今度は 3.txt が引っかかる）
+        that(self::resolveFunction('file_rename'))([
+            "$root/1.txt",
+            "$root/2.txt",
+        ], fn($fn) => (pathinfo($fn, PATHINFO_FILENAME) + 1) . '.txt')->wasThrown('3.txt is already exists');
+
+        // 例外が飛んだ場合は一切の処理は行われない
+        that(self::resolveFunction('file_rename'))([
+            "$root/5.txt",
+            "$root/2.txt",
+        ], fn($fn) => (pathinfo($fn, PATHINFO_FILENAME) + 1) . '.txt')->wasThrown('3.txt is already exists');
+        that("$root/6.txt")->fileNotExists();
+
+        // すべて指定すれば成功する & 第2引数の pathinfo を活用
+        that(file_rename([
+            "$root/1.txt",
+            "$root/2.txt",
+            "$root/3.txt",
+            "$root/4.txt",
+            "$root/5.txt",
+        ], function ($fn, $pathinfo) {
+            $pathinfo['filename'] += 1;
+            return $pathinfo;
+        }))->isSame([
+            "$root/5.txt" => path_normalize("$root/6.txt"),
+            "$root/4.txt" => path_normalize("$root/5.txt"),
+            "$root/3.txt" => path_normalize("$root/4.txt"),
+            "$root/2.txt" => path_normalize("$root/3.txt"),
+            "$root/1.txt" => path_normalize("$root/2.txt"),
+        ]);
+
+        // 絶対パスを指定すればそれが活きる
+        that(file_rename([
+            "$root/3.txt",
+        ], fn($fn) => "$root/dir/3.txt"))->isSame([
+            "$root/3.txt" => path_normalize("$root/dir/3.txt"),
+        ]);
+
+        // $callback が null を返すと候補自体にならない・存在しないファイルは null が返ってくる
+        that(file_rename([
+            "$root/6.txt",
+            "$root/99.txt",
+        ], fn($fn) => pathinfo($fn, PATHINFO_FILENAME) === '6' ? null : 'other'))->isSame([
+            "$root/99.txt" => null,
+        ]);
+
+        // 最終的に上書きされてしまった/rename されていないなどをチェックするために tree と中身を検証
+        that(file_list($root))->is([
+            realpath("$root/2.txt"),
+            realpath("$root/4.txt"),
+            realpath("$root/5.txt"),
+            realpath("$root/6.txt"),
+            realpath("$root/dir/1.txt"),
+            realpath("$root/dir/2.txt"),
+            realpath("$root/dir/3.txt"),
+        ], null, true);
+        that("$root/2.txt")->fileEquals("1");
+        that("$root/4.txt")->fileEquals("3");
+        that("$root/5.txt")->fileEquals("4");
+        that("$root/6.txt")->fileEquals("5");
+        that("$root/dir/1.txt")->fileEquals("dir/1");
+        that("$root/dir/2.txt")->fileEquals("dir/2");
+        that("$root/dir/3.txt")->fileEquals("2");
     }
 
     function test_file_rewrite_contents()
