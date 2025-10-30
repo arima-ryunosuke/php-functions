@@ -31,6 +31,7 @@ use function ryunosuke\Functions\Package\json_export;
 use function ryunosuke\Functions\Package\ltsv_export;
 use function ryunosuke\Functions\Package\memory_stream;
 use function ryunosuke\Functions\Package\mkdir_p;
+use function ryunosuke\Functions\Package\path_build;
 use function ryunosuke\Functions\Package\path_is_absolute;
 use function ryunosuke\Functions\Package\path_normalize;
 use function ryunosuke\Functions\Package\path_parse;
@@ -1263,6 +1264,40 @@ class filesystemTest extends AbstractTestCase
         that(mkdir_p($dir))->isTrue();
         that($dir)->fileExists();
         that(mkdir_p($dir))->isFalse();
+    }
+
+    function test_path_build()
+    {
+        $DS = DIRECTORY_SEPARATOR;
+
+        that(path_build([]))->is("");
+
+        that(path_build(pathinfo('/full/path/name.ext')))->is("/full/path{$DS}name.ext");
+        that(path_build(pathinfo('/full/path/name.')))->is("/full/path{$DS}name.");
+        that(path_build(pathinfo('/full/path/name')))->is("/full/path{$DS}name");
+        that(path_build(pathinfo('/full/path/.ext')))->is("/full/path{$DS}.ext");
+        that(path_build(pathinfo('/full/path/')))->is("/full{$DS}path");
+        that(path_build(pathinfo('/full/path')))->is("/full{$DS}path");
+
+        that(path_build(pathinfo('relative/name.ext')))->is("relative{$DS}name.ext");
+        that(path_build(pathinfo('relative/name.')))->is("relative{$DS}name.");
+        that(path_build(pathinfo('relative/name')))->is("relative{$DS}name");
+        that(path_build(pathinfo('relative/.ext')))->is("relative{$DS}.ext");
+        that(path_build(pathinfo('relative/')))->is("relative");
+        that(path_build(pathinfo('relative')))->is("relative");
+
+        that(path_build(pathinfo('./relative/name.ext')))->is("relative{$DS}name.ext");
+        that(path_build(pathinfo('./relative/name.')))->is("relative{$DS}name.");
+        that(path_build(pathinfo('./relative/name')))->is("relative{$DS}name");
+        that(path_build(pathinfo('./relative/.ext')))->is("relative{$DS}.ext");
+        that(path_build(pathinfo('./relative/')))->is("relative");
+        that(path_build(pathinfo('./relative')))->is("relative");
+
+        that(path_build(pathinfo('/root.ext')))->is("{$DS}root.ext");
+        that(path_build(pathinfo('/root.')))->is("{$DS}root.");
+        that(path_build(pathinfo('/root.')))->is("{$DS}root.");
+        that(path_build(pathinfo('/.ext')))->is("{$DS}.ext");
+        that(path_build(pathinfo('/')))->is($DS);
     }
 
     function test_path_is_absolute()
