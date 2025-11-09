@@ -33,6 +33,7 @@ use function ryunosuke\Functions\Package\array_grep_key;
 use function ryunosuke\Functions\Package\array_group;
 use function ryunosuke\Functions\Package\array_implode;
 use function ryunosuke\Functions\Package\array_insert;
+use function ryunosuke\Functions\Package\array_intersection_differences;
 use function ryunosuke\Functions\Package\array_join;
 use function ryunosuke\Functions\Package\array_keys_exist;
 use function ryunosuke\Functions\Package\array_kvmap;
@@ -1700,6 +1701,148 @@ class arrayTest extends AbstractTestCase
 
         // 連想配列もOK
         that(array_insert(['x' => 'X', 'y' => 'Y', 'z' => 'Z'], ['x1', 'n' => 'x2'], 1))->is(['x' => 'X', 'x1', 'n' => 'x2', 'y' => 'Y', 'z' => 'Z']);
+    }
+
+    function test_array_intersection_differences()
+    {
+        $a = [
+            1 => 'onlyA1',
+            2 => 'onlyAB',
+            5 => 'onlyC1',
+            6 => 'onlyAC',
+            7 => 'commonABC',
+            8 => 'sameValue',
+        ];
+        $b = [
+            1 => 'onlyA2',
+            2 => 'onlyAB',
+            3 => 'onlyB1',
+            4 => 'onlyBC',
+            7 => 'commonABC',
+            9 => 'sameValue',
+        ];
+        $c = [
+            3  => 'onlyB2',
+            4  => 'onlyBC',
+            5  => 'onlyC2',
+            6  => 'onlyAC',
+            7  => 'commonABC',
+            10 => 'sameValue',
+        ];
+
+        // key
+        $actual = [
+            "" => [
+                7 => "commonABC",
+            ],
+            [
+                8 => "sameValue",
+            ],
+            [
+                9 => "sameValue",
+            ],
+            [
+                10 => "sameValue",
+            ],
+        ];
+        that($actual)->is([
+            "" => array_intersect_key($a, $b, $c),
+            array_diff_key($a, $b, $c),
+            array_diff_key($b, $a, $c),
+            array_diff_key($c, $a, $b),
+        ]);
+        that(array_intersection_differences($a, $b, $c, function ($akvn, $bkvn) {
+            [, $ak,] = $akvn;
+            [, $bk,] = $bkvn;
+            return $ak <=> $bk;
+        }))->is($actual);
+
+        // value
+        $actual = [
+            "" => [
+                7 => "commonABC",
+                8 => "sameValue",
+            ],
+            [
+                1 => "onlyA1",
+                5 => "onlyC1",
+            ],
+            [
+                1 => "onlyA2",
+                3 => "onlyB1",
+            ],
+            [
+                3 => "onlyB2",
+                5 => "onlyC2",
+            ],
+        ];
+        that($actual)->is([
+            "" => array_intersect($a, $b, $c),
+            array_diff($a, $b, $c),
+            array_diff($b, $a, $c),
+            array_diff($c, $a, $b),
+        ]);
+        that(array_intersection_differences($a, $b, $c, function ($akvn, $bkvn) {
+            [$av, ,] = $akvn;
+            [$bv, ,] = $bkvn;
+            return $av <=> $bv;
+        }))->is($actual);
+
+        // key-value
+        $actual = [
+            "" => [
+                7 => "commonABC",
+            ],
+            [
+                1 => "onlyA1",
+                5 => "onlyC1",
+                8 => "sameValue",
+            ],
+            [
+                1 => "onlyA2",
+                3 => "onlyB1",
+                9 => "sameValue",
+            ],
+            [
+                3  => "onlyB2",
+                5  => "onlyC2",
+                10 => "sameValue",
+            ],
+        ];
+        that($actual)->is([
+            "" => array_intersect_assoc($a, $b, $c),
+            array_diff_assoc($a, $b, $c),
+            array_diff_assoc($b, $a, $c),
+            array_diff_assoc($c, $a, $b),
+        ]);
+        that(array_intersection_differences($a, $b, $c, function ($akvn, $bkvn) {
+            [$av, $ak,] = $akvn;
+            [$bv, $bk,] = $bkvn;
+            return $ak <=> $bk ?: $av <=> $bv;
+        }))->is($actual);
+
+        // usecase
+        $current = [
+            1 => ['id' => 1, 'name' => 'hoge'],
+            2 => ['id' => 2, 'name' => 'fuga'],
+            3 => ['id' => 3, 'name' => 'piyo'],
+        ];
+        $updates = [
+            2 => ['id' => 2, 'name' => 'fuga'],
+            4 => ['id' => 4, 'name' => 'foo'],
+        ];
+        that(array_intersection_differences($current, $updates))->is([
+            "" => [
+                2 => ['id' => 2, 'name' => 'fuga'],
+            ],
+            [
+                1 => ['id' => 1, 'name' => 'hoge'],
+                3 => ['id' => 3, 'name' => 'piyo'],
+            ],
+            [
+                4 => ['id' => 4, 'name' => 'foo'],
+            ],
+        ]);
     }
 
     function test_array_join()
@@ -3651,7 +3794,7 @@ class arrayTest extends AbstractTestCase
             ['c', 'C', $object, false, true],
         ]);
 
-        $iterator = (function (){
+        $iterator = (function () {
             yield 'a' => 'A';
             yield 'b' => 'B';
             yield 'c' => 'C';
