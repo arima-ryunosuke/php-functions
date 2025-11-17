@@ -4,6 +4,7 @@ namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\array_flatten;
 use function ryunosuke\Functions\Package\cidr2ip;
+use function ryunosuke\Functions\Package\cidr_subnet;
 use function ryunosuke\Functions\Package\dns_resolve;
 use function ryunosuke\Functions\Package\fcgi_request;
 use function ryunosuke\Functions\Package\function_configure;
@@ -60,6 +61,23 @@ class networkTest extends AbstractTestCase
             $actual = array_flatten(array_map(self::resolveFunction('cidr2ip'), self::resolveFunction('ip2cidr')($min, $max)));
             that($actual)->isSame($expected);
         }
+    }
+
+    function test_cidr_subnet()
+    {
+        that(cidr_subnet("192.168.1.0/24", 24))->is([
+            "192.168.1.0/24",
+        ]);
+        that(cidr_subnet("192.168.2.0/24", 25))->is([
+            "192.168.2.0/25",
+            "192.168.2.128/25",
+        ]);
+        that(cidr_subnet("192.168.3.0/24", 26))->is([
+            "192.168.3.0/26",
+            "192.168.3.64/26",
+            "192.168.3.128/26",
+            "192.168.3.192/26",
+        ]);
     }
 
     function test_dns_resolve()
