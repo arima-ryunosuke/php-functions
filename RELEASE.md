@@ -11,6 +11,14 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.29
+
+- [feature] cidr_subnet を追加
+- [feature] array_intersection_differences を追加
+- [feature] sql_export を追加
+- [feature] file_rename を追加
+- [feature] path_build を追加
+
 ## 2.0.28
 
 - [feature] sleetflake を追加
