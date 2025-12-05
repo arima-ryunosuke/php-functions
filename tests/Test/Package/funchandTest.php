@@ -5,6 +5,7 @@ namespace ryunosuke\Test\Package;
 use ryunosuke\Functions\Utility;
 use function ryunosuke\Functions\Package\chain;
 use function ryunosuke\Functions\Package\func_eval;
+use function ryunosuke\Functions\Package\func_get_namedargs;
 use function ryunosuke\Functions\Package\func_method;
 use function ryunosuke\Functions\Package\func_new;
 use function ryunosuke\Functions\Package\func_operator;
@@ -210,6 +211,138 @@ class funchandTest extends AbstractTestCase
         that(parameter_length(func_eval('$v')))->is(0);
         that(parameter_length(func_eval('$v', 'a')))->is(1);
         that(parameter_length(func_eval('$v', 'a', 'b')))->is(2);
+    }
+
+    function test_func_get_namedargs()
+    {
+        $object = new class() {
+            public bool $variadic_folding;
+            public bool $default_contain;
+
+            public function method($a, $b = 2, $c = 3, ...$xyz)
+            {
+                return func_get_namedargs($this->variadic_folding, $this->default_contain);
+            }
+        };
+
+        $object->variadic_folding = false;
+        $object->default_contain = false;
+        // positioned
+        that($object->method(1, 2, 3, 7, 8, 9))->is([
+            "a" => 1,
+            3   => 7,
+            4   => 8,
+            5   => 9,
+        ]);
+        that($object->method(1, 20, 30, 7, 8, 9))->is([
+            "a" => 1,
+            "b" => 20,
+            "c" => 30,
+            3   => 7,
+            4   => 8,
+            5   => 9,
+        ]);
+        // named
+        that($object->method(1, x: 7, y: 8, z: 9))->is([
+            "a" => 1,
+            "x" => 7,
+            "y" => 8,
+            "z" => 9,
+        ]);
+        that($object->method(1, c: 3, b: 2, x: 7, y: 8, z: 9))->is([
+            "a" => 1,
+            "x" => 7,
+            "y" => 8,
+            "z" => 9,
+        ]);
+        that($object->method(1, c: 30, b: 20, x: 7, y: 8, z: 9))->is([
+            "a" => 1,
+            "b" => 20,
+            "c" => 30,
+            "x" => 7,
+            "y" => 8,
+            "z" => 9,
+        ]);
+
+        $object->variadic_folding = true;
+        $object->default_contain = true;
+        // positioned
+        that($object->method(1, 2, 3, 7, 8, 9))->is([
+            "a"   => 1,
+            "b"   => 2,
+            "c"   => 3,
+            "xyz" => [
+                3 => 7,
+                4 => 8,
+                5 => 9,
+            ],
+        ]);
+        that($object->method(1, 20, 30, 7, 8, 9))->is([
+            "a"   => 1,
+            "b"   => 20,
+            "c"   => 30,
+            "xyz" => [
+                3 => 7,
+                4 => 8,
+                5 => 9,
+            ],
+        ]);
+        // named
+        that($object->method(1, x: 7, y: 8, z: 9))->is([
+            "a"   => 1,
+            "b"   => 2,
+            "c"   => 3,
+            "xyz" => [
+                "x" => 7,
+                "y" => 8,
+                "z" => 9,
+            ],
+        ]);
+        that($object->method(1, c: 3, b: 2, x: 7, y: 8, z: 9))->is([
+            "a"   => 1,
+            "b"   => 2,
+            "c"   => 3,
+            "xyz" => [
+                "x" => 7,
+                "y" => 8,
+                "z" => 9,
+            ],
+        ]);
+        that($object->method(1, c: 30, b: 20, x: 7, y: 8, z: 9))->is([
+            "a"   => 1,
+            "b"   => 20,
+            "c"   => 30,
+            "xyz" => [
+                "x" => 7,
+                "y" => 8,
+                "z" => 9,
+            ],
+        ]);
+
+        $f = function ($a, $b = 2, $c = 3, ...$xyz) {
+            return func_get_namedargs();
+        };
+        $expected = [
+            "a" => 1,
+            "x" => 7,
+            "y" => 8,
+            "z" => 9,
+        ];
+
+        that($f->__invoke(1, x: 7, y: 8, z: 9))->is($expected);
+        that(call_user_func($f, 1, x: 7, y: 8, z: 9))->is($expected);
+        that(call_user_func_array($f, [1, 'x' => 7, 'y' => 8, 'z' => 9]))->is($expected);
+
+        $rf = new \ReflectionFunction($f);
+        that($rf->invoke(1, x: 7, y: 8, z: 9))->is($expected);
+        that($rf->invokeArgs([1, 'x' => 7, 'y' => 8, 'z' => 9]))->is($expected);
+
+        that(array_map($f, [10, 20]))->is([
+            ["a" => 10],
+            ["a" => 20],
+        ]);
+
+        that(fn($f) => eval('return $f(1);'))($f)->wasThrown("can't detect named argument");
     }
 
     function test_func_method()
