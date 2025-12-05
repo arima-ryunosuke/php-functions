@@ -405,6 +405,15 @@ x"
             ['a' => 'a3', 'b' => 'b3', 'c' => "c3\nx"],
         ]);
 
+        // headers 指定（null）
+        that(csv_import('
+a1,b1,c1
+a2,b2,c2
+', ['headers' => null]))->is([
+            ['a1', 'b1', 'c1'],
+            ['a2', 'b2', 'c2'],
+        ]);
+
         // headers 指定（数値）
         that(csv_import('
 a1,b1,c1

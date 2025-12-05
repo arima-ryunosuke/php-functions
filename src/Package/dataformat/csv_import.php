@@ -42,6 +42,19 @@ require_once __DIR__ . '/../url/query_parse.php';
  *     ['a' => 'A3', 'b' => 'B3', 'c' => 'C3'],
  * ]);
  *
+ * // ヘッダを指定しない
+ * that(csv_import("
+ * A1,B1,C1
+ * A2,B2,C2
+ * A3,B3,C3
+ * ", [
+ *     'headers' => null, // null を指定するとヘッダなしになる
+ * ]))->is([
+ *     ['A1', 'B1', 'C1'],
+ *     ['A2', 'B2', 'C2'],
+ *     ['A3', 'B3', 'C3'],
+ * ]);
+ *
  * // ヘッダを指定できる
  * that(csv_import("
  * A1,B1,C1
@@ -167,7 +180,10 @@ function csv_import($csvstring, $options = [])
                         $row[] = str_getcsv($field, $delimiter, $enclosure, $escape)[0];
                     }
                 }
-                if (!$headers) {
+                if (!$headermap && $headers === null) {
+                    $headers = range(0, count($row) - 1);
+                }
+                elseif (!$headers) {
                     $headers = $row;
                     continue;
                 }
