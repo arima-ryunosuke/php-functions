@@ -1081,6 +1081,122 @@ class varTest extends AbstractTestCase
         );
     }
 
+    function test_var_export2_named()
+    {
+        $array = [
+            'array'       => [1, 2, 3,],
+            'hash'        => [
+                'a' => 'A',
+                'b' => 'B',
+            ],
+            'empty'       => [],
+            'emptyempty'  => [[]],
+            'emptyempty1' => [[[1]]],
+            'nest'        => [
+                'hash'  => [
+                    'a'    => 'A',
+                    'b'    => 'B',
+                    'hash' => [
+                        'x' => 'X',
+                    ],
+                ],
+                'array' => [
+                    [1, 2, 3, ['X']],
+                ],
+            ],
+            'null'        => null,
+            'int'         => 123,
+            'string'      => "ABC\nXYZ",
+        ];
+
+        that(var_export2($array, ['named' => true, 'return' => true]))->is(<<<'VAR'
+        array      : [1, 2, 3],
+        hash       : [
+            "a" => "A",
+            "b" => "B",
+        ],
+        empty      : [],
+        emptyempty : [
+            [],
+        ],
+        emptyempty1: [
+            [
+                [1],
+            ],
+        ],
+        nest       : [
+            "hash"  => [
+                "a"    => "A",
+                "b"    => "B",
+                "hash" => [
+                    "x" => "X",
+                ],
+            ],
+            "array" => [
+                [
+                    1,
+                    2,
+                    3,
+                    ["X"],
+                ],
+            ],
+        ],
+        null       : null,
+        int        : 123,
+        string     : <<<TEXT
+        ABC
+        XYZ
+        TEXT,
+        
+        VAR,);
+        that(var_export2($array, ['named' => true, 'return' => true, 'minify' => 1]))->is(<<<'VAR'
+        array: [1, 2, 3],
+        hash: [
+            "a" => "A",
+            "b" => "B",
+        ],
+        empty: [],
+        emptyempty: [
+            [],
+        ],
+        emptyempty1: [
+            [
+                [1],
+            ],
+        ],
+        nest: [
+            "hash" => [
+                "a" => "A",
+                "b" => "B",
+                "hash" => [
+                    "x" => "X",
+                ],
+            ],
+            "array" => [
+                [
+                    1,
+                    2,
+                    3,
+                    ["X"],
+                ],
+            ],
+        ],
+        null: null,
+        int: 123,
+        string: "ABC\nXYZ",
+        
+        VAR,);
+        that(var_export2($array, ['named' => true, 'return' => true, 'minify' => 2]))->is(<<<'VAR'
+        array: [1, 2, 3], hash: ["a" => "A", "b" => "B"], empty: [], emptyempty: [[]], emptyempty1: [[[1]]], nest: ["hash" => ["a" => "A", "b" => "B", "hash" => ["x" => "X"]], "array" => [[1, 2, 3, ["X"]]]], null: null, int: 123, string: "ABC\nXYZ"
+        VAR,);
+        that(var_export2($array, ['named' => true, 'return' => true, 'minify' => 3]))->is(<<<'VAR'
+        array:[1,2,3], hash:["a"=>"A", "b"=>"B"], empty:[], emptyempty:[[]], emptyempty1:[[[1]]], nest:["hash"=>["a"=>"A", "b"=>"B", "hash"=>["x"=>"X"]], "array"=>[[1, 2, 3, ["X"]]]], null:null, int:123, string:"ABC\nXYZ"
+        VAR,);
+        that(var_export2($array, ['named' => true, 'return' => true, 'minify' => 9]))->is(<<<'VAR'
+        array:[1,2,3],hash:["a"=>"A","b"=>"B"],empty:[],emptyempty:[[]],emptyempty1:[[[1]]],nest:["hash"=>["a"=>"A","b"=>"B","hash"=>["x"=>"X"]],"array"=>[[1,2,3,["X"]]]],null:null,int:123,string:"ABC\nXYZ"
+        VAR,);
+    }
+
     function test_var_export3()
     {
         $values = [
