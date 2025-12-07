@@ -1002,7 +1002,7 @@ class varTest extends AbstractTestCase
             "null"    => null,
             "nulls"   => [null],
         ]
-        EXPECTED
+        EXPECTED,
         );
         that(var_export2(["'\0\"" => "'\0\""], true))->isSame("[\n    \"'\\0\\\"\" => \"'\\0\\\"\",\n]");
 
@@ -1034,7 +1034,7 @@ class varTest extends AbstractTestCase
             "privateField"    => "Concrete",
             "name"            => "hoge",
         ])
-        VAR
+        VAR,
         );
 
         $concrete->external = 'aaa';
@@ -1046,7 +1046,7 @@ class varTest extends AbstractTestCase
             "privateField"    => "Concrete",
             "name"            => "hoge",
         ])
-        VAR
+        VAR,
         );
     }
 
@@ -1062,7 +1062,7 @@ class varTest extends AbstractTestCase
                 ],
             ],
         ]
-        VAR
+        VAR,
         );
 
         $robject = new \stdClass();
@@ -1077,7 +1077,7 @@ class varTest extends AbstractTestCase
                 ],
             ],
         ]
-        VAR
+        VAR,
         );
     }
 
@@ -1751,6 +1751,7 @@ class varTest extends AbstractTestCase
             'return'       => true,
             'trace'        => 3,
             'table'        => false,
+            'counting'     => false,
             'excludeclass' => [\Exception::class],
         ]))
             ->stringContains(__FILE__)
@@ -1791,6 +1792,7 @@ class varTest extends AbstractTestCase
         ], [
             'context'  => 'plain',
             'return'   => true,
+            'counting' => false,
             'maxcount' => 5,
         ]))
             ->stringContains('  list: [1, 2, 3, 4, 5 (more 5 elements)],')
@@ -1802,6 +1804,7 @@ class varTest extends AbstractTestCase
         ], [
             'context'  => 'plain',
             'return'   => true,
+            'counting' => false,
             'maxdepth' => 5,
         ]))
             ->stringContains('          (too deep),')
@@ -1817,6 +1820,7 @@ class varTest extends AbstractTestCase
         ], [
             'context'   => 'plain',
             'return'    => true,
+            'counting'  => false,
             'maxlength' => 30,
         ]))
             ->stringContains('  list1: ["ssssssssss"],')
@@ -1868,9 +1872,10 @@ class varTest extends AbstractTestCase
                 ['A2', 'B2', 'C2'],
             ],
         ], [
-            'context' => 'plain',
-            'return'  => true,
-            'table'   => true,
+            'context'  => 'plain',
+            'return'   => true,
+            'table'    => true,
+            'counting' => false,
         ]))
             ->stringContains(<<<MD
               arrays: array[]
@@ -1945,9 +1950,10 @@ class varTest extends AbstractTestCase
                 'p' => (object) ['a' => 'A3', 'b' => 'B3', 'c' => 'C3', 'x' => ['y' => ['z' => 3]]],
             ],
         ], [
-            'context' => 'plain',
-            'return'  => true,
-            'table'   => fn($v) => var_export($v, true),
+            'context'  => 'plain',
+            'return'   => true,
+            'table'    => fn($v) => var_export($v, true),
+            'counting' => false,
         ]))
             ->stringContains(<<<MD
               arrays: array[]
@@ -2038,10 +2044,26 @@ class varTest extends AbstractTestCase
             )  ,
             MD,);
 
+        that(var_pretty([
+            [1, 2],
+            ['a' => 'A', 'b' => 'B'],
+            (object) ['x' => 'X'],
+        ], [
+            'context'  => 'plain',
+            'return'   => true,
+            'table'    => false,
+            'counting' => true,
+        ]))
+            ->stringContains("(3)[")
+            ->stringContains("(2)[")
+            ->stringContains("(2){")
+            ->stringContains("(1){");
+
         that(var_pretty($value, [
-            'context' => 'plain',
-            'return'  => true,
-            'limit'   => 60,
+            'context'  => 'plain',
+            'return'   => true,
+            'counting' => false,
+            'limit'    => 60,
         ]))
             ->stringContains("      X: (...omitted)");
 
@@ -2103,9 +2125,10 @@ class varTest extends AbstractTestCase
         ], null, true);
 
         that(var_pretty($value, [
-            'context' => 'plain',
-            'return'  => true,
-            'minify'  => true,
+            'context'  => 'plain',
+            'return'   => true,
+            'counting' => false,
+            'minify'   => true,
         ]))
             ->stringNotContains("\n")
             ->stringNotContains("0:stdClass#")
@@ -2194,8 +2217,8 @@ class varTest extends AbstractTestCase
 
         // stdClass や AllowDynamicProperties は object になる
         that(var_type(new #[\AllowDynamicProperties] class(
-            id: 1,
-            name: 'a',
+            id      : 1,
+            name    : 'a',
             children: [
                 (object) ['cid' => 1, 'cname' => 'x'],
                 (object) ['cid' => 2, 'cname' => 'y'],

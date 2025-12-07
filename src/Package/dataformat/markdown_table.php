@@ -52,7 +52,7 @@ function markdown_table($array, $option = [])
         }
         return $result;
     })();
-    $option['stringify'] ??= fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false]);
+    $option['stringify'] ??= fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false, 'counting' => $option['counting'] ?? true]);
 
     $stringify = fn($v) => strtr(((is_stringable($v) && !is_null($v) && !is_bool($v) ? $v : $option['stringify']($v)) ?? ''), ["\t" => '    ']);
     $is_numeric = function ($v) {

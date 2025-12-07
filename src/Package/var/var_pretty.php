@@ -83,6 +83,7 @@ function var_pretty($value, $options = [])
         'callback'      => null,  // 値1つごとのコールバック（値と文字列表現（参照）が引数で渡ってくる）
         'debuginfo'     => true,  // debugInfo を利用してオブジェクトのプロパティを絞るか
         'table'         => true,  // 連想配列の配列の場合にテーブル表示するか（コールバック。true はマークダウン風味固定）
+        'counting'      => true,  // 個数の表示
         'maxcolumn'     => null,  // 1行あたりの文字数
         'maxcount'      => null,  // 複合型の要素の数
         'maxdepth'      => null,  // 複合型の深さ
@@ -170,6 +171,11 @@ function var_pretty($value, $options = [])
         public function plain($token, $style = null): self
         {
             return $this->_append($token, $style);
+        }
+
+        public function comment($token): self
+        {
+            return $this->_append($token, 'italic');
         }
 
         public function index($token): self
@@ -361,7 +367,7 @@ function var_pretty($value, $options = [])
                         }
                     }
 
-                    return $objective ? "{$first_condition}[]" : 'array[]';
+                    return ($objective ? "{$first_condition}[]" : "array[]") . ($this->options['counting'] ? "($count)" : "");
                 })();
 
                 $key = null;
@@ -400,6 +406,7 @@ function var_pretty($value, $options = [])
                         $this->plain(preg_replace('#^#um', $spacer1, markdown_table(array_map(fn($v) => $this->array($v), $value), [
                             'keylabel' => "#",
                             'context'  => $this->options['context'],
+                            'counting' => $this->options['counting'],
                         ])));
                     }
                     else {
@@ -409,6 +416,9 @@ function var_pretty($value, $options = [])
                 }
                 elseif ($assoc) {
                     $n = 0;
+                    if ($this->options['counting']) {
+                        $this->comment("($count)");
+                    }
                     if ($is_hasharray) {
                         $this->plain("{\n");
                     }
@@ -442,6 +452,9 @@ function var_pretty($value, $options = [])
                 else {
                     $lastkey = last_key($value);
                     $n = 0;
+                    if ($this->options['counting']) {
+                        $this->comment("($count)");
+                    }
                     $this->plain('[');
                     if (!$value) {
                         $this->plain('...(too length)...')->plain(', ');
