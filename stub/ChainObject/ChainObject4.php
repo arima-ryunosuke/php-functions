@@ -343,6 +343,11 @@ trait ChainObject4
     public function strmode2oct($perms): self { }
     public function strmode2oct(): self { }
 
+    /** @see func_get_namedargs() */
+    public self $func_get_namedargs;
+    public function func_get_namedargs(bool $variadic_folding = false, bool $default_contain = false): self { }
+    public function func_get_namedargs(bool $default_contain = false): self { }
+
     /** @see func_wiring() */
     public self $func_wiring;
     public function func_wiring(callable $callable, $dependency): self { }

@@ -643,6 +643,11 @@ trait ChainObject6
     public function strcat(?string ...$variadic): self { }
     public function strcat(): self { }
 
+    /** @see stritr() */
+    public self $stritr;
+    public function stritr(string $string, array $replace_pairs, ?int &$count = null): self { }
+    public function stritr(array $replace_pairs, ?int &$count = null): self { }
+
     /** @see try_return() */
     public self $try_return;
     public function try_return($try, ...$variadic): self { }

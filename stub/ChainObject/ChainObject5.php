@@ -454,6 +454,11 @@ TEXT): self { }
     public function type_exists($typename, $autoload = true): self { }
     public function type_exists($autoload = true): self { }
 
+    /** @see import_once() */
+    public self $import_once;
+    public function import_once(string $filename): self { }
+    public function import_once(): self { }
+
     /** @see sql_quote() */
     public self $sql_quote;
     public function sql_quote($value): self { }

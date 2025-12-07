@@ -7698,6 +7698,56 @@ if (!function_exists('type_exists')) {
     }
 }
 
+assert(!function_exists('import_once') || (new \ReflectionFunction('import_once'))->isUserDefined());
+if (!function_exists('import_once')) {
+    /**
+     * 一度しか読み込まない require
+     *
+     * require_once と同じだが require_once は2回目以降 true を返すので「そのファイルで生成した何か」を得るのにやや不向き。
+     * js の import のようにファイル側で何かインスタンスを生成してそれを使いまわしたいことは多々ある。
+     * （php の仕様上 js のようにクラス定義を返したりすることは不可能だが）。
+     *
+     * Example:
+     * ```php
+     * $file = sys_get_temp_dir() . '/rf-import_once.php';
+     * file_put_contents($file, '<?php usleep(10000); return microtime(true);');
+     *
+     * // require_once は2回目に true を返す
+     * $require_once1 = require_once($file);
+     * $require_once2 = require_once($file);
+     * that($require_once1)->isFloat();
+     * that($require_once2)->isTrue();
+     * that($require_once1)->isNotSame($require_once2);
+     *
+     * // require は2回読み込めるが毎回読み込む
+     * $require1 = require($file);
+     * $require2 = require($file);
+     * that($require1)->isFloat();
+     * that($require2)->isFloat();
+     * that($require1)->isNotSame($require2);
+     *
+     * // import_once は2回読み込めて同じ結果を返す
+     * $import_once1 = import_once($file);
+     * $import_once2 = import_once($file);
+     * that($import_once1)->isFloat();
+     * that($import_once2)->isFloat();
+     * that($import_once1)->isSame($import_once2);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\core
+     *
+     * @param string $filename
+     * @return mixed require の返り値
+     */
+    function import_once(string $filename)
+    {
+        static $imports = [];
+
+        $filename = realpath($filename);
+        return $imports[$filename] ??= require $filename;
+    }
+}
+
 assert(!function_exists('sql_bind') || (new \ReflectionFunction('sql_bind'))->isUserDefined());
 if (!function_exists('sql_bind')) {
     /**
@@ -9466,6 +9516,19 @@ if (!function_exists('csv_import')) {
      *     ['a' => 'A3', 'b' => 'B3', 'c' => 'C3'],
      * ]);
      *
+     * // ヘッダを指定しない
+     * that(csv_import("
+     * A1,B1,C1
+     * A2,B2,C2
+     * A3,B3,C3
+     * ", [
+     *     'headers' => null, // null を指定するとヘッダなしになる
+     * ]))->is([
+     *     ['A1', 'B1', 'C1'],
+     *     ['A2', 'B2', 'C2'],
+     *     ['A3', 'B3', 'C3'],
+     * ]);
+     *
      * // ヘッダを指定できる
      * that(csv_import("
      * A1,B1,C1
@@ -9591,7 +9654,10 @@ if (!function_exists('csv_import')) {
                             $row[] = str_getcsv($field, $delimiter, $enclosure, $escape)[0];
                         }
                     }
-                    if (!$headers) {
+                    if (!$headermap && $headers === null) {
+                        $headers = range(0, count($row) - 1);
+                    }
+                    elseif (!$headers) {
                         $headers = $row;
                         continue;
                     }
@@ -11082,7 +11148,7 @@ if (!function_exists('markdown_table')) {
             }
             return $result;
         })();
-        $option['stringify'] ??= fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false]);
+        $option['stringify'] ??= fn($v) => var_pretty($v, ['return' => true, 'context' => $option['context'], 'table' => false, 'counting' => $option['counting'] ?? true]);
 
         $stringify = fn($v) => strtr(((is_stringable($v) && !is_null($v) && !is_bool($v) ? $v : $option['stringify']($v)) ?? ''), ["\t" => '    ']);
         $is_numeric = function ($v) {
@@ -17940,6 +18006,82 @@ if (!function_exists('func_eval')) {
             $cache[$cachekey] = evaluate("return function($args) { return $stmt; };");
         }
         return $cache[$cachekey];
+    }
+}
+
+assert(!function_exists('func_get_namedargs') || (new \ReflectionFunction('func_get_namedargs'))->isUserDefined());
+if (!function_exists('func_get_namedargs')) {
+    /**
+     * 呼び出し元の名前付き引数を返す
+     *
+     * 意外にも標準関数には存在しないし、get_defined_vars が近いが、使う場所や use 等で事故りやすい。
+     * この関数を使うと本当の名前付き引数を得ることができる。
+     * ただし、debug_backtrace + Reflection を使用しているので get_defined_vars に比べて猛烈に遅いことに注意。
+     *
+     * また、クロージャの直接呼出しは対応していない（call_user_func や $c->__invoke 等で呼び出す必要がある）。
+     * 呼び元に依存する上、かなりややこしいことになるが言語仕様上不可能なのでしょうがない。
+     *
+     * @package ryunosuke\Functions\Package\funchand
+     *
+     * @param bool $variadic_folding 可変引数を1つにまとめるか
+     * @param bool $default_contain デフォルト引数を含めるか
+     * @return array 名前付き引数
+     */
+    function func_get_namedargs(bool $variadic_folding = false, bool $default_contain = false): array
+    {
+        $traces = debug_backtrace(limit: 3);
+        $argsuments = $traces[1]['args'];
+
+        $ref = (function () use ($traces) {
+            $trace = $traces[1];
+            if (!str_ends_with($trace['function'], '{closure}')) {
+                return isset($trace['class']) ? new \ReflectionMethod($trace['class'], $trace['function']) : new \ReflectionFunction($trace['function']);
+            }
+
+            $trace = $traces[2];
+            if (!isset($trace['class'])) {
+                $closures = array_filter($trace['args'] ?? [], fn($v) => $v instanceof \Closure);
+                if (count($closures) === 1) {
+                    return new \ReflectionFunction(reset($closures));
+                }
+            }
+            elseif ($trace['class'] === \Closure::class) {
+                return new \ReflectionFunction($trace['object']);
+            }
+            elseif ($trace['class'] === \ReflectionFunction::class) {
+                return new \ReflectionFunction($trace['object']->getClosure());
+            }
+            throw new \DomainException("can't detect named argument at {$trace['function']}");
+        })();
+
+        $n = 0;
+        $parameters = [];
+        foreach ($ref->getParameters() as $param) {
+            $pos = $param->getPosition();
+            $nam = $param->getName();
+
+            if ($param->isVariadic()) {
+                $restargs = array_slice($argsuments, $n, null, true);
+                if ($variadic_folding) {
+                    $parameters[$nam] = $restargs;
+                }
+                else {
+                    $parameters = array_replace($parameters, $restargs);
+                }
+            }
+            elseif (array_key_exists($pos, $argsuments)) {
+                $n++;
+                if ($default_contain || !($param->isDefaultValueAvailable() && $argsuments[$pos] === $param->getDefaultValue())) {
+                    $parameters[$nam] = $argsuments[$pos];
+                }
+            }
+            else {
+                if ($default_contain) {
+                    $parameters[$nam] = $param->getDefaultValue();
+                }
+            }
+        }
+        return $parameters;
     }
 }
 
@@ -32277,6 +32419,57 @@ if (!function_exists('strcat')) {
     }
 }
 
+assert(!function_exists('stritr') || (new \ReflectionFunction('stritr'))->isUserDefined());
+if (!function_exists('stritr')) {
+    /**
+     * 大文字小文字を区別しない strtr
+     *
+     * それ以外のすべての動作は strtr と同じ。
+     * ただし3引数版は用途がほぼないので2引数版のみ。
+     *
+     * また str_replace を真似て $count に置換回数が格納される。
+     * ただしこの $count はマッチ回数ではなく置換回数を返す。
+     * つまり検索文字が見つかったが、結果として変わらなかった場合は $count には計上されない。
+     * $count は往々にして「置換が行われたか？」の判断に使われるのでマッチ回数だとやや不便。
+     * （そのようなことは strtr や str_replace では検索と置換を同じ文字にしない限りあり得ないが、大文字小文字を区別しない場合はそこそこあり得る話である）。
+     *
+     * Example:
+     * ```php
+     * // 長いものから置換される
+     * that(stritr('Hello', ['Hel' => 'X', 'Hell' => 'Y']))->isSame('Yo');
+     * // 一度置換したものは置換しない
+     * that(stritr('Hello', ['Hel' => 'X', 'X' => 'Y', 'Y' => 'Z']))->isSame('Xlo');
+     * // 大文字小文字は区別しない
+     * that(stritr('Hello', ['hel' => 'X', 'hell' => 'Y']))->isSame('Yo');
+     * // $count には置換回数が格納される
+     * // この場合、apple という単語を Apple という upper に置換する処理で、マッチ回数は4,置換回数は2 である
+     * that(stritr('apple to Apple, APPLE to Apple', ['apple' => 'Apple'], $count))->isSame('Apple to Apple, Apple to Apple');
+     * that($count)->is(2);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     */
+    function stritr(string $string, array $replace_pairs, ?int &$count = null): string
+    {
+        uksort($replace_pairs, fn($a, $b) => strlen($b) <=> strlen($a));
+
+        $patterns = array_map(fn($s) => preg_quote($s, '#'), array_keys($replace_pairs));
+        $pattern = '#' . implode('|', $patterns) . '#iu';
+
+        $replace_pairs = array_change_key_case($replace_pairs, CASE_LOWER);
+
+        $count = 0;
+        return preg_replace_callback($pattern, function ($matches) use ($replace_pairs, &$count) {
+            $lower = strtolower($matches[0]);
+            if ($matches[0] !== $replace_pairs[$lower]) {
+                $count++;
+                return $replace_pairs[$lower];
+            }
+            return $matches[0];
+        }, $string);
+    }
+}
+
 assert(!function_exists('strpos_array') || (new \ReflectionFunction('strpos_array'))->isUserDefined());
 if (!function_exists('strpos_array')) {
     /**
@@ -37035,10 +37228,19 @@ if (!function_exists('var_export2')) {
      *
      * - 配列は 5.4 以降のショートシンタックス（[]）で出力
      * - ただの配列は1行（[1, 2, 3]）でケツカンマなし、連想配列は桁合わせインデントでケツカンマあり
+     *   - 多少の整形は下記の minify オプションで指定可能（4 ～ 8 は未定義）
+     *     - 0: 完全なるフォーマット
+     *     - 1: アライン無しフォーマット
+     *     - 2: スペースありのワンライン
+     *     - 3: 要素ペアごとにスペースありのワンライン
+     *     - 9: 一切スペースなし最短縮
      * - 文字列はダブルクオート
      * - null は null（小文字）
      * - 再帰構造を渡しても警告がでない（さらに NULL ではなく `'*RECURSION*'` という文字列になる）
      * - 配列の再帰構造の出力が異なる（Example参照）
+     *
+     * named オプションを渡すと出力が名前付き引数形式になる。
+     * シンタックスのチェックや値の検証などは行わないので注意。
      *
      * Example:
      * ```php
@@ -37074,6 +37276,8 @@ if (!function_exists('var_export2')) {
      *         ],
      *     ],
      * ]');
+     * // 名前付き引数形式
+     * that(var_export2(['name' => 'taro', 'age' => 27, 'opt' => ['X', 'Y', 'Z']], ['return' => true, 'minify' => 2, 'named' => true]))->isSame('name: "taro", age: 27, opt: ["X", "Y", "Z"]');
      * ```
      *
      * @package ryunosuke\Functions\Package\var
@@ -37091,46 +37295,61 @@ if (!function_exists('var_export2')) {
         }
 
         $options += [
-            'minify' => false, // 短縮形で返す（実質的には情報を減らして1行で返す）
+            'minify' => 0,     // 短縮レベル
+            'named'  => false, // 名前付き引数の形式で返す
             'indent' => 4,     // インデントの空白数
             'return' => false, // 値を戻すか出力するか
         ];
+        // for compatible
+        if ($options['minify'] === true) {
+            $options['minify'] = 9;
+        }
+        $options['minify'] = (int) $options['minify'];
 
         // 再帰用クロージャ
-        $export = function ($value, $context, $nest = 0, $parents = []) use (&$export, $options) {
+        $export = function ($value, $context, $nest, $parents = []) use (&$export, $options) {
             // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
             foreach ($parents as $parent) {
                 if ($parent === $value) {
-                    return $export('*RECURSION*', 'recursion');
+                    return $export('*RECURSION*', 'recursion', $nest);
                 }
             }
 
-            $space = $options['minify'] ? "" : " ";
-            $break = $options['minify'] ? "" : "\n";
+            $space = $options['minify'] < 9 ? " " : "";
+            $break = $options['minify'] > 1 ? "" : "\n";
+            $lastcomma = $options['minify'] === 0 || $options['minify'] === 1 ? "," : "";
+            $tailcomma = 1 < $options['minify'] && $options['minify'] < 9 ? ", " : ",";
+            $indent = $options['minify'] === 0 || $options['minify'] === 1 ? $space : "";
+            $align = $options['minify'] === 0 ? $space : "";
+            $arrow = $options['minify'] <= 2 ? $space : "";
+            $delim = $options['named'] && $nest === -1 ? ":$arrow" : "$arrow=>$arrow";
 
             // 配列は連想判定したり再帰したり色々
             if (is_array($value)) {
-                $spacer1 = str_repeat($space, ($nest + 1) * $options['indent']);
-                $spacer2 = str_repeat($space, $nest * $options['indent']);
+                $spacer1 = str_repeat($indent, ($nest + 1) * $options['indent']);
+                $spacer2 = str_repeat($indent, max(0, $nest) * $options['indent']);
 
                 $hashed = is_hasharray($value);
 
                 // スカラー値のみで構成されているならシンプルな再帰
                 if (!$hashed && array_and($value, fn(...$args) => is_primitive(...$args))) {
-                    return '[' . implode(",$space", array_map(fn($v) => $export($v, 'array-value'), $value)) . ']';
+                    return '[' . implode(",$arrow", array_map(fn($v) => $export($v, 'array-value', $nest), $value)) . ']';
                 }
 
                 // 連想配列はキーを含めて桁あわせ
                 if ($hashed) {
-                    $keys = array_map(fn($v) => $export($v, 'array-key'), array_combine($keys = array_keys($value), $keys));
+                    $keys = array_map(fn($v) => $export($v, 'array-key', $nest), array_combine($keys = array_keys($value), $keys));
                     $maxlen = max(array_map('strlen', $keys));
                 }
                 $kvl = '';
                 $lastkey = array_key_last($value);
                 $parents[] = $value;
                 foreach ($value as $k => $v) {
-                    $keystr = $hashed ? $keys[$k] . str_repeat($space, $maxlen - strlen($keys[$k])) . "$space=>$space" : '';
-                    $kvl .= $spacer1 . $keystr . $export($v, 'array-value', $nest + 1, $parents) . ($k === $lastkey && $options['minify'] ? "" : ",") . "$break";
+                    $keystr = $hashed ? $keys[$k] . str_repeat($align, $maxlen - strlen($keys[$k])) . $delim : '';
+                    $kvl .= $spacer1 . $keystr . $export($v, 'array-value', $nest + 1, $parents) . ($k === $lastkey ? $lastcomma : $tailcomma) . $break;
+                }
+                if ($options['named'] && $nest === -1) {
+                    return $kvl;
                 }
                 return "[$break{$kvl}{$spacer2}]";
             }
@@ -37147,6 +37366,9 @@ if (!function_exists('var_export2')) {
             elseif (is_string($value)) {
                 // 列揃えのため配列のキーは常にダブルクォート
                 if ($context === 'array-key') {
+                    if ($options['named'] && $nest === -1) {
+                        return $value;
+                    }
                     return str_quote($value);
                 }
                 // 改行を含むならヒアドキュメント
@@ -37172,7 +37394,7 @@ if (!function_exists('var_export2')) {
         };
 
         // 結果を返したり出力したり
-        $result = $export($value, null);
+        $result = $export($value, null, $options['named'] ? -1 : 0);
         if ($options['return']) {
             return $result;
         }
@@ -38030,6 +38252,7 @@ if (!function_exists('var_pretty')) {
             'callback'      => null,  // 値1つごとのコールバック（値と文字列表現（参照）が引数で渡ってくる）
             'debuginfo'     => true,  // debugInfo を利用してオブジェクトのプロパティを絞るか
             'table'         => true,  // 連想配列の配列の場合にテーブル表示するか（コールバック。true はマークダウン風味固定）
+            'counting'      => true,  // 個数の表示
             'maxcolumn'     => null,  // 1行あたりの文字数
             'maxcount'      => null,  // 複合型の要素の数
             'maxdepth'      => null,  // 複合型の深さ
@@ -38117,6 +38340,11 @@ if (!function_exists('var_pretty')) {
             public function plain($token, $style = null): self
             {
                 return $this->_append($token, $style);
+            }
+
+            public function comment($token): self
+            {
+                return $this->_append($token, 'italic');
             }
 
             public function index($token): self
@@ -38308,7 +38536,7 @@ if (!function_exists('var_pretty')) {
                             }
                         }
 
-                        return $objective ? "{$first_condition}[]" : 'array[]';
+                        return ($objective ? "{$first_condition}[]" : "array[]") . ($this->options['counting'] ? "($count)" : "");
                     })();
 
                     $key = null;
@@ -38347,6 +38575,7 @@ if (!function_exists('var_pretty')) {
                             $this->plain(preg_replace('#^#um', $spacer1, markdown_table(array_map(fn($v) => $this->array($v), $value), [
                                 'keylabel' => "#",
                                 'context'  => $this->options['context'],
+                                'counting' => $this->options['counting'],
                             ])));
                         }
                         else {
@@ -38356,6 +38585,9 @@ if (!function_exists('var_pretty')) {
                     }
                     elseif ($assoc) {
                         $n = 0;
+                        if ($this->options['counting']) {
+                            $this->comment("($count)");
+                        }
                         if ($is_hasharray) {
                             $this->plain("{\n");
                         }
@@ -38389,6 +38621,9 @@ if (!function_exists('var_pretty')) {
                     else {
                         $lastkey = last_key($value);
                         $n = 0;
+                        if ($this->options['counting']) {
+                            $this->comment("($count)");
+                        }
                         $this->plain('[');
                         if (!$value) {
                             $this->plain('...(too length)...')->plain(', ');
