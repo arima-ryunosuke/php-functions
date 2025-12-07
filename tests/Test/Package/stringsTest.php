@@ -54,6 +54,7 @@ use function ryunosuke\Functions\Package\str_resource;
 use function ryunosuke\Functions\Package\str_submap;
 use function ryunosuke\Functions\Package\str_subreplace;
 use function ryunosuke\Functions\Package\strcat;
+use function ryunosuke\Functions\Package\stritr;
 use function ryunosuke\Functions\Package\strpos_array;
 use function ryunosuke\Functions\Package\strpos_closest;
 use function ryunosuke\Functions\Package\strpos_escaped;
@@ -1893,6 +1894,31 @@ that is <del>a</del><ins>the</ins> pen
         // __toString() も活きるはず（implode してるだけだが念のため）
         $e = new \Exception();
         that(strcat('a', $e, 'z'))->is("a{$e}z");
+    }
+
+    function test_stritr()
+    {
+        // 長いものから置換される
+        that(stritr('hogera', ['hog' => 'X', 'hoge' => 'Y'], $count))->is('Yra');
+        that($count)->is(1);
+        that(stritr('hogera', ['hoge' => 'Y', 'hog' => 'X'], $count))->is('Yra');
+        that($count)->is(1);
+
+        // 置換後は置換対象にならない
+        that(stritr('hogegera', ['hoge' => 'ge', 'ge' => 'Y'], $count))->is('geYra');
+        that($count)->is(2);
+        that(stritr('hogegera', ['ge' => 'Y', 'hoge' => 'ge'], $count))->is('geYra');
+        that($count)->is(2);
+
+        // そして何より大文字小文字を区別しない
+        that(stritr('hogera', ['Hoge' => 'X', 'RA' => 'Y'], $count))->is('XY');
+        that($count)->is(2);
+        that(stritr('hogera', ['RA' => 'Y', 'Hoge' => 'X'], $count))->is('XY');
+        that($count)->is(2);
+
+        // count は置換された場合のみ
+        that(stritr('apple to Apple, APPLE to Apple', ['apple' => 'Apple'], $count))->is('Apple to Apple, Apple to Apple');
+        that($count)->is(2);
     }
 
     function test_strpos_array()
