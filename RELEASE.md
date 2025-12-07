@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.30
+
+- [feature] var_pretty に件数表示オプションを追加
+- [feature] stritr を追加
+- [feature] csv_import にヘッダ未指定機能を追加
+- [feature] import_once を追加
+- [feature] func_get_namedargs を追加
+- [feature] var_export2 の名前付き引数出力機能
+
 ## 2.0.29
 
 - [feature] cidr_subnet を追加
