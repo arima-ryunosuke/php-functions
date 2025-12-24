@@ -74,7 +74,7 @@ function stream_describe($stream = null): ?array
         $metadata = stream_get_meta_data($resource);
         if (isset($metadata['uri'])) {
             $fstat = fstat($resource);
-            if ($fstat != false) {
+            if ($fstat) {
                 if (isset($descriptors[$fstat['ino']])) {
                     // resource と fd は id は一致しないが時系列での増減は同じなので順番に取り出せば一致する
                     $descriptor = array_shift($descriptors[$fstat['ino']]);

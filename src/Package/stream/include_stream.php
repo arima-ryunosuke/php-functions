@@ -263,7 +263,7 @@ function include_stream()
 
         #</editor-fold>
 
-        public function register($hook)
+        public function register(callable $hook): self
         {
             stream_wrapper_unregister('file');
             stream_wrapper_register('file', get_class($this));
@@ -271,7 +271,7 @@ function include_stream()
             return $this;
         }
 
-        public function restore()
+        public function restore(): callable
         {
             stream_wrapper_unregister('file');
             stream_wrapper_restore('file');

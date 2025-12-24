@@ -125,7 +125,7 @@ function html_attr($array, $options = [])
         if (is_array($value)) {
             return true;
         }
-        if (is_object($value) && $value instanceof \Traversable && !method_exists($value, '__toString')) {
+        if ($value instanceof \Traversable && !method_exists($value, '__toString')) {
             return true;
         }
         return false;

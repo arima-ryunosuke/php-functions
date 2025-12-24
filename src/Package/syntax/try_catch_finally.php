@@ -41,12 +41,7 @@ function try_catch_finally($try, $catch = null, $finally = null, ...$variadic)
         return $try(...$variadic);
     }
     catch (\Exception $tried_ex) {
-        try {
-            return $catch($tried_ex);
-        }
-        catch (\Exception $catched_ex) {
-            throw $catched_ex;
-        }
+        return $catch($tried_ex);
     }
     finally {
         if ($finally !== null) {

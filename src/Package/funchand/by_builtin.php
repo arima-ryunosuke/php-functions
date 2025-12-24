@@ -51,11 +51,11 @@ function by_builtin($class, $function)
                 return false;
             }
             // for call_user_func([$object, 'func']), (new ReflectionMethod($object, 'func'))->invoke($object)
-            elseif (isset($last) && isset($last['function']) && isset($invoker[$last['function']])) {
+            elseif (isset($last['function']) && isset($invoker[$last['function']])) {
                 return false;
             }
             // for func($object)
-            elseif (isset($last) && isset($last['function']) && $last['function'] === $function) {
+            elseif (isset($last['function']) && $last['function'] === $function) {
                 return true;
             }
         }

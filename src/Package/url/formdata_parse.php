@@ -64,7 +64,7 @@ function formdata_parse(
         $formdata = str_resource($formdata);
     }
 
-    $generator = (function () use ($formdata, $decoder) {
+    $generator = (function () use ($formdata, $boundary, $decoder) {
         $line = fgets($formdata);
         $boundary ??= trim(substr($line, 2));
 

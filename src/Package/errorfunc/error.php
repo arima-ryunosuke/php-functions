@@ -29,7 +29,7 @@ function error($message, $destination = null)
     $time = date('d-M-Y H:i:s e');
     $content = stringify($message);
     $location = '';
-    if (!($message instanceof \Exception || $message instanceof \Throwable)) {
+    if (!$message instanceof \Throwable) {
         foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
             if (isset($trace['file'], $trace['line'])) {
                 $location = " in {$trace['file']} on line {$trace['line']}";

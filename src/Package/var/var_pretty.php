@@ -392,7 +392,7 @@ function var_pretty($value, $options = [])
                     }
                     // 要素が1つなら複数行化するメリットがないので2以上とする
                     if (count($lengths) >= 2 && ($this->options['maxlistcolumn'] ?? PHP_INT_MAX) <= array_sum($lengths)) {
-                        $assoc = !$this->options['minify'] && true;
+                        $assoc = !$this->options['minify'];
                     }
                 }
 

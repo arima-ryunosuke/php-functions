@@ -75,11 +75,11 @@ function cacheobject($directory = null, $clean_probability = 0, $clean_execution
                 return $props;
             }
 
-            private function _exception(string $message = "", int $code = 0, \Throwable $previous = null): \Throwable
+            private function _exception(string $message = ""): \Throwable
             {
                 return interface_exists(\Psr\SimpleCache\InvalidArgumentException::class)
-                    ? new class ( $message, $code, $previous ) extends \InvalidArgumentException implements \Psr\SimpleCache\InvalidArgumentException { }
-                    : new class ( $message, $code, $previous ) extends \InvalidArgumentException { };
+                    ? new class ( $message ) extends \InvalidArgumentException implements \Psr\SimpleCache\InvalidArgumentException { }
+                    : new class ( $message ) extends \InvalidArgumentException { };
             }
 
             private function _validateKey(string $key): void

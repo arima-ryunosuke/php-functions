@@ -665,17 +665,13 @@ function sql_format($sql, $options = [])
         ];
         $rule = $rules[$options['highlight']] ?? throw new \InvalidArgumentException('highlight must be "cli" or "html".');
         $options['highlight'] = function ($token, $ttype) use ($keywords, $rule) {
-            switch (true) {
-                case isset($keywords[strtoupper($token)]):
-                    return $rule['KEYWORD']($token);
-                case in_array($ttype, [T_COMMENT, T_DOC_COMMENT]):
-                    return $rule['COMMENT']($token);
-                case in_array($ttype, [T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE]):
-                    return $rule['STRING']($token);
-                case in_array($ttype, [T_LNUMBER, T_DNUMBER]):
-                    return $rule['NUMBER']($token);
-            }
-            return $token;
+            return match (true) {
+                isset($keywords[strtoupper($token)])                                      => $rule['KEYWORD']($token),
+                in_array($ttype, [T_COMMENT, T_DOC_COMMENT])                              => $rule['COMMENT']($token),
+                in_array($ttype, [T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE]) => $rule['STRING']($token),
+                in_array($ttype, [T_LNUMBER, T_DNUMBER])                                  => $rule['NUMBER']($token),
+                default                                                                   => $token,
+            };
         };
     }
     $options['syntaxer'] = function ($token, $ttype) use ($options, $keywords) {

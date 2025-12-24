@@ -259,8 +259,8 @@ function chain($source = null)
                     ];
                     foreach ($parameters as $parameter) {
                         $type = $parameter->getType();
-                        $metadata['nullable'][$parameter->getPosition()] = $type ? $type->allowsNull() : null;
-                        $metadata['nullable'][$parameter->getName()] = $type ? $type->allowsNull() : null;
+                        $metadata['nullable'][$parameter->getPosition()] = $type?->allowsNull();
+                        $metadata['nullable'][$parameter->getName()] = $type?->allowsNull();
                         $metadata['positions'][$parameter->getPosition()] = $parameter->getName();
                         $metadata['names'][$parameter->getName()] = $parameter->getPosition();
                     }

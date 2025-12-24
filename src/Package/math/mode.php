@@ -41,6 +41,5 @@ function mode(...$variadic)
     $args = array_combine($vals, $args);
     $counts = array_count_values($vals);
     arsort($counts);
-    reset($counts);
-    return $args[key($counts)];
+    return $args[array_key_first($counts)];
 }

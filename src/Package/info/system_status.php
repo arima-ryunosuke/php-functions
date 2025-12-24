@@ -20,7 +20,7 @@ require_once __DIR__ . '/../var/si_unprefix.php';
  */
 function system_status(
     /** バイト系数値の単位 */ string $siunit = '',
-    /** 日時系のフォーマット */ string $datetime_format = \DateTime::RFC3339,
+    /** 日時系のフォーマット */ string $datetime_format = \DateTimeInterface::RFC3339,
 ): array {
     $unitize = function ($size) use ($siunit) {
         return match ($siunit) {

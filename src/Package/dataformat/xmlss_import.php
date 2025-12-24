@@ -76,18 +76,13 @@ function xmlss_import($xmlssstring, array $options = [])
         'callback' => null,  // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
         'type'     => function ($type, $value) {
             // 実質的に DateTime 専用で DateTime を使わないなら指定する意味は全くない
-            switch ($type) {
-                case 'String':
-                    return $value;
-                case 'Boolean':
-                    return (bool) $value;
-                case 'Number':
-                    return +$value;
-                case 'DateTime':
-                    return new (function_configure('datetime.class'))($value);
-                default:
-                    throw new \UnexpectedValueException('Unknown type: ' . $type); // @codeCoverageIgnore
-            }
+            return match ($type) {
+                'String'   => $value,
+                'Boolean'  => (bool) $value,
+                'Number'   => +$value,
+                'DateTime' => new (function_configure('datetime.class'))($value),
+                default    => throw new \UnexpectedValueException('Unknown type: ' . $type),
+            };
         },
         'limit'    => null,  // 正味のデータ行の最大値（超えた場合はそこで処理を終了する。例外が飛んだりはしない）
     ];

@@ -31,7 +31,7 @@ function set_trace_logger($logger, string $target)
     return register_autoload_function(function ($classname, $filename, $contents) use ($target) {
         if (preg_match($target, $classname)) {
             $contents ??= file_get_contents($filename);
-            $contents = preg_replace_callback('#((final|public|protected|private|static)\s+){0,3}function\s+[_0-9a-z]+?\([^{]+\{#usmi', function ($m) {
+            $contents = preg_replace_callback('#((final|public|protected|private|static)\s+){0,3}function\s+[_0-9a-z]+?\([^{]+\{#umi', function ($m) {
                 return $m[0] . "(\$GLOBALS['___trace_log_internal'] ?? fn() => null)(__FILE__, __LINE__ - 1, __CLASS__, __FUNCTION__, func_get_args());";
             }, $contents);
             return $contents;
