@@ -53,7 +53,11 @@ require_once "$BASEDIR/vendor/autoload.php";
 
 if ($srcfile) {
     echo("$srcfile was written.\n");
-    file_put_contents($srcfile, \ryunosuke\Functions\Transporter::exportNamespace($namespace, array_merge([dirname($srcfile)], $psrdirs)));
+    file_put_contents($srcfile, \ryunosuke\Functions\Transporter::exportNamespace($namespace, match (true) {
+        !isset($argv[1])   => array_merge([dirname($srcfile)], $psrdirs),
+        $argv[1] === 'all' => null,
+        default            => $argv[1],
+    }));
 }
 if ($devfile) {
     echo("$devfile was written.\n");
