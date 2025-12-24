@@ -39,6 +39,6 @@ class IncludeStream
     public function rmdir(string $path, int $options) { }
     public function rename(string $path_from, string $path_to) { }
     public function unlink(string $path) { }
-    public function register($hook) { }
-    public function restore() { }
+    public function register(callable $hook): self { }
+    public function restore(): callable { }
 }

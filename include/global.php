@@ -6515,7 +6515,7 @@ if (!function_exists('class_extends')) {
                     {
                         return self::$__originalClass::$name(...$arguments);
                     }
-                }
+                },
             );
             // @codeCoverageIgnoreEnd
             $sl = $template_reflection->getStartLine();
@@ -8603,17 +8603,13 @@ if (!function_exists('sql_format')) {
             ];
             $rule = $rules[$options['highlight']] ?? throw new \InvalidArgumentException('highlight must be "cli" or "html".');
             $options['highlight'] = function ($token, $ttype) use ($keywords, $rule) {
-                switch (true) {
-                    case isset($keywords[strtoupper($token)]):
-                        return $rule['KEYWORD']($token);
-                    case in_array($ttype, [T_COMMENT, T_DOC_COMMENT]):
-                        return $rule['COMMENT']($token);
-                    case in_array($ttype, [T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE]):
-                        return $rule['STRING']($token);
-                    case in_array($ttype, [T_LNUMBER, T_DNUMBER]):
-                        return $rule['NUMBER']($token);
-                }
-                return $token;
+                return match (true) {
+                    isset($keywords[strtoupper($token)])                                      => $rule['KEYWORD']($token),
+                    in_array($ttype, [T_COMMENT, T_DOC_COMMENT])                              => $rule['COMMENT']($token),
+                    in_array($ttype, [T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE]) => $rule['STRING']($token),
+                    in_array($ttype, [T_LNUMBER, T_DNUMBER])                                  => $rule['NUMBER']($token),
+                    default                                                                   => $token,
+                };
             };
         }
         $options['syntaxer'] = function ($token, $ttype) use ($options, $keywords) {
@@ -9861,7 +9857,7 @@ if (!function_exists('html_attr')) {
             if (is_array($value)) {
                 return true;
             }
-            if (is_object($value) && $value instanceof \Traversable && !method_exists($value, '__toString')) {
+            if ($value instanceof \Traversable && !method_exists($value, '__toString')) {
                 return true;
             }
             return false;
@@ -10784,7 +10780,7 @@ if (!function_exists('json_import')) {
                     case 'object':
                         $array = array_combine(
                             array_map(fn($value) => $value->value($options), $this->keys),
-                            array_map(fn($value) => $value->value($options), $this->values)
+                            array_map(fn($value) => $value->value($options), $this->values),
                         );
                         return $options[JSON_OBJECT_AS_ARRAY] ? $array : (object) $array;
                     case 'key':
@@ -11968,18 +11964,13 @@ if (!function_exists('xmlss_import')) {
             'callback' => null,  // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
             'type'     => function ($type, $value) {
                 // 実質的に DateTime 専用で DateTime を使わないなら指定する意味は全くない
-                switch ($type) {
-                    case 'String':
-                        return $value;
-                    case 'Boolean':
-                        return (bool) $value;
-                    case 'Number':
-                        return +$value;
-                    case 'DateTime':
-                        return new (function_configure('datetime.class'))($value);
-                    default:
-                        throw new \UnexpectedValueException('Unknown type: ' . $type); // @codeCoverageIgnore
-                }
+                return match ($type) {
+                    'String'   => $value,
+                    'Boolean'  => (bool) $value,
+                    'Number'   => +$value,
+                    'DateTime' => new (function_configure('datetime.class'))($value),
+                    default    => throw new \UnexpectedValueException('Unknown type: ' . $type),
+                };
             },
             'limit'    => null,  // 正味のデータ行の最大値（超えた場合はそこで処理を終了する。例外が飛んだりはしない）
         ];
@@ -13608,7 +13599,7 @@ if (!function_exists('error')) {
         $time = date('d-M-Y H:i:s e');
         $content = stringify($message);
         $location = '';
-        if (!($message instanceof \Exception || $message instanceof \Throwable)) {
+        if (!$message instanceof \Throwable) {
             foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
                 if (isset($trace['file'], $trace['line'])) {
                     $location = " in {$trace['file']} on line {$trace['line']}";
@@ -13849,7 +13840,7 @@ if (!function_exists('set_trace_logger')) {
         return register_autoload_function(function ($classname, $filename, $contents) use ($target) {
             if (preg_match($target, $classname)) {
                 $contents ??= file_get_contents($filename);
-                $contents = preg_replace_callback('#((final|public|protected|private|static)\s+){0,3}function\s+[_0-9a-z]+?\([^{]+\{#usmi', function ($m) {
+                $contents = preg_replace_callback('#((final|public|protected|private|static)\s+){0,3}function\s+[_0-9a-z]+?\([^{]+\{#umi', function ($m) {
                     return $m[0] . "(\$GLOBALS['___trace_log_internal'] ?? fn() => null)(__FILE__, __LINE__ - 1, __CLASS__, __FUNCTION__, func_get_args());";
                 }, $contents);
                 return $contents;
@@ -17615,11 +17606,11 @@ if (!function_exists('by_builtin')) {
                     return false;
                 }
                 // for call_user_func([$object, 'func']), (new ReflectionMethod($object, 'func'))->invoke($object)
-                elseif (isset($last) && isset($last['function']) && isset($invoker[$last['function']])) {
+                elseif (isset($last['function']) && isset($invoker[$last['function']])) {
                     return false;
                 }
                 // for func($object)
-                elseif (isset($last) && isset($last['function']) && $last['function'] === $function) {
+                elseif (isset($last['function']) && $last['function'] === $function) {
                     return true;
                 }
             }
@@ -17879,8 +17870,8 @@ if (!function_exists('chain')) {
                         ];
                         foreach ($parameters as $parameter) {
                             $type = $parameter->getType();
-                            $metadata['nullable'][$parameter->getPosition()] = $type ? $type->allowsNull() : null;
-                            $metadata['nullable'][$parameter->getName()] = $type ? $type->allowsNull() : null;
+                            $metadata['nullable'][$parameter->getPosition()] = $type?->allowsNull();
+                            $metadata['nullable'][$parameter->getName()] = $type?->allowsNull();
                             $metadata['positions'][$parameter->getPosition()] = $parameter->getName();
                             $metadata['names'][$parameter->getName()] = $parameter->getPosition();
                         }
@@ -19415,7 +19406,7 @@ if (!function_exists('system_status')) {
      */
     function system_status(
         /** バイト系数値の単位 */ string $siunit = '',
-        /** 日時系のフォーマット */ string $datetime_format = \DateTime::RFC3339,
+        /** 日時系のフォーマット */ string $datetime_format = \DateTimeInterface::RFC3339,
     ): array {
         $unitize = function ($size) use ($siunit) {
             return match ($siunit) {
@@ -20724,8 +20715,7 @@ if (!function_exists('mode')) {
         $args = array_combine($vals, $args);
         $counts = array_count_values($vals);
         arsort($counts);
-        reset($counts);
-        return $args[key($counts)];
+        return $args[array_key_first($counts)];
     }
 }
 
@@ -22666,8 +22656,8 @@ if (!function_exists('unique_id')) {
             $config = function_configure('unique_id.config');
             return sleetflake(
                 base_timestamp: $config['timestamp_base'],
-                sequence_bit: $config['sequence_bit'],
-                ipaddress_bit: $config['ipaddress_bit'],
+                sequence_bit  : $config['sequence_bit'],
+                ipaddress_bit : $config['ipaddress_bit'],
             );
         })();
         return $sleetflake->binary();
@@ -24724,7 +24714,7 @@ if (!function_exists('ip_info')) {
                                 expire   INT         NOT NULL,
                                 PRIMARY KEY (registry)
                             )
-                            SQL
+                            SQL,
                         );
                         $pdo->exec(<<<SQL
                             CREATE TABLE IF NOT EXISTS rir_data(
@@ -24735,7 +24725,7 @@ if (!function_exists('ip_info')) {
                                 date      VARCHAR(8),
                                 PRIMARY KEY (ipaddress, netmask)
                             )
-                            SQL
+                            SQL,
                         );
                     }
                     return $pdo;
@@ -27926,7 +27916,7 @@ if (!function_exists('include_stream')) {
 
             #</editor-fold>
 
-            public function register($hook)
+            public function register(callable $hook): self
             {
                 stream_wrapper_unregister('file');
                 stream_wrapper_register('file', get_class($this));
@@ -27934,7 +27924,7 @@ if (!function_exists('include_stream')) {
                 return $this;
             }
 
-            public function restore()
+            public function restore(): callable
             {
                 stream_wrapper_unregister('file');
                 stream_wrapper_restore('file');
@@ -28380,7 +28370,7 @@ if (!function_exists('memory_stream')) {
                             atime: $var[1] ?? $var[0] ?? $now,
                         ),
                         STREAM_META_ACCESS     => $set_entry(
-                            mode: (self::$entries[$id]->mode & 077_0000) | $var & ~umask(),
+                            mode : (self::$entries[$id]->mode & 077_0000) | $var & ~umask(),
                             ctime: $now,
                         ),
                         STREAM_META_OWNER_NAME => $set_entry(
@@ -28710,7 +28700,7 @@ if (!function_exists('stream_describe')) {
             $metadata = stream_get_meta_data($resource);
             if (isset($metadata['uri'])) {
                 $fstat = fstat($resource);
-                if ($fstat != false) {
+                if ($fstat) {
                     if (isset($descriptors[$fstat['ino']])) {
                         // resource と fd は id は一致しないが時系列での増減は同じなので順番に取り出せば一致する
                         $descriptor = array_shift($descriptors[$fstat['ino']]);
@@ -31165,7 +31155,6 @@ if (!function_exists('str_diff')) {
                     if (isset($rule[$diff[0]])) {
                         $difftext = [];
                         foreach ($rule[$diff[0]][1] as $n => $sign) {
-                            /** @noinspection PhpIllegalArrayKeyTypeInspection */
                             $difftext[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
                         }
                         $result[] = "{$index($diff[1])}{$rule[$diff[0]][0]}{$index($diff[2])}";
@@ -33234,12 +33223,7 @@ if (!function_exists('try_catch_finally')) {
             return $try(...$variadic);
         }
         catch (\Exception $tried_ex) {
-            try {
-                return $catch($tried_ex);
-            }
-            catch (\Exception $catched_ex) {
-                throw $catched_ex;
-            }
+            return $catch($tried_ex);
         }
         finally {
             if ($finally !== null) {
@@ -33953,7 +33937,7 @@ if (!function_exists('formdata_parse')) {
             $formdata = str_resource($formdata);
         }
 
-        $generator = (function () use ($formdata, $decoder) {
+        $generator = (function () use ($formdata, $boundary, $decoder) {
             $line = fgets($formdata);
             $boundary ??= trim(substr($line, 2));
 
@@ -34909,11 +34893,11 @@ if (!function_exists('cacheobject')) {
                     return $props;
                 }
 
-                private function _exception(string $message = "", int $code = 0, \Throwable $previous = null): \Throwable
+                private function _exception(string $message = ""): \Throwable
                 {
                     return interface_exists(\Psr\SimpleCache\InvalidArgumentException::class)
-                        ? new class ( $message, $code, $previous ) extends \InvalidArgumentException implements \Psr\SimpleCache\InvalidArgumentException { }
-                        : new class ( $message, $code, $previous ) extends \InvalidArgumentException { };
+                        ? new class ( $message ) extends \InvalidArgumentException implements \Psr\SimpleCache\InvalidArgumentException { }
+                        : new class ( $message ) extends \InvalidArgumentException { };
                 }
 
                 private function _validateKey(string $key): void
@@ -38561,7 +38545,7 @@ if (!function_exists('var_pretty')) {
                         }
                         // 要素が1つなら複数行化するメリットがないので2以上とする
                         if (count($lengths) >= 2 && ($this->options['maxlistcolumn'] ?? PHP_INT_MAX) <= array_sum($lengths)) {
-                            $assoc = !$this->options['minify'] && true;
+                            $assoc = !$this->options['minify'];
                         }
                     }
 

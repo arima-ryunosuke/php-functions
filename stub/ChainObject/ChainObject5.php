@@ -511,8 +511,8 @@ TEXT): self { }
 
     /** @see system_status() */
     public self $system_status;
-    public function system_status(string $siunit = "", string $datetime_format = \DateTime::RFC3339): self { }
-    public function system_status(string $datetime_format = \DateTime::RFC3339): self { }
+    public function system_status(string $siunit = "", string $datetime_format = \DateTimeInterface::RFC3339): self { }
+    public function system_status(string $datetime_format = \DateTimeInterface::RFC3339): self { }
 
     /** @see average() */
     public self $average;
