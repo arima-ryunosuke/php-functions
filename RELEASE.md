@@ -11,6 +11,10 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.31
+
+- [feature] export-function に引数を追加
+
 ## 2.0.30
 
 - [feature] var_pretty に件数表示オプションを追加
