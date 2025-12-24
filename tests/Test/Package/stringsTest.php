@@ -437,7 +437,7 @@ This is VARIABLE.
         あ              : 1 mb
         ほげ            : 2 mb
         自由文          : 3 mb
-        EXPECTED
+        EXPECTED,
         );
     }
 
@@ -480,7 +480,7 @@ This is VARIABLE.
             line2
             tommorow n
             ever knows
-            ACTUAL
+            ACTUAL,
         );
         that(mb_wordwrap("line1\nline2\ntommorow never knows", 10, null))->is([
             'line1',
@@ -494,7 +494,7 @@ This is VARIABLE.
             line2
             todayは晴
             天なり
-            ACTUAL
+            ACTUAL,
         );
         that(mb_wordwrap("line1\nline2\ntodayは晴天なり", 10, null))->is([
             'line1',
@@ -508,7 +508,7 @@ This is VARIABLE.
             line2
             tommorowは
             雨天なり
-            ACTUAL
+            ACTUAL,
         );
         that(mb_wordwrap("line1\nline2\ntommorowは雨天なり", 10, null))->is([
             'line1',
@@ -1179,7 +1179,7 @@ zero is index 0.
             異1            * 異2
             長い行長い行長 | 長い行長い行長
             い行長い行       い行長い行
-            SIDEBYSIDE
+            SIDEBYSIDE,
         );
 
         that(str_diff(mb_convert_encoding("同\n左\n同\n同\n異1\n長い行長い行長い行長い行", 'SJIS'), mb_convert_encoding("同\n同\n右\n同\n異2\n長い行長い行長い行長い行", 'SJIS'), ['encoding' => 'SJIS', 'stringify' => 'split=10,32']))->is(mb_convert_encoding(<<<SIDEBYSIDE
@@ -1191,7 +1191,7 @@ zero is index 0.
             異1            * 異2
             長い行長い行長 | 長い行長い行長
             い行長い行       い行長い行
-            SIDEBYSIDE, 'SJIS')
+            SIDEBYSIDE, 'SJIS'),
         );
 
         that(str_diff("e\nd\ne\ne\nc\n<b>B</b>", "e\ne\na\ne\nC\n<b>B</b>", ['stringify' => 'html']))->is('e

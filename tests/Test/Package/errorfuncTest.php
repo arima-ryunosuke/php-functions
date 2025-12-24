@@ -7,7 +7,6 @@ use Psr\Log\LoggerTrait;
 use function ryunosuke\Functions\Package\add_error_handler;
 use function ryunosuke\Functions\Package\backtrace;
 use function ryunosuke\Functions\Package\error;
-use function ryunosuke\Functions\Package\phpval;
 use function ryunosuke\Functions\Package\process_parallel;
 use function ryunosuke\Functions\Package\reflect_callable;
 use function ryunosuke\Functions\Package\set_all_error_handler;

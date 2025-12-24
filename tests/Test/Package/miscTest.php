@@ -314,12 +314,12 @@ syntax error
 };
 ')->wasThrown(new \ParseError(<<<ERR
         on line 14
-        ERR
+        ERR,
         ));
 
         that(self::resolveFunction('evaluate'))('syntax error')->wasThrown(new \ParseError(<<<ERR
         >>> syntax error
-        ERR
+        ERR,
         ));
 
         that(self::resolveFunction('evaluate'))(<<<PHP
@@ -336,7 +336,7 @@ syntax error
         // 11
         // 12
         // 13
-        PHP
+        PHP,
         )->wasThrown(new \ParseError(<<<ERR
         // 01
         >>> syntax error // 02
@@ -345,7 +345,7 @@ syntax error
         // 05
         // 06
         // 07
-        ERR
+        ERR,
         ));
 
         that(self::resolveFunction('evaluate'))(<<<PHP
@@ -356,10 +356,10 @@ syntax error
         // 11
         >>> syntax error // 12
         // 13
-        PHP
+        PHP,
         )->wasThrown(new \ParseError(<<<ERR
         >>> syntax error
-        ERR
+        ERR,
         ));
 
         that(self::resolveFunction('evaluate'))(<<<PHP
@@ -376,7 +376,7 @@ syntax error
         // 11
         // 12
         // 13
-        PHP
+        PHP,
         )->wasThrown(new \ParseError(<<<ERR
         // 02
         // 03
@@ -389,7 +389,7 @@ syntax error
         // 10
         // 11
         // 12
-        ERR
+        ERR,
         ));
     }
 

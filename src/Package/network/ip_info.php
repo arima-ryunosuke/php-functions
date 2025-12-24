@@ -237,7 +237,7 @@ function ip_info($ipaddr, $options = [])
                             expire   INT         NOT NULL,
                             PRIMARY KEY (registry)
                         )
-                        SQL
+                        SQL,
                     );
                     $pdo->exec(<<<SQL
                         CREATE TABLE IF NOT EXISTS rir_data(
@@ -248,7 +248,7 @@ function ip_info($ipaddr, $options = [])
                             date      VARCHAR(8),
                             PRIMARY KEY (ipaddress, netmask)
                         )
-                        SQL
+                        SQL,
                     );
                 }
                 return $pdo;

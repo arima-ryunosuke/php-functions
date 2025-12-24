@@ -19,8 +19,8 @@ function unique_id(): string
         $config = function_configure('unique_id.config');
         return sleetflake(
             base_timestamp: $config['timestamp_base'],
-            sequence_bit: $config['sequence_bit'],
-            ipaddress_bit: $config['ipaddress_bit'],
+            sequence_bit  : $config['sequence_bit'],
+            ipaddress_bit : $config['ipaddress_bit'],
         );
     })();
     return $sleetflake->binary();

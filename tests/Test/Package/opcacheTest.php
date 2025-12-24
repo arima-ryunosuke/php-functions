@@ -44,7 +44,7 @@ class opcacheTest extends AbstractTestCase
         include($file5);
 
         $actual = opcache_gc(
-            deletedFile: false,
+            deletedFile     : false,
             excludeCondition: fn($script) => str_contains($script['full_path'], 'file5'),
         );
         that($actual)->notHasKey($file1);
@@ -56,7 +56,7 @@ class opcacheTest extends AbstractTestCase
         unlink($file3);
         unlink($file4);
         $actual = opcache_gc(
-            deletedFile: true,
+            deletedFile     : true,
             includeCondition: fn($script) => str_contains($script['full_path'], 'file3'),
         );
         that($actual)->notHasKey($file1);
@@ -66,7 +66,7 @@ class opcacheTest extends AbstractTestCase
 
         $actual = opcache_gc(
             thresholdLifetime: 0,
-            deletedFile: true,
+            deletedFile      : true,
         );
         that($actual)->hasKey($file1);    // thresholdLifetime により消える
         that($actual)->notHasKey($file2); // hits:1 により残る

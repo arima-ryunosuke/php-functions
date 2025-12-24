@@ -61,7 +61,7 @@ This is VARIABLE.
             }
             ?>
             ```
-            MD
+            MD,
         );
         $actual = <<<RESULT
             Sample file

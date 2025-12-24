@@ -122,28 +122,28 @@ class filesystemTest extends AbstractTestCase
         touch("$root/directory/subitem", time() - 60, time() - 60);
 
         that(dir_clean($root,
-            atime: 45,
-            mtime: 45,
-            excludePattern: "*/ex*"
+            atime         : 45,
+            mtime         : 45,
+            excludePattern: "*/ex*",
         ))->is([
             "$root/directory/subitem",
             "$root/directory",
         ]);
 
         that(dir_clean($root,
-            atime: 45,
-            excludePattern: "*/ex*"
+            atime         : 45,
+            excludePattern: "*/ex*",
         ))->is([
             "$root/mtime",
         ]);
 
         that(dir_clean($root,
-            excludePattern: "*/ex*"
+            excludePattern: "*/ex*",
         ))->is([
             "$root/atime",
         ]);
 
-        that(dir_clean("$root/notfound",))->is([]);
+        that(dir_clean("$root/notfound"))->is([]);
     }
 
     function test_dir_diff()
@@ -1676,7 +1676,7 @@ class filesystemTest extends AbstractTestCase
             that(path_relative($data[0], $data[1]))->as(var_pretty([
                 'args'   => [$data[0], $data[1]],
                 'return' => $data[2],
-            ], ['return' => true]
+            ], ['return' => true],
             ))->is($data[2]);
 
             if (DIRECTORY_SEPARATOR === '\\') {
@@ -1687,7 +1687,7 @@ class filesystemTest extends AbstractTestCase
                 that(path_relative($data[0], $data[1]))->as(var_pretty([
                     'args'   => [$data[0], $data[1]],
                     'return' => $data[2],
-                ], ['return' => true]
+                ], ['return' => true],
                 ))->is($data[2]);
             }
         }

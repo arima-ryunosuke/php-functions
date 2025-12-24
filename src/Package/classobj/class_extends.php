@@ -131,7 +131,7 @@ function class_extends($object, $methods, $fields = [], $implements = [])
                 {
                     return self::$__originalClass::$name(...$arguments);
                 }
-            }
+            },
         );
         // @codeCoverageIgnoreEnd
         $sl = $template_reflection->getStartLine();

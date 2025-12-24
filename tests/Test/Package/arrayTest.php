@@ -2093,7 +2093,7 @@ class arrayTest extends AbstractTestCase
                         ],
                     ],
                 ],
-            ]
+            ],
         );
     }
 
@@ -3739,7 +3739,7 @@ class arrayTest extends AbstractTestCase
         that(array_zip(
             ['a' => 1, 2, 3],
             ['hoge', 'b' => 'fuga', 'piyo'],
-            ['foo', 'bar', 'c' => 'baz', 'n' => 'null']
+            ['foo', 'bar', 'c' => 'baz', 'n' => 'null'],
         ))->is([
                 [
                     'a' => 1,
@@ -3761,7 +3761,7 @@ class arrayTest extends AbstractTestCase
                     1   => null,
                     'n' => 'null',
                 ],
-            ]
+            ],
         );
 
         that(self::resolveFunction('array_zip'))()->wasThrown('$arrays is empty');

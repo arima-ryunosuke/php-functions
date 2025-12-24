@@ -271,7 +271,7 @@ function memory_stream($path = '')
                         atime: $var[1] ?? $var[0] ?? $now,
                     ),
                     STREAM_META_ACCESS     => $set_entry(
-                        mode: (self::$entries[$id]->mode & 077_0000) | $var & ~umask(),
+                        mode : (self::$entries[$id]->mode & 077_0000) | $var & ~umask(),
                         ctime: $now,
                     ),
                     STREAM_META_OWNER_NAME => $set_entry(

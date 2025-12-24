@@ -3,7 +3,6 @@
 namespace ryunosuke\Test\Package;
 
 use SplFileInfo;
-use function ryunosuke\Functions\Package\array_unset;
 use function ryunosuke\Functions\Package\base62_decode;
 use function ryunosuke\Functions\Package\base62_encode;
 use function ryunosuke\Functions\Package\base64url_decode;

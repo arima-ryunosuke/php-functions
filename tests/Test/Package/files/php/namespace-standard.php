@@ -55,7 +55,7 @@ $object = new class () extends AO {
         return [self::class, static::class, parent::class];
     }
 
-    private PropertyType $property1;
+    private PropertyType     $property1;
     private Sub\PropertyType $property2;
 
     function typehint(ArgumentType $arg1, ?Sub\ArgumentType $arg2 = null): ReturnType|Sub\ReturnType

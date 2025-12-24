@@ -83,7 +83,7 @@ class funchandTest extends AbstractTestCase
         that($chain($string)
             ->apply(fn($v) => ltrim($v, 'a'))
             ->apply(fn($v) => rtrim($v, 'z'))
-            ->apply(fn($v) => number_format($v, 3))
+            ->apply(fn($v) => number_format($v, 3)),
         )()->is('12,345.000');
 
         // iterator
@@ -496,8 +496,8 @@ class funchandTest extends AbstractTestCase
             $calls[] = $arg;
             return $arg;
         },
-            interval: 0.1,
-            leading_arguments: [-1],
+            interval          : 0.1,
+            leading_arguments : [-1],
             trailing_arguments: [999],
         );
         foreach (range(0, 30) as $i) {

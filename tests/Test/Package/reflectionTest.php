@@ -146,11 +146,11 @@ class reflectionTest extends AbstractTestCase
             'new class ( $a, $b ) { public function __construct($a, $b) { } }',
         ]);
 
-        ?><?php $fn = fn($a, $b) => [$a,  $b] ?><?php
+        ?><?php $fn = fn($a, $b) => [$a, $b] ?><?php
         $code = callable_code($fn);
         that($code)->is([
             'fn($a, $b)',
-            '[$a,  $b]',
+            '[$a, $b]',
         ]);
 
         $code = callable_code($fn, true);

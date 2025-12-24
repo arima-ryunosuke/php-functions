@@ -22,8 +22,8 @@ class AbstractTestCase extends \ryunosuke\Test\AbstractTestCase
         ]);
 
         Utility::function_configure([
-            'cachedir'         => self::$TMPDIR . '/cache',
-            'storagedir'       => self::$TMPDIR . '/storage',
+            'cachedir'      => self::$TMPDIR . '/cache',
+            'storagedir'    => self::$TMPDIR . '/storage',
             'chain.version' => 2,
         ]);
     }

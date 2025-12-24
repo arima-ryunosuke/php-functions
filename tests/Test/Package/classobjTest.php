@@ -675,7 +675,7 @@ class classobjTest extends AbstractTestCase
                     return strtr($contents ?? file_get_contents($filename), ['$initialized' => '$initialized2']);
                 }
             },
-            null
+            null,
         );
         // 多重登録も可能
         register_autoload_function(
@@ -690,7 +690,7 @@ class classobjTest extends AbstractTestCase
                 if (method_exists($classname, '__initialize')) {
                     $classname::__initialize();
                 }
-            }
+            },
         );
 
         /** @noinspection PhpUndefinedFieldInspection */

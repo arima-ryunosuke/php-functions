@@ -624,7 +624,7 @@ data-camel-case="123"
 data-hoge="false"
 data-fuga="fuga"
 data-piyo="{&quot;a&quot;:&quot;A&quot;}"
-ATTRS
+ATTRS,
         );
 
         that(html_attr([
@@ -641,7 +641,7 @@ camelCase='hoge[]'
 data='hoge'
 data-='fuga'
 data-name='name'
-ATTRS
+ATTRS,
         );
 
         that(html_attr([
@@ -821,17 +821,17 @@ line3
     function test_html_tag()
     {
         that(html_tag('a.c1#hoge.c2[target=hoge\[\]][href="http://hoge"][hidden][!readonly]{width:123px;;;height:456px}'))->is(
-            '<a id="hoge" class="c1 c2" style="width:123px;height:456px" target="hoge[]" href="http://hoge" hidden></a>'
+            '<a id="hoge" class="c1 c2" style="width:123px;height:456px" target="hoge[]" href="http://hoge" hidden></a>',
         );
         that(html_tag(['a.c1#hoge.c2[href="http://hoge"]' => '<b>bold</b>']))->is(
-            '<a id="hoge" class="c1 c2" href="http://hoge">&lt;b&gt;bold&lt;/b&gt;</a>'
+            '<a id="hoge" class="c1 c2" href="http://hoge">&lt;b&gt;bold&lt;/b&gt;</a>',
         );
         that(html_tag([
             'a.c1#hoge.c2[href="http://hoge"]' => [
                 'b' => '<bold>',
             ],
         ]))->is(
-            '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;bold&gt;</b></a>'
+            '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;bold&gt;</b></a>',
         );
         that(html_tag([
             'a.c1#hoge.c2[href="http://hoge"]' => [
@@ -842,7 +842,7 @@ line3
                 ],
             ],
         ]))->is(
-            '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;plain1&gt;<t>&lt;thin&gt;</t>&lt;plain2&gt;</b></a>'
+            '<a id="hoge" class="c1 c2" href="http://hoge"><b>&lt;plain1&gt;<t>&lt;thin&gt;</t>&lt;plain2&gt;</b></a>',
         );
 
         that(html_tag([
@@ -857,7 +857,7 @@ line3
   <b>plain1</b>
   <b>plain2</b>
 </div>
-<span>plain</span>'
+<span>plain</span>',
         );
 
         that(self::resolveFunction('html_tag'))('#id.class')->wasThrown('tagname is empty');
@@ -1669,7 +1669,7 @@ zzz`,
 	1. 1
 	* a = 2
 	2. 3
-"
+",
         );
 
         that("\n" . markdown_list(['a' => 'A', 'b' => 'B', 'ls' => 'LS', [1, 'a' => 2, 3]], [
@@ -1686,7 +1686,7 @@ zzz`,
 	* 0 = 1
 	* a = 2
 	* 1 = 3
-"
+",
         );
     }
 

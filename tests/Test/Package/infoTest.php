@@ -268,7 +268,7 @@ class infoTest extends AbstractTestCase
             require(__DIR__ . "/required1.php");
             require(__DIR__ . "/required2.tpl");
             require(__DIR__ . "/required3.php");
-            PHP
+            PHP,
         );
         file_set_contents("$dir/required1.php", '<?php return 1;');
         file_set_contents("$dir/required2.tpl", '<?php return 2;');

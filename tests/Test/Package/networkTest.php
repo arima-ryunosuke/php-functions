@@ -379,9 +379,9 @@ class networkTest extends AbstractTestCase
             "$server/delay/1",
             "$server/delay/2",
         ],
-            requests: 3,
+            requests   : 3,
             concurrency: 2,
-            output: $output,
+            output     : $output,
         );
 
         that($result)->isArray();

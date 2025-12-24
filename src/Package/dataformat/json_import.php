@@ -314,7 +314,7 @@ function json_import($value, $options = [])
                 case 'object':
                     $array = array_combine(
                         array_map(fn($value) => $value->value($options), $this->keys),
-                        array_map(fn($value) => $value->value($options), $this->values)
+                        array_map(fn($value) => $value->value($options), $this->values),
                     );
                     return $options[JSON_OBJECT_AS_ARRAY] ? $array : (object) $array;
                 case 'key':
