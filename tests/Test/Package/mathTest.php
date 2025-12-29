@@ -92,6 +92,28 @@ class mathTest extends AbstractTestCase
         that(calculate_formula('NS\\NINE + M_PI * 3 + \\M_PI'))->is(9 + M_PI * 4);
         that(calculate_formula('NS\\NINE + ArrayObject::ARRAY_AS_PROPS * 3 + \\ArrayObject::ARRAY_AS_PROPS'))->is(9 + \ArrayObject::ARRAY_AS_PROPS * 4);
 
+        that(calculate_formula('1,234+123,456,789', allow_comma: true))->is(1_234 + 123_456_789);
+        that(self::resolveFunction('calculate_formula'))(',234+123,456,789', allow_comma: true)->wasErrored();
+        that(self::resolveFunction('calculate_formula'))('1,234+123,456,789', allow_comma: false)->wasErrored();
+
+        that(calculate_formula('M_PI + 1', allow_constant: ['M_PI']))->is(M_PI + 1);
+        that(calculate_formula('\\M_PI + 2', allow_constant: ['M_PI']))->is(M_PI + 2);
+        that(calculate_formula('M_PI + 3', allow_constant: ['\\M_PI']))->is(M_PI + 3);
+        that(calculate_formula('\\M_PI + 4', allow_constant: ['\\M_PI']))->is(M_PI + 4);
+        that(self::resolveFunction('calculate_formula'))('M_PI + 1', allow_constant: ['M_E'])->wasErrored();
+        that(self::resolveFunction('calculate_formula'))('M_PI + 1', allow_constant: false)->wasErrored();
+
+        that(calculate_formula([
+            'NS\\NINE + 1',
+            'k1' => 'NS\\NINE + 2',
+        ]))->is([
+            \NS\NINE + 1,
+            'k1' => \NS\NINE + 2,
+        ]);
+        that(self::resolveFunction('calculate_formula'))([
+            'UNDEFINED(1)',
+        ])->wasErrored();
+
         define('NS\\STR', 'evil');
         that(self::resolveFunction('calculate_formula'))('NS\\STR + 1')->wasErrored();
         that(self::resolveFunction('calculate_formula'))('NS\\STR (1)')->wasErrored();
