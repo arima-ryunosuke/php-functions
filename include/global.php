@@ -19855,6 +19855,213 @@ if (!function_exists('system_status')) {
     }
 }
 
+assert(!function_exists('generatify') || (new \ReflectionFunction('generatify'))->isUserDefined());
+if (!function_exists('generatify')) {
+    /**
+     * コールバックを Generator に変換する
+     *
+     * Example:
+     * ``php
+     * // - iterable を回して $v,$k でコールバックする
+     * // - その返り値が true ならループを打ち切る
+     * // - 最終的に合計値を返す
+     * // というコールバックな関数
+     * $callbackable_function = function ($iterable, $callback) {
+     *     $sum = 0;
+     *     foreach ($iterable as $k => $v) {
+     *         if ($callback($v, $k) === true) {
+     *             break;
+     *         }
+     *         $sum += $v;
+     *     }
+     *     return $sum;
+     * };
+     *
+     * // 上記を generator 化したもの
+     * $generator = generatify(fn($c) => $callbackable_function(range(1, 9), $c));
+     * that($generator)->isInstanceOf(\Generator::class);
+     * that(iterator_to_array($generator))->isSame([
+     *     [1, 0],
+     *     [2, 1],
+     *     [3, 2],
+     *     [4, 3],
+     *     [5, 4],
+     *     [6, 5],
+     *     [7, 6],
+     *     [8, 7],
+     *     [9, 8],
+     * ]);
+     * that($generator)->getReturn()->isSame(45);
+     *
+     * // 中の foreach を打ち切れる
+     * $generator = generatify(fn($c) => $callbackable_function(range(1, 9), $c));
+     * foreach ($generator as [$v, $k]) {
+     *     if ($k === 5) {
+     *         generator_end($generator, true);
+     *         break;
+     *     }
+     * }
+     * that($generator)->getReturn()->isSame(15);
+     * ```
+     *
+     * @codeCoverageIgnore php < 8.1
+     * @package ryunosuke\Functions\Package\iterator
+     */
+    function generatify(
+        /** 対象 callable */ callable $callable,
+    ) {
+        $fiber = new \Fiber(fn() => $callable(fn(...$args) => \Fiber::suspend($args)));
+
+        for ($args = $fiber->start(); !$fiber->isTerminated(); $args = $fiber->resume($result)) {
+            $result = yield $args;
+        }
+        return $fiber->getReturn();
+    }
+}
+
+assert(!function_exists('generator_apply') || (new \ReflectionFunction('generator_apply'))->isUserDefined());
+if (!function_exists('generator_apply')) {
+    /**
+     * generator 専用の iterator_apply
+     *
+     * iterator_apply は正直言って意味が分からない。
+     * - true を返さなければならない（仮に打ち切りのためだとしても普通は false 返しでは…？ これのせいでアロー関数がほぼ使えない）
+     * - 引数に渡ってこない（第3引数で自身を渡しながら中で $it->current する必要がある）
+     * - 返り値が要素数（と、マニュアルは言っているが実際は処理数）
+     *
+     * ので iterator_apply は多分使うことはないが、こと generator に関しては明確に返り値を持つため、回し切りつつ返り値が欲しい、という限定的な状況がある。
+     * その時、count や蓄積配列も得られると便利ではある（generator は一度回すともう回せないため）。
+     * この関数はそんなときに使う。
+     *
+     * 特筆すべき挙動して、回しきった generator を渡してもエラーにはならず、単に返り値を返すのみとなる（$receiver, $count も空）。
+     * この関数は「generator の返り値を雑に得たい」が初期の目的だったためそのようになっている。
+     * （回っている・回っていないを意識せず返り値が得たかった）。
+     * この挙動は将来的に変更される可能性がある。
+     *
+     * $callback が非 null を返すと $receiver に蓄積される。
+     * これは無条件で蓄積したら generator の旨味がなくなってしまうため（全部蓄積するならもう iterator_to_array した方が手っ取り早い）。
+     * キーは格納されないため注意（generator のキーは連想配列のキーになれるとは限らないため）。
+     *
+     * $callback の返り値に関わらず $count には処理数が格納される。
+     *
+     * 要するに
+     * - generator を回しつつ
+     * - 必要ならば蓄積して
+     * - 数も数えて
+     * - generator の返り値を返す
+     * ということを同時に行う。
+     *
+     * Example:
+     * ```php
+     * $g = (function () {
+     *     yield 1;
+     *     yield 2;
+     *     yield 3;
+     *     yield 4;
+     *     yield 5;
+     *     yield 6;
+     *     yield 7;
+     *     yield 8;
+     *     yield 9;
+     *     return 99;
+     * })();
+     *
+     * $return = generator_apply($g, fn ($v) => $v % 2 == 0 ? $v : null, $receiver, $count);
+     *
+     * // generator の返り値を返す
+     * that($return)->isSame(99);
+     * // 偶数のみが格納される
+     * that($receiver)->isSame([2, 4, 6, 8]);
+     * // ループ数が格納される
+     * that($count)->isSame(9);
+     *
+     * // もう一回読んでもエラーにはならない
+     * $return = generator_apply($g, fn ($v) => $v % 2 == 0 ? $v : null, $receiver, $count);
+     * // 返り値は正常に得られる
+     * that($return)->isSame(99);
+     * // receiver は格納されない（もう回せないため）
+     * that($receiver)->isSame(null);
+     * // count は格納されない（もう回せないため）
+     * that($count)->isSame(null);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\iterator
+     */
+    function generator_apply(
+        /** 対象 Generator */ \Generator $generator,
+        /** 実行コールバック */ callable $callback,
+        /** 蓄積配列 */ ?array &$receiver = null,
+        /** ループ数 */ ?int &$count = null,
+    ) {
+        $receiver = null;
+        $count = null;
+        if ($generator->valid()) {
+            $receiver = [];
+            $count = 0;
+            foreach ($generator as $k => $v) {
+                $return = $callback($v, $k, $count++);
+                if ($return !== null) {
+                    $receiver[] = $return;
+                }
+            }
+        }
+        return $generator->getReturn();
+    }
+}
+
+assert(!function_exists('generator_end') || (new \ReflectionFunction('generator_end'))->isUserDefined());
+if (!function_exists('generator_end')) {
+    /**
+     * generator を強制的に終了させ最終値を返す
+     *
+     * おまけとして可変引数で最終値を送り込むことができる。
+     *
+     * foreach generator を break で抜けるあとに getReturn したい状況が稀によくある。
+     * いちいち iterator_count 等はしたくないしそもそも valid 判定したり NoRewindIterator をカマしたりする必要がありややめんどくさい。
+     *
+     * ただし、この関数は非常に限定的な用途で、ほぼ使うことはない。
+     * （当然だが）generator を回しきるとは処理の終着点まで行くことになるため、generator の旨味を完全に捨て去る挙動となる。
+     * generator を終了させることで付随する処理も終了するとか、yield 値によって関数が return されるとか、限られたケースでしか有効にはならない。
+     *
+     * Example:
+     * ```php
+     * $generator = (function () {
+     *     yield 1;
+     *     yield 2;
+     *     yield 3;
+     *     yield 4;
+     *     yield 5;
+     *     yield 6;
+     *     yield 7;
+     *     yield 8;
+     *     yield 9;
+     * })();
+     * $generator->next();
+     * $generator->next();
+     * $generator->next();
+     * // まだ途中だが最終値である 9 を返す
+     * that(generator_end($generator))->is(9);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\iterator
+     */
+    function generator_end(
+        /** 対象 Generator */ \Generator $generator,
+        /** 最終値 */ mixed ...$values,
+    ) {
+        foreach ($values as $value) {
+            $generator->send($value);
+        }
+
+        while ($generator->valid()) {
+            $result = $generator->current();
+            $generator->next();
+        }
+
+        return $result ?? null;
+    }
+}
+
 assert(!function_exists('iterator_chunk') || (new \ReflectionFunction('iterator_chunk'))->isUserDefined());
 if (!function_exists('iterator_chunk')) {
     /**
@@ -20342,53 +20549,111 @@ if (!function_exists('calculate_formula')) {
      *
      * 内部的には eval で計算するが、文字列や関数呼び出しなどは受け付けないため原則としてセーフティ。
      * 許可されるのは定数・数値リテラルと演算子のみ。
-     * 定数を許可しているのは PI(3.14) や HOUR(3600) などの利便性のため。
+     * 定数を許可しているのは PI(3.14) や HOUR(3600) などの利便性のため。ただし定数は $allow_constant で受け付ける物を制限できる。
      * 定数値が非数値の場合、強制的に数値化して警告を促す。
+     *
+     * $allow_comma を true にするとカンマ区切りの数値も許可される。
+     * 内部的には _ への置換であり、シンタックスは保たれる。
+     * つまり ",123" のような変な数値はエラーになるし、逆に言うと3桁等のチェックはされないことになる。
+     * ちょっと懸念があるのでデフォルト false にしているが、将来的に true になるか引数自体が削除される見込み。
+     *
+     * $formula に配列を渡すと全てを計算してそのまま配列で返す。
+     * つまり呼び元で foreach しても同じ結果になる。
+     * 最大の違いは内部的に eval を使用しているため、都度呼ぶのと一括で呼ぶのとでは速度に明らかに違いが出る点。
+     * このような処理は得てして1度で終わらず、何度も呼び出される傾向があるためまとめて呼びやすいようにこのような実装になっている。
      *
      * Example:
      * ```php
+     * // 定数やカンマが使える
      * that(calculate_formula('1 + 2 - 3 * 4'))->isSame(-9);
      * that(calculate_formula('1 + (2 - 3) * 4'))->isSame(-3);
+     * that(calculate_formula('1,234+5,678', allow_comma: true))->isSame(6912);
      * that(calculate_formula('PHP_INT_SIZE * 3'))->isSame(PHP_INT_SIZE * 3);
+     * // 配列を与えると全て計算して配列を返す（キーは維持される）
+     * that(calculate_formula([
+     *     'k1' => '123+456',
+     *     'k2' => '789+123',
+     * ]))->is([
+     *     'k1' => '579',
+     *     'k2' => '912',
+     * ]);
      * ```
      *
      * @package ryunosuke\Functions\Package\math
-     *
-     * @param string $formula 計算式
-     * @return int|float 計算結果
      */
-    function calculate_formula($formula)
-    {
-        // TOKEN_PARSE を渡せばシンタックスチェックも行ってくれる
-        $tokens = php_tokens("<?php ($formula);", TOKEN_PARSE);
-        array_shift($tokens);
-        array_pop($tokens);
+    function calculate_formula(
+        string|array $formula,
+        bool $allow_comma = false,
+        bool|array $allow_constant = true,
+    ): int|float|array {
+        $isarray = is_array($formula);
 
-        $constants = [T_STRING, T_DOUBLE_COLON, T_NS_SEPARATOR, T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE];
-        $operands = [T_LNUMBER, T_DNUMBER];
-        $operators = ['(', ')', '+', '-', '*', '/', '%', '**'];
+        if (is_array($allow_constant)) {
+            $allow_constant = array_flip(array_map(fn($v) => ltrim($v, '\\'), $allow_constant));
+        }
 
-        $constant = '';
-        $expression = '';
-        foreach ($tokens as $token) {
-            if ($token->isIgnorable()) {
-                continue;
-            }
-            if ($token->is($constants)) {
-                $constant .= $token->text;
-            }
-            elseif ($token->is($operands) || $token->is($operators)) {
-                if (strlen($constant)) {
-                    $expression .= constant($constant) + 0;
-                    $constant = '';
-                }
-                $expression .= $token->text;
+        $throw = function ($k, $token) use ($isarray) {
+            if ($isarray) {
+                throw new \ParseError(sprintf("syntax error, unexpected '%s' in %s on line %d", $token->text, $k, $token->line));
             }
             else {
-                throw new \ParseError(sprintf("syntax error, unexpected '%s' in  on line %d", $token->text, $token->line));
+                throw new \ParseError(sprintf("syntax error, unexpected '%s' on line %d", $token->text, $token->line));
             }
+        };
+
+        $expressions = [];
+        foreach ((array) $formula as $k => $v) {
+            $tokens = php_tokens("<?php ($v);");
+            array_shift($tokens);
+            array_pop($tokens);
+
+            $constants = [T_STRING, T_DOUBLE_COLON, T_NS_SEPARATOR, T_NAME_QUALIFIED, T_NAME_FULLY_QUALIFIED, T_NAME_RELATIVE];
+            $operands = [T_LNUMBER, T_DNUMBER, '_'];
+            $operators = ['(', ')', '+', '-', '*', '/', '%', '**'];
+
+            if ($allow_comma) {
+                foreach ($tokens as $n => $token) {
+                    if ($token->prev(fn() => true)?->is($operands) && $token->is(',') && $token->next(fn() => true)?->is($operands)) {
+                        $tokens[$n] = $token->clone(id: ord('_'), text: '_');
+                    }
+                }
+            }
+
+            $constant = '';
+            $expression = '';
+            foreach ($tokens as $token) {
+                if ($token->isIgnorable()) {
+                    continue;
+                }
+                if ($token->is($constants)) {
+                    $constant .= $token->text;
+                }
+                elseif ($token->is($operands) || $token->is($operators)) {
+                    if (strlen($constant)) {
+                        $constant = ltrim($constant, '\\');
+                        if (!($allow_constant === true || isset($allow_constant[$constant]))) {
+                            $throw($k, $token);
+                        }
+                        if (!defined($constant)) {
+                            $throw($k, $token);
+                        }
+                        $expression .= constant($constant) + 0;
+                        $constant = '';
+                    }
+                    $expression .= $token->text;
+                }
+                else {
+                    $throw($k, $token);
+                }
+            }
+            $expressions[$k] = var_export($k, true) . '=>' . $expression;
         }
-        return evaluate("return $expression;");
+
+        $results = evaluate("return [" . implode(",", $expressions) . "];");
+        if ($isarray) {
+            return $results;
+        }
+        return $results[0];
     }
 }
 
@@ -30775,7 +31040,9 @@ if (!function_exists('str_diff')) {
      * `$options['allow-binary']` でバイナリ文字列の扱いを指定する（false: 例外, null: null を返す）。
      * `$options['ignore-case'] = true` で大文字小文字を無視する。
      * `$options['ignore-space-change'] = true` で空白文字の数を無視する。
-     * `$options['ignore-all-space'] = true` ですべての空白文字を無視する
+     * `$options['ignore-all-space'] = true` ですべての空白文字を無視する。
+     * `$options['color']` で色を指定する。
+     * `$options['lineno']` で行番号表示を指定する。ただし行番号が出るのは sisple unified と split と html のみ（これら以外は由緒正しい形式なので行を出すと壊れてしまう）。
      * `$options['stringify']` で差分データを文字列化するクロージャを指定する。
      *
      * - normal: 標準形式（diff のオプションなしに相当する）
@@ -30784,6 +31051,7 @@ if (!function_exists('str_diff')) {
      *     - unified のみを指定するとヘッダを含まない +- のみの差分を出す
      * - split: サイドバイサイド形式（split=3,120 のような形式で diff の -y -W 120 に相当する）
      *     - diff -y と互換性はなく、あくまでそれっぽくしているのみ
+     *     - 120 部分は省略でき、省略した場合自動で算出される
      * - html: ins, del の html タグ形式
      *     - html=perline とすると行レベルでの差分も出す
      *
@@ -30813,22 +31081,26 @@ if (!function_exists('str_diff')) {
      * +this is changed line
      * ');
      * // html で差分を返す
-     * that(str_diff($old, $new, ['stringify' => 'html']))->isSame('same
+     * that(str_diff($old, $new, ['stringify' => 'html']))->isSame(<<<HTML
+     * <span>same</span>
      * <del>delete</del>
-     * same
+     * <span>same</span>
      * <ins>append</ins>
-     * same
+     * <span>same</span>
      * <del>change</del>
      * <ins>this is changed line</ins>
-     * ');
+     *
+     * HTML);
      * // 行レベルの html で差分を返す
-     * that(str_diff($old, $new, ['stringify' => 'html=perline']))->isSame('same
+     * that(str_diff($old, $new, ['stringify' => 'html=perline']))->isSame(<<<HTML
+     * <span>same</span>
      * <del>delete</del>
-     * same
+     * <span>same</span>
      * <ins>append</ins>
-     * same
-     * <ins>this is </ins>chang<ins>ed lin</ins>e
-     * ');
+     * <span>same</span>
+     * <ins>this is </ins><span>chang</span><ins>ed lin</ins><span>e</span>
+     *
+     * HTML);
      * // raw な配列で差分を返す
      * that(str_diff($old, $new, ['stringify' => null]))->isSame([
      *     // 等価行（'=' という記号と前後それぞれの文字列を返す（キーは行番号））
@@ -30866,8 +31138,18 @@ if (!function_exists('str_diff')) {
                     'ignore-case'         => false,
                     'ignore-space-change' => false,
                     'ignore-all-space'    => false,
+                    'trailing-break'      => false, // for compatible
+                    'color'               => false,
+                    'lineno'              => false,
                     'stringify'           => 'unified',
                 ];
+                $options['color'] ??= is_ansi(STDOUT);
+                if ($options['color'] === true) {
+                    $options['color'] = ['-' => 'RED+white|bold', '+' => 'CYAN+white|bold'];
+                }
+                if ($options['color'] === false) {
+                    $options['color'] = [];
+                }
                 $this->options = $options;
 
                 $this->recover = mb_ereg_options([
@@ -30923,6 +31205,13 @@ if (!function_exists('str_diff')) {
                 if (!$stringfy) {
                     return $diffs;
                 }
+
+                $lineno_length = null;
+                if ($this->options['lineno']) {
+                    $this->recursive($diffs, function ($line, $no) use (&$lineno_length) {
+                        $lineno_length = max(strlen($no), $lineno_length ?? 0);
+                    });
+                }
                 if ($stringfy === 'normal') {
                     $stringfy = [$this, 'normal'];
                 }
@@ -30932,16 +31221,29 @@ if (!function_exists('str_diff')) {
                 }
                 if (is_string($stringfy) && preg_match('#unified(=(\d+))?#', $stringfy, $m)) {
                     $block_size = isset($m[2]) ? (int) $m[2] : null;
-                    $stringfy = fn($diff) => $this->unified($diff, $block_size);
+                    $stringfy = fn($diff) => $this->unified($diff, $block_size, $lineno_length);
                 }
                 if (is_string($stringfy) && preg_match('#split(=(\d+),?(\d+)?)?#', $stringfy, $m)) {
                     $block_size = (int) ($m[2] ?? 3);
-                    $column_size = (int) ($m[3] ?? 100);
-                    $stringfy = fn($diff) => $this->split($diff, $column_size);
+                    $column_size = $m[3] ?? null;
+                    if ($column_size === null) {
+                        // FullHD での一般的な COLUMNS は 220～240 くらいで、ツールバーなども加味して最大幅は 200 程度を想定しておく
+                        // mb_monospace は強烈に遅いので打ち切りの意味もある
+                        $sizes = [1 => 0, 2 => 0];
+                        $this->recursive($diffs, function ($line, $no, $n) use (&$sizes) {
+                            return ($sizes[$n] = max(mb_monospace($line), $sizes[$n])) <= 200;
+                        });
+                        $column_size = array_maps($sizes, fn($v) => $v + $lineno_length + 1);
+                    }
+                    $stringfy = fn($diff) => $this->split($diff, $column_size, $lineno_length);
                 }
                 if (is_string($stringfy) && preg_match('#html(=(.+))?#', $stringfy, $m)) {
                     $mode = $m[2] ?? null;
                     $stringfy = fn($diff) => $this->html($diff, $mode);
+                }
+
+                if (is_string($stringfy)) {
+                    throw new \InvalidArgumentException("$stringfy is not supported");
                 }
 
                 if (isset($block_size)) {
@@ -30951,7 +31253,11 @@ if (!function_exists('str_diff')) {
                     $result = $stringfy($diffs);
                 }
 
-                return !strlen($result) ? $result : $result . $trailingN;
+                $result = strlen($result) ? $result . $trailingN : $result;
+                if ($this->options['trailing-break']) {
+                    $result .= "\n";
+                }
+                return $result;
             }
 
             private function diff(array $xarray, array $yarray)
@@ -31155,7 +31461,7 @@ if (!function_exists('str_diff')) {
                     if (isset($rule[$diff[0]])) {
                         $difftext = [];
                         foreach ($rule[$diff[0]][1] as $n => $sign) {
-                            $difftext[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
+                            $difftext[] = implode("\n", array_map(fn($v) => $this->color($sign . $v, $diff[0], $n), $diff[$n]));
                         }
                         $result[] = "{$index($diff[1])}{$rule[$diff[0]][0]}{$index($diff[2])}";
                         $result[] = implode("\n---\n", $difftext);
@@ -31190,7 +31496,7 @@ if (!function_exists('str_diff')) {
                     if (array_filter($diffs, fn($d) => strpos($key, $d[0]) !== false)) {
                         foreach ($diffs as $diff) {
                             foreach ($rule[$diff[0]] ?? [] as $n => $sign) {
-                                $result[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
+                                $result[] = implode("\n", array_map(fn($v) => $this->color($sign . $v, $diff[0], $n), $diff[$n]));
                             }
                         }
                     }
@@ -31198,7 +31504,7 @@ if (!function_exists('str_diff')) {
                 return implode("\n", $result);
             }
 
-            private function unified($diffs, $block_size)
+            private function unified($diffs, $block_size, $lineno_length)
             {
                 $result = [];
 
@@ -31209,40 +31515,89 @@ if (!function_exists('str_diff')) {
                     $result[] = "@@ -{$xheader} +{$yheader} @@";
                 }
 
+                $pad = function ($no, $n) use ($block_size, $lineno_length) {
+                    if ($block_size !== null || !$this->options['lineno']) {
+                        return "";
+                    }
+                    if ($no !== null) {
+                        $no++;
+                    }
+                    if ($n === 3) {
+                        return str_pad($no ?? "", $lineno_length * 2 + 2, ' ', STR_PAD_BOTH);
+                    }
+                    $s = str_pad($no ?? "", $lineno_length, ' ', STR_PAD_LEFT);
+                    $e = str_repeat(' ', $lineno_length);
+                    $l = $n === 1 ? $s : $e;
+                    $r = $n === 2 ? $s : $e;
+                    return "$l $r ";
+                };
+
                 $rule = [
                     '+' => [2 => '+'],
                     '-' => [1 => '-'],
                     '*' => [1 => '-', 2 => '+'],
-                    '=' => [1 => ' '],
+                    '=' => [3 => ' '],
                 ];
                 foreach ($diffs as $diff) {
                     foreach ($rule[$diff[0]] as $n => $sign) {
-                        $result[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
+                        $nx = $n === 3 ? 1 : $n;
+                        $result[] = implode("\n", array_maps($diff[$nx], fn($v, $k) => $this->color($pad($k, $n) . $sign . $v, $diff[0], $n)));
                     }
                 }
                 return implode("\n", $result);
             }
 
-            private function split($diffs, $column_size)
+            private function split($diffs, $column_size, $lineno_length)
             {
-                $columns = floor(($column_size - 3) / 2);
-
-                $result = [];
+                if (is_array($column_size)) {
+                    $overwidth = max(0, ($column_size[1] + $column_size[2]) - 200) / 2;
+                    $left_width = max(40, $column_size[1] - $overwidth);
+                    $right_width = max(40, $column_size[2] - $overwidth);
+                }
+                else {
+                    $column = ($column_size - 3) / 2;
+                    $left_width = floor($column);
+                    $right_width = ceil($column);
+                }
+                $pad = function ($no) use ($lineno_length) {
+                    if (!$this->options['lineno']) {
+                        return "";
+                    }
+                    if ($no !== null) {
+                        $no++;
+                    }
+                    return str_pad($no ?? "", $lineno_length, ' ', STR_PAD_LEFT) . ' ';
+                };
 
                 $rules = [
-                    '+' => ['>', 1 => null, 2 => 2],
-                    '-' => ['<', 1 => 1, 2 => null],
+                    '+' => ['+', 1 => null, 2 => 2],
+                    '-' => ['-', 1 => 1, 2 => null],
                     '*' => ['*', 1 => 1, 2 => 2],
                     '=' => ['|', 1 => 1, 2 => 2],
                 ];
+
+                $result = [];
                 foreach ($diffs as $diff) {
-                    $rule = $rules[$diff[0]];
-                    foreach (array_zip($diff[$rule[1]] ?? [], $diff[$rule[2]] ?? []) as $d) {
-                        $d0 = mb_wordwrap($d[0] ?? '', $columns, null);
-                        $d1 = mb_wordwrap($d[1] ?? '', $columns, null);
+                    [$sign, $before, $after] = $rules[$diff[0]];
+
+                    $mi = new \MultipleIterator(\MultipleIterator::MIT_NEED_ANY | \MultipleIterator::MIT_KEYS_NUMERIC);
+                    $mi->attachIterator(new \ArrayIterator($diff[$before] ?? []));
+                    $mi->attachIterator(new \ArrayIterator($diff[$after] ?? []));
+
+                    foreach ($mi as $k => $v) {
+                        $d0 = mb_wordwrap($v[0] ?? '', $left_width - $lineno_length - 1, null);
+                        $d1 = mb_wordwrap($v[1] ?? '', $right_width - $lineno_length - 1, null);
                         foreach (array_zip($d0, $d1) as $n => $dd) {
-                            $gutter = $n === 0 ? $rule[0] : " ";
-                            $result[] = mb_pad_width($dd[0] ?? '', $columns) . " $gutter " . $dd[1] ?? '';
+                            if ($n === 0) {
+                                $p0 = $pad($k[0]);
+                                $p1 = $pad($k[1]);
+                            }
+                            else {
+                                $p0 = $p1 = $pad(null);
+                            }
+                            $before = $this->color(mb_pad_width($p0 . ($dd[0] ?? ''), $left_width), $k[0] === null ? '' : $diff[0], 1);
+                            $after = $this->color(mb_pad_width($p1 . ($dd[1] ?? ''), $right_width), $k[1] === null ? '' : $diff[0], 2);
+                            $result[] = "$before $sign $after";
                         }
                     }
                 }
@@ -31251,14 +31606,27 @@ if (!function_exists('str_diff')) {
 
             private function html($diffs, $mode)
             {
-                $htmlescape = function ($v) use (&$htmlescape) { return is_array($v) ? array_map($htmlescape, $v) : htmlspecialchars($v, ENT_QUOTES); };
-                $taging = fn($tag, $content) => strlen($tag) && strlen($content) ? "<$tag>$content</$tag>" : $content;
+                $htmlescape = function ($v) use (&$htmlescape) {
+                    if (is_array($v)) {
+                        return array_map($htmlescape, $v);
+                    }
+                    return htmlspecialchars($v, ENT_QUOTES);
+                };
+                $taging = function ($tag, $content, $no) {
+                    if (strlen($tag) && strlen($content)) {
+                        if ($this->options['lineno'] && $no !== null) {
+                            return "<$tag data-line-number='$no'>$content</$tag>";
+                        }
+                        return "<$tag>$content</$tag>";
+                    }
+                    return $content;
+                };
 
                 $rule = [
                     '+' => [2 => 'ins'],
                     '-' => [1 => 'del'],
                     '*' => [1 => 'del', 2 => 'ins'],
-                    '=' => [1 => ''],
+                    '=' => [3 => 'span'],
                 ];
                 $result = [];
                 foreach ($diffs as $diff) {
@@ -31267,13 +31635,14 @@ if (!function_exists('str_diff')) {
                         $delete = array_splice($diff[1], 0, $length, []);
                         $append = array_splice($diff[2], 0, $length, []);
                         for ($i = 0; $i < $length; $i++) {
-                            $options2 = ['stringify' => null] + $this->options;
+                            $options2 = ['stringify' => null, 'lineno' => false] + $this->options;
                             $diffs2 = str_diff(preg_split('/(?<!^)(?!$)/u', $delete[$i]), preg_split('/(?<!^)(?!$)/u', $append[$i]), $options2);
                             //$diffs2 = str_diff(mb_split('(?<!^)(?!$)', $delete[$i]), mb_split('(?<!^)(?!$)', $append[$i]), $options2);
                             $result2 = [];
                             foreach ($diffs2 as $diff2) {
                                 foreach ($rule[$diff2[0]] as $n => $tag) {
-                                    $content = $taging($tag, implode("", (array) $htmlescape($diff2[$n])));
+                                    $nx = $n === 3 ? 1 : $n;
+                                    $content = $taging($tag, implode("", (array) $htmlescape($diff2[$nx])), null);
                                     if (strlen($content)) {
                                         $result2[] = $content;
                                     }
@@ -31283,7 +31652,12 @@ if (!function_exists('str_diff')) {
                         }
                     }
                     foreach ($rule[$diff[0]] as $n => $tag) {
-                        $content = $taging($tag, implode("\n", (array) $htmlescape($diff[$n])));
+                        $nx = $n === 3 ? 1 : $n;
+                        $contents = [];
+                        foreach ($diff[$nx] as $no => $line) {
+                            $contents[] = $taging($tag, $htmlescape($line), $no);
+                        }
+                        $content = implode("\n", $contents);
                         if ($diff[0] === '=' && !strlen($content)) {
                             $result[] = "";
                         }
@@ -31339,6 +31713,37 @@ if (!function_exists('str_diff')) {
                     $blocks[] = $block;
                 }
                 return $blocks;
+            }
+
+            private function recursive($diffs, $callback)
+            {
+                foreach ($diffs as $diff) {
+                    foreach (array_filter($diff, fn($v) => is_array($v)) as $n => $dd) {
+                        foreach ($dd as $no => $d) {
+                            if ($callback($d, $no, $n) === false) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+
+            private function color($string, $mode, $n)
+            {
+                $color = $this->options['color'][$mode] ?? null;
+                if ($mode === '*' && $color === null) {
+                    $fallback = match ($n) {
+                        1 => '-',
+                        2 => '+',
+                    };
+                    $color = $this->options['color'][$fallback] ?? null;
+                }
+
+                if ($color !== null) {
+                    $string = ansi_colorize($string, $color);
+                }
+                return $string;
             }
         };
 
@@ -37279,10 +37684,12 @@ if (!function_exists('var_export2')) {
         }
 
         $options += [
-            'minify' => 0,     // 短縮レベル
-            'named'  => false, // 名前付き引数の形式で返す
-            'indent' => 4,     // インデントの空白数
-            'return' => false, // 値を戻すか出力するか
+            'minify'   => 0,     // 短縮レベル
+            'named'    => false, // 名前付き引数の形式で返す
+            'indent'   => 4,     // インデントの空白数
+            'return'   => false, // 値を戻すか出力するか
+            'nest'     => 0,     // ネストの初期値
+            'callback' => null,  // コールバック
         ];
         // for compatible
         if ($options['minify'] === true) {
@@ -37290,8 +37697,16 @@ if (!function_exists('var_export2')) {
         }
         $options['minify'] = (int) $options['minify'];
 
+        $options['first-nest'] = $options['nest'] + ($options['named'] ? -1 : 0);
+
         // 再帰用クロージャ
         $export = function ($value, $context, $nest, $parents = []) use (&$export, $options) {
+            // コールバックを最優先とする
+            if ($options['callback']) {
+                if (($string = $options['callback']($value)) !== null) {
+                    return $string;
+                }
+            }
             // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
             foreach ($parents as $parent) {
                 if ($parent === $value) {
@@ -37306,7 +37721,7 @@ if (!function_exists('var_export2')) {
             $indent = $options['minify'] === 0 || $options['minify'] === 1 ? $space : "";
             $align = $options['minify'] === 0 ? $space : "";
             $arrow = $options['minify'] <= 2 ? $space : "";
-            $delim = $options['named'] && $nest === -1 ? ":$arrow" : "$arrow=>$arrow";
+            $delim = $options['named'] && $nest === $options['first-nest'] ? ":$arrow" : "$arrow=>$arrow";
 
             // 配列は連想判定したり再帰したり色々
             if (is_array($value)) {
@@ -37332,7 +37747,7 @@ if (!function_exists('var_export2')) {
                     $keystr = $hashed ? $keys[$k] . str_repeat($align, $maxlen - strlen($keys[$k])) . $delim : '';
                     $kvl .= $spacer1 . $keystr . $export($v, 'array-value', $nest + 1, $parents) . ($k === $lastkey ? $lastcomma : $tailcomma) . $break;
                 }
-                if ($options['named'] && $nest === -1) {
+                if ($options['named'] && $nest === $options['first-nest']) {
                     return $kvl;
                 }
                 return "[$break{$kvl}{$spacer2}]";
@@ -37350,7 +37765,7 @@ if (!function_exists('var_export2')) {
             elseif (is_string($value)) {
                 // 列揃えのため配列のキーは常にダブルクォート
                 if ($context === 'array-key') {
-                    if ($options['named'] && $nest === -1) {
+                    if ($options['named'] && $nest === $options['first-nest']) {
                         return $value;
                     }
                     return str_quote($value);
@@ -37378,7 +37793,7 @@ if (!function_exists('var_export2')) {
         };
 
         // 結果を返したり出力したり
-        $result = $export($value, null, $options['named'] ? -1 : 0);
+        $result = $export($value, null, $options['first-nest']);
         if ($options['return']) {
             return $result;
         }

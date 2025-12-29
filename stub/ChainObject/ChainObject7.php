@@ -374,6 +374,11 @@ TEXT): self { }
     public function func_throttle(callable $callback, float $interval, ?array $leading_arguments = null, ?array $trailing_arguments = null): self { }
     public function func_throttle(float $interval, ?array $leading_arguments = null, ?array $trailing_arguments = null): self { }
 
+    /** @see generator_end() */
+    public self $generator_end;
+    public function generator_end(\Generator $generator, mixed ...$values): self { }
+    public function generator_end(mixed ...$values): self { }
+
     /** @see iterator_chunk() */
     public self $iterator_chunk;
     public function iterator_chunk($iterator, $length, $preserve_keys = false): self { }

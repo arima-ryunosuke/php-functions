@@ -523,6 +523,16 @@ trait ChainObject3
     public function get_uploaded_files($files = null): self { }
     public function get_uploaded_files(): self { }
 
+    /** @see generatify() */
+    public self $generatify;
+    public function generatify(callable $callable): self { }
+    public function generatify(): self { }
+
+    /** @see generator_apply() */
+    public self $generator_apply;
+    public function generator_apply(\Generator $generator, callable $callback, ?array &$receiver = null, ?int &$count = null): self { }
+    public function generator_apply(callable $callback, ?array &$receiver = null, ?int &$count = null): self { }
+
     /** @see iterator_split() */
     public self $iterator_split;
     public function iterator_split(iterable $iterable, $chunk_sizes, $preserve_keys = false): self { }
@@ -530,8 +540,8 @@ trait ChainObject3
 
     /** @see calculate_formula() */
     public self $calculate_formula;
-    public function calculate_formula($formula): self { }
-    public function calculate_formula(): self { }
+    public function calculate_formula(array|string $formula, bool $allow_comma = false, array|bool $allow_constant = true): self { }
+    public function calculate_formula(bool $allow_comma = false, array|bool $allow_constant = true): self { }
 
     /** @see int_divide() */
     public self $int_divide;
