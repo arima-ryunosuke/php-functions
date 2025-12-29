@@ -2,8 +2,12 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../array/array_maps.php';
 require_once __DIR__ . '/../array/array_zip.php';
+require_once __DIR__ . '/../info/ansi_colorize.php';
+require_once __DIR__ . '/../info/is_ansi.php';
 require_once __DIR__ . '/../strings/mb_ereg_options.php';
+require_once __DIR__ . '/../strings/mb_monospace.php';
 require_once __DIR__ . '/../strings/mb_pad_width.php';
 require_once __DIR__ . '/../strings/mb_wordwrap.php';
 // @codeCoverageIgnoreEnd
@@ -14,7 +18,9 @@ require_once __DIR__ . '/../strings/mb_wordwrap.php';
  * `$options['allow-binary']` でバイナリ文字列の扱いを指定する（false: 例外, null: null を返す）。
  * `$options['ignore-case'] = true` で大文字小文字を無視する。
  * `$options['ignore-space-change'] = true` で空白文字の数を無視する。
- * `$options['ignore-all-space'] = true` ですべての空白文字を無視する
+ * `$options['ignore-all-space'] = true` ですべての空白文字を無視する。
+ * `$options['color']` で色を指定する。
+ * `$options['lineno']` で行番号表示を指定する。ただし行番号が出るのは sisple unified と split と html のみ（これら以外は由緒正しい形式なので行を出すと壊れてしまう）。
  * `$options['stringify']` で差分データを文字列化するクロージャを指定する。
  *
  * - normal: 標準形式（diff のオプションなしに相当する）
@@ -23,6 +29,7 @@ require_once __DIR__ . '/../strings/mb_wordwrap.php';
  *     - unified のみを指定するとヘッダを含まない +- のみの差分を出す
  * - split: サイドバイサイド形式（split=3,120 のような形式で diff の -y -W 120 に相当する）
  *     - diff -y と互換性はなく、あくまでそれっぽくしているのみ
+ *     - 120 部分は省略でき、省略した場合自動で算出される
  * - html: ins, del の html タグ形式
  *     - html=perline とすると行レベルでの差分も出す
  *
@@ -52,22 +59,26 @@ require_once __DIR__ . '/../strings/mb_wordwrap.php';
  * +this is changed line
  * ');
  * // html で差分を返す
- * that(str_diff($old, $new, ['stringify' => 'html']))->isSame('same
+ * that(str_diff($old, $new, ['stringify' => 'html']))->isSame(<<<HTML
+ * <span>same</span>
  * <del>delete</del>
- * same
+ * <span>same</span>
  * <ins>append</ins>
- * same
+ * <span>same</span>
  * <del>change</del>
  * <ins>this is changed line</ins>
- * ');
+ *
+ * HTML);
  * // 行レベルの html で差分を返す
- * that(str_diff($old, $new, ['stringify' => 'html=perline']))->isSame('same
+ * that(str_diff($old, $new, ['stringify' => 'html=perline']))->isSame(<<<HTML
+ * <span>same</span>
  * <del>delete</del>
- * same
+ * <span>same</span>
  * <ins>append</ins>
- * same
- * <ins>this is </ins>chang<ins>ed lin</ins>e
- * ');
+ * <span>same</span>
+ * <ins>this is </ins><span>chang</span><ins>ed lin</ins><span>e</span>
+ *
+ * HTML);
  * // raw な配列で差分を返す
  * that(str_diff($old, $new, ['stringify' => null]))->isSame([
  *     // 等価行（'=' という記号と前後それぞれの文字列を返す（キーは行番号））
@@ -105,8 +116,18 @@ function str_diff($xstring, $ystring, $options = [])
                 'ignore-case'         => false,
                 'ignore-space-change' => false,
                 'ignore-all-space'    => false,
+                'trailing-break'      => false, // for compatible
+                'color'               => false,
+                'lineno'              => false,
                 'stringify'           => 'unified',
             ];
+            $options['color'] ??= is_ansi(STDOUT);
+            if ($options['color'] === true) {
+                $options['color'] = ['-' => 'RED+white|bold', '+' => 'CYAN+white|bold'];
+            }
+            if ($options['color'] === false) {
+                $options['color'] = [];
+            }
             $this->options = $options;
 
             $this->recover = mb_ereg_options([
@@ -162,6 +183,13 @@ function str_diff($xstring, $ystring, $options = [])
             if (!$stringfy) {
                 return $diffs;
             }
+
+            $lineno_length = null;
+            if ($this->options['lineno']) {
+                $this->recursive($diffs, function ($line, $no) use (&$lineno_length) {
+                    $lineno_length = max(strlen($no), $lineno_length ?? 0);
+                });
+            }
             if ($stringfy === 'normal') {
                 $stringfy = [$this, 'normal'];
             }
@@ -171,16 +199,29 @@ function str_diff($xstring, $ystring, $options = [])
             }
             if (is_string($stringfy) && preg_match('#unified(=(\d+))?#', $stringfy, $m)) {
                 $block_size = isset($m[2]) ? (int) $m[2] : null;
-                $stringfy = fn($diff) => $this->unified($diff, $block_size);
+                $stringfy = fn($diff) => $this->unified($diff, $block_size, $lineno_length);
             }
             if (is_string($stringfy) && preg_match('#split(=(\d+),?(\d+)?)?#', $stringfy, $m)) {
                 $block_size = (int) ($m[2] ?? 3);
-                $column_size = (int) ($m[3] ?? 100);
-                $stringfy = fn($diff) => $this->split($diff, $column_size);
+                $column_size = $m[3] ?? null;
+                if ($column_size === null) {
+                    // FullHD での一般的な COLUMNS は 220～240 くらいで、ツールバーなども加味して最大幅は 200 程度を想定しておく
+                    // mb_monospace は強烈に遅いので打ち切りの意味もある
+                    $sizes = [1 => 0, 2 => 0];
+                    $this->recursive($diffs, function ($line, $no, $n) use (&$sizes) {
+                        return ($sizes[$n] = max(mb_monospace($line), $sizes[$n])) <= 200;
+                    });
+                    $column_size = array_maps($sizes, fn($v) => $v + $lineno_length + 1);
+                }
+                $stringfy = fn($diff) => $this->split($diff, $column_size, $lineno_length);
             }
             if (is_string($stringfy) && preg_match('#html(=(.+))?#', $stringfy, $m)) {
                 $mode = $m[2] ?? null;
                 $stringfy = fn($diff) => $this->html($diff, $mode);
+            }
+
+            if (is_string($stringfy)) {
+                throw new \InvalidArgumentException("$stringfy is not supported");
             }
 
             if (isset($block_size)) {
@@ -190,7 +231,11 @@ function str_diff($xstring, $ystring, $options = [])
                 $result = $stringfy($diffs);
             }
 
-            return !strlen($result) ? $result : $result . $trailingN;
+            $result = strlen($result) ? $result . $trailingN : $result;
+            if ($this->options['trailing-break']) {
+                $result .= "\n";
+            }
+            return $result;
         }
 
         private function diff(array $xarray, array $yarray)
@@ -394,7 +439,7 @@ function str_diff($xstring, $ystring, $options = [])
                 if (isset($rule[$diff[0]])) {
                     $difftext = [];
                     foreach ($rule[$diff[0]][1] as $n => $sign) {
-                        $difftext[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
+                        $difftext[] = implode("\n", array_map(fn($v) => $this->color($sign . $v, $diff[0], $n), $diff[$n]));
                     }
                     $result[] = "{$index($diff[1])}{$rule[$diff[0]][0]}{$index($diff[2])}";
                     $result[] = implode("\n---\n", $difftext);
@@ -429,7 +474,7 @@ function str_diff($xstring, $ystring, $options = [])
                 if (array_filter($diffs, fn($d) => strpos($key, $d[0]) !== false)) {
                     foreach ($diffs as $diff) {
                         foreach ($rule[$diff[0]] ?? [] as $n => $sign) {
-                            $result[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
+                            $result[] = implode("\n", array_map(fn($v) => $this->color($sign . $v, $diff[0], $n), $diff[$n]));
                         }
                     }
                 }
@@ -437,7 +482,7 @@ function str_diff($xstring, $ystring, $options = [])
             return implode("\n", $result);
         }
 
-        private function unified($diffs, $block_size)
+        private function unified($diffs, $block_size, $lineno_length)
         {
             $result = [];
 
@@ -448,40 +493,89 @@ function str_diff($xstring, $ystring, $options = [])
                 $result[] = "@@ -{$xheader} +{$yheader} @@";
             }
 
+            $pad = function ($no, $n) use ($block_size, $lineno_length) {
+                if ($block_size !== null || !$this->options['lineno']) {
+                    return "";
+                }
+                if ($no !== null) {
+                    $no++;
+                }
+                if ($n === 3) {
+                    return str_pad($no ?? "", $lineno_length * 2 + 2, ' ', STR_PAD_BOTH);
+                }
+                $s = str_pad($no ?? "", $lineno_length, ' ', STR_PAD_LEFT);
+                $e = str_repeat(' ', $lineno_length);
+                $l = $n === 1 ? $s : $e;
+                $r = $n === 2 ? $s : $e;
+                return "$l $r ";
+            };
+
             $rule = [
                 '+' => [2 => '+'],
                 '-' => [1 => '-'],
                 '*' => [1 => '-', 2 => '+'],
-                '=' => [1 => ' '],
+                '=' => [3 => ' '],
             ];
             foreach ($diffs as $diff) {
                 foreach ($rule[$diff[0]] as $n => $sign) {
-                    $result[] = implode("\n", array_map(fn($v) => $sign . $v, $diff[$n]));
+                    $nx = $n === 3 ? 1 : $n;
+                    $result[] = implode("\n", array_maps($diff[$nx], fn($v, $k) => $this->color($pad($k, $n) . $sign . $v, $diff[0], $n)));
                 }
             }
             return implode("\n", $result);
         }
 
-        private function split($diffs, $column_size)
+        private function split($diffs, $column_size, $lineno_length)
         {
-            $columns = floor(($column_size - 3) / 2);
-
-            $result = [];
+            if (is_array($column_size)) {
+                $overwidth = max(0, ($column_size[1] + $column_size[2]) - 200) / 2;
+                $left_width = max(40, $column_size[1] - $overwidth);
+                $right_width = max(40, $column_size[2] - $overwidth);
+            }
+            else {
+                $column = ($column_size - 3) / 2;
+                $left_width = floor($column);
+                $right_width = ceil($column);
+            }
+            $pad = function ($no) use ($lineno_length) {
+                if (!$this->options['lineno']) {
+                    return "";
+                }
+                if ($no !== null) {
+                    $no++;
+                }
+                return str_pad($no ?? "", $lineno_length, ' ', STR_PAD_LEFT) . ' ';
+            };
 
             $rules = [
-                '+' => ['>', 1 => null, 2 => 2],
-                '-' => ['<', 1 => 1, 2 => null],
+                '+' => ['+', 1 => null, 2 => 2],
+                '-' => ['-', 1 => 1, 2 => null],
                 '*' => ['*', 1 => 1, 2 => 2],
                 '=' => ['|', 1 => 1, 2 => 2],
             ];
+
+            $result = [];
             foreach ($diffs as $diff) {
-                $rule = $rules[$diff[0]];
-                foreach (array_zip($diff[$rule[1]] ?? [], $diff[$rule[2]] ?? []) as $d) {
-                    $d0 = mb_wordwrap($d[0] ?? '', $columns, null);
-                    $d1 = mb_wordwrap($d[1] ?? '', $columns, null);
+                [$sign, $before, $after] = $rules[$diff[0]];
+
+                $mi = new \MultipleIterator(\MultipleIterator::MIT_NEED_ANY | \MultipleIterator::MIT_KEYS_NUMERIC);
+                $mi->attachIterator(new \ArrayIterator($diff[$before] ?? []));
+                $mi->attachIterator(new \ArrayIterator($diff[$after] ?? []));
+
+                foreach ($mi as $k => $v) {
+                    $d0 = mb_wordwrap($v[0] ?? '', $left_width - $lineno_length - 1, null);
+                    $d1 = mb_wordwrap($v[1] ?? '', $right_width - $lineno_length - 1, null);
                     foreach (array_zip($d0, $d1) as $n => $dd) {
-                        $gutter = $n === 0 ? $rule[0] : " ";
-                        $result[] = mb_pad_width($dd[0] ?? '', $columns) . " $gutter " . $dd[1] ?? '';
+                        if ($n === 0) {
+                            $p0 = $pad($k[0]);
+                            $p1 = $pad($k[1]);
+                        }
+                        else {
+                            $p0 = $p1 = $pad(null);
+                        }
+                        $before = $this->color(mb_pad_width($p0 . ($dd[0] ?? ''), $left_width), $k[0] === null ? '' : $diff[0], 1);
+                        $after = $this->color(mb_pad_width($p1 . ($dd[1] ?? ''), $right_width), $k[1] === null ? '' : $diff[0], 2);
+                        $result[] = "$before $sign $after";
                     }
                 }
             }
@@ -490,14 +584,27 @@ function str_diff($xstring, $ystring, $options = [])
 
         private function html($diffs, $mode)
         {
-            $htmlescape = function ($v) use (&$htmlescape) { return is_array($v) ? array_map($htmlescape, $v) : htmlspecialchars($v, ENT_QUOTES); };
-            $taging = fn($tag, $content) => strlen($tag) && strlen($content) ? "<$tag>$content</$tag>" : $content;
+            $htmlescape = function ($v) use (&$htmlescape) {
+                if (is_array($v)) {
+                    return array_map($htmlescape, $v);
+                }
+                return htmlspecialchars($v, ENT_QUOTES);
+            };
+            $taging = function ($tag, $content, $no) {
+                if (strlen($tag) && strlen($content)) {
+                    if ($this->options['lineno'] && $no !== null) {
+                        return "<$tag data-line-number='$no'>$content</$tag>";
+                    }
+                    return "<$tag>$content</$tag>";
+                }
+                return $content;
+            };
 
             $rule = [
                 '+' => [2 => 'ins'],
                 '-' => [1 => 'del'],
                 '*' => [1 => 'del', 2 => 'ins'],
-                '=' => [1 => ''],
+                '=' => [3 => 'span'],
             ];
             $result = [];
             foreach ($diffs as $diff) {
@@ -506,13 +613,14 @@ function str_diff($xstring, $ystring, $options = [])
                     $delete = array_splice($diff[1], 0, $length, []);
                     $append = array_splice($diff[2], 0, $length, []);
                     for ($i = 0; $i < $length; $i++) {
-                        $options2 = ['stringify' => null] + $this->options;
+                        $options2 = ['stringify' => null, 'lineno' => false] + $this->options;
                         $diffs2 = str_diff(preg_split('/(?<!^)(?!$)/u', $delete[$i]), preg_split('/(?<!^)(?!$)/u', $append[$i]), $options2);
                         //$diffs2 = str_diff(mb_split('(?<!^)(?!$)', $delete[$i]), mb_split('(?<!^)(?!$)', $append[$i]), $options2);
                         $result2 = [];
                         foreach ($diffs2 as $diff2) {
                             foreach ($rule[$diff2[0]] as $n => $tag) {
-                                $content = $taging($tag, implode("", (array) $htmlescape($diff2[$n])));
+                                $nx = $n === 3 ? 1 : $n;
+                                $content = $taging($tag, implode("", (array) $htmlescape($diff2[$nx])), null);
                                 if (strlen($content)) {
                                     $result2[] = $content;
                                 }
@@ -522,7 +630,12 @@ function str_diff($xstring, $ystring, $options = [])
                     }
                 }
                 foreach ($rule[$diff[0]] as $n => $tag) {
-                    $content = $taging($tag, implode("\n", (array) $htmlescape($diff[$n])));
+                    $nx = $n === 3 ? 1 : $n;
+                    $contents = [];
+                    foreach ($diff[$nx] as $no => $line) {
+                        $contents[] = $taging($tag, $htmlescape($line), $no);
+                    }
+                    $content = implode("\n", $contents);
                     if ($diff[0] === '=' && !strlen($content)) {
                         $result[] = "";
                     }
@@ -578,6 +691,37 @@ function str_diff($xstring, $ystring, $options = [])
                 $blocks[] = $block;
             }
             return $blocks;
+        }
+
+        private function recursive($diffs, $callback)
+        {
+            foreach ($diffs as $diff) {
+                foreach (array_filter($diff, fn($v) => is_array($v)) as $n => $dd) {
+                    foreach ($dd as $no => $d) {
+                        if ($callback($d, $no, $n) === false) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        private function color($string, $mode, $n)
+        {
+            $color = $this->options['color'][$mode] ?? null;
+            if ($mode === '*' && $color === null) {
+                $fallback = match ($n) {
+                    1 => '-',
+                    2 => '+',
+                };
+                $color = $this->options['color'][$fallback] ?? null;
+            }
+
+            if ($color !== null) {
+                $string = ansi_colorize($string, $color);
+            }
+            return $string;
         }
     };
 

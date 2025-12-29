@@ -1169,87 +1169,166 @@ zero is index 0.
             ['=', [3 => 'e'], [3 => 'e'],],
             ['*', [4 => 'c'], [4 => 'C'],],
         ]);
+        that(str_diff("e\nd\ne\ne\nc", "e\ne\na\ne\nC", ['stringify' => 'unified', 'trailing-break' => true]))->is(<<<UNIFIED
+             e
+            -d
+             e
+            +a
+             e
+            -c
+            +C
+            
+            UNIFIED,);
 
-        that(str_diff("同\n左\n同\n同\n異1\n長い行長い行長い行長い行", "同\n同\n右\n同\n異2\n長い行長い行長い行長い行", ['stringify' => 'split=10,32']))->is(<<<SIDEBYSIDE
-            同             | 同
-            左             < 
-            同             | 同
-                           > 右
-            同             | 同
-            異1            * 異2
-            長い行長い行長 | 長い行長い行長
-            い行長い行       い行長い行
+        that(str_diff("同\n左\n同\n同\n異1\n長い行長い行長い行長い行\n長い行長い行長い行長い行1", "同\n同\n右\n同\n異2\n長い行長い行長い行長い行\n長い行長い行長い行長い行2", ['stringify' => 'split=10,32']))->is(<<<SIDEBYSIDE
+            同             | 同             
+            左             -                
+            同             | 同             
+                           + 右             
+            同             | 同             
+            異1            * 異2            
+            長い行長い行   | 長い行長い行長 
+            長い行長い行   | い行長い行     
+            長い行長い行   * 長い行長い行長 
+            長い行長い行1  * い行長い行2    
             SIDEBYSIDE,
         );
 
-        that(str_diff(mb_convert_encoding("同\n左\n同\n同\n異1\n長い行長い行長い行長い行", 'SJIS'), mb_convert_encoding("同\n同\n右\n同\n異2\n長い行長い行長い行長い行", 'SJIS'), ['encoding' => 'SJIS', 'stringify' => 'split=10,32']))->is(mb_convert_encoding(<<<SIDEBYSIDE
-            同             | 同
-            左             < 
-            同             | 同
-                           > 右
-            同             | 同
-            異1            * 異2
-            長い行長い行長 | 長い行長い行長
-            い行長い行       い行長い行
+        that(str_diff(mb_convert_encoding("同\n左\n同\n同\n異1\n長い行長い行長い行長い行\n長い行長い行長い行長い行1", 'SJIS'), mb_convert_encoding("同\n同\n右\n同\n異2\n長い行長い行長い行長い行\n長い行長い行長い行長い行2", 'SJIS'), ['encoding' => 'SJIS', 'stringify' => 'split=10,32']))->is(mb_convert_encoding(<<<SIDEBYSIDE
+            同             | 同             
+            左             -                
+            同             | 同             
+                           + 右             
+            同             | 同             
+            異1            * 異2            
+            長い行長い行   | 長い行長い行長 
+            長い行長い行   | い行長い行     
+            長い行長い行   * 長い行長い行長 
+            長い行長い行1  * い行長い行2    
             SIDEBYSIDE, 'SJIS'),
         );
 
-        that(str_diff("e\nd\ne\ne\nc\n<b>B</b>", "e\ne\na\ne\nC\n<b>B</b>", ['stringify' => 'html']))->is('e
-<del>d</del>
-e
-<ins>a</ins>
-e
-<del>c</del>
-<ins>C</ins>
-&lt;b&gt;B&lt;/b&gt;');
+        that(str_diff("e\nd\ne\ne\nc\n<b>B</b>", "e\ne\na\ne\nC\n<b>B</b>", ['stringify' => 'html']))->is(<<<HTML
+            <span>e</span>
+            <del>d</del>
+            <span>e</span>
+            <ins>a</ins>
+            <span>e</span>
+            <del>c</del>
+            <ins>C</ins>
+            <span>&lt;b&gt;B&lt;/b&gt;</span>
+            HTML,);
 
-        that(str_diff("
-sameline
-diff1
-diff2
-diff3
+        that(str_diff(<<<PLAIN
+            sameline
+            diff1
+            diff2
+            diff3
+            
+            sameline
+            diff4
+            diff5
+            
+            sameline
+            this is a pen
+            
+            that is a pen
+            
+            PLAIN,
+            <<<PLAIN
+            sameline
+            diff1x
+            diff2x
+            
+            sameline
+            diff4x
+            diff5x
+            diff6x
+            
+            sameline
+            this is the pen
+            
+            that is the pen
+            
+            PLAIN, ['stringify' => 'html=perline']))->is(<<<HTML
+            <span>sameline</span>
+            <span>diff1</span><ins>x</ins>
+            <span>diff2</span><ins>x</ins>
+            <del>diff3</del>
+            
+            <span>sameline</span>
+            <span>diff4</span><ins>x</ins>
+            <span>diff5</span><ins>x</ins>
+            <ins>diff6x</ins>
+            
+            <span>sameline</span>
+            <span>this is </span><del>a</del><ins>the</ins><span> pen</span>
+            
+            <span>that is </span><del>a</del><ins>the</ins><span> pen</span>
+            
+            HTML,);
 
-sameline
-diff4
-diff5
+        // unified で前後行を指定すると行番号は出ない
+        that(str_diff("1\n\nX\n4\n5", "1\n2\nY\n\n5", ['stringify' => 'unified=3', 'lineno' => true]))->is(<<<UNIFIED3
+            @@ -1,5 +1,5 @@
+             1
+            +2
+            +Y
+             
+            -X
+            -4
+             5
+            UNIFIED3,
+        );
 
-sameline
-this is a pen
+        // 指定しないと出る
+        that(str_diff("1\n\nX\n4\n5", "1\n2\nY\n\n5", ['stringify' => 'unified', 'lineno' => true]))->is(<<<UNIFIED
+             1   1
+              2 +2
+              3 +Y
+             2   
+            3   -X
+            4   -4
+             5   5
+            UNIFIED,
+        );
 
-that is a pen
+        // 自動算出（最低40列は維持）
+        that(str_diff("1\n\nX\n4\n5", "1\n2\nY\n\n5", ['stringify' => 'split', 'lineno' => true]))->is(<<<SIDEBYSIDE
+            1 1                                      | 1 1                                     
+                                                     + 2 2                                     
+                                                     + 3 Y                                     
+            2                                        | 4                                       
+            3 X                                      -                                         
+            4 4                                      -                                         
+            5 5                                      | 5 5                                     
+            SIDEBYSIDE,
+        );
+        that(str_diff("1\n\nX\n4\n5", "1\n2\nY\n\n5", ['stringify' => 'split', 'lineno' => true, 'color' => true]))->contains("\033");
 
-", "
-sameline
-diff1x
-diff2x
+        // 自動算出するとはいえ限界はある（1行json等が含まれていたら完全にぶっ壊れる）
+        that(str_diff("", str_repeat('x', 210), ['stringify' => 'split', 'lineno' => true]))->is(<<<SIDEBYSIDE
+            1                                        * 1 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                                                     *   xxxxxxx                                                                                                                                                                                                    
+            SIDEBYSIDE,
+        );
 
-sameline
-diff4x
-diff5x
-diff6x
+        // 色（テストはしんどいので含まれていることだけ担保）
+        that(str_diff("1\n\nX\n4\n5", "1\n2\nY\n\n5", ['stringify' => 'split', 'lineno' => true, 'color' => true]))->contains("\033");
 
-sameline
-this is the pen
+        // html は data-line-number に出る
+        that(str_diff("1\n\nX\n4\n5", "1\n2\nY\n\n5", ['stringify' => 'html', 'lineno' => true]))->is(<<<HTML
+            <span data-line-number='0'>1</span>
+            <ins data-line-number='1'>2</ins>
+            <ins data-line-number='2'>Y</ins>
+            
+            <del data-line-number='2'>X</del>
+            <del data-line-number='3'>4</del>
+            <span data-line-number='4'>5</span>
+            HTML,
+        );
 
-that is the pen
-
-", ['stringify' => 'html=perline']))->is('
-sameline
-diff1<ins>x</ins>
-diff2<ins>x</ins>
-<del>diff3</del>
-
-sameline
-diff4<ins>x</ins>
-diff5<ins>x</ins>
-<ins>diff6x</ins>
-
-sameline
-this is <del>a</del><ins>the</ins> pen
-
-that is <del>a</del><ins>the</ins> pen
-
-');
+        that(self::resolveFunction('str_diff'))("", "", ['stringify' => 'undefined'])->wasThrown("not supported");
 
         $x = tmpfile();
         $y = "hoge";
