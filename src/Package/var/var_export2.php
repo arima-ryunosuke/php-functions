@@ -85,10 +85,12 @@ function var_export2($value, $options = [])
     }
 
     $options += [
-        'minify' => 0,     // 短縮レベル
-        'named'  => false, // 名前付き引数の形式で返す
-        'indent' => 4,     // インデントの空白数
-        'return' => false, // 値を戻すか出力するか
+        'minify'   => 0,     // 短縮レベル
+        'named'    => false, // 名前付き引数の形式で返す
+        'indent'   => 4,     // インデントの空白数
+        'return'   => false, // 値を戻すか出力するか
+        'nest'     => 0,     // ネストの初期値
+        'callback' => null,  // コールバック
     ];
     // for compatible
     if ($options['minify'] === true) {
@@ -96,8 +98,16 @@ function var_export2($value, $options = [])
     }
     $options['minify'] = (int) $options['minify'];
 
+    $options['first-nest'] = $options['nest'] + ($options['named'] ? -1 : 0);
+
     // 再帰用クロージャ
     $export = function ($value, $context, $nest, $parents = []) use (&$export, $options) {
+        // コールバックを最優先とする
+        if ($options['callback']) {
+            if (($string = $options['callback']($value)) !== null) {
+                return $string;
+            }
+        }
         // 再帰を検出したら *RECURSION* とする（処理に関しては is_recursive のコメント参照）
         foreach ($parents as $parent) {
             if ($parent === $value) {
@@ -112,7 +122,7 @@ function var_export2($value, $options = [])
         $indent = $options['minify'] === 0 || $options['minify'] === 1 ? $space : "";
         $align = $options['minify'] === 0 ? $space : "";
         $arrow = $options['minify'] <= 2 ? $space : "";
-        $delim = $options['named'] && $nest === -1 ? ":$arrow" : "$arrow=>$arrow";
+        $delim = $options['named'] && $nest === $options['first-nest'] ? ":$arrow" : "$arrow=>$arrow";
 
         // 配列は連想判定したり再帰したり色々
         if (is_array($value)) {
@@ -138,7 +148,7 @@ function var_export2($value, $options = [])
                 $keystr = $hashed ? $keys[$k] . str_repeat($align, $maxlen - strlen($keys[$k])) . $delim : '';
                 $kvl .= $spacer1 . $keystr . $export($v, 'array-value', $nest + 1, $parents) . ($k === $lastkey ? $lastcomma : $tailcomma) . $break;
             }
-            if ($options['named'] && $nest === -1) {
+            if ($options['named'] && $nest === $options['first-nest']) {
                 return $kvl;
             }
             return "[$break{$kvl}{$spacer2}]";
@@ -156,7 +166,7 @@ function var_export2($value, $options = [])
         elseif (is_string($value)) {
             // 列揃えのため配列のキーは常にダブルクォート
             if ($context === 'array-key') {
-                if ($options['named'] && $nest === -1) {
+                if ($options['named'] && $nest === $options['first-nest']) {
                     return $value;
                 }
                 return str_quote($value);
@@ -184,7 +194,7 @@ function var_export2($value, $options = [])
     };
 
     // 結果を返したり出力したり
-    $result = $export($value, null, $options['named'] ? -1 : 0);
+    $result = $export($value, null, $options['first-nest']);
     if ($options['return']) {
         return $result;
     }

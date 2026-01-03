@@ -1050,6 +1050,20 @@ class varTest extends AbstractTestCase
         );
     }
 
+    function test_var_export2_callback()
+    {
+        that(var_export2([
+            'scalar'    => '12345',
+            'exception' => new \Exception(),
+        ], ['return' => true, 'callback' => fn($v) => $v instanceof \Exception ? "EX" : null, 'nest' => 1]))->is(<<<'VAR'
+        [
+                "scalar"    => "12345",
+                "exception" => EX,
+            ]
+        VAR,
+        );
+    }
+
     function test_var_export2_recursive()
     {
         $rarray = [];
@@ -1109,6 +1123,46 @@ class varTest extends AbstractTestCase
             'string'      => "ABC\nXYZ",
         ];
 
+        that(var_export2($array, ['named' => true, 'return' => true, 'nest' => 1]))->is(<<<'VAR'
+            array      : [1, 2, 3],
+            hash       : [
+                "a" => "A",
+                "b" => "B",
+            ],
+            empty      : [],
+            emptyempty : [
+                [],
+            ],
+            emptyempty1: [
+                [
+                    [1],
+                ],
+            ],
+            nest       : [
+                "hash"  => [
+                    "a"    => "A",
+                    "b"    => "B",
+                    "hash" => [
+                        "x" => "X",
+                    ],
+                ],
+                "array" => [
+                    [
+                        1,
+                        2,
+                        3,
+                        ["X"],
+                    ],
+                ],
+            ],
+            null       : null,
+            int        : 123,
+            string     : <<<TEXT
+            ABC
+            XYZ
+            TEXT,
+        
+        VAR,);
         that(var_export2($array, ['named' => true, 'return' => true]))->is(<<<'VAR'
         array      : [1, 2, 3],
         hash       : [
