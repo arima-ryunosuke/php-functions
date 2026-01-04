@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\generator_apply;
+use function ryunosuke\Functions\Package\generator_end;
 use function ryunosuke\Functions\Package\iterator_chunk;
 use function ryunosuke\Functions\Package\iterator_combine;
 use function ryunosuke\Functions\Package\iterator_join;
@@ -40,6 +41,42 @@ class iteratorTest extends AbstractTestCase
         that($return)->isSame(99);
         that($receiver)->isSame(null);
         that($count)->isSame(null);
+    }
+
+    function test_generator_end()
+    {
+        $range = function ($max) {
+            for ($i = 1; $i <= $max; $i++) {
+                yield $i;
+            }
+            return 99;
+        };
+
+        // 回し切ってないもの
+        $range3 = $range(3);
+        $range3->next();
+        that(generator_end($range3))->isSame(3);
+        that($range3->getReturn())->isSame(99);
+
+        // ぴったりのもの
+        $range3 = $range(3);
+        $range3->next();
+        $range3->next();
+        that(generator_end($range3))->isSame(3);
+        that($range3->getReturn())->isSame(99);
+
+        // 回し切ったもの
+        $range3 = $range(3);
+        $range3->next();
+        $range3->next();
+        $range3->next();
+        that(generator_end($range3))->isSame(null);
+        that($range3->getReturn())->isSame(99);
+
+        // 上記の引数版
+        that(generator_end($range(3), null))->isSame(3);
+        that(generator_end($range(3), null, null))->isSame(3);
+        that(generator_end($range(3), null, null, null))->isSame(null);
     }
 
     function test_iterator_chunk()
