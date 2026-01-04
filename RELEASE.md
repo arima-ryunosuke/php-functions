@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.32
+
+- [feature] generatify を追加
+- [feature] generator_end を追加
+- [feature] generator_apply を追加
+- [feature] var_export2 に nest と callback オプションを追加
+- [feature] str_diff の新オプション＋軽微修正
+- [feature] calculate_formula に機能追加+リファクタ
+
 ## 2.0.31
 
 - [feature] export-function に引数を追加
