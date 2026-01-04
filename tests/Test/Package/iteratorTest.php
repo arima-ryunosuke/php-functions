@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
+use function ryunosuke\Functions\Package\generator_apply;
 use function ryunosuke\Functions\Package\iterator_chunk;
 use function ryunosuke\Functions\Package\iterator_combine;
 use function ryunosuke\Functions\Package\iterator_join;
@@ -11,6 +12,36 @@ use function ryunosuke\Functions\Package\iterator_split;
 
 class iteratorTest extends AbstractTestCase
 {
+    function test_generator_apply()
+    {
+        $g = (function () {
+            yield 1;
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+            yield 6;
+            yield 7;
+            yield 8;
+            yield 9;
+            return 99;
+        })();
+
+        $return = generator_apply($g, function ($v) {
+            return $v % 2 == 0 ? $v : null;
+        }, $receiver, $count);
+
+        that($return)->isSame(99);
+        that($receiver)->isSame([2, 4, 6, 8]);
+        that($count)->isSame(9);
+
+        $return = generator_apply($g, fn($v) => $v % 2 == 0 ? $v : null, $receiver, $count);
+
+        that($return)->isSame(99);
+        that($receiver)->isSame(null);
+        that($count)->isSame(null);
+    }
+
     function test_iterator_chunk()
     {
         $data = [
