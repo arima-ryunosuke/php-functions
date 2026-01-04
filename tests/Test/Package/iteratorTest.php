@@ -2,6 +2,7 @@
 
 namespace ryunosuke\Test\Package;
 
+use function ryunosuke\Functions\Package\generatify;
 use function ryunosuke\Functions\Package\generator_apply;
 use function ryunosuke\Functions\Package\generator_end;
 use function ryunosuke\Functions\Package\iterator_chunk;
@@ -13,6 +14,47 @@ use function ryunosuke\Functions\Package\iterator_split;
 
 class iteratorTest extends AbstractTestCase
 {
+    function test_generatify()
+    {
+        if (!class_exists(\Fiber::class)) {
+            $this->markTestSkipped();
+        }
+        $callbackable_function = function ($iterable, $callback) {
+            $sum = 0;
+            foreach ($iterable as $k => $v) {
+                if ($callback($v, $k) === true) {
+                    break;
+                }
+                $sum += $v;
+            }
+            return $sum;
+        };
+
+        $generator = generatify(fn($c) => $callbackable_function(range(1, 9), $c));
+        that($generator)->isInstanceOf(\Generator::class);
+        that(iterator_to_array($generator))->isSame([
+            [1, 0],
+            [2, 1],
+            [3, 2],
+            [4, 3],
+            [5, 4],
+            [6, 5],
+            [7, 6],
+            [8, 7],
+            [9, 8],
+        ]);
+        that($generator)->getReturn()->isSame(45);
+
+        $generator = generatify(fn($c) => $callbackable_function(range(1, 9), $c));
+        foreach ($generator as [$v, $k]) {
+            if ($k === 5) {
+                generator_end($generator, true);
+                break;
+            }
+        }
+        that($generator)->getReturn()->isSame(15);
+    }
+
     function test_generator_apply()
     {
         $g = (function () {
