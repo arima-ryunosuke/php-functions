@@ -65,7 +65,7 @@ function calculate_formula(
 
     $expressions = [];
     foreach ((array) $formula as $k => $v) {
-        $tokens = php_tokens("<?php ($v);");
+        $tokens = php_tokens("<?php (\n$v\n);");
         array_shift($tokens);
         array_pop($tokens);
 
