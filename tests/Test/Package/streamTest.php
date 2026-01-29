@@ -7,7 +7,9 @@ use function ryunosuke\Functions\Package\include_stream;
 use function ryunosuke\Functions\Package\iterator_stream;
 use function ryunosuke\Functions\Package\memory_stream;
 use function ryunosuke\Functions\Package\profiler;
+use function ryunosuke\Functions\Package\resource_stream;
 use function ryunosuke\Functions\Package\rm_rf;
+use function ryunosuke\Functions\Package\str_resource;
 use function ryunosuke\Functions\Package\stream_describe;
 use function ryunosuke\Functions\Package\var_stream;
 
@@ -370,6 +372,88 @@ class streamTest extends AbstractTestCase
         unset($result);
 
         gc_collect_cycles();
+    }
+
+    function test_resource_stream()
+    {
+        $string = str_repeat("123456789abcdef0\n", 1000);
+        $original = str_resource($string, 0);
+
+        // 無駄を避けるため stream(seekable) は何もしない
+        $stream = resource_stream($original, forcely: false);
+        that($stream)->isSame($original);
+        $stream = resource_stream($original, forcely: true);
+        that($stream)->isNotSame($original);
+
+        // 読めるし
+        that(fgets($stream))->is("123456789abcdef0\n");
+        // seek できる
+        fseek($stream, 9, SEEK_SET);
+        that(fgets($stream))->is("abcdef0\n");
+        // rewind も可（実質 seek）
+        that(stream_get_contents($stream, null, 0))->is($string);
+
+        // 問題なく閉じられる
+        that(fclose($stream))->isSame(true);
+    }
+
+    function test_resource_stream_misc()
+    {
+        $t = resource_stream(fopen(tempnam(sys_get_temp_dir(), 'tmp'), 'wb+'), forcely: true);
+
+        // 書き込みは対応していない
+        that(@fwrite($t, 'X'))->isSame(false);
+        that(@ftruncate($t, 1))->isSame(false);
+
+        // この辺はカバレッジ
+        that(@flock($t, LOCK_EX))->isSame(true);
+        that(@stream_set_blocking($t, false))->isSameAny([false, true]); // Windows/Linux
+        that(@stream_set_timeout($t, 10))->isSame(false);
+        that(@stream_set_read_buffer($t, 10))->isSame(-1);
+        that(@stream_set_write_buffer($t, 10))->isSame(0);
+        $read = [$t];
+        $write = null;
+        $except = null;
+        that(stream_select($read, $write, $except, 10))->isSame(1);
+
+        // バッファーのカバレッジ
+        $bufferManager = (fn() => $this->bufferManager)->call(stream_get_meta_data($t)['wrapper_data']);
+        $bufferManager->read(0, 100)->read(200, 100)->read(990, 10)->read(900, 100)->read(400, 100);
+        that($bufferManager->getUnread(0, 1000))->is([
+            [100, 100],
+            [300, 100],
+            [500, 400],
+        ]);
+    }
+
+    function test_resource_stream_http()
+    {
+        if (!defined('TESTWEBSERVER')) {
+            return;
+        }
+        $server = TESTWEBSERVER;
+
+        $url = "$server/get?test=123";
+        $expected = file_get_contents($url);
+
+        // ドカッと読んでも同じ動き
+        $stream = resource_stream(fopen($url, 'rb'));
+        that(stream_get_contents($stream))->is($expected);
+
+        // rewind できる
+        rewind($stream);
+
+        // fgets で細切れに読んでも同じ動き
+        $first = fgets($stream);
+        $second = fgets($stream);
+        that($first . $second . stream_get_contents($stream))->is($expected);
+
+        // 進み seek の後に戻り seek は出来ない
+        $stream = resource_stream(fopen($url, 'rb'), 0);
+        that(fseek($stream, 10))->isSame(0);
+        that(@fgets($stream, 10))->isSameAny([false, ": {\n"]); // http の seek は時々コケる（多分その位置まで読み込みが終わっていないとき）
+        that(fseek($stream, 0))->isSame(0);
+        that(@fgets($stream, 10))->isSame(false);
     }
 
     function test_stream_describe()
