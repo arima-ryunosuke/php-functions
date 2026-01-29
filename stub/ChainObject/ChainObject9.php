@@ -623,6 +623,11 @@ trait ChainObject9
     public function function_export_false2null(string $namespace, bool $false_only = true): self { }
     public function function_export_false2null(bool $false_only = true): self { }
 
+    /** @see resource_stream() */
+    public self $resource_stream;
+    public function resource_stream($resource, int $max_memory = 2097152, bool $forcely = false): self { }
+    public function resource_stream(int $max_memory = 2097152, bool $forcely = false): self { }
+
     /** @see mb_ereg_options() */
     public self $mb_ereg_options;
     public function mb_ereg_options($options): self { }

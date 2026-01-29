@@ -394,6 +394,16 @@ TEXT): self { }
     public function filter_map(iterable $array, callable $callback): self { }
     public function filter_map(callable $callback): self { }
 
+    /** @see array_flatmap() */
+    public self $array_flatmap;
+    public function array_flatmap(iterable $array, callable $callback): self { }
+    public function array_flatmap(callable $callback): self { }
+
+    /** @see array_flatmap() */
+    public self $flatmap;
+    public function flatmap(iterable $array, callable $callback): self { }
+    public function flatmap(callable $callback): self { }
+
     /** @see array_group() */
     public self $array_group;
     public function array_group(iterable $array, callable $callback = null, $preserve_keys = false): self { }

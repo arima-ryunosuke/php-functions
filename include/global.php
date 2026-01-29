@@ -1720,6 +1720,96 @@ if (!function_exists('array_fill_gap')) {
     }
 }
 
+assert(!function_exists('array_fill_values') || (new \ReflectionFunction('array_fill_values'))->isUserDefined());
+if (!function_exists('array_fill_values')) {
+    /**
+     * 既存配列のキーを埋める
+     *
+     * キーベースの array_combine のようなもの。
+     * array_combine を呼ぶときは手元に連想配列があることが多く、array_combine(array_keys($array), ['some', 'thing']) という使い方が多い。
+     * ならばいっそキーベースで値を埋められた方が便利なことがある。
+     *
+     * $values が非配列の場合、単純にその値で埋められる（array_fill_keys 相当の動きになる）。
+     * $values が配列の場合、読み替えはキー・連番の両方で行われる（連想配列を渡した場合は array_shrink_key 相当の動きになる）。
+     * さらに $values の数は一致していなくてもよい。
+     * $values の方が大きい場合は array_combine と同様に例外を投げるが、少ない場合は足りない分はフィルタされる。
+     *
+     * $values はコールバックを受け付けるので、与えられた場合は各要素のコールバック結果が値となる（array_fill_callback 相当の動きになる）。
+     *
+     * Example:
+     * ```php
+     * $array = [
+     *     'a' => 'A',
+     *     'b' => 'B',
+     * ];
+     * # array_fill_keys のような使い方
+     * that(array_fill_values($array, 'hogera'))->isSame(['a' => 'hogera', 'b' => 'hogera']);
+     * # array_combine のような使い方
+     * that(array_fill_values($array, ['hoge', 'fuga']))->isSame(['a' => 'hoge', 'b' => 'fuga']);
+     * # array_shrink_key のような使い方
+     * that(array_fill_values($array, ['b' => 'hoge', 'a' => 'fuga']))->isSame(['a' => 'fuga', 'b' => 'hoge']);
+     * # array_fill_callback のような使い方
+     * that(array_fill_values($array, fn($v, $k, $n) => "$v-$k-$n"))->isSame(['a' => "A-a-0", 'b' => "B-b-1"]);
+     * # 数が少なくてもエラーにはならないが数が多いと例外
+     * that(array_fill_values($array, ['X']))->isSame(['a' => "X"]);
+     * try {
+     *     array_fill_values($array, ['X', 'Y', 'Z']);
+     *     $this->fail();
+     * } catch (\Throwable) {}
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\array
+     *
+     * @template T of iterable&\ArrayAccess
+     * @param T $array
+     * @return T
+     */
+    function array_fill_values(iterable $array, mixed $values)
+    {
+        // Iterator だが ArrayAccess ではないオブジェクト（Generator とか）は unset できないので配列として扱わざるを得ない
+        if (!(function_configure('array.variant') && is_arrayable($array))) {
+            $array = arrayval($array, false);
+        }
+
+        $array2 = arrayval($array, false);
+
+        $n = 0;
+        $settled = [];
+        foreach ($array2 as $k => $v) {
+            if (is_array($values)) {
+                if (array_key_exists($key = $k, $values) || array_key_exists($key = $n, $values)) {
+                    $array[$k] = $values[$key];
+                    unset($values[$k]);
+                    unset($values[$n]);
+                    $settled[$k] = true;
+                }
+            }
+            elseif (is_callback($values)) {
+                $array[$k] = $values($v, $k, $n);
+                $settled[$k] = true;
+            }
+            else {
+                $array[$k] = $values;
+                $settled[$k] = true;
+            }
+
+            $n++;
+        }
+
+        if (is_array($values) && count(array_filter($values, 'is_int', ARRAY_FILTER_USE_KEY))) {
+            throw new \ValueError('array_fill_values(): Argument #2 ($values) must less then number of array');
+        }
+
+        foreach ($array2 as $k => $v) {
+            if (!isset($settled[$k])) {
+                unset($array[$k]);
+            }
+        }
+
+        return $array;
+    }
+}
+
 assert(!function_exists('array_filter_map') || (new \ReflectionFunction('array_filter_map'))->isUserDefined());
 if (!function_exists('array_filter_map')) {
     /**
@@ -2117,6 +2207,48 @@ if (!function_exists('array_find_recursive')) {
 
         $return = $main($array, [], []);
         return $return === $notfound ? false : $return;
+    }
+}
+
+assert(!function_exists('array_flatmap') || (new \ReflectionFunction('array_flatmap'))->isUserDefined());
+if (!function_exists('array_flatmap')) {
+    /**
+     * スタンダードな flatMap
+     *
+     * 同じことは array_kvmap でもできる。
+     * ただあちらは仕様が独自なので、こちらは癖のない万人が想起する flatmap になる。
+     *
+     * コールバック引数:
+     * - array_kvmap: ($k, $v, $callback) # $k が第一で、再帰を意識していたので $callback も渡ってくる
+     * - array_flatmap: ($v, $k, $array)  # シンプルに js に合わせる
+     * null の扱い
+     * - array_kvmap: 変更なしとして扱う
+     * - array_flatmap: 値として扱う
+     * !array & iterable の扱い
+     * - array_kvmap: 配列として扱う
+     * - array_flatmap: 値として扱う
+     *
+     * @package ryunosuke\Functions\Package\array
+     */
+    function array_flatmap(iterable $array, $callback): array
+    {
+        $result = [];
+        foreach ($array as $k => $v) {
+            $kv = $callback($v, $k, $array);
+            if (!is_array($kv)) {
+                $kv = [$kv];
+            }
+            // $result = array_merge($result, $kv); // 遅すぎる
+            foreach ($kv as $k2 => $v2) {
+                if (is_int($k2)) {
+                    $result[] = $v2;
+                }
+                else {
+                    $result[$k2] = $v2;
+                }
+            }
+        }
+        return $result;
     }
 }
 
@@ -20603,7 +20735,7 @@ if (!function_exists('calculate_formula')) {
 
         $expressions = [];
         foreach ((array) $formula as $k => $v) {
-            $tokens = php_tokens("<?php ($v);");
+            $tokens = php_tokens("<?php (\n$v\n);");
             array_shift($tokens);
             array_pop($tokens);
 
@@ -28890,6 +29022,231 @@ if (!function_exists('profiler')) {
         };
 
         return $profiler;
+    }
+}
+
+assert(!function_exists('resource_stream') || (new \ReflectionFunction('resource_stream'))->isUserDefined());
+if (!function_exists('resource_stream')) {
+    /**
+     * resource を (file)stream にプロキシする
+     *
+     * バックエンドが tmpfile になるいわゆる BufferedStream であり、透過的にバッファリングする。
+     * もっとも、今のところ read にしか対応していないため、「seek できる stream にする」くらいの意味合いでしかない。
+     *
+     * resource に対応しているプロダクトでも stream 以外は対応していないことがある。
+     * e.g. doctrine: https://github.com/doctrine/dbal/blob/4.4.1/src/Driver/Mysqli/Statement.php#L102
+     * この関数を通すとファイルシステムを通して file stream 扱いになるのでこのようなプロダクトでも扱えるようになる。
+     * 副作用としてはいったんファイルが出来上がることになるので resource であるメリットを一部捨て去ってしまうこと。
+     *
+     * $max_memory を与えるとそのサイズまではメモリ内で展開される。
+     * 0 を与えると完全にディスクで動作する。
+     * 0 以外では seek 動作が効かないので注意。
+     * （php://temp が seek に対応していないっぽい。とはいえシーケンシャルじゃない seek したい状況がまずないので基本的に気にしなくてよい）。
+     *
+     * @package ryunosuke\Functions\Package\stream
+     *
+     * @return resource
+     */
+    function resource_stream($resource, int $max_memory = 2 * 1024 * 1024, bool $forcely = false)
+    {
+        // seekable だったら無駄なので何もしない
+        if (!$forcely && stream_get_meta_data($resource)['seekable']) {
+            return $resource;
+        }
+
+        static $STREAM_NAME, $stream_class = null;
+        if ($STREAM_NAME === null) {
+            $STREAM_NAME = 'resource-stream';
+            if (in_array($STREAM_NAME, stream_get_wrappers())) {
+                throw new \DomainException("$STREAM_NAME is registered already."); // @codeCoverageIgnore
+            }
+
+            stream_wrapper_register($STREAM_NAME, $stream_class = get_class(new class() {
+                public static $resources = [];
+
+                private int    $id;
+                private        $sourceStream;
+                private        $bufferStream;
+                private object $bufferManager;
+
+                public $context;
+
+                // <editor-fold desc="open/close">
+
+                /** @noinspection PhpUnusedParameterInspection */
+                public function stream_open(string $path, string $mode, int $options, &$opened_path): bool
+                {
+                    // リソース ID とパラメータを取得
+                    $parsed = parse_url($path);
+                    parse_str($parsed['query'], $query);
+
+                    // リソースを取得（unset のために ID は取っておく）
+                    $this->id = $parsed['host'];
+                    $this->sourceStream = self::$resources[$parsed['host']];
+
+                    // バッファー生成（位置は合わせておく）
+                    $this->bufferStream = $query['max_memory'] ? fopen("php://temp/maxmemory:{$query['max_memory']}", 'wb+') : tmpfile();
+                    fseek($this->bufferStream, ftell($this->sourceStream));
+
+                    // 既読管理マネージャ
+                    $this->bufferManager = new class () {
+                        public function __construct(private array $ranges = []) { }
+
+                        public function read(int $start, int $length): self
+                        {
+                            $end = $start + $length;
+
+                            $result = [];
+                            foreach ($this->ranges as [$readFrom, $readTo]) {
+                                if ($readTo < $start) {
+                                    $result[] = [$readFrom, $readTo];
+                                }
+                                elseif ($readFrom > $end) {
+                                    $result[] = [$start, $end];
+                                    $start = $readFrom;
+                                    $end = $readTo;
+                                }
+                                else {
+                                    $start = min($start, $readFrom);
+                                    $end = max($end, $readTo);
+                                }
+                            }
+                            $result[] = [$start, $end];
+                            $this->ranges = $result;
+
+                            return $this;
+                        }
+
+                        public function getUnread(int $start, int $length): array
+                        {
+                            $end = $start + $length;
+
+                            $result = [];
+                            foreach ($this->ranges as [$readFrom, $readTo]) {
+                                if ($readFrom >= $end) {
+                                    break;
+                                }
+                                if ($readTo <= $start) {
+                                    continue;
+                                }
+
+                                if ($readFrom > $start) {
+                                    $result[] = [$start, $readFrom - $start];
+                                }
+
+                                $start = max($start, $readTo);
+
+                                if ($start >= $end) {
+                                    return $result;
+                                }
+                            }
+
+                            if ($start < $end) {
+                                $result[] = [$start, $end - $start];
+                            }
+
+                            return $result;
+                        }
+                    };
+
+                    return true;
+                }
+
+                public function stream_close(): void
+                {
+                    fclose($this->sourceStream);
+                    fclose($this->bufferStream);
+                    unset(self::$resources[$this->id]);
+                }
+
+                // </editor-fold>
+
+                // <editor-fold desc="read/write">
+
+                public function stream_read(int $count): string|false
+                {
+                    $bufferPos = ftell($this->bufferStream);
+
+                    // buffer に無いなら読む（seek 次第で細切れになるが普通はシーケンシャルなので許容する）
+                    $unreads = $this->bufferManager->getUnread($bufferPos, $count);
+                    foreach ($unreads as [$start, $length]) {
+                        // buffer でしか seek していないのでここで seek（もちろんここでエラーになることもある）
+                        if (ftell($this->sourceStream) !== $start) {
+                            if (fseek($this->sourceStream, $start) === -1) {
+                                return false;
+                            }
+                        }
+
+                        // 読んで書いて既読にする
+                        $buffer = fread($this->sourceStream, $length);
+                        fseek($this->bufferStream, $start);
+                        fwrite($this->bufferStream, $buffer);
+                        $this->bufferManager->read($start, strlen($buffer));
+                    }
+
+                    // 上を通過した時点で buffer に溜まっているので単純に読めばよい
+                    fseek($this->bufferStream, $bufferPos);
+                    return fread($this->bufferStream, $count);
+                }
+
+                // </editor-fold>
+
+                // <editor-fold desc="seek">
+
+                public function stream_seek(int $offset, int $whence): bool
+                {
+                    // seek は buffer が主体で読み込み時に source も seek する
+                    return fseek($this->bufferStream, $offset, $whence) === 0;
+                }
+
+                public function stream_tell(): int
+                {
+                    return ftell($this->bufferStream);
+                }
+
+                public function stream_eof(): bool
+                {
+                    return feof($this->sourceStream);
+                }
+
+                // </editor-fold>
+
+                // <editor-fold desc="misc">
+
+                public function stream_stat(): array|false
+                {
+                    return fstat($this->sourceStream);
+                }
+
+                public function stream_set_option(int $option, int $arg1, ?int $arg2): bool
+                {
+                    return match ($option) {
+                        STREAM_OPTION_BLOCKING     => stream_set_blocking($this->sourceStream, $arg1),
+                        STREAM_OPTION_READ_BUFFER  => stream_set_read_buffer($this->sourceStream, $arg2),
+                        STREAM_OPTION_WRITE_BUFFER => stream_set_write_buffer($this->sourceStream, $arg2),
+                        STREAM_OPTION_READ_TIMEOUT => stream_set_timeout($this->sourceStream, $arg1 + $arg2 / 1_000_000),
+                    };
+                }
+
+                public function stream_lock(int $operation): bool
+                {
+                    return flock($this->sourceStream, $operation);
+                }
+
+                /** @noinspection PhpUnusedParameterInspection */
+                public function stream_cast(int $cast_as)
+                {
+                    return $this->bufferStream;
+                }
+
+                // </editor-fold>
+            }));
+        }
+
+        $id = get_resource_id($resource);
+        $stream_class::$resources[$id] = $resource;
+
+        return fopen("$STREAM_NAME://$id?max_memory=$max_memory", 'rb');
     }
 }
 
