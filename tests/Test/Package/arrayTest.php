@@ -27,6 +27,7 @@ use function ryunosuke\Functions\Package\array_filters;
 use function ryunosuke\Functions\Package\array_find_first;
 use function ryunosuke\Functions\Package\array_find_last;
 use function ryunosuke\Functions\Package\array_find_recursive;
+use function ryunosuke\Functions\Package\array_flatmap;
 use function ryunosuke\Functions\Package\array_flatten;
 use function ryunosuke\Functions\Package\array_get;
 use function ryunosuke\Functions\Package\array_grep_key;
@@ -1489,6 +1490,37 @@ class arrayTest extends AbstractTestCase
         that(array_find_recursive($array, fn($v) => $v === [1, 2, 3], true))->is(['xyz', 'x', 'y', 'z']);
         that(array_find_recursive($array, fn($v) => $v === [1, 2, 9], true))->is(false);
         that(array_find_recursive($array, fn($v) => $v === $abc, true))->is(['xyz', 'abc']);
+    }
+
+    function test_array_flatmap()
+    {
+        that(array_flatmap(['a' => 'A', 'b' => 'B', 'c' => 'C'], function ($v, $k) {
+            if ($k === 'a') {
+                return null;
+            }
+            if ($k === 'b') {
+                return [];
+            }
+            if ($k === 'c') {
+                return ["{$k}1" => "{$v}1", "{$k}2" => "{$v}2"];
+            }
+        }))->is([
+            null,
+            'c1' => 'C1',
+            'c2' => 'C2',
+        ]);
+
+        that(array_flatmap(['a', 'b', 'c', 'x' => 'X'], function ($v, $k, $array) {
+            if ($v === 'a') {
+                return $array['x'];
+            }
+            if ($v === 'b') {
+                return ['B'];
+            }
+            if ($v === 'c') {
+                return 'C';
+            }
+        }))->is(['X', 'B', 'C', null]);
     }
 
     function test_array_flatten()
