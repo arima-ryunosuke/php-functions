@@ -21,6 +21,7 @@ use function ryunosuke\Functions\Package\array_explode;
 use function ryunosuke\Functions\Package\array_extend;
 use function ryunosuke\Functions\Package\array_fill_callback;
 use function ryunosuke\Functions\Package\array_fill_gap;
+use function ryunosuke\Functions\Package\array_fill_values;
 use function ryunosuke\Functions\Package\array_filter_map;
 use function ryunosuke\Functions\Package\array_filter_recursive;
 use function ryunosuke\Functions\Package\array_filters;
@@ -1249,6 +1250,61 @@ class arrayTest extends AbstractTestCase
         that(array_fill_gap(['a', 'x' => 'Noise', 'b', 'y' => 'Noise', 3 => 'd', 'z' => 'Noise'], 'c', 'e'))->isSame(['a', 'x' => 'Noise', 'b', 'y' => 'Noise', 'c', 'd', 'z' => 'Noise', 'e']);
         that(array_fill_gap(['a', 4 => 'e'], 'b', 'c'))->isSame(['a', 'b', 'c', 4 => 'e']);
         that(array_fill_gap(array_fill_gap(['a', 4 => 'e'], 'b', 'c'), 'd'))->isSame(['a', 'b', 'c', 'd', 'e']);
+    }
+
+    function test_array_fill_values()
+    {
+        $array = [
+            'a' => 'A',
+            'b' => 'B',
+        ];
+
+        // scalar
+        that(array_fill_values($array, null))->isSame([
+            "a" => null,
+            "b" => null,
+        ]);
+        that(array_fill_values($array, 123))->isSame([
+            "a" => 123,
+            "b" => 123,
+        ]);
+        that(array_fill_values($array, STDOUT))->isSame([
+            "a" => STDOUT,
+            "b" => STDOUT,
+        ]);
+
+        // array
+        that(array_fill_values($array, ['A', 'x' => 'dummy']))->isSame([
+            "a" => 'A',
+        ]);
+        that(array_fill_values($array, ['A', 'B']))->isSame([
+            "a" => 'A',
+            "b" => 'B',
+        ]);
+        // 順番を問わずキー優先
+        that(array_fill_values($array, [0 => 'A1', 'a' => 'A2', 'b' => 'B1', 1 => 'B2']))->isSame([
+            "a" => 'A2',
+            "b" => 'B1',
+        ]);
+        // 要素数越え
+        that(self::resolveFunction('array_fill_values'))($array, [1, 2, 3, 4])->wasThrown('less then');
+
+        // callback
+        that(array_fill_values($array, fn($v, $k, $n) => [$v, $k, $n]))->isSame([
+            "a" => ["A", "a", 0],
+            "b" => ["B", "b", 1],
+        ]);
+
+        $restorer = $this->restorer(fn($v) => function_configure(['array.variant' => $v]), [true], [false]);
+
+        $ao = new \ArrayObject($array);
+        that(array_fill_values($ao, [123, 456]))->isSame($ao);
+        that($ao->getArrayCopy())->isSame([
+            "a" => 123,
+            "b" => 456,
+        ]);
+
+        unset($restorer);
     }
 
     function test_array_filter_map()
