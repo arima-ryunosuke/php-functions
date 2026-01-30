@@ -11,6 +11,13 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.33
+
+- [feature] resource_stream を追加
+- [feature] array_fill_values を追加
+- [feature] array_flatmap を追加
+- [fixbug] 末端が行コメントだとパース出来ない不具合
+
 ## 2.0.32
 
 - [feature] generatify を追加
