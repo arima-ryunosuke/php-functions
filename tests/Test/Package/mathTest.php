@@ -7,6 +7,7 @@ use function ryunosuke\Functions\Package\base_convert_array;
 use function ryunosuke\Functions\Package\calculate_formula;
 use function ryunosuke\Functions\Package\clamp;
 use function ryunosuke\Functions\Package\decimal;
+use function ryunosuke\Functions\Package\hoelder_mean;
 use function ryunosuke\Functions\Package\int_divide;
 use function ryunosuke\Functions\Package\maximum;
 use function ryunosuke\Functions\Package\mean;
@@ -442,6 +443,27 @@ class mathTest extends AbstractTestCase
 
         that(self::resolveFunction('decimal'))(1, 1, 'hoge')->wasThrown('$precision must be either');
         that(self::resolveFunction('decimal'))(9007199254740991.0, 1, $NINF)->wasErrored('it exceeds the valid values');
+    }
+
+    function test_hoelder_mean()
+    {
+        $numbers = [1.1, 2.2, 3.3, 4.4, 5.5];
+
+        that(hoelder_mean(-INF, ...$numbers))->isSame(1.1);
+        that(hoelder_mean(+INF, ...$numbers))->isSame(5.5);
+        that(hoelder_mean(0, ...$numbers))->isSame(2.865688193167087);
+
+        that(hoelder_mean(-1, ...$numbers))->isSame(2.408759124087591);
+        that(hoelder_mean(+1, ...$numbers))->isSame(3.3);
+        that(hoelder_mean(+2, ...$numbers))->isSame(3.6482872693909396);
+        that(hoelder_mean(+3, ...$numbers))->isSame(3.912582634939069);
+
+        that(hoelder_mean(-INF))->isSame(null);
+        that(hoelder_mean(+INF))->isSame(null);
+        that(hoelder_mean(0))->isSame(null);
+        that(hoelder_mean(0.5))->isSame(null);
+
+        that(self::resolveFunction('hoelder_mean'))(0, 0)->wasThrown('must be number>0');
     }
 
     function test_int_divide()
