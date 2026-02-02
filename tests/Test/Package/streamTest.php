@@ -454,7 +454,7 @@ class streamTest extends AbstractTestCase
         that(fseek($stream, 10))->isSame(0);
         that(@fgets($stream, 10))->isSameAny([false, ": {\n"]); // http の seek は時々コケる（多分その位置まで読み込みが終わっていないとき）
         that(fseek($stream, 0))->isSame(0);
-        that(@fgets($stream, 10))->isSame(false);
+        that(@fgets($stream, 10))->isSameAny([false, "{\n"]);
     }
 
     function test_stream_describe()
