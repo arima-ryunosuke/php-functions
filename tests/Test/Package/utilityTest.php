@@ -13,6 +13,7 @@ use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\function_resolve;
 use function ryunosuke\Functions\Package\json_storage;
 use function ryunosuke\Functions\Package\number_serial;
+use function ryunosuke\Functions\Package\progressor;
 use function ryunosuke\Functions\Package\rm_rf;
 
 class utilityTest extends AbstractTestCase
@@ -391,5 +392,48 @@ class utilityTest extends AbstractTestCase
         // null は要するに range で復元できる形式となる
         $array = [-9, -5, -4, -3, -1, 1, 3, 4, 5, 9];
         that(array_flatten(array_maps(number_serial($array), '...range')))->is($array);
+    }
+
+    function test_progressor()
+    {
+        $progressor = progressor(0);
+        that($progressor)->current()->isSame(0);
+        that($progressor)->remain()->isSame(0);
+        that($progressor)->total()->isSame(0);
+        that($progressor)->percent()->isSame(null);
+        that($progressor)->elapse()->isFloat();
+        that($progressor)->estimate()->isSame(null);
+        that($progressor)->mean()->isSame(null);
+
+        $progressor = progressor(10, 0.5);
+        $progressor->proceed();
+        that($progressor)->current()->isSame(1);
+        that($progressor)->remain()->isSame(9);
+        that($progressor)->total()->isSame(10);
+        that($progressor)->percent()->isSame(10.0);
+        that($progressor)->elapse()->isFloat();
+        that($progressor)->estimate()->isFloat();
+        that($progressor)->mean()->isFloat();
+        usleep(100_000);
+        $progressor->proceed();
+        that($progressor)->current()->isSame(2);
+        that($progressor)->remain()->isSame(8);
+        that($progressor)->total()->isSame(10);
+        that($progressor)->percent()->isSame(20.0);
+        that($progressor)->elapse()->closesTo(0.1);
+        that($progressor)->estimate()->closesTo(0.2); // ここが違う
+        that($progressor)->mean()->isFloat();
+
+        $progressor = progressor(10, 1);
+        $progressor->proceed();
+        usleep(100_000);
+        $progressor->proceed();
+        that($progressor)->current()->isSame(2);
+        that($progressor)->remain()->isSame(8);
+        that($progressor)->total()->isSame(10);
+        that($progressor)->percent()->isSame(20.0);
+        that($progressor)->elapse()->closesTo(0.1);
+        that($progressor)->estimate()->closesTo(0.4); // ここが違う
+        that($progressor)->mean()->isFloat();
     }
 }
