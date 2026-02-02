@@ -325,7 +325,7 @@ class Transporter
                 if (isset($constants[$token->text]) && ($tokens[$i - 1]->id ?? '') !== T_DOUBLE_COLON) {
                     $token->dependent = 'constant';
                 }
-                if (isset($functions[$token->text]) && ($tokens[$i - 2]->id ?? '') !== T_FUNCTION && ($tokens[$i + 1]->text ?? '') === '(') {
+                if (isset($functions[$token->text]) && ($tokens[$i - 1]->id ?? '') !== T_OBJECT_OPERATOR && ($tokens[$i - 2]->id ?? '') !== T_FUNCTION && ($tokens[$i + 1]->text ?? '') === '(') {
                     $token->dependent = 'function';
                 }
             }
