@@ -621,6 +621,16 @@ TEXT): self { }
 \\b\10\\d\177
 TEXT): self { }
 
+    /** @see str_partition() */
+    public self $str_partition;
+    public function str_partition(string $string, string $separator, int $require_count, mixed $default = null): self { }
+    public function str_partition(string $separator, int $require_count, mixed $default = null): self { }
+
+    /** @see str_partition() */
+    public self $partition;
+    public function partition(string $string, string $separator, int $require_count, mixed $default = null): self { }
+    public function partition(string $separator, int $require_count, mixed $default = null): self { }
+
     /** @see str_quote() */
     public self $str_quote;
     public function str_quote(string $string, array $options = []): self { }

@@ -683,9 +683,19 @@ trait ChainObject9
     public function function_resolve(string $funcname): self { }
     public function function_resolve(): self { }
 
+    /** @see decimalstr() */
+    public self $decimalstr;
+    public function decimalstr(float $number, int $precision = 16): self { }
+    public function decimalstr(int $precision = 16): self { }
+
     /** @see is_resourcable() */
     public self $is_resourcable;
     public function is_resourcable($var): self { }
     public function is_resourcable(): self { }
+
+    /** @see timeval() */
+    public self $timeval;
+    public function timeval(int|float $seconds): self { }
+    public function timeval(): self { }
 
 }

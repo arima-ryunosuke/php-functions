@@ -413,10 +413,20 @@ trait ChainObject0
     public function base_convert_array(iterable $array, $from_base, $to_base): self { }
     public function base_convert_array($from_base, $to_base): self { }
 
+    /** @see hoelder_mean() */
+    public self $hoelder_mean;
+    public function hoelder_mean(float $p, int|float ...$numbers): self { }
+    public function hoelder_mean(int|float ...$numbers): self { }
+
     /** @see http_request() */
     public self $http_request;
     public function http_request($options = [], &$response_header = [], &$info = []): self { }
     public function http_request(&$response_header = [], &$info = []): self { }
+
+    /** @see stream_transfer() */
+    public self $stream_transfer;
+    public function stream_transfer(array $streams, array $options = []): self { }
+    public function stream_transfer(array $options = []): self { }
 
     /** @see ends_with() */
     public self $ends_with;

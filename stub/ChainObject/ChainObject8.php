@@ -474,6 +474,11 @@ TEXT): self { }
     public function number_serial($numbers, $step = 1, $separator = null, $doSort = true): self { }
     public function number_serial($step = 1, $separator = null, $doSort = true): self { }
 
+    /** @see is_arithmetic() */
+    public self $is_arithmetic;
+    public function is_arithmetic($var): self { }
+    public function is_arithmetic(): self { }
+
     /** @see is_empty() */
     public self $is_empty;
     public function is_empty($var, $empty_stdClass = false): self { }

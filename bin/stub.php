@@ -19,6 +19,7 @@ $targetFunction = [
     'reflect_types'    => [[]],
     'php_tokens'       => [['<?php return null;']],
     'sleetflake'       => [[]],
+    'progressor'       => [[10]],
 ];
 
 foreach ($targetFunction as $funcname => $argses) {
@@ -147,7 +148,7 @@ foreach (get_defined_functions(true) as $type => $functions) {
         if (true
             && $reffunc->isVariadic() && count($params) === 2
             && $params[0]->hasType() && $params[1]->hasType()
-            && $params[0]->getType()->getName() === $params[1]->getType()->getName()
+            && strval($params[0]->getType()) === strval($params[1]->getType())
         ) {
             // echo "{$reffunc->name}({$V(implode(', ', $parameters))})\n";
             array_shift($parameters);

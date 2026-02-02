@@ -20909,6 +20909,62 @@ if (!function_exists('decimal')) {
     }
 }
 
+assert(!function_exists('hoelder_mean') || (new \ReflectionFunction('hoelder_mean'))->isUserDefined());
+if (!function_exists('hoelder_mean')) {
+    /**
+     * ヘルダー平均を返す
+     *
+     * 定義に従い、p=-INF,+INF,0 の場合は特別扱いされる。
+     * - -INF: 最小値
+     * - +INF: 最大値
+     * - 0.0: 幾何平均
+     *
+     * 要素が 0 の場合はエラーではなく null を返す。
+     * これは ?? default を意図したもので、呼び側は常に要素数を意識しなければならない。
+     *
+     * Example:
+     * ```php
+     * // 最小値
+     * that(hoelder_mean(-INF, 1, 2, 3, 4, 5, 10))->isSame(1);
+     * // 最大値
+     * that(hoelder_mean(+INF, 1, 2, 3, 4, 5, 10))->isSame(10);
+     * // 算術平均
+     * that(hoelder_mean(1, 1, 2, 3, 4, 5, 10))->isSame(4.166666666666667);
+     * // 平方根平均
+     * that(hoelder_mean(0.5, 1, 2, 3, 4, 5, 10))->isSame(3.7021672285503406);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\math
+     *
+     * @param float $p ヘルダー指数
+     * @param float|int ...$numbers 数値の配列
+     * @return float|int|null 計算結果
+     */
+    function hoelder_mean(float $p, float|int ...$numbers): float|int|null
+    {
+        $count = count($numbers);
+        if (!$count) {
+            return null;
+        }
+
+        if ($p === -INF) {
+            return min($numbers);
+        }
+        if ($p === +INF) {
+            return max($numbers);
+        }
+        if ($p === 0.0) {
+            // 幾何平均で <=0 は定義されない
+            if (array_find_first($numbers, fn($v) => $v <= 0) !== null) {
+                throw new \LogicException("geometric mean must be number>0.");
+            }
+            return exp(array_sum(array_map(fn($v) => log($v), $numbers)) / $count);
+        }
+
+        return pow(array_sum(array_map(fn($v) => pow($v, $p), $numbers)) / $count, 1 / $p);
+    }
+}
+
 assert(!function_exists('int_divide') || (new \ReflectionFunction('int_divide'))->isUserDefined());
 if (!function_exists('int_divide')) {
     /**
@@ -21004,8 +21060,8 @@ if (!function_exists('mean')) {
     function mean(...$variadic)
     {
         $args = array_flatten($variadic) or throw new \LengthException("argument's length is 0.");
-        $args = array_filter($args, 'is_numeric') or throw new \LengthException("argument's must be contain munber.");
-        return array_sum($args) / count($args);
+        $args = array_filter($args, fn($v) => is_arithmetic($v)) or throw new \LengthException("argument's must be contain number.");
+        return sum($args) / count($args);
     }
 }
 
@@ -21040,7 +21096,7 @@ if (!function_exists('median')) {
         $center = (int) ($count / 2);
         sort($args);
         // 偶数で共に数値なら平均値
-        if ($count % 2 === 0 && (is_numeric($args[$center - 1]) && is_numeric($args[$center]))) {
+        if ($count % 2 === 0 && (is_arithmetic($args[$center - 1]) && is_arithmetic($args[$center]))) {
             return ($args[$center - 1] + $args[$center]) / 2;
         }
         // 奇数なら単純に中央値
@@ -21138,8 +21194,13 @@ if (!function_exists('sum')) {
     function sum(...$variadic)
     {
         $args = array_flatten($variadic) or throw new \LengthException("argument's length is 0.");
-        $args = array_filter($args, 'is_numeric') or throw new \LengthException("argument's must be contain munber.");
-        return array_sum($args);
+        $args = array_filter($args, fn($v) => is_arithmetic($v)) or throw new \LengthException("argument's must be contain number.");
+        //return array_sum($args); // for compatible php 8.3
+        $result = 0;
+        foreach ($args as $arg) {
+            $result += $arg;
+        }
+        return $result;
     }
 }
 
@@ -29345,6 +29406,133 @@ if (!function_exists('stream_describe')) {
     }
 }
 
+assert(!function_exists('stream_transfer') || (new \ReflectionFunction('stream_transfer'))->isUserDefined());
+if (!function_exists('stream_transfer')) {
+    /**
+     * ストリームの転送を並列で行う
+     *
+     * $streams は下記の配列を指定する。
+     * ```
+     * [
+     *     'read'  => resource|string|callable, // 読み込み対象
+     *     'write' => resource|string|callable, // 書き込み対象
+     *     'done'  => callable, // 完了時コールバック
+     *     'fail'  => callable, // 失敗時コールバック
+     * ]
+     * ```
+     *
+     * ローカルストリームはファイル名で渡すことが多いので、文字列が来たら fopen する。
+     * 大量に実行したい場合に全て fopen したくない場合は callable を渡せば必要に応じてコールされる。
+     *
+     * done, fail 成功/失敗時にコールされるがほぼオマケ。
+     * 未指定だと成功時 size, 失敗時 null が格納される。
+     *
+     * @package ryunosuke\Functions\Package\stream
+     *
+     * @param array<array{read:resource|string|callable, write:resource|string|callable, done?:callable, fail?:callable}> $streams
+     */
+    function stream_transfer(array $streams, array $options = []): array
+    {
+        $options += [
+            'concurrency'   => 8,    // 同時並列数
+            'buffer_size'   => 8192, // 読み込みバッファサイズ
+            'select_second' => 1.5,  // stream_select の待機秒数（stream_select なので多少大きくてもよい）
+            'sleep_second'  => 0.01, // 読めるものがなかった場合の待機秒数（select 未対応時の sleep なのであまり大きいとスループットが下がる）
+            'done'          => null, // 共通の done
+            'fail'          => null, // 共通の fail
+        ];
+
+        $open = fn($target, $mode) => match (true) {
+            default              => $target,
+            is_callable($target) => $target(),
+            is_string($target)   => fopen($target, $mode),
+        };
+
+        $result = array_fill_keys(array_keys($streams), 0);
+        $currents = [];
+        $noselectable_streams = [];
+
+        while ($streams || $currents) {
+            while ($streams && count($currents) < $options['concurrency']) {
+                // 次の要素を取得
+                $first = array_key_first($streams);
+                $stream = $streams[$first];
+                unset($streams[$first]);
+
+                // 呼び出し時点で全部開かれるのもアレなので callable/string を許容する
+                $stream['read'] = $open($stream['read'], 'rb');
+                $stream['write'] = $open($stream['write'], 'wb');
+
+                // キューに追加
+                stream_set_blocking($stream['read'], false);
+                $currents[$first] = $stream;
+            }
+
+            $read = false;
+            foreach ($currents as $key => $current) {
+                $data = fread($current['read'], $options['buffer_size']);
+
+                // 読めなかったら諦める
+                if ($data === false) {
+                    // @codeCoverageIgnoreStart
+                    unset($currents[$key]);
+                    $result[$key] = ($currents['fail'] ?? $options['fail'] ?? fn() => null)($current, $key, $current['read']);
+                    continue;
+                    // @codeCoverageIgnoreEnd
+                }
+
+                // 読めたら書く
+                if ($data !== '') {
+                    // https://www.php.net/manual/ja/function.fwrite.php
+                    // ネットワークストリームへの書き込みは、 すべての文字列を書き込み終える前に終了する可能性があります。 fwrite() の戻り値を確かめるようにしましょう
+                    for ($written = 0; $written < strlen($data); $written += $fwrite) {
+                        $fwrite = fwrite($current['write'], substr($data, $written));
+                        if ($fwrite === false) {
+                            // @codeCoverageIgnoreStart
+                            $result[$key] = ($currents['fail'] ?? $options['fail'] ?? fn() => null)($current, $key, $current['write']);
+                            unset($currents[$key]);
+                            continue 2;
+                            // @codeCoverageIgnoreEnd
+                        }
+                    }
+
+                    $read = true;
+                    $result[$key] = ($currents['done'] ?? $options['done'] ?? fn() => $result[$key] + strlen($data))($current, $key, null);
+                }
+
+                // 読み終わったらそいつは終わり
+                if (feof($current['read'])) {
+                    unset($currents[$key]);
+                }
+            }
+
+            // 読めなかったら待つ（読めてるなら次も読める可能性が高いので待たない）
+            if (!$read && $currents) {
+                // stream_select は対応していない resource をフィルタするらしく、全て未対応だと ValueError(No stream arrays were passed) を投げてくる（1つでも対応していれば投げない）
+                // のでエラーになった resource を覚えておいてフィルタする
+                $r = array_filter(array_column($currents, 'read'), fn($r) => !isset($noselectable_streams[get_resource_id($r)]));
+                $w = $e = [];
+
+                // stream_select が使えるなら使いたい。しかし対応していないプロトコルもあるだろうので usleep にフォールバック
+                $ret = false;
+                if ($r) {
+                    try {
+                        $ret = @stream_select($r, $w, $e, ...timeval($options['select_second']));
+                    }
+                    catch (\Throwable) {
+                        $noselectable_streams += array_fill_keys(array_map('get_resource_id', $r), false);
+                    }
+                }
+                if (!$ret) {
+                    usleep($options['sleep_second'] * 1_000_000);
+                }
+            }
+        }
+
+        return $result;
+    }
+}
+
 assert(!function_exists('var_stream') || (new \ReflectionFunction('var_stream'))->isUserDefined());
 if (!function_exists('var_stream')) {
     /**
@@ -32484,6 +32672,66 @@ if (!function_exists('str_lchop')) {
     function str_lchop(?string $string, ?string $prefix, $case_insensitivity = false)
     {
         return str_chop($string, $prefix, '', $case_insensitivity);
+    }
+}
+
+assert(!function_exists('str_partition') || (new \ReflectionFunction('str_partition'))->isUserDefined());
+if (!function_exists('str_partition')) {
+    /**
+     * 文字列をトークンで分割して後ろ優先で詰めて返す
+     *
+     * 非常にしばしば下記のような必要性に出くわす。
+     * - "namespace\\classname" => ["namespace", "classname"]
+     * - "classname"            => ["", "classname"]
+     * - "table.column"         => ["table", "column"]
+     * - "column"               => ["", "column"]
+     *
+     * つまり「修飾子的なものがあってもなくてもよい（あるなら修飾子も得たい）」ケース。
+     * explode+array_pad で一発で書けるんだが、ややややこしいし煩雑なので関数化した。
+     *
+     * それだけだとつまらないので $require_count の負数の特殊化も加えてある。
+     * 負数を与えると要素が $require_count に一致しなかったときの挙動が前詰めになる。
+     *
+     * 分かりづらいが、端的に
+     * - 必ず $require_count 個の配列を返す。その上で・・・
+     *   - 正数の場合は「必要そうなもの」が右に来る
+     *   - 負数の場合は「必要そうなもの」が左に来る
+     * というだけ。
+     *
+     * Example:
+     * ```php
+     * // 0 の場合は常に空配列を返す
+     * that(str_partition('a.b.c.d', '.', 0))->isSame([]);
+     *
+     * // 正数は右に必要そうなものが来る（不必要≒溢れた null や足りなかったので分割されなかった文字）
+     * that(str_partition('a.b.c.d', '.', 1))->isSame(["a.b.c.d"]);
+     * that(str_partition('a.b.c.d', '.', 2))->isSame(["a.b.c", "d"]);
+     * that(str_partition('a.b.c.d', '.', 3))->isSame(["a.b", "c", "d"]);
+     * that(str_partition('a.b.c.d', '.', 4))->isSame(["a", "b", "c", "d"]);
+     * that(str_partition('a.b.c.d', '.', 5))->isSame([null, "a", "b", "c", "d"]);
+     *
+     * // 負数は左に必要そうなものが来る（不必要≒溢れた null や足りなかったので分割されなかった文字）
+     * that(str_partition('a.b.c.d', '.', -1))->isSame(["a.b.c.d"]);
+     * that(str_partition('a.b.c.d', '.', -2))->isSame(["a", "b.c.d"]);
+     * that(str_partition('a.b.c.d', '.', -3))->isSame(["a", "b", "c.d"]);
+     * that(str_partition('a.b.c.d', '.', -4))->isSame(["a", "b", "c", "d"]);
+     * that(str_partition('a.b.c.d', '.', -5))->isSame(["a", "b", "c", "d", null]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     */
+    function str_partition(
+        /** 対象文字列 */ string                $string,
+        /** セパレータ */ string                $separator,
+        /** 最終的に欲しい数 */ int             $require_count,
+        /** 満たない場合のデフォルト値 */ mixed $default = null,
+    ): array {
+        // 0 で呼ばれることはほぼないが、仕様としては「何があろうと $require_count 個の配列を返す」としているので 0 の時は空配列を返さないと整合性が取れない
+        if ($require_count === 0) {
+            return [];
+        }
+
+        return array_pad(multiexplode($separator, $string, -$require_count), -$require_count, $default);
     }
 }
 
@@ -36299,6 +36547,149 @@ if (!function_exists('number_serial')) {
     }
 }
 
+assert(!function_exists('progressor') || (new \ReflectionFunction('progressor'))->isUserDefined());
+if (!function_exists('progressor')) {
+    /**
+     * 進捗(%)と見積もり(秒)を返すオブジェクトを返す
+     *
+     * $total に 0 を与えたり proceed していない状態だと結構なメソッドが null を返すので注意。
+     *
+     * 引数 $p は要するに外れ値の影響度だと思えばよい（高ければ高いほど見積もりが外れ値の影響を受ける）。
+     * とはいえ 1 以上を与えることは（外れ値が逆方向に作用するため）ほぼあり得なく、0.5~1.0 あたりを与えておけばよいだろう。
+     *
+     * Example:
+     * ```php
+     * // このようにすると例えば下記のようになる
+     * $progressor = progressor(11, 0.5);
+     * foreach (range(1, 11) as $i) {
+     *     $progressor->proceed(1);
+     *
+     *     // 基本100msかかるとするがたまに何かが刺さって1秒かかるとする
+     *     usleep(100_000);
+     *     if ($i === 2) {
+     *         sleep(1);
+     *     }
+     *
+     *     printf("%d: %.2f[%%], %.3f[s]\n", $progressor->current(), $progressor->percent(), $progressor->estimate());
+     * }
+     * <<<'OUT'
+     * 1: 9.09[%], 0.000[s]
+     * 2: 18.18[%], 0.237[s]
+     * 3: 27.27[%], 1.689[s]    // $p はここの跳ね上がり具合に影響する
+     * 4: 36.36[%], 1.277[s]
+     * 5: 45.45[%], 0.996[s]
+     * 6: 54.55[%], 0.778[s]
+     * 7: 63.64[%], 0.594[s]
+     * 8: 72.73[%], 0.429[s]
+     * 9: 81.82[%], 0.279[s]
+     * 10: 90.91[%], 0.136[s]
+     * 11: 100.00[%], 0.000[s]
+     * OUT;
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\utility
+     *
+     * @param int $total 全件数
+     * @param float $p ヘルダー平均の p
+     * @return \Progressor|object プログレスインスタンス
+     */
+    function progressor(int $total, float $p = 1.0)
+    {
+        assert($total >= 0);
+        assert($p > 0);
+
+        return new class($total, $p) {
+            private int   $current    = 0;
+            private float $hoelderSum = 0;
+            private float $startTime;
+            private float $previousTime;
+
+            public function __construct(private int $total, private float $p)
+            {
+                $this->startTime = microtime(true);
+                $this->previousTime = microtime(true);
+            }
+
+            /**
+             * 処理を進める
+             */
+            public function proceed(int $step = 1)
+            {
+                $now = microtime(true);
+
+                $this->current = min($this->total, $this->current + $step);
+                $this->hoelderSum += pow(($now - $this->previousTime) * $step, $this->p);
+                $this->previousTime = $now;
+            }
+
+            /**
+             * 現在値を返す
+             */
+            public function current(): int
+            {
+                return $this->current;
+            }
+
+            /**
+             * 残件数を返す
+             */
+            public function remain(): int
+            {
+                return $this->total - $this->current;
+            }
+
+            /**
+             * 全件数を返す
+             */
+            public function total(): int
+            {
+                return $this->total;
+            }
+
+            /**
+             * 進捗パーセントを返す
+             */
+            public function percent(): ?float
+            {
+                if ($this->total === 0) {
+                    return null;
+                }
+                return $this->current / $this->total * 100;
+            }
+
+            /**
+             * 実行時間を返す
+             */
+            public function elapse(): float
+            {
+                return microtime(true) - $this->startTime;
+            }
+
+            /**
+             * 見積もり秒を返す
+             */
+            public function estimate(): ?float
+            {
+                if ($this->current === 0) {
+                    return null;
+                }
+                return $this->remain() * $this->mean();
+            }
+
+            /**
+             * 平均実行秒を返す
+             */
+            public function mean(): ?float
+            {
+                if ($this->current === 0) {
+                    return null;
+                }
+                return pow($this->hoelderSum / $this->current, 1 / $this->p);
+            }
+        };
+    }
+}
+
 assert(!function_exists('arrayable_key_exists') || (new \ReflectionFunction('arrayable_key_exists'))->isUserDefined());
 if (!function_exists('arrayable_key_exists')) {
     /**
@@ -36668,6 +37059,57 @@ if (!function_exists('cipher_metadata')) {
     }
 }
 
+assert(!function_exists('decimalstr') || (new \ReflectionFunction('decimalstr'))->isUserDefined());
+if (!function_exists('decimalstr')) {
+    /**
+     * 10進数小数文字列を返す
+     *
+     * 指数表記や誤差などは除去してできるだけ「一般人の感覚」に近い文字列を返す。
+     * $precision で精度も指定できるがまぁ渡すことはあまりないだろう。
+     *
+     * Example:
+     * ```php
+     * // 右0詰めは行われない（%F だと詰められる）
+     * that(decimalstr(1.234))->isSame('1.234');
+     * // .0 は失われない（%H だと失われる）
+     * that(decimalstr(3.0))->isSame('3.0');
+     * // 指数表記にならない（%F は指数表記になる）
+     * that(decimalstr(1000000.0))->isSame('1000000.0');
+     * that(decimalstr(0.000001))->isSame('0.000001');
+     * // -INF は -INF になる（%H,%F だとなぜか INF になる）
+     * that(decimalstr(-INF))->isSame('-INF');
+     * // デフォルトの精度は16
+     * that(decimalstr(M_PI))->isSame('3.141592653589793');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\var
+     */
+    function decimalstr(float $number, int $precision = 16): string
+    {
+        // -INF が INF になる不具合？ があるっぽいので特別扱いしておく（これらだけ E 以外の文字が出現するので特別扱いは別におかしくない）
+        if (is_infinite($number) || is_nan($number)) {
+            return (string) $number;
+        }
+
+        $string = sprintf("%.{$precision}H", $number);
+
+        // %H は 1.0 などが 1 になるので付け足す
+        if (!str_contains($string, '.')) {
+            return "$string.0";
+        }
+
+        // 指数記法が出現したら %F で戻す
+        if (str_contains($string, 'E')) {
+            $string = rtrim(sprintf("%.{$precision}F", $number), '0');
+            if ($string[-1] === '.') {
+                $string .= '0';
+            }
+        }
+
+        return $string;
+    }
+}
+
 assert(!function_exists('decrypt') || (new \ReflectionFunction('decrypt'))->isUserDefined());
 if (!function_exists('decrypt')) {
     /**
@@ -36980,6 +37422,42 @@ if (!function_exists('hashvar')) {
 
         // 仕組み上ここへは到達しないはず（呼び出し元のシンタックスが壊れてるときに到達しうるが、それならばそもそもこの関数自体が呼ばれないはず）。
         throw new \DomainException('syntax error.'); // @codeCoverageIgnore
+    }
+}
+
+assert(!function_exists('is_arithmetic') || (new \ReflectionFunction('is_arithmetic'))->isUserDefined());
+if (!function_exists('is_arithmetic')) {
+    /**
+     * 変数が算術可能か調べる
+     *
+     * Example:
+     * ```php
+     * // 整数
+     * that(is_arithmetic(123))->isTrue();
+     * // 小数
+     * that(is_arithmetic(3.14))->isTrue();
+     * // 数値文字列
+     * that(is_arithmetic('-3.14'))->isTrue();
+     * // GMP
+     * that(is_arithmetic(gmp_init('3')))->isTrue();
+     * // 変な文字列やオブジェクトは false
+     * that(is_arithmetic('hoge'))->isFalse();
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\var
+     *
+     * @param mixed $var 調べる値
+     * @return bool 配列アクセス可能なら true
+     * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection
+     */
+    function is_arithmetic($var)
+    {
+        // cast_object レベルで実装されているので計算可能
+        if ($var instanceof \GMP || $var instanceof \BcMath\Number || $var instanceof \SimpleXMLElement) {
+            return true;
+        }
+
+        return is_numeric($var);
     }
 }
 
@@ -37406,8 +37884,14 @@ if (!function_exists('is_stringable')) {
         if (is_array($var)) {
             return false;
         }
-        if (is_object($var) && !method_exists($var, '__toString')) {
-            return false;
+        if (is_object($var)) {
+            // toString は未実装だが cast_object レベルで文字列化可能になっている
+            if ($var instanceof \GMP) {
+                return true;
+            }
+            if (!method_exists($var, '__toString')) {
+                return false;
+            }
         }
         return true;
     }
@@ -37861,6 +38345,10 @@ if (!function_exists('stringify')) {
             case 'array':
                 return var_export2($var, true);
             case 'object':
+                // toString は未実装だが cast_object レベルで文字列化可能になっている
+                if ($var instanceof \GMP) {
+                    return strval($var);
+                }
                 if (method_exists($var, '__toString')) {
                     return (string) $var;
                 }
@@ -37875,6 +38363,32 @@ if (!function_exists('stringify')) {
             default:
                 return (string) $var;
         }
+    }
+}
+
+assert(!function_exists('timeval') || (new \ReflectionFunction('timeval'))->isUserDefined());
+if (!function_exists('timeval')) {
+    /**
+     * float（秒）を int[秒, マイクロ秒] に変換する
+     *
+     * stream_select のような(秒, マイクロ秒)を要求してくる関数があるので、ササっと呼び出したい時に使う非常にニッチな関数。
+     * いわゆる timeval 構造体を返す（ただし、連想配列ではなく通常配列）。
+     *
+     * Example:
+     * ```php
+     * // 1.5 秒を 1 と 500000 に分離
+     * that(timeval(1.5))->isSame([1, 500_000]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\var
+     *
+     * @return int[] [秒, マイクロ秒]
+     */
+    function timeval(float|int $seconds): array
+    {
+        $tv_sec = (int) $seconds;
+        $tv_usec = (int) (($seconds - $tv_sec) * 1000000);
+        return [$tv_sec, $tv_usec];
     }
 }
 
@@ -39185,6 +39699,9 @@ if (!function_exists('var_pretty')) {
                     }
                     return json_encode($token, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                 }
+                elseif (is_float($token)) {
+                    return decimalstr($token);
+                }
                 elseif (is_scalar($token)) {
                     return var_export($token, true);
                 }
@@ -39456,6 +39973,13 @@ if (!function_exists('var_pretty')) {
                         $this->plain(' use ');
                         $this->export($properties, $nest, $parents, $keys, false);
                     }
+                }
+                elseif ($value instanceof \GMP) {
+                    $this->value($value);
+
+                    $this->plain("(");
+                    $this->export((string) $value, $nest, $parents, $keys, false);
+                    $this->plain(")");
                 }
                 elseif (is_object($value)) {
                     $this->value($value);

@@ -639,6 +639,11 @@ TEXT): self { }
     public function cache($key, $provider, $namespace = null): self { }
     public function cache($provider, $namespace = null): self { }
 
+    /** @see progressor() */
+    public self $progressor;
+    public function progressor(int $total, float $p = 1.0): self { }
+    public function progressor(float $p = 1.0): self { }
+
     /** @see arrayable_key_exists() */
     public self $arrayable_key_exists;
     public function arrayable_key_exists($key, iterable $arrayable): self { }
