@@ -46,6 +46,7 @@ use function ryunosuke\Functions\Package\str_equals;
 use function ryunosuke\Functions\Package\str_exists;
 use function ryunosuke\Functions\Package\str_guess;
 use function ryunosuke\Functions\Package\str_lchop;
+use function ryunosuke\Functions\Package\str_partition;
 use function ryunosuke\Functions\Package\str_patch;
 use function ryunosuke\Functions\Package\str_putcsv;
 use function ryunosuke\Functions\Package\str_quote;
@@ -1791,6 +1792,39 @@ zero is index 0.
         ], $percent))->isSame([]);
 
         that(self::resolveFunction('str_guess'))('', [])->wasThrown('is empty');
+    }
+
+    function test_str_partition()
+    {
+        that(str_partition('', '.', -1))->isSame([""]);
+        that(str_partition('', '.', 0))->isSame([]);
+        that(str_partition('', '.', +1))->isSame([""]);
+
+        that(str_partition('a.b.c.d', '.', 0))->isSame([]);
+
+        that(str_partition('a.b.c.d', '.', 1))->isSame(["a.b.c.d"]);
+        that(str_partition('a.b.c.d', '.', 2))->isSame(["a.b.c", "d"]);
+        that(str_partition('a.b.c.d', '.', 3))->isSame(["a.b", "c", "d"]);
+        that(str_partition('a.b.c.d', '.', 4))->isSame(["a", "b", "c", "d"]);
+        that(str_partition('a.b.c.d', '.', 5))->isSame([null, "a", "b", "c", "d"]);
+        that(str_partition('a.b.c.d', '.', 6))->isSame([null, null, "a", "b", "c", "d"]);
+
+        that(str_partition('a.b.c.d', '.', -1))->isSame(["a.b.c.d"]);
+        that(str_partition('a.b.c.d', '.', -2))->isSame(["a", "b.c.d"]);
+        that(str_partition('a.b.c.d', '.', -3))->isSame(["a", "b", "c.d"]);
+        that(str_partition('a.b.c.d', '.', -4))->isSame(["a", "b", "c", "d"]);
+        that(str_partition('a.b.c.d', '.', -5))->isSame(["a", "b", "c", "d", null]);
+        that(str_partition('a.b.c.d', '.', -6))->isSame(["a", "b", "c", "d", null, null]);
+
+        // ユースケース（php の名前空間（これは別の専用関数があるけど））
+        that(str_partition('vendor\\package\\sub\\class', '\\', 2))->isSame(["vendor\\package\\sub", "class"]);
+        that(str_partition('vendor\\package\\class', '\\', 2))->isSame(["vendor\\package", "class"]);
+        that(str_partition('class', '\\', 2))->isSame([null, "class"]);
+
+        // ユースケース（SQL の修飾）
+        that(str_partition('schema.table.column', '.', 3))->isSame(["schema", "table", "column"]);
+        that(str_partition('table.column', '.', 3))->isSame([null, "table", "column"]);
+        that(str_partition('column', '.', 3))->isSame([null, null, "column"]);
     }
 
     function test_str_putcsv()
