@@ -38,6 +38,7 @@ use function ryunosuke\Functions\Package\si_prefix;
 use function ryunosuke\Functions\Package\si_unprefix;
 use function ryunosuke\Functions\Package\strdec;
 use function ryunosuke\Functions\Package\stringify;
+use function ryunosuke\Functions\Package\timeval;
 use function ryunosuke\Functions\Package\var_apply;
 use function ryunosuke\Functions\Package\var_applys;
 use function ryunosuke\Functions\Package\var_export2;
@@ -899,6 +900,16 @@ class varTest extends AbstractTestCase
         that(stringify(new \Concrete('hoge')))->is('hoge');
         that(stringify(new \SerialObject(['hoge'])))->is('O:12:"SerialObject":1:{i:0;s:4:"hoge";}');
         that(stringify(new \JsonObject(['hoge'])))->is('JsonObject:["hoge"]');
+    }
+
+    function test_timeval()
+    {
+        that(timeval(-2.999999))->is([-2, -999998]);
+        that(timeval(-1.2345))->is([-1, -234499]);
+        that(timeval(0))->is([0, 0]);
+        that(timeval(0.2345))->is([0, 234500]);
+        that(timeval(1.2345))->is([1, 234499]);
+        that(timeval(2.999999))->is([2, 999998]);
     }
 
     function test_var_apply()
