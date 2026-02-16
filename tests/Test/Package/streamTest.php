@@ -11,6 +11,7 @@ use function ryunosuke\Functions\Package\resource_stream;
 use function ryunosuke\Functions\Package\rm_rf;
 use function ryunosuke\Functions\Package\str_resource;
 use function ryunosuke\Functions\Package\stream_describe;
+use function ryunosuke\Functions\Package\stream_transfer;
 use function ryunosuke\Functions\Package\var_stream;
 
 class streamTest extends AbstractTestCase
@@ -540,6 +541,33 @@ class streamTest extends AbstractTestCase
 
         unset($dummy_resource);
         gc_collect_cycles();
+    }
+
+    function test_stream_transfer()
+    {
+        if (!defined('TESTSTREAMHTTPURL') || !defined('TESTSTREAMSFTPURL')) {
+            return;
+        }
+
+        $tmpdir = sys_get_temp_dir();
+
+        $parts = parse_url(TESTSTREAMSFTPURL);
+        $ssh = ssh2_connect($parts['host'], $parts['port']);
+        ssh2_auth_password($ssh, $parts['user'], $parts['pass']);
+        $sftp = ssh2_sftp($ssh);
+
+        that(stream_transfer([
+            'http' => [
+                'read'  => fopen(TESTSTREAMHTTPURL, 'rb'),
+                'write' => "$tmpdir/http.txt",
+            ],
+            'sftp' => [
+                'read'  => fn() => fopen("{$parts['scheme']}://$sftp{$parts['path']}", 'rb'),
+                'write' => "$tmpdir/sftp.txt",
+            ],
+        ]))->hasKeyAll(['http', 'sftp']);
+        that("$tmpdir/http.txt")->fileExists();
+        that("$tmpdir/sftp.txt")->fileExists();
     }
 
     function test_var_stream()
