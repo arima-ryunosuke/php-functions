@@ -1815,7 +1815,8 @@ class varTest extends AbstractTestCase
                 ],
             ],
             'E'     => new \Concrete('hoge'),
-            'A'     => ["str", 1, 2, 3, true, null],
+            'A'     => ["str", 1, 2, 3, true, null, 3.14, PHP_FLOAT_EPSILON],
+            'gmp'   => gmp_init("123"),
             'H'     => ['a' => 'A', 'b' => 'B'],
             'C'     => $closure,
             'c1'    => [$sclosure, $sclosure],
@@ -1846,7 +1847,8 @@ class varTest extends AbstractTestCase
             ->stringContains("      X: stdClass#")
             ->stringContains("  E: Concrete#")
             ->stringContains("    info: \"this is __debugInfo\"")
-            ->stringContains("  A: [\"str\", 1, 2, 3, true, null]")
+            ->stringContains("  A: [\"str\", 1, 2, 3, true, null, 3.14, 0.0000000000000002]")
+            ->stringContains("(\"123\")")
             ->stringContains("class@anonymous")
             ->stringContains("    recur: {")
             ->stringContains("    Closure#")
@@ -2185,7 +2187,10 @@ class varTest extends AbstractTestCase
             ["A", 3],
             ["A", 4],
             ["A", 5],
+            ["A", 6],
+            ["A", 7],
             ["A"],
+            ["gmp"],
             ["H", "a"],
             ["H", "b"],
             ["H"],
@@ -2220,7 +2225,7 @@ class varTest extends AbstractTestCase
             ->stringNotContains("\n")
             ->stringNotContains("0:stdClass#")
             ->stringContains("E:Concrete#")
-            ->stringContains("A:[\"str\", 1, 2, 3, true, null]")
+            ->stringContains("A:[\"str\", 1, 2, 3, true, null, 3.14, 0.0000000000000002]")
             ->stringContains("R:Resource id #2 of type (stream)")
             ->stringContains("empty:[]");
 

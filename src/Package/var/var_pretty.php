@@ -15,6 +15,7 @@ require_once __DIR__ . '/../info/ansi_colorize.php';
 require_once __DIR__ . '/../info/is_ansi.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
 require_once __DIR__ . '/../strings/str_ellipsis.php';
+require_once __DIR__ . '/../var/decimalstr.php';
 require_once __DIR__ . '/../var/is_primitive.php';
 require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
@@ -259,6 +260,9 @@ function var_pretty($value, $options = [])
                     $token = str_ellipsis($token, $this->options['maxlength'], '...(too length)...');
                 }
                 return json_encode($token, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+            elseif (is_float($token)) {
+                return decimalstr($token);
             }
             elseif (is_scalar($token)) {
                 return var_export($token, true);
@@ -531,6 +535,13 @@ function var_pretty($value, $options = [])
                     $this->plain(' use ');
                     $this->export($properties, $nest, $parents, $keys, false);
                 }
+            }
+            elseif ($value instanceof \GMP) {
+                $this->value($value);
+
+                $this->plain("(");
+                $this->export((string) $value, $nest, $parents, $keys, false);
+                $this->plain(")");
             }
             elseif (is_object($value)) {
                 $this->value($value);
