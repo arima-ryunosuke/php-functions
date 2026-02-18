@@ -17,6 +17,7 @@ use function gettype as gt;
 use function ryunosuke\Functions\Package\arrayable_key_exists;
 use function ryunosuke\Functions\Package\arrayval;
 use function ryunosuke\Functions\Package\attr_get;
+use function ryunosuke\Functions\Package\decimalstr;
 use function ryunosuke\Functions\Package\decrypt;
 use function ryunosuke\Functions\Package\encrypt;
 use function ryunosuke\Functions\Package\flagval;
@@ -227,6 +228,27 @@ class varTest extends AbstractTestCase
         that(attr_get('ok', $closure, 'default'))->isSame('default');
 
         that(self::resolveFunction('attr_get'))(null, 'dummy')->wasThrown('must be array or object');
+    }
+
+    function test_decimalstr()
+    {
+        that(decimalstr(-NAN))->isSame('NAN');
+        that(decimalstr(+NAN))->isSame('NAN');
+        that(decimalstr(-INF))->isSame('-INF');
+        that(decimalstr(+INF))->isSame('INF');
+        that(decimalstr(-PHP_FLOAT_EPSILON))->isSame('-0.0000000000000002');
+        that(decimalstr(+PHP_FLOAT_EPSILON))->isSame('0.0000000000000002');
+        that(decimalstr(-0.0))->isSame('-0.0');
+        that(decimalstr(+0.0))->isSame('0.0');
+        that(decimalstr(-3.14))->isSame('-3.14');
+        that(decimalstr(+3.14))->isSame('3.14');
+        that(decimalstr(-3))->isSame('-3.0');
+        that(decimalstr(+3))->isSame('3.0');
+        that(decimalstr(1000000.0))->isSame('1000000.0');
+        that(decimalstr(0.000001))->isSame('0.000001');
+
+        that(decimalstr(-PHP_FLOAT_EPSILON, 10))->isSame('-0.0');
+        that(decimalstr(+PHP_FLOAT_EPSILON, 10))->isSame('0.0');
     }
 
     function test_encrypt_decrypt()
