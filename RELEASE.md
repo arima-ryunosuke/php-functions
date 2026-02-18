@@ -11,6 +11,19 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.34
+
+- [fixbug] Utility 出力で構文エラーが出る
+- [feature] math 系の GMP 対応
+- [feature] string 系の GMP 対応
+- [feature] var_pretty の GMP 対応と小数は decimalstr する
+- [feature] stream_transfer を追加
+- [feature] decimalstr を追加
+- [feature] timeval を追加
+- [feature] str_partition を追加
+- [feature] progressor を追加
+- [feature] hoelder_mean を追加
+
 ## 2.0.33
 
 - [feature] resource_stream を追加
