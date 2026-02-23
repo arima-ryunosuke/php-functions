@@ -653,6 +653,7 @@ class varTest extends AbstractTestCase
         that(is_stringable('hoge'))->isTrue();
         that(is_stringable(STDIN))->isTrue();
         that(is_stringable(['array']))->isFalse();
+        that(is_stringable(gmp_init('123')))->isTrue();
         that(is_stringable(new \stdClass()))->isFalse();
         that(is_stringable(new \Concrete('hoge')))->isTrue();
     }
@@ -918,6 +919,7 @@ class varTest extends AbstractTestCase
         that(stringify('hoge'))->is('hoge');
         that(stringify(STDIN))->is('Resource id #1');
         that(stringify(['array']))->is('["array"]');
+        that(stringify(gmp_init('123')))->is('123');
         that(stringify(new \stdClass()))->is('stdClass');
         that(stringify(new \Concrete('hoge')))->is('hoge');
         that(stringify(new \SerialObject(['hoge'])))->is('O:12:"SerialObject":1:{i:0;s:4:"hoge";}');

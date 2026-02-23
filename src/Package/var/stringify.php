@@ -26,6 +26,10 @@ function stringify($var)
         case 'array':
             return var_export2($var, true);
         case 'object':
+            // toString は未実装だが cast_object レベルで文字列化可能になっている
+            if ($var instanceof \GMP) {
+                return strval($var);
+            }
             if (method_exists($var, '__toString')) {
                 return (string) $var;
             }

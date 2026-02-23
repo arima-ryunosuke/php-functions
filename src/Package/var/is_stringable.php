@@ -33,8 +33,14 @@ function is_stringable($var)
     if (is_array($var)) {
         return false;
     }
-    if (is_object($var) && !method_exists($var, '__toString')) {
-        return false;
+    if (is_object($var)) {
+        // toString は未実装だが cast_object レベルで文字列化可能になっている
+        if ($var instanceof \GMP) {
+            return true;
+        }
+        if (!method_exists($var, '__toString')) {
+            return false;
+        }
     }
     return true;
 }
