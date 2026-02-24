@@ -3,6 +3,7 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_flatten.php';
+require_once __DIR__ . '/../var/is_arithmetic.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -34,7 +35,7 @@ function median(...$variadic)
     $center = (int) ($count / 2);
     sort($args);
     // 偶数で共に数値なら平均値
-    if ($count % 2 === 0 && (is_numeric($args[$center - 1]) && is_numeric($args[$center]))) {
+    if ($count % 2 === 0 && (is_arithmetic($args[$center - 1]) && is_arithmetic($args[$center]))) {
         return ($args[$center - 1] + $args[$center]) / 2;
     }
     // 奇数なら単純に中央値

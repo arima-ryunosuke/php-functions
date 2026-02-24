@@ -3,6 +3,8 @@ namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../array/array_flatten.php';
+require_once __DIR__ . '/../math/sum.php';
+require_once __DIR__ . '/../var/is_arithmetic.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -26,6 +28,6 @@ require_once __DIR__ . '/../array/array_flatten.php';
 function mean(...$variadic)
 {
     $args = array_flatten($variadic) or throw new \LengthException("argument's length is 0.");
-    $args = array_filter($args, 'is_numeric') or throw new \LengthException("argument's must be contain munber.");
-    return array_sum($args) / count($args);
+    $args = array_filter($args, fn($v) => is_arithmetic($v)) or throw new \LengthException("argument's must be contain number.");
+    return sum($args) / count($args);
 }

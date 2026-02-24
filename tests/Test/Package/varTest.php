@@ -22,6 +22,7 @@ use function ryunosuke\Functions\Package\decrypt;
 use function ryunosuke\Functions\Package\encrypt;
 use function ryunosuke\Functions\Package\flagval;
 use function ryunosuke\Functions\Package\hashvar;
+use function ryunosuke\Functions\Package\is_arithmetic;
 use function ryunosuke\Functions\Package\is_arrayable;
 use function ryunosuke\Functions\Package\is_decimal;
 use function ryunosuke\Functions\Package\is_empty;
@@ -420,6 +421,22 @@ class varTest extends AbstractTestCase
             $fuga = 2;
             [hashvar($hoge), hashvar($fuga)];
         })()->wasThrown(new \UnexpectedValueException('ambiguous'));
+    }
+
+    function test_is_arithmetic()
+    {
+        that(is_arithmetic(null))->isFalse();
+        that(is_arithmetic(false))->isFalse();
+        that(is_arithmetic(true))->isFalse();
+        that(is_arithmetic(123))->isTrue();
+        that(is_arithmetic(123.456))->isTrue();
+        that(is_arithmetic('hoge'))->isFalse();
+        that(is_arithmetic(STDIN))->isFalse();
+        that(is_arithmetic(['array']))->isFalse();
+        that(is_arithmetic(gmp_init('123')))->isTrue();
+        that(is_arithmetic(new \SimpleXMLElement('<b>123</b>')))->isTrue();
+        that(is_arithmetic(new \stdClass()))->isFalse();
+        that(is_arithmetic(new \Concrete('hoge')))->isFalse();
     }
 
     function test_is_arrayable()

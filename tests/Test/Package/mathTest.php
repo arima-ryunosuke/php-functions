@@ -550,6 +550,8 @@ class mathTest extends AbstractTestCase
         that(self::resolveFunction('mean'))($data['datetime_evn'])->wasThrown('must be contain');
         that(self::resolveFunction('mean'))($data['datetime_odd'])->wasThrown('must be contain');
         that(mean('1', 2, 3.5, 5.5, 'x'))->is(3.0);
+
+        that((string) mean(gmp_init("1"), gmp_init("2")))->is("1");
     }
 
     function test_median()
@@ -563,6 +565,8 @@ class mathTest extends AbstractTestCase
         that(median($data['string_odd']))->is('m');
         that(median($data['datetime_evn']))->is(new \DateTime('2000/12/24 12:34:56'));
         that(median($data['datetime_odd']))->is(new \DateTime('2000/12/24 12:34:56'));
+
+        that((string) median(gmp_init("1"), gmp_init("2")))->is("1");
     }
 
     function test_minimum()
@@ -604,5 +608,7 @@ class mathTest extends AbstractTestCase
         that(self::resolveFunction('sum'))($data['datetime_evn'])->wasThrown('must be contain');
         that(self::resolveFunction('sum'))($data['datetime_odd'])->wasThrown('must be contain');
         that(sum('1', 2, 3.5, 'x'))->is(6.5);
+
+        that((string) sum(gmp_init("1"), gmp_init("2")))->is("3");
     }
 }
