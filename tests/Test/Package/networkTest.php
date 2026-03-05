@@ -667,7 +667,7 @@ class networkTest extends AbstractTestCase
 
         that(self::resolveFunction('http_request'))([
             CURLOPT_URL => "http://0.0.0.0:801",
-        ])->wasThrown("Couldn't connect");
+        ])->wasThrown("t connect to server");
     }
 
     function test_http_request_nobody()
@@ -690,7 +690,7 @@ class networkTest extends AbstractTestCase
         that(self::resolveFunction('http_request'))([
             CURLOPT_URL => "http://0.0.0.0:801",
             'nobody'    => true,
-        ], $response_header, $info)->wasThrown("Couldn't connect");
+        ], $response_header, $info)->wasThrown("t connect to server");
     }
 
     function test_http_request_retry()
@@ -731,7 +731,7 @@ class networkTest extends AbstractTestCase
             ], $response_header, $info);
         }
         catch (\Throwable $t) {
-            that($t->getMessage())->contains("Couldn't connect");
+            that($t->getMessage())->contains("t connect to server");
         }
         that(microtime(true) - $time)->break()->isBetween(0.0, 0.2);
         that($info['retry'])->is(0);

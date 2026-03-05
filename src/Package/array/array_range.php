@@ -205,7 +205,7 @@ function array_range($start, $end, $step = null, $options = [])
                 $end = \DateTimeImmutable::createFromMutable($end);
             }
             if (is_string($step)) {
-                $step = @\DateInterval::createFromDateString($step) ?: date_interval($step);
+                $step = @date_interval_create_from_date_string($step) ?: date_interval($step);
             }
 
             $now = new \DateTimeImmutable();

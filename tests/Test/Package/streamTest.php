@@ -271,13 +271,13 @@ class streamTest extends AbstractTestCase
 
         that(chown($path, 48))->is(true);
         that(fileowner($path))->is(48);
-        that(chown($path, 'mysql'))->is(true);
-        that(fileowner($path))->is(27);
+        that(chown($path, 'postfix'))->is(true);
+        that(fileowner($path))->is(89);
 
         that(chgrp($path, 48))->is(true);
         that(filegroup($path))->is(48);
-        that(chgrp($path, 'mysql'))->is(true);
-        that(filegroup($path))->is(27);
+        that(chgrp($path, 'postfix'))->is(true);
+        that(filegroup($path))->is(89);
 
         that(chmod($path, 0700))->is(true);
         if (getmyuid() !== 0) {

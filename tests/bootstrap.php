@@ -68,10 +68,10 @@ if (!function_exists('posix_getgid')) {
     function posix_getgid() { return 48; }
 }
 if (!function_exists('posix_getpwnam')) {
-    function posix_getpwnam() { return ['uid' => 27]; }
+    function posix_getpwnam() { return ['uid' => 89]; }
 }
 if (!function_exists('posix_getgrnam')) {
-    function posix_getgrnam() { return ['gid' => 27]; }
+    function posix_getgrnam() { return ['gid' => 89]; }
 }
 
 // ダミー関数
