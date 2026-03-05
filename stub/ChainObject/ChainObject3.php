@@ -373,6 +373,11 @@ trait ChainObject3
     public function mb_ereg_search_regs(?string $pattern = null, ?string $options = null): self { }
     public function mb_ereg_search_regs(?string $options = null): self { }
 
+    /** @see mb_ltrim() */
+    public self $mb_ltrim;
+    public function mb_ltrim(string $string, ?string $characters = null, ?string $encoding = null): self { }
+    public function mb_ltrim(?string $characters = null, ?string $encoding = null): self { }
+
     /** @see array_each() */
     public self $array_each;
     public function array_each(iterable $array, callable $callback, $default = null): self { }

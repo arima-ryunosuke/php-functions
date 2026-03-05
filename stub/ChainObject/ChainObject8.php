@@ -366,8 +366,8 @@ TEXT): self { }
 
     /** @see msleep() */
     public self $msleep;
-    public function msleep(\DateTimeInterface|float $seconds, ?bool $cancel_signal = null): self { }
-    public function msleep(?bool $cancel_signal = null): self { }
+    public function msleep(\DateTimeInterface|float $seconds, ?bool $cancel_signal = null, bool $relative = false): self { }
+    public function msleep(?bool $cancel_signal = null, bool $relative = false): self { }
 
     /** @see cidr2ip() */
     public self $cidr2ip;

@@ -293,6 +293,16 @@ trait ChainObject2
     public function mb_ereg(string $pattern, string $string, &$matches = null): self { }
     public function mb_ereg(string $string, &$matches = null): self { }
 
+    /** @see trigger_deprecation() */
+    public self $trigger_deprecation;
+    public function trigger_deprecation(string $package, string $version, string $message, ...$args): self { }
+    public function trigger_deprecation(string $version, string $message, ...$args): self { }
+
+    /** @see mb_ucfirst() */
+    public self $mb_ucfirst;
+    public function mb_ucfirst(string $string, ?string $encoding = null): self { }
+    public function mb_ucfirst(?string $encoding = null): self { }
+
     /** @see ReflectionClassConstant_isEnumCase() */
     public self $reflectionclassconstant_isenumcase;
     public function reflectionclassconstant_isenumcase(\ReflectionClassConstant $that): self { }

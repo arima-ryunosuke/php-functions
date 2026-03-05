@@ -364,6 +364,11 @@ TEXT): self { }
     public function mb_ereg_search_setpos(int $offset): self { }
     public function mb_ereg_search_setpos(): self { }
 
+    /** @see mb_rtrim() */
+    public self $mb_rtrim;
+    public function mb_rtrim(string $string, ?string $characters = null, ?string $encoding = null): self { }
+    public function mb_rtrim(?string $characters = null, ?string $encoding = null): self { }
+
     /** @see array_append() */
     public self $array_append;
     public function array_append(iterable $array, $value, $key = null): self { }

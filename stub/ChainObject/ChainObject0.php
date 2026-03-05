@@ -223,6 +223,11 @@ trait ChainObject0
     public function mb_ord(string $string, ?string $encoding = null): self { }
     public function mb_ord(?string $encoding = null): self { }
 
+    /** @see mb_lcfirst() */
+    public self $mb_lcfirst;
+    public function mb_lcfirst(string $string, ?string $encoding = null): self { }
+    public function mb_lcfirst(?string $encoding = null): self { }
+
     /** @see array_assort() */
     public self $array_assort;
     public function array_assort(iterable $array, $rules): self { }

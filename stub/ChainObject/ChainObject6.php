@@ -553,6 +553,11 @@ trait ChainObject6
     public function file_suffix($filename, $suffix): self { }
     public function file_suffix($suffix): self { }
 
+    /** @see fwrite_stream() */
+    public self $fwrite_stream;
+    public function fwrite_stream($stream, string $data, ?int $length = null, ?callable $retry = null): self { }
+    public function fwrite_stream(string $data, ?int $length = null, ?callable $retry = null): self { }
+
     /** @see by_builtin() */
     public self $by_builtin;
     public function by_builtin($class, $function): self { }
@@ -660,8 +665,8 @@ trait ChainObject6
 
     /** @see query_build() */
     public self $query_build;
-    public function query_build($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null): self { }
-    public function query_build($numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null): self { }
+    public function query_build($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null, $delimiter = null): self { }
+    public function query_build($numeric_prefix = null, $arg_separator = null, $encoding_type = PHP_QUERY_RFC1738, $brackets = null, $delimiter = null): self { }
 
     /** @see arrayval() */
     public self $arrayval;

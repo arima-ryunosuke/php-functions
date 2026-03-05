@@ -338,6 +338,11 @@ trait ChainObject9
     public function mb_ereg_search_init(string $string, ?string $pattern = null, ?string $options = null): self { }
     public function mb_ereg_search_init(?string $pattern = null, ?string $options = null): self { }
 
+    /** @see mb_trim() */
+    public self $mb_trim;
+    public function mb_trim(string $string, ?string $characters = null, ?string $encoding = null): self { }
+    public function mb_trim(?string $characters = null, ?string $encoding = null): self { }
+
     /** @see array_aggregate() */
     public self $array_aggregate;
     public function array_aggregate(iterable $array, $columns, $key = null): self { }
@@ -632,11 +637,6 @@ trait ChainObject9
     public self $mb_ereg_options;
     public function mb_ereg_options($options): self { }
     public function mb_ereg_options(): self { }
-
-    /** @see mb_trim() */
-    public self $mb_trim;
-    public function mb_trim(?string $string): self { }
-    public function mb_trim(): self { }
 
     /** @see render_string() */
     public self $render_string;

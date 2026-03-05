@@ -4297,7 +4297,7 @@ if (!function_exists('ryunosuke\\Functions\\array_range')) {
                     $end = \DateTimeImmutable::createFromMutable($end);
                 }
                 if (is_string($step)) {
-                    $step = @\DateInterval::createFromDateString($step) ?: date_interval($step);
+                    $step = @date_interval_create_from_date_string($step) ?: date_interval($step);
                 }
 
                 $now = new \DateTimeImmutable();
@@ -5376,6 +5376,9 @@ if (!function_exists('ryunosuke\\Functions\\array_walk_recursive2')) {
      * - $keys が渡ってくるのでツリー構造の特定のノードだけ触ることが可能
      * になっている。
      *
+     * $recursive_primitive_array に false を渡すと「プリミティブだけの連番配列」を値とみなし再帰されなくなる。
+     * 非常にアドホックだが、プリミティブ配列は構造体のような扱いはせず単に値と見なした方が都合がいいケースが稀によくある。
+     *
      * 「map も filter も可能」という少しマッチョな関数。
      * 実質的には「再帰的な array_kvmap」のように振る舞う。
      *
@@ -5383,15 +5386,16 @@ if (!function_exists('ryunosuke\\Functions\\array_walk_recursive2')) {
      *
      * @param array $array 対象配列
      * @param callable $callback コールバック
+     * @param bool $recursive_primitive_array プリミティブだけの連番配列を再帰するか
      * @return array walk 後の配列
      */
-    function array_walk_recursive2($array, $callback)
+    function array_walk_recursive2($array, $callback, $recursive_primitive_array = true)
     {
         $callback = func_user_func_array($callback);
 
-        $main = function (&$array, $keys) use (&$main, $callback) {
+        $main = function (&$array, $keys) use (&$main, $callback, $recursive_primitive_array) {
             foreach ($array as $k => &$v) {
-                if (is_array($v)) {
+                if (is_array($v) && ($recursive_primitive_array || is_hasharray($v) || array_or($v, fn($v) => !is_primitive($v)))) {
                     $main($v, array_merge($keys, [$k]));
                 }
                 else {
@@ -16487,6 +16491,66 @@ if (!function_exists('ryunosuke\\Functions\\fnmatch_or')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\fwrite_stream') || (new \ReflectionFunction('ryunosuke\\Functions\\fwrite_stream'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\fwrite_stream')) {
+    /**
+     * fwrite の改善版
+     *
+     * まず https://www.php.net/manual/ja/function.fwrite.php にはこうある。
+     * > ネットワークストリームへの書き込みは、 すべての文字列を書き込み終える前に終了する可能性があります。fwrite() の戻り値を確かめるようにしましょう。
+     *
+     * 次にユーザーノート（https://www.php.net/manual/ja/function.fwrite.php#96951）にはこうある（長いので抜粋）。
+     * > This means the example fwrite_stream() code from the docs, as well as all the "helper" functions posted by others in the comments are all broken. You *must* check for a return value of 0 and either abort immediately or track a maximum number of retries.
+     *
+     * とどのつまり、ネットワークリソースの場合は length 分書きこむとは限らないし 0 を返し続けることもある。
+     * これを避けるために「length 分書けるか、0 が来たらリトライする」としたのがこの関数。
+     *
+     * @package ryunosuke\Functions\Package\filesystem
+     */
+    function fwrite_stream($stream, string $data, ?int $length = null, ?callable $retry = null): int|false
+    {
+        assert(is_resource($stream));
+
+        $chunk = 8192;
+
+        $length ??= strlen($data);
+        $length = min($length, strlen($data));
+
+        $retry ??= fn($try) => $try < 3;
+
+        $written = 0;
+        $try = 0;
+
+        while ($written < $length) {
+            // 例えば 1GB の文字列で 1byte だけ書き込めた場合、999,999,999 のコピーが発生する
+            // とんでもないほど無駄なので、chunk を指定して少しずつ書き込む
+            // 逆にファイルストリームで無駄になるが…まぁ内部でも同じことやってるだろうし必要なコストとして無視する
+            $limit = min($chunk, $length - $written);
+            $result = fwrite($stream, substr($data, $written, $limit));
+
+            // ユーザーノートによれば引数不一致以外では false を返さないらしい（ので常に false 返しで良いはずだが念のため）
+            if ($result === false) {
+                return ($written > 0) ? $written : false; // @codeCoverageIgnore
+            }
+
+            if ($result === 0) {
+                if (!$retry(++$try)) {
+                    // 標準関数に合わせるため例外ではなくエラーとしている
+                    trigger_error("Failed to write to stream", E_USER_WARNING);
+                    return false;
+                }
+
+                continue;
+            }
+
+            $written += $result;
+            $try = 0;
+        }
+
+        return $written;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\globstar') || (new \ReflectionFunction('ryunosuke\\Functions\\globstar'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\globstar')) {
     /**
@@ -21536,6 +21600,7 @@ if (!function_exists('ryunosuke\\Functions\\msleep')) {
      * - time_sleep_until: 精度も高くシグナルを無視できるが、逆に言えばシグナルで打ち切れない
      *
      * float でのミリ秒で実用上は十分だろうし、上記のような細かな動作差異など覚えていられないので、シグナル無視を引数化し常に「残りミリ秒数」を返すようにした。
+     * $relative に true を与えると前回の実行からの相対秒で待機し、いわゆるスロットリングが行える（10/second rate な API に無駄なく投げるなど）
      *
      * $seconds は DateTime を受け入れ、DateTime の場合は指定日時まで待機という動作になる。
      * この時、過去日時を指定してもエラーにはならず 0 を返す（用途から考えてスケジューリングの都合で過去になることは多々ある）。
@@ -21550,8 +21615,11 @@ if (!function_exists('ryunosuke\\Functions\\msleep')) {
     function msleep(
         /** 待機するミリ秒|待機するまでの日時 */ float|\DateTimeInterface $seconds,
         /** シグナルでキャンセルされるか */ ?bool $cancel_signal = null,
+        /** 前回実行からの相対で待機するか */ bool $relative = false,
     ): /** 残りミリ秒数 */ float
     {
+        static $last = 0;
+
         $now = microtime(true);
 
         if ($seconds instanceof \DateTimeInterface) {
@@ -21563,6 +21631,10 @@ if (!function_exists('ryunosuke\\Functions\\msleep')) {
             assert($seconds >= 0);
         }
 
+        if ($relative) {
+            $seconds = max(0, $seconds - ($now - $last));
+        }
+
         if ($seconds > 0) {
             if ($cancel_signal) {
                 usleep((int) ($seconds * 1000000));
@@ -21571,7 +21643,10 @@ if (!function_exists('ryunosuke\\Functions\\msleep')) {
                 time_sleep_until($now + $seconds);
             }
         }
-        return max(0.0, $seconds - (microtime(true) - $now));
+
+        $last = microtime(true);
+
+        return max(0.0, $seconds - ($last - $now));
     }
 }
 
@@ -29465,7 +29540,7 @@ if (!function_exists('ryunosuke\\Functions\\stream_transfer')) {
                 $stream['write'] = $open($stream['write'], 'wb');
 
                 // キューに追加
-                stream_set_blocking($stream['read'], false);
+                @stream_set_blocking($stream['read'], false);
                 $currents[$first] = $stream;
             }
 
@@ -29477,7 +29552,7 @@ if (!function_exists('ryunosuke\\Functions\\stream_transfer')) {
                 if ($data === false) {
                     // @codeCoverageIgnoreStart
                     unset($currents[$key]);
-                    $result[$key] = ($currents['fail'] ?? $options['fail'] ?? fn() => null)($current, $key, $current['read']);
+                    $result[$key] = ($current['fail'] ?? $options['fail'] ?? fn() => null)($current, $key, $current['read']);
                     continue;
                     // @codeCoverageIgnoreEnd
                 }
@@ -29490,7 +29565,7 @@ if (!function_exists('ryunosuke\\Functions\\stream_transfer')) {
                         $fwrite = fwrite($current['write'], substr($data, $written));
                         if ($fwrite === false) {
                             // @codeCoverageIgnoreStart
-                            $result[$key] = ($currents['fail'] ?? $options['fail'] ?? fn() => null)($current, $key, $current['write']);
+                            $result[$key] = ($current['fail'] ?? $options['fail'] ?? fn() => null)($current, $key, $current['write']);
                             unset($currents[$key]);
                             continue 2;
                             // @codeCoverageIgnoreEnd
@@ -29498,12 +29573,12 @@ if (!function_exists('ryunosuke\\Functions\\stream_transfer')) {
                     }
 
                     $read = true;
-                    $result[$key] = ($currents['done'] ?? $options['done'] ?? fn() => $result[$key] + strlen($data))($current, $key, null);
                 }
 
                 // 読み終わったらそいつは終わり
                 if (feof($current['read'])) {
                     unset($currents[$key]);
+                    $result[$key] = ($current['done'] ?? $options['done'] ?? fn() => $result[$key] + strlen($data))($current, $key, null);
                 }
             }
 
@@ -35041,9 +35116,10 @@ if (!function_exists('ryunosuke\\Functions\\query_build')) {
      * @param string|null $arg_separator クエリセパレータ
      * @param int $encoding_type エンコードタイプ
      * @param string[]|string|null $brackets 配列ブラケット文字
+     * @param string|null $delimiter 配列区切り文字
      * @return string クエリ文字列
      */
-    function query_build($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738, $brackets = null)
+    function query_build($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738, $brackets = null, $delimiter = null)
     {
         $data = arrayval($data, false);
         if (!$data) {
@@ -35057,6 +35133,14 @@ if (!function_exists('ryunosuke\\Functions\\query_build')) {
             $brackets = [$brackets, ''];
         }
         $brackets = array_values($brackets);
+
+        if ($delimiter !== null) {
+            $data = array_walk_recursive2($data, function (&$v) use ($delimiter) {
+                if (is_array($v)) {
+                    $v = [implode($delimiter, $v)];
+                }
+            }, false);
+        }
 
         $REGEX = '%5B\d+%5D';
         $NOSEQ = implode('', $brackets);
