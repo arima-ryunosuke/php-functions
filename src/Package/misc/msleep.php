@@ -14,6 +14,7 @@ namespace ryunosuke\Functions\Package;
  * - time_sleep_until: 精度も高くシグナルを無視できるが、逆に言えばシグナルで打ち切れない
  *
  * float でのミリ秒で実用上は十分だろうし、上記のような細かな動作差異など覚えていられないので、シグナル無視を引数化し常に「残りミリ秒数」を返すようにした。
+ * $relative に true を与えると前回の実行からの相対秒で待機し、いわゆるスロットリングが行える（10/second rate な API に無駄なく投げるなど）
  *
  * $seconds は DateTime を受け入れ、DateTime の場合は指定日時まで待機という動作になる。
  * この時、過去日時を指定してもエラーにはならず 0 を返す（用途から考えてスケジューリングの都合で過去になることは多々ある）。
@@ -28,8 +29,11 @@ namespace ryunosuke\Functions\Package;
 function msleep(
     /** 待機するミリ秒|待機するまでの日時 */ float|\DateTimeInterface $seconds,
     /** シグナルでキャンセルされるか */ ?bool $cancel_signal = null,
+    /** 前回実行からの相対で待機するか */ bool $relative = false,
 ): /** 残りミリ秒数 */ float
 {
+    static $last = 0;
+
     $now = microtime(true);
 
     if ($seconds instanceof \DateTimeInterface) {
@@ -41,6 +45,10 @@ function msleep(
         assert($seconds >= 0);
     }
 
+    if ($relative) {
+        $seconds = max(0, $seconds - ($now - $last));
+    }
+
     if ($seconds > 0) {
         if ($cancel_signal) {
             usleep((int) ($seconds * 1000000));
@@ -49,5 +57,8 @@ function msleep(
             time_sleep_until($now + $seconds);
         }
     }
-    return max(0.0, $seconds - (microtime(true) - $now));
+
+    $last = microtime(true);
+
+    return max(0.0, $seconds - ($last - $now));
 }

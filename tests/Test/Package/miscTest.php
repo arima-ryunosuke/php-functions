@@ -395,6 +395,17 @@ syntax error
 
     function test_msleep()
     {
+        // 初回の relative は待たない
+        $time = microtime(true);
+        that(msleep(0.1, relative: true))->isSame(0.0);
+        that(microtime(true) - $time)->isBetween(0.0, 0.01);
+
+        // 2回目以降は相対で待つ
+        $time = microtime(true);
+        usleep(100 * 1000);
+        that(msleep(0.2, relative: true))->isSame(0.0);
+        that(microtime(true) - $time)->isBetween(0.2, 0.22);
+
         $time = microtime(true);
         that(msleep(0))->isSame(0.0);
         that(microtime(true) - $time)->isBetween(0.0, 0.01);
