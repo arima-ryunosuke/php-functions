@@ -27,6 +27,7 @@ use function ryunosuke\Functions\Package\file_suffix;
 use function ryunosuke\Functions\Package\file_tree;
 use function ryunosuke\Functions\Package\fnmatch_and;
 use function ryunosuke\Functions\Package\fnmatch_or;
+use function ryunosuke\Functions\Package\fwrite_stream;
 use function ryunosuke\Functions\Package\globstar;
 use function ryunosuke\Functions\Package\json_export;
 use function ryunosuke\Functions\Package\ltsv_export;
@@ -1260,6 +1261,57 @@ class filesystemTest extends AbstractTestCase
         that(fnmatch_or(['*aaa*', '*bbb*'], 'cccX'))->isFalse();
 
         that(self::resolveFunction('fnmatch_or'))([], '')->wasThrown('empty');
+    }
+
+    function test_fwrite_stream()
+    {
+        $tmpfile = tmpfile();
+        $hoge3000 = str_repeat('hoge', 3000);
+        that(fwrite_stream($tmpfile, 'hoge', 0))->is(0); // 0 でおかしなことにならない
+        that(fwrite_stream($tmpfile, 'hoge', 2))->is(2); // 少ないなら切られる
+        that(fwrite_stream($tmpfile, 'hoge', 6))->is(4); // 多くてもおかしなことにならない
+        that(fwrite_stream($tmpfile, $hoge3000))->is(12000);           // chunk されても大丈夫
+        that(stream_get_contents($tmpfile, null, 0))->is("hohoge" . $hoge3000);
+
+        // 0 を返しうる fake stream
+        stream_wrapper_register('fake-stream', get_class(new class() {
+            private $fp;
+
+            public $context;
+
+            public function stream_open(string $path, string $mode, int $options, &$opened_path): bool
+            {
+                $this->fp = fopen(sys_get_temp_dir() . '/' . sha1($path), $mode);
+                return true;
+            }
+
+            public function stream_close()
+            {
+                fclose($this->fp);
+            }
+
+            public function stream_write(string $data): int
+            {
+                if ($data === '0') {
+                    return 0;
+                }
+                if ($data === '2') {
+                    static $count = 0;
+                    if ($count++ < 2) {
+                        return 0;
+                    }
+                }
+                return fwrite($this->fp, $data);
+            }
+        }));
+
+        $fp = fopen('fake-stream://dummy.txt', 'w');
+        that(fwrite_stream($fp, 'hoge'))->is(4);
+        that(fwrite_stream($fp, '2'))->is(1);
+        that(@fwrite_stream($fp, '0'))->is(false);
+
+        $fp = fopen('fake-stream://dummy.txt', 'r');
+        that(@fwrite_stream($fp, 'hoge'))->isSame(false);
     }
 
     function test_globstar()
