@@ -3756,6 +3756,27 @@ class arrayTest extends AbstractTestCase
                 ],
             ],
         ]);
+
+        // プリミティブ連番配列は再帰せず値とみなす
+        that(array_walk_recursive2($array, function (&$v, $k, &$array, $keys) {
+            if ($keys === ['a', 'b']) {
+                $v = array_map(fn($n) => $n * 2, $v);
+            }
+            if ($keys === ['x', 'y']) {
+                $v = array_map(fn($n) => $n * 3, $v);
+            }
+        }, false))->is([
+            "a" => [
+                "b" => [
+                    "c" => [2, 4, 6],
+                ],
+            ],
+            "x" => [
+                "y" => [
+                    "z" => [21, 24, 27],
+                ],
+            ],
+        ]);
     }
 
     function test_array_where()

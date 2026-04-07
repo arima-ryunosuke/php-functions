@@ -2,7 +2,10 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../array/array_or.php';
+require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../funchand/func_user_func_array.php';
+require_once __DIR__ . '/../var/is_primitive.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -23,6 +26,9 @@ require_once __DIR__ . '/../funchand/func_user_func_array.php';
  * - $keys が渡ってくるのでツリー構造の特定のノードだけ触ることが可能
  * になっている。
  *
+ * $recursive_primitive_array に false を渡すと「プリミティブだけの連番配列」を値とみなし再帰されなくなる。
+ * 非常にアドホックだが、プリミティブ配列は構造体のような扱いはせず単に値と見なした方が都合がいいケースが稀によくある。
+ *
  * 「map も filter も可能」という少しマッチョな関数。
  * 実質的には「再帰的な array_kvmap」のように振る舞う。
  *
@@ -30,15 +36,16 @@ require_once __DIR__ . '/../funchand/func_user_func_array.php';
  *
  * @param array $array 対象配列
  * @param callable $callback コールバック
+ * @param bool $recursive_primitive_array プリミティブだけの連番配列を再帰するか
  * @return array walk 後の配列
  */
-function array_walk_recursive2($array, $callback)
+function array_walk_recursive2($array, $callback, $recursive_primitive_array = true)
 {
     $callback = func_user_func_array($callback);
 
-    $main = function (&$array, $keys) use (&$main, $callback) {
+    $main = function (&$array, $keys) use (&$main, $callback, $recursive_primitive_array) {
         foreach ($array as $k => &$v) {
-            if (is_array($v)) {
+            if (is_array($v) && ($recursive_primitive_array || is_hasharray($v) || array_or($v, fn($v) => !is_primitive($v)))) {
                 $main($v, array_merge($keys, [$k]));
             }
             else {
