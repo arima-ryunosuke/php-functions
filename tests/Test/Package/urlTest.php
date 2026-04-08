@@ -407,6 +407,37 @@ class urlTest extends AbstractTestCase
         that(query_build([1, 2, 3], 'pre-'))->is('pre-0=1&pre-1=2&pre-2=3');
     }
 
+    function test_query_build()
+    {
+        $query = query_build([
+            'a' => 1,
+            'b' => 2,
+            'c' => [],
+            'd' => [1, 2, 3],
+            'x' => [
+                'a' => 1,
+                'b' => 2,
+                'c' => [],
+                'd' => [1, 2, 3],
+            ],
+        ], delimiter: ' ');
+        that($query)->is('a=1&b=2&c%5B%5D=&d%5B%5D=1+2+3&x%5Ba%5D=1&x%5Bb%5D=2&x%5Bc%5D%5B%5D=&x%5Bd%5D%5B%5D=1+2+3');
+
+        // 読みにくいのでパースして検証
+        that(query_parse($query))->is([
+            "a" => "1",
+            "b" => "2",
+            "c" => [""],
+            "d" => ["1 2 3"],
+            "x" => [
+                "a" => "1",
+                "b" => "2",
+                "c" => [""],
+                "d" => ["1 2 3"],
+            ],
+        ]);
+    }
+
     function test_query_parse()
     {
         that(query_parse('a=1&b[]=2'))->is([

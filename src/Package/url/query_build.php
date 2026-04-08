@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../array/array_walk_recursive2.php';
 require_once __DIR__ . '/../var/arrayval.php';
 // @codeCoverageIgnoreEnd
 
@@ -39,9 +40,10 @@ require_once __DIR__ . '/../var/arrayval.php';
  * @param string|null $arg_separator クエリセパレータ
  * @param int $encoding_type エンコードタイプ
  * @param string[]|string|null $brackets 配列ブラケット文字
+ * @param string|null $delimiter 配列区切り文字
  * @return string クエリ文字列
  */
-function query_build($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738, $brackets = null)
+function query_build($data, $numeric_prefix = null, $arg_separator = null, $encoding_type = \PHP_QUERY_RFC1738, $brackets = null, $delimiter = null)
 {
     $data = arrayval($data, false);
     if (!$data) {
@@ -55,6 +57,14 @@ function query_build($data, $numeric_prefix = null, $arg_separator = null, $enco
         $brackets = [$brackets, ''];
     }
     $brackets = array_values($brackets);
+
+    if ($delimiter !== null) {
+        $data = array_walk_recursive2($data, function (&$v) use ($delimiter) {
+            if (is_array($v)) {
+                $v = [implode($delimiter, $v)];
+            }
+        }, false);
+    }
 
     $REGEX = '%5B\d+%5D';
     $NOSEQ = implode('', $brackets);
