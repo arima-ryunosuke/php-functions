@@ -61,7 +61,7 @@ function stream_transfer(array $streams, array $options = []): array
             $stream['write'] = $open($stream['write'], 'wb');
 
             // キューに追加
-            stream_set_blocking($stream['read'], false);
+            @stream_set_blocking($stream['read'], false);
             $currents[$first] = $stream;
         }
 
@@ -73,7 +73,7 @@ function stream_transfer(array $streams, array $options = []): array
             if ($data === false) {
                 // @codeCoverageIgnoreStart
                 unset($currents[$key]);
-                $result[$key] = ($currents['fail'] ?? $options['fail'] ?? fn() => null)($current, $key, $current['read']);
+                $result[$key] = ($current['fail'] ?? $options['fail'] ?? fn() => null)($current, $key, $current['read']);
                 continue;
                 // @codeCoverageIgnoreEnd
             }
@@ -86,7 +86,7 @@ function stream_transfer(array $streams, array $options = []): array
                     $fwrite = fwrite($current['write'], substr($data, $written));
                     if ($fwrite === false) {
                         // @codeCoverageIgnoreStart
-                        $result[$key] = ($currents['fail'] ?? $options['fail'] ?? fn() => null)($current, $key, $current['write']);
+                        $result[$key] = ($current['fail'] ?? $options['fail'] ?? fn() => null)($current, $key, $current['write']);
                         unset($currents[$key]);
                         continue 2;
                         // @codeCoverageIgnoreEnd
@@ -94,12 +94,12 @@ function stream_transfer(array $streams, array $options = []): array
                 }
 
                 $read = true;
-                $result[$key] = ($currents['done'] ?? $options['done'] ?? fn() => $result[$key] + strlen($data))($current, $key, null);
             }
 
             // 読み終わったらそいつは終わり
             if (feof($current['read'])) {
                 unset($currents[$key]);
+                $result[$key] = ($current['done'] ?? $options['done'] ?? fn() => $result[$key] + strlen($data))($current, $key, null);
             }
         }
 
