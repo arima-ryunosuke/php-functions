@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.35
+
+- [feature] php8.3 でコケた箇所を修正
+- [feature] query_build に delimiter 引数を追加
+- [feature] array_walk_recursive2 にプリミティブ配列を値とみなす引数を追加
+- [feature] msleep で相対的に待機する機能
+- [feature] fwrite_stream を追加
+- [fixbug] stream_transfer がめちゃくちゃだったので修正
+
 ## 2.0.34
 
 - [fixbug] Utility 出力で構文エラーが出る
