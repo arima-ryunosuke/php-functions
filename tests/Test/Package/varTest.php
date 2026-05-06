@@ -1105,13 +1105,20 @@ class varTest extends AbstractTestCase
     function test_var_export2_callback()
     {
         that(var_export2([
-            'scalar'    => '12345',
-            'exception' => new \Exception(),
-        ], ['return' => true, 'callback' => fn($v) => $v instanceof \Exception ? "EX" : null, 'nest' => 1]))->is(<<<'VAR'
+            'scalar' => '12345',
+            'nest'   => [
+                'exception' => new \Exception(),
+            ],
+        ], ['return' => true, 'callback' => fn($v, $nest) => $v instanceof \Exception ? var_export2(['e' => 'E', 'x' => 'X'], ['return' => true, 'nest' => $nest]) : null, 'nest' => 0]))->is(<<<'VAR'
         [
-                "scalar"    => "12345",
-                "exception" => EX,
-            ]
+            "scalar" => "12345",
+            "nest"   => [
+                "exception" => [
+                    "e" => "E",
+                    "x" => "X",
+                ],
+            ],
+        ]
         VAR,
         );
     }
@@ -1142,6 +1149,22 @@ class varTest extends AbstractTestCase
                     "grand" => "*RECURSION*",
                 ],
             ],
+        ]
+        VAR,
+        );
+    }
+
+    function test_var_export2_enum()
+    {
+        $enums = [
+            'int-enum'    => IntEnum::Case1(),
+            'string-enum' => StringEnum::CaseHoge(),
+        ];
+        $suffix = version_compare(PHP_VERSION, '8.1') >= 0 ? "" : "()";
+        that(var_export2($enums, true))->is(<<<VAR
+        [
+            "int-enum"    => \\ryunosuke\\Test\\Package\\files\\enums\\IntEnum::Case1,
+            "string-enum" => \\ryunosuke\\Test\\Package\\files\\enums\\StringEnum::CaseHoge$suffix,
         ]
         VAR,
         );

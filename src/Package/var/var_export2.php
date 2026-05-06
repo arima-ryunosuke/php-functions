@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection */
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
@@ -104,7 +104,7 @@ function var_export2($value, $options = [])
     $export = function ($value, $context, $nest, $parents = []) use (&$export, $options) {
         // コールバックを最優先とする
         if ($options['callback']) {
-            if (($string = $options['callback']($value)) !== null) {
+            if (($string = $options['callback']($value, $nest)) !== null) {
                 return $string;
             }
         }
@@ -155,6 +155,28 @@ function var_export2($value, $options = [])
         }
         // オブジェクトは単にプロパティを __set_state する文字列を出力する
         elseif (is_object($value)) {
+            $ref = new \ReflectionObject($value);
+
+            // enum はリテラルを返せばよい
+            if ($value instanceof \UnitEnum) {
+                $declare = "\\$ref->name::$value->name";
+                if ($ref->getConstant($value->name) === $value) {
+                    return $declare;
+                }
+                // enum の polyfill で、__callStatic を利用して疑似的にエミュレートしているライブラリは多い
+                // もっとも、「多い」だけであり、そうとは限らないので値は見る必要はある（例外が飛ぶかもしれないので try も必要）
+                if ($ref->hasMethod('__callStatic')) {
+                    try {
+                        if ($declare() === $value) {
+                            return "$declare()";
+                        }
+                    }
+                    catch (\Throwable) { // @codeCoverageIgnore
+                        // through. treat regular object
+                    }
+                }
+            }
+
             $parents[] = $value;
             $classname = get_class($value);
             if ($classname === \stdClass::class) {
