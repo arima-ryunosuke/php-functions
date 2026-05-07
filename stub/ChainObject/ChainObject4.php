@@ -373,6 +373,11 @@ trait ChainObject4
     public function iterator_join(iterable $iterables, $preserve_keys = true): self { }
     public function iterator_join($preserve_keys = true): self { }
 
+    /** @see numcmp() */
+    public self $numcmp;
+    public function numcmp($number1, $number2): self { }
+    public function numcmp($number2): self { }
+
     /** @see probability() */
     public self $probability;
     public function probability($probability, $divisor = 100): self { }

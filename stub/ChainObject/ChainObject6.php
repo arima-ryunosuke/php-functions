@@ -600,8 +600,8 @@ trait ChainObject6
 
     /** @see chain_case() */
     public self $chain_case;
-    public function chain_case(?string $string, ?string $delimiter = "-"): self { }
-    public function chain_case(?string $delimiter = "-"): self { }
+    public function chain_case(?string $string, ?string $delimiter = "-", $keep_abbr = false): self { }
+    public function chain_case(?string $delimiter = "-", $keep_abbr = false): self { }
 
     /** @see mb_ereg_split() */
     public self $mb_ereg_split;
@@ -622,6 +622,17 @@ trait ChainObject6
     public self $multiexplode;
     public function multiexplode($delimiter, ?string $string, $limit = PHP_INT_MAX): self { }
     public function multiexplode(?string $string, $limit = PHP_INT_MAX): self { }
+
+    /** @see splitwords() */
+    public self $splitwords;
+    public function splitwords(string $string, $keep_abbr = true, $no_empty = true, $separators = <<<TEXT
+-_ 	
+
+TEXT): self { }
+    public function splitwords($keep_abbr = true, $no_empty = true, $separators = <<<TEXT
+-_ 	
+
+TEXT): self { }
 
     /** @see str_array() */
     public self $str_array;

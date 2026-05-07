@@ -532,8 +532,8 @@ TEXT): self { }
 
     /** @see snake_case() */
     public self $snake_case;
-    public function snake_case(?string $string, ?string $delimiter = "_", $keep_abbr = false): self { }
-    public function snake_case(?string $delimiter = "_", $keep_abbr = false): self { }
+    public function snake_case(?string $string, ?string $delimiter = "_", $keep_abbr = false, $screaming = false): self { }
+    public function snake_case(?string $delimiter = "_", $keep_abbr = false, $screaming = false): self { }
 
     /** @see str_lchop() */
     public self $str_lchop;

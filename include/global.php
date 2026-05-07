@@ -1917,7 +1917,8 @@ if (!function_exists('array_filter_recursive')) {
      *
      * @package ryunosuke\Functions\Package\array
      *
-     * @template T of iterable&\ArrayAccess
+     * @template T of array|iterable&\ArrayAccess
+     * @return T
      */
     function array_filter_recursive(
         /** @var T 対象配列 */ iterable $array,
@@ -10014,12 +10015,12 @@ if (!function_exists('html_attr')) {
                 continue;
             }
 
-            $k = $chaincase($k);
-            assert(!isset($attrs[$k]));
-
             if (strpbrk($k, "\r\n\t\f '\"<>/=") !== false) {
                 throw new \UnexpectedValueException('found invalid charactor as attribute name');
             }
+
+            $k = $chaincase($k);
+            assert(!isset($attrs[$k]));
 
             switch ($k) {
                 default:
@@ -12728,7 +12729,7 @@ if (!function_exists('date_interval_string')) {
      * @package ryunosuke\Functions\Package\datetime
      *
      * @param \DateInterval|string|float|int $interval DateInterval インスタンスか間隔を表す ISO8601 文字列
-     * @param string|array|\Closure $format 時刻フォーマット
+     * @param null|string|array|\Closure $format 時刻フォーマット
      * @param string|int $limit_type どこまで換算するか（[c|y|m|d|h|i|s]）
      * @return string|\DateInterval 時間差文字列
      */
@@ -12771,6 +12772,11 @@ if (!function_exists('date_interval_string')) {
         $interval->i = $limit < $map['i'] ? 0 : (int) ($limit === $map['i'] ? $minutes : (int) $minutes % 60);
         $interval->s = $limit < $map['s'] ? 0 : (int) ($limit === $map['s'] ? $seconds : (int) $seconds % 60);
         $interval->v = $mills % 1000;
+
+        // null はそのまま返す
+        if ($format === null) {
+            return $interval;
+        }
 
         // クロージャはコールバックする
         if ($format instanceof \Closure) {
@@ -21236,6 +21242,43 @@ if (!function_exists('mode')) {
     }
 }
 
+assert(!function_exists('numcmp') || (new \ReflectionFunction('numcmp'))->isUserDefined());
+if (!function_exists('numcmp')) {
+    /**
+     * 数値比較の関数版
+     *
+     * $number1 が $number2 より大きければ正数、小さければ負数、等しければ 0 を返す。
+     * 要するに $number1 <=> $number2 と同じだが、演算子だと型チェックが効かず、厳密な型で比較したい場合にいちいち is_系を挟まなければならない。
+     * しかもその場合は数値的文字列（"3.14" 等）は許容するケースも多く、判定が非常にめんどくさいので関数があった方が便利。
+     * この関数は数値演算不可能の場合に TypeError を投げる。
+     *
+     * Example:
+     * ```php
+     * that(['hoge'] <=> 0)->gt(0);                       // php はこんなのが平気で許容されるが、多くの場合これはバグだろうのでエラーにしたい
+     * //that(numcmp(['hoge'], 0))->gt(0);                // numcmp は TypeError を投げる
+     * that(numcmp(1, 0))->gt(0);                         // 結果自体は要するに 1 <=> 0 と同じ
+     * that(numcmp(gmp_init("0"), gmp_init("1")))->lt(0); // gmp も対応している
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\math
+     */
+    function numcmp($number1, $number2): int
+    {
+        if (!is_arithmetic($number1)) {
+            throw new \TypeError(sprintf('%s(): Argument #1 ($number1) must be of type arithmetic, %s given, called', __FUNCTION__, get_debug_type($number1)));
+        }
+        if (!is_arithmetic($number2)) {
+            throw new \TypeError(sprintf('%s(): Argument #2 ($number2) must be of type arithmetic, %s given, called', __FUNCTION__, get_debug_type($number1)));
+        }
+
+        // 数値的オブジェクトを許容するために少し冗長にやらなければならない
+        // 例えば === 0 してしまうとオブジェクト全般でおかしくなる
+        // 例えば <=> を使うと SimpleXML でおかしくなる
+        $diff = $number1 - $number2;
+        return $diff > 0 ? 1 : ($diff < 0 ? -1 : 0);
+    }
+}
+
 assert(!function_exists('sum') || (new \ReflectionFunction('sum'))->isUserDefined());
 if (!function_exists('sum')) {
     /**
@@ -26166,6 +26209,41 @@ if (!function_exists('ob_capture')) {
     }
 }
 
+assert(!function_exists('ob_get_clean_all') || (new \ReflectionFunction('ob_get_clean_all'))->isUserDefined());
+if (!function_exists('ob_get_clean_all')) {
+    /**
+     * 出力バッファを全部閉じて配列で返す
+     *
+     * 閉じられないバッファを検出した場合は例外を投げる（この関数の本懐は「すべて閉じる」なので）。
+     * 閉じられないバッファを使うことはそうそうないのであまり問題にならない。
+     * というよりバッファの仕様が複雑すぎて追いきれない。
+     *
+     * https://www.php.net/manual/ja/outcontrol.operations-on-buffers.php
+     * > PHP_OUTPUT_HANDLER_CLEANABLE を指定すると、 ob_clean() によってバッファの内容を削除できるようになります。
+     * > PHP_OUTPUT_HANDLER_CLEANABLE フラグ を指定していなくても、 ob_end_clean() や ob_get_clean() がバッファの内容を削除できなくなるわけではありません。
+     *
+     * https://www.php.net/manual/ja/function.ob-get-clean.php
+     * > PHP_OUTPUT_HANDLER_REMOVABLE を指定して アクティブな出力バッファを開始しないと、 ob_get_clean() は失敗します。
+     *
+     * 結局のところ PHP_OUTPUT_HANDLER_REMOVABLE が最も重要で、「閉じる」に関わる処理はこれだけを見ればよい。
+     * で、消せないバッファに出くわすとその上位バッファの削除を阻害するので、例外を投げるしか方法が無い。
+     * が、トップレベルバッファだけは上位バッファが存在しないし、圧縮バッファのような超特殊なコア機能が多いので例外は投げずにスルーする。
+     *
+     * @package ryunosuke\Functions\Package\outcontrol
+     */
+    function ob_get_clean_all(): array
+    {
+        $result = [];
+        foreach (array_reverse(ob_get_status(true)) as $stat) {
+            if ($stat['level'] !== 0 && !($stat['flags'] & PHP_OUTPUT_HANDLER_REMOVABLE)) {
+                throw new \UnexpectedValueException('detect no removable output buffer'); // @codeCoverageIgnore
+            }
+            $result[$stat['level']] = ob_get_clean();
+        }
+        return $result;
+    }
+}
+
 assert(!function_exists('ob_include') || (new \ReflectionFunction('ob_include'))->isUserDefined());
 if (!function_exists('ob_include')) {
     /**
@@ -29815,11 +29893,12 @@ if (!function_exists('chain_case')) {
      *
      * @param string $string 対象文字列
      * @param string $delimiter デリミタ
+     * @param bool $keep_abbr すべて大文字の単語を1単語として扱うか
      * @return string 変換した文字列
      */
-    function chain_case(?string $string, ?string $delimiter = '-')
+    function chain_case(?string $string, ?string $delimiter = '-', $keep_abbr = false)
     {
-        return snake_case($string, $delimiter);
+        return snake_case($string, $delimiter, $keep_abbr);
     }
 }
 
@@ -30804,8 +30883,7 @@ if (!function_exists('pascal_case')) {
      */
     function pascal_case(?string $string, ?string $delimiter = '_')
     {
-        $replacemap = array_combine(str_split($delimiter), array_pad([], strlen($delimiter), ' '));
-        return strtr(ucwords(strtr($string, $replacemap)), [' ' => '']);
+        return implode('', array_map('ucfirst', splitwords($string ?? '', false, true, $delimiter ?? '_')));
     }
 }
 
@@ -31078,12 +31156,16 @@ if (!function_exists('snake_case')) {
      * @param string $string 対象文字列
      * @param string $delimiter デリミタ
      * @param bool $keep_abbr すべて大文字の単語を1単語として扱うか
+     * @param bool $screaming すべて大文字にするか（SCREAMING_SNAKE_CASE スタイル）
      * @return string 変換した文字列
      */
-    function snake_case(?string $string, ?string $delimiter = '_', $keep_abbr = false)
+    function snake_case(?string $string, ?string $delimiter = '_', $keep_abbr = false, $screaming = false)
     {
-        $pattern = $keep_abbr ? '/[A-Z]([A-Z](?![a-z]))*/' : '/[A-Z]/';
-        return ltrim(strtolower(preg_replace($pattern, $delimiter . '\0', $string)), $delimiter);
+        $result = implode($delimiter ?? '_', array_map('strtolower', splitwords($string ?? '', $keep_abbr, false)));
+        if ($screaming) {
+            $result = strtoupper($result);
+        }
+        return $result;
     }
 }
 
@@ -31126,6 +31208,49 @@ if (!function_exists('split_noempty')) {
         $parts = array_filter($parts, 'strlen');
         $parts = array_values($parts);
         return $parts;
+    }
+}
+
+assert(!function_exists('splitwords') || (new \ReflectionFunction('splitwords'))->isUserDefined());
+if (!function_exists('splitwords')) {
+    /**
+     * ucwords の配列返し版
+     *
+     * PascalCase, camelCase, snake_case などのスタイルは数あれど、結局のところ単語に分割さえできれば文字列関数を適用して結合するだけで済む。
+     * つまり標準の ucwords を配列で返すようにすれば十分。
+     * それだけじゃつまらないので、$keep_abbr で連続大文字をバラさないように指定できるようにしてある。
+     *
+     * Example:
+     * ```php
+     * that(splitwords('ThisIsAPen'))->isSame(["This", "Is", "A", "Pen"]);
+     * that(splitwords('this-is-a-pen'))->isSame(["this", "is", "a", "pen"]);
+     * that(splitwords('This-Is-A-Pen'))->isSame(["This", "Is", "A", "Pen"]);
+     *
+     * that(splitwords('URLEncode', false))->isSame(["U", "R", "L", "Encode"]);
+     * that(splitwords('URLEncode', true))->isSame(["URL", "Encode"]);
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param string $string 対象文字列
+     * @param bool $keep_abbr すべて大文字の単語を1単語として扱うか
+     * @param bool $no_empty 空文字を除去するか
+     * @param string $separators デリミタ
+     * @return array 単語配列
+     */
+    function splitwords(string $string, $keep_abbr = true, $no_empty = true, $separators = "-_ \t\r\n\f\v"): array
+    {
+        $pattern = $keep_abbr ? "#[A-Z]([A-Z](?![a-z]))*#" : "#[A-Z]#";
+        $string = ltrim(preg_replace($pattern, $separators[0] . '\0', $string), $separators); // for compatible ltrim
+
+        $pattern = "[" . preg_quote($separators) . "]";
+        $words = preg_split("#$pattern#u", $string);
+
+        if ($no_empty) {
+            $words = array_values(array_filter($words, 'strlen'));
+        }
+
+        return $words;
     }
 }
 
@@ -33996,6 +34121,29 @@ if (!function_exists('strtr_escaped')) {
             $offset = $pos + strlen($replaced);
         }
         return $string;
+    }
+}
+
+assert(!function_exists('train_case') || (new \ReflectionFunction('train_case'))->isUserDefined());
+if (!function_exists('train_case')) {
+    /**
+     * Train-Case に変換する
+     *
+     * Example:
+     * ```php
+     * that(train_case('ThisIsAPen'))->isSame('This-Is-A-Pen');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param string $string 対象文字列
+     * @param string $delimiter デリミタ
+     * @param bool $keep_abbr すべて大文字の単語を1単語として扱うか
+     * @return string 変換した文字列
+     */
+    function train_case(?string $string, ?string $delimiter = '-', $keep_abbr = false)
+    {
+        return ucwords(snake_case($string, $delimiter, $keep_abbr), $delimiter);
     }
 }
 
@@ -38658,7 +38806,7 @@ if (!function_exists('var_export2')) {
         $export = function ($value, $context, $nest, $parents = []) use (&$export, $options) {
             // コールバックを最優先とする
             if ($options['callback']) {
-                if (($string = $options['callback']($value)) !== null) {
+                if (($string = $options['callback']($value, $nest)) !== null) {
                     return $string;
                 }
             }
@@ -38709,6 +38857,28 @@ if (!function_exists('var_export2')) {
             }
             // オブジェクトは単にプロパティを __set_state する文字列を出力する
             elseif (is_object($value)) {
+                $ref = new \ReflectionObject($value);
+
+                // enum はリテラルを返せばよい
+                if ($value instanceof \UnitEnum) {
+                    $declare = "\\$ref->name::$value->name";
+                    if ($ref->getConstant($value->name) === $value) {
+                        return $declare;
+                    }
+                    // enum の polyfill で、__callStatic を利用して疑似的にエミュレートしているライブラリは多い
+                    // もっとも、「多い」だけであり、そうとは限らないので値は見る必要はある（例外が飛ぶかもしれないので try も必要）
+                    if ($ref->hasMethod('__callStatic')) {
+                        try {
+                            if ($declare() === $value) {
+                                return "$declare()";
+                            }
+                        }
+                        catch (\Throwable) { // @codeCoverageIgnore
+                            // through. treat regular object
+                        }
+                    }
+                }
+
                 $parents[] = $value;
                 $classname = get_class($value);
                 if ($classname === \stdClass::class) {

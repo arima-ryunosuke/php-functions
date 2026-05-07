@@ -673,6 +673,11 @@ trait ChainObject9
     public function patch(?string $string, ?string $patch, $options = []): self { }
     public function patch(?string $patch, $options = []): self { }
 
+    /** @see train_case() */
+    public self $train_case;
+    public function train_case(?string $string, ?string $delimiter = "-", $keep_abbr = false): self { }
+    public function train_case(?string $delimiter = "-", $keep_abbr = false): self { }
+
     /** @see try_catch() */
     public self $try_catch;
     public function try_catch($try, $catch = null, ...$variadic): self { }
