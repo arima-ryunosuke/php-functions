@@ -358,6 +358,8 @@ class datetimeTest extends AbstractTestCase
 
     function test_date_interval_string()
     {
+        that(date_interval_string('P1Y2M3DT4H5M6S'))->isInstanceOf(\DateInterval::class);
+
         $HOUR_1 = 60 * 60;
         $DAY_1 = $HOUR_1 * 24;
         $MONTH_1 = $DAY_1 * (365 / 12);

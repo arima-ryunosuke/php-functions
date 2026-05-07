@@ -63,7 +63,7 @@ require_once __DIR__ . '/../strings/strtr_escaped.php';
  * @package ryunosuke\Functions\Package\datetime
  *
  * @param \DateInterval|string|float|int $interval DateInterval インスタンスか間隔を表す ISO8601 文字列
- * @param string|array|\Closure $format 時刻フォーマット
+ * @param null|string|array|\Closure $format 時刻フォーマット
  * @param string|int $limit_type どこまで換算するか（[c|y|m|d|h|i|s]）
  * @return string|\DateInterval 時間差文字列
  */
@@ -106,6 +106,11 @@ function date_interval_string($interval, $format = null, $limit_type = 'y')
     $interval->i = $limit < $map['i'] ? 0 : (int) ($limit === $map['i'] ? $minutes : (int) $minutes % 60);
     $interval->s = $limit < $map['s'] ? 0 : (int) ($limit === $map['s'] ? $seconds : (int) $seconds % 60);
     $interval->v = $mills % 1000;
+
+    // null はそのまま返す
+    if ($format === null) {
+        return $interval;
+    }
 
     // クロージャはコールバックする
     if ($format instanceof \Closure) {
