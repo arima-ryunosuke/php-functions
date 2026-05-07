@@ -3,6 +3,7 @@
 namespace ryunosuke\Test\Package;
 
 use function ryunosuke\Functions\Package\ob_capture;
+use function ryunosuke\Functions\Package\ob_get_clean_all;
 use function ryunosuke\Functions\Package\ob_include;
 use function ryunosuke\Functions\Package\ob_stdout;
 
@@ -26,6 +27,23 @@ class outcontrolTest extends AbstractTestCase
             'hoge')->wasThrown('inob');
         // ob レベルは変わらない
         that(ob_get_level())->is($current);
+    }
+
+    function test_ob_get_clean_all()
+    {
+        echo "level1";
+        ob_start();
+        echo "level2";
+        ob_start();
+        echo "level3";
+
+        that(ob_get_clean_all())->is([
+            2 => "level3",
+            1 => "level2",
+            0 => "level1",
+        ]);
+
+        ob_start(); // supress risky test
     }
 
     function test_ob_include()
