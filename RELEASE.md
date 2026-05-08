@@ -11,6 +11,15 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.36
+
+- [feature] 比較演算子の関数版 numcmp を追加
+- [feature] case style 系の処理を一新
+- [feature] 出力バッファを全部閉じて全部返す ob_get_clean_all
+- [feature] date_interval で生オブジェクトを返す機能
+- [feature] var_export2 の改善
+- [refactor] array_filter_recursive の型ヒントを修正
+
 ## 2.0.35
 
 - [feature] php8.3 でコケた箇所を修正
