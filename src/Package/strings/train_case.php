@@ -6,11 +6,11 @@ require_once __DIR__ . '/../strings/snake_case.php';
 // @codeCoverageIgnoreEnd
 
 /**
- * chain-case に変換する
+ * Train-Case に変換する
  *
  * Example:
  * ```php
- * that(chain_case('ThisIsAPen'))->isSame('this-is-a-pen');
+ * that(train_case('ThisIsAPen'))->isSame('This-Is-A-Pen');
  * ```
  *
  * @package ryunosuke\Functions\Package\strings
@@ -20,7 +20,7 @@ require_once __DIR__ . '/../strings/snake_case.php';
  * @param bool $keep_abbr すべて大文字の単語を1単語として扱うか
  * @return string 変換した文字列
  */
-function chain_case(?string $string, ?string $delimiter = '-', $keep_abbr = false)
+function train_case(?string $string, ?string $delimiter = '-', $keep_abbr = false)
 {
-    return snake_case($string, $delimiter, $keep_abbr);
+    return ucwords(snake_case($string, $delimiter, $keep_abbr), $delimiter);
 }

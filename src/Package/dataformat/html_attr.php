@@ -146,12 +146,12 @@ function html_attr($array, $options = [])
             continue;
         }
 
-        $k = $chaincase($k);
-        assert(!isset($attrs[$k]));
-
         if (strpbrk($k, "\r\n\t\f '\"<>/=") !== false) {
             throw new \UnexpectedValueException('found invalid charactor as attribute name');
         }
+
+        $k = $chaincase($k);
+        assert(!isset($attrs[$k]));
 
         switch ($k) {
             default:

@@ -29,6 +29,7 @@ use function ryunosuke\Functions\Package\render_string;
 use function ryunosuke\Functions\Package\render_template;
 use function ryunosuke\Functions\Package\snake_case;
 use function ryunosuke\Functions\Package\split_noempty;
+use function ryunosuke\Functions\Package\splitwords;
 use function ryunosuke\Functions\Package\starts_with;
 use function ryunosuke\Functions\Package\str_anyof;
 use function ryunosuke\Functions\Package\str_array;
@@ -63,6 +64,7 @@ use function ryunosuke\Functions\Package\strpos_quoted;
 use function ryunosuke\Functions\Package\strposr;
 use function ryunosuke\Functions\Package\strrstr;
 use function ryunosuke\Functions\Package\strtr_escaped;
+use function ryunosuke\Functions\Package\train_case;
 
 class stringsTest extends AbstractTestCase
 {
@@ -81,6 +83,8 @@ class stringsTest extends AbstractTestCase
         that(chain_case('ThisIsAPen'))->is('this-is-a-pen');
         that(chain_case('ABC'))->is('a-b-c');
         that(chain_case('-ABC-'))->is('a-b-c-');
+        that(chain_case('URLEncode'))->is('u-r-l-encode');
+        that(chain_case('URLEncode', '-', true))->is('url-encode');
     }
 
     function test_concat()
@@ -784,6 +788,8 @@ zero is index 0.
         that(snake_case('ABC', '_', true))->is('abc');
         that(snake_case('_ABC_', '_', true))->is('abc_');
         that(snake_case('URLEncode', '-', true))->is('url-encode');
+
+        that(snake_case('URLEncode', '_', true, true))->is('URL_ENCODE');
     }
 
     function test_split_noempty()
@@ -803,6 +809,21 @@ zero is index 0.
 
         // 結果はただの配列になる
         that(split_noempty(',', 'A,,B,,,C'))->is(['A', 'B', 'C']);
+    }
+
+    function test_splitwords()
+    {
+        that(splitwords('', true, true))->is([]);
+
+        that(splitwords('ThisIsAPen'))->is(["This", "Is", "A", "Pen"]);
+        that(splitwords('this-is-a-pen'))->is(["this", "is", "a", "pen"]);
+        that(splitwords('This-Is-A-Pen'))->is(["This", "Is", "A", "Pen"]);
+
+        that(splitwords('URLEncode', false))->is(["U", "R", "L", "Encode"]);
+        that(splitwords('URLEncode', true))->is(["URL", "Encode"]);
+
+        that(splitwords('-ThisIsAPen-', true, true))->is(["This", "Is", "A", "Pen"]);
+        that(splitwords('-ThisIsAPen-', true, false))->is(["This", "Is", "A", "Pen", ""]);
     }
 
     function test_starts_with()
@@ -2315,5 +2336,22 @@ zero is index 0.
             's'   => 'S',   // エスケープが対象なので置換されない（%s は文字 "s" ではない（\n が文字 "n" ではないのと同じ））
             'XYZ' => 'abc', // 1. 後ろにあるがまず置換される
         ], '%'))->isSame('abc AB p %s');
+    }
+
+    function test_train_case()
+    {
+        that(train_case(''))->is('');
+        that(train_case('ThisIsAPen', '-'))->is('This-Is-A-Pen');
+        that(train_case('ThisIsAPen'))->is('This-Is-A-Pen');
+        that(train_case('ABC'))->is('A-B-C');
+        that(train_case('_ABC_'))->is('A-B-C-');
+        that(train_case('URLEncode'))->is('U-R-L-Encode');
+
+        that(train_case('', '-', true))->is('');
+        that(train_case('ThisIsAPen', '-', true))->is('This-Is-A-Pen');
+        that(train_case('ThisIsAPen', '_', true))->is('This_Is_A_Pen');
+        that(train_case('ABC', '_', true))->is('Abc');
+        that(train_case('_ABC_', '_', true))->is('Abc_');
+        that(train_case('URLEncode', '-', true))->is('Url-Encode');
     }
 }

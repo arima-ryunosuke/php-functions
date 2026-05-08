@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../strings/splitwords.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -19,10 +20,14 @@ namespace ryunosuke\Functions\Package;
  * @param string $string 対象文字列
  * @param string $delimiter デリミタ
  * @param bool $keep_abbr すべて大文字の単語を1単語として扱うか
+ * @param bool $screaming すべて大文字にするか（SCREAMING_SNAKE_CASE スタイル）
  * @return string 変換した文字列
  */
-function snake_case(?string $string, ?string $delimiter = '_', $keep_abbr = false)
+function snake_case(?string $string, ?string $delimiter = '_', $keep_abbr = false, $screaming = false)
 {
-    $pattern = $keep_abbr ? '/[A-Z]([A-Z](?![a-z]))*/' : '/[A-Z]/';
-    return ltrim(strtolower(preg_replace($pattern, $delimiter . '\0', $string)), $delimiter);
+    $result = implode($delimiter ?? '_', array_map('strtolower', splitwords($string ?? '', $keep_abbr, false)));
+    if ($screaming) {
+        $result = strtoupper($result);
+    }
+    return $result;
 }

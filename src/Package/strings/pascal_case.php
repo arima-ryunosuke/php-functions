@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../strings/splitwords.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -21,6 +22,5 @@ namespace ryunosuke\Functions\Package;
  */
 function pascal_case(?string $string, ?string $delimiter = '_')
 {
-    $replacemap = array_combine(str_split($delimiter), array_pad([], strlen($delimiter), ' '));
-    return strtr(ucwords(strtr($string, $replacemap)), [' ' => '']);
+    return implode('', array_map('ucfirst', splitwords($string ?? '', false, true, $delimiter ?? '_')));
 }
