@@ -14,6 +14,7 @@ use function ryunosuke\Functions\Package\mean;
 use function ryunosuke\Functions\Package\median;
 use function ryunosuke\Functions\Package\minimum;
 use function ryunosuke\Functions\Package\mode;
+use function ryunosuke\Functions\Package\numcmp;
 use function ryunosuke\Functions\Package\sum;
 
 class mathTest extends AbstractTestCase
@@ -594,6 +595,35 @@ class mathTest extends AbstractTestCase
         that(mode($data['datetime_evn']))->is(new \DateTime('2000/12/24 12:34:56'));
         that(mode($data['datetime_odd']))->is(new \DateTime('2000/12/24 12:34:56'));
         that(mode(new \Exception('a'), new \Exception('a'), new \Exception('b')))->is(new \Exception('a'));
+    }
+
+    function test_numcmp()
+    {
+        $data = function () {
+            yield [1, 0] => 'gt';
+            yield [0, 1] => 'lt';
+            yield [0, -1] => 'gt';
+            yield [-1, 0] => 'lt';
+            yield [0, 0] => 'is';
+            yield [1, 1] => 'is';
+            yield [-1, -1] => 'is';
+        };
+
+        foreach ($data() as $ns => $expected) {
+            [$n1, $n2] = $ns;
+
+            that(numcmp($n1, $n2))->as("number: $n1 <=> $n2")->$expected(0);
+            that(numcmp("$n1", "$n2"))->as("string: $n1 <=> $n2")->$expected(0);
+            that(numcmp(gmp_init("$n1"), gmp_init("$n2")))->as("gmp: $n1 <=> $n2")->$expected(0);
+            that(numcmp(new \SimpleXMLElement("<span>$n1</span>"), new \SimpleXMLElement("<span>$n2</span>")))->as("simplexml: $n1 <=> $n2")->$expected(0);
+        }
+
+        // 文字列のエッジケース
+        that(numcmp('123', '9'))->gt(0);
+        that(numcmp('9', '123'))->lt(0);
+
+        that(self::resolveFunction('numcmp'))("abc", 123)->wasThrown('must be of type arithmetic');
+        that(self::resolveFunction('numcmp'))(123, "abc")->wasThrown('must be of type arithmetic');
     }
 
     function test_sum()
