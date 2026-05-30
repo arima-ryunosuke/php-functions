@@ -42,7 +42,7 @@ require_once __DIR__ . '/../exec/process_async.php';
  * @param ?array $options その他の追加オプション
  * @return int リターンコード
  */
-function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null, $options = null)
+function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, ?array $env = null, $options = null)
 {
     $rc = process_async($command, $args, $stdin, $stdout, $stderr, $cwd, $env, $options)();
     if ($rc === -1) {

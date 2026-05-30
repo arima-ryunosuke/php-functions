@@ -79,7 +79,7 @@ function class_extends($object, $methods, $fields = [], $implements = [])
                 private        $__methods       = [];
                 private static $__staticMethods = [];
 
-                public function __construct(\ReflectionClass $refclass = null, $original = null, $fields = [], $methods = [])
+                public function __construct(?\ReflectionClass $refclass = null, $original = null, $fields = [], $methods = [])
                 {
                     if ($refclass === null) {
                         return;

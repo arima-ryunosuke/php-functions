@@ -162,7 +162,7 @@ function ip_info($ipaddr, $options = [])
                     $this->transaction(function () use ($fp, $registry) {
                         // 同時に走らないように rand でバラす
                         $this->refresh($registry, time() + $this->options['ttl'] + rand(0, 60), (function () use ($fp) {
-                            while (($fields = fgetcsv($fp, 0, "|")) !== false) {
+                            while (($fields = fgetcsv($fp, 0, "|", escape: "\\")) !== false) { // for compatible: change to escape:"" in future scope
                                 if (($fields[2] ?? '') === 'ipv4' && in_array($fields[6] ?? '', ['assigned', 'allocated'], true)) {
                                     foreach ($this->cidr($fields[3], $fields[4]) as $cidr) {
                                         yield [

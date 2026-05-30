@@ -28,8 +28,10 @@ function function_parameter($eitherReffuncOrCallable)
     foreach ($reffunc->getParameters() as $parameter) {
         $declare = '';
 
+        $type = null;
         if ($parameter->hasType()) {
-            $declare .= reflect_type_resolve($parameter->getType()) . ' ';
+            $type = reflect_type_resolve($parameter->getType());
+            $declare .= $type . ' ';
         }
 
         if ($parameter->isPassedByReference()) {
@@ -66,6 +68,9 @@ function function_parameter($eitherReffuncOrCallable)
                 // Type に応じたデフォルト値が得られればベストだがそこまでする必要もない
                 // 少なくとも 8.0 時点では = null してしまえば型エラーも起きない（8.4 で非推奨になってるけど）
                 $defval = "null";
+                if ($type !== null && !preg_match('#[^_0-9a-z]?(null|mixed)[^_0-9a-z]?#u', $type)) {
+                    $declare = 'null|' . $declare;
+                }
             }
 
             if (isset($defval)) {

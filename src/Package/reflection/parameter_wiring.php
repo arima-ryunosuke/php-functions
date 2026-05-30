@@ -98,7 +98,7 @@ function parameter_wiring($callable, $dependency)
     // recurse for closure
     return array_map(function ($arg) use ($dependency) {
         if ($arg instanceof \Closure) {
-            if ((new \ReflectionFunction($arg))->getShortName() === '{closure}') {
+            if (str_contains((new \ReflectionFunction($arg))->getShortName(), '{closure')) {
                 $arg = $arg->bindTo($dependency);
             }
             return $arg(...parameter_wiring($arg, $dependency));

@@ -33,7 +33,7 @@ namespace ryunosuke\Functions\Package;
  * @param int $error_types エラータイプ
  * @return callable|null 直近に設定されていたエラーハンドラ（未設定の場合は null）
  */
-function add_error_handler($handler, $error_types = \E_ALL | \E_STRICT)
+function add_error_handler($handler, $error_types = \E_ALL)
 {
     $already = set_error_handler(static function () use ($handler, &$already) {
         $result = $handler(...func_get_args());

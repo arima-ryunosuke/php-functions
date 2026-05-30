@@ -4,6 +4,7 @@ namespace ryunosuke\Functions\Package;
 // @codeCoverageIgnoreStart
 require_once __DIR__ . '/../classobj/const_exists.php';
 require_once __DIR__ . '/../funchand/is_callback.php';
+require_once __DIR__ . '/../misc/namespace_parse.php';
 require_once __DIR__ . '/../misc/namespace_resolve.php';
 // @codeCoverageIgnoreEnd
 
@@ -210,7 +211,15 @@ function php_tokens(string $code, int $flags = 0)
                 $text = $var_export($ref->getFileName());
             }
             if ($this->id === T_NS_C) {
-                $text = $var_export($ref->getNamespaceName());
+                // php8.4 から ReflectionFunction({closure})::getNamespaceName は値を返さなくなった
+                // 「クロージャは名前空間を持つものではない」とのこと（それ自体は正しい）
+                // 得る術が完全になくなったので自前で得るしかない
+                if (version_compare(PHP_VERSION, '8.4.0') >= 0) {
+                    $text = $var_export(array_key_first(namespace_parse($ref->getFileName()))); // @codeCoverageIgnore
+                }
+                else {
+                    $text = $var_export($ref->getNamespaceName());
+                }
             }
             return $text;
         }

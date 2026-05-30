@@ -56,8 +56,8 @@ function function_export_false2null(string $namespace, bool $false_only = true):
             if (str_contains($funcname, '\\')) {
                 continue;
             }
-            // assert を名前空間内に定義することはできない
-            if ($funcname === 'assert') {
+            // これらは名前空間内に定義することはできない
+            if (in_array($funcname, ['assert', 'exit', 'die'], true)) {
                 continue;
             }
             // 標準関数に参照返しは存在しないはず（したとしても1文で返すのが難しいので対応しない）

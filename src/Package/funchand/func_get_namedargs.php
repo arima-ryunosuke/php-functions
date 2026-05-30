@@ -27,7 +27,7 @@ function func_get_namedargs(bool $variadic_folding = false, bool $default_contai
 
     $ref = (function () use ($traces) {
         $trace = $traces[1];
-        if (!str_ends_with($trace['function'], '{closure}')) {
+        if (!str_contains($trace['function'], '{closure')) {
             return isset($trace['class']) ? new \ReflectionMethod($trace['class'], $trace['function']) : new \ReflectionFunction($trace['function']);
         }
 

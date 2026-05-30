@@ -21,7 +21,7 @@ require_once __DIR__ . '/../array/arrayize.php';
  * @param ?array $options その他の追加オプション
  * @return \ProcessAsync|object プロセスオブジェクト
  */
-function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null, $options = null)
+function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, ?array $env = null, $options = null)
 {
     if (is_array($args)) {
         $statement = [$command];

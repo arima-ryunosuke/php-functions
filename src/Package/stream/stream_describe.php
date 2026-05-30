@@ -23,7 +23,7 @@ function stream_describe($stream = null): ?array
     if (DIRECTORY_SEPARATOR === '\\') {
         exec('handle -v -p ' . getmypid(), $output);
         foreach (array_slice($output, 6) as $descriptor) {
-            [, , , $fd, $type, , $realpath] = str_getcsv($descriptor);
+            [, , , $fd, $type, , $realpath] = str_getcsv($descriptor, escape: "\\"); // for compatible: change to escape:"" in future scope
             if ($type === 'File') {
                 clearstatcache(true, $realpath);
                 if (file_exists($realpath)) {

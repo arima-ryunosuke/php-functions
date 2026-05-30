@@ -534,7 +534,7 @@ class funchandTest extends AbstractTestCase
 
     function test_func_wiring()
     {
-        $closure = fn($a, $b, \Exception $c = null) => func_get_args();
+        $closure = fn($a, $b, ?\Exception $c = null) => func_get_args();
         $new_closure = func_wiring($closure, [
             \LogicException::class  => null,
             \DomainException::class => null,
