@@ -57,6 +57,10 @@ function is_exportable($var): bool
     }
 
     if (is_object($var)) {
+        // マニュアルに記載はないが enum は export できる
+        if ($var instanceof \UnitEnum) {
+            return true;
+        }
         // 無名クラスは非常に特殊で、出力は class@anonymous{filename}:123$456::__set_state(...) のようになる
         // set_state さえ実装してれば復元可能に思えるが php コードとして不正なのでそのまま実行するとシンタックスエラーになる
         // 'class@anonymous{filename}:123$456'::__set_state(...) のようにクオートすれば実行可能になるが、それは標準 var_export の動作ではない
@@ -71,10 +75,6 @@ function is_exportable($var): bool
         }
         // これの唯一の例外は stdClass です。 stdClass は、配列をオブジェクトにキャストした形でエクスポートされます
         if (get_class($var) === \stdClass::class) {
-            return true;
-        }
-        // マニュアルに記載はないが enum は export できる
-        if ($var instanceof \UnitEnum) {
             return true;
         }
         return false;
