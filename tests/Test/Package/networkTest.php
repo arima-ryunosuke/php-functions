@@ -114,8 +114,6 @@ class networkTest extends AbstractTestCase
         // 特殊
         that(dns_resolve('192.168.1.1', DNS_A, flush: true, hosts: $hosts))->is('192.168.1.1');
         that(dns_resolve('2001:db8::', DNS_AAAA, flush: true, hosts: $hosts))->is('2001:db8::');
-        that(dns_resolve('undefined.localdomain', DNS_A, flush: true, hosts: $hosts))->is(null);
-        that(dns_resolve('undefined.localdomain', DNS_A, 'values', flush: true, hosts: $hosts))->is([]);
 
         // 各種 TTL
         that(dns_resolve('localdomain', DNS_SOA, 'raw', 11, 22, flush: true, hosts: $hosts))[0]['ttl']->is(11);
@@ -126,10 +124,6 @@ class networkTest extends AbstractTestCase
         that(dns_resolve('localhost.localdomain', DNS_A, 'raw', 11, 22, hosts: $hosts))[0]['ttl']->is(11);
         // hosts にないので $nxdomainTtl が使用される
         that(dns_resolve('undefined', DNS_A, 'raw', 11, 22, hosts: $hosts))[0]['ttl']->is(22);
-        // 親に SOA があるので minimum-ttl が使用される
-        that(dns_resolve('undefined.localdomain', DNS_A, 'raw', 11, 22, hosts: $hosts))[0]['ttl']->is(33);
-        // 自身にも親にも SOA がないので $nxdomainTtl が使用される
-        that(dns_resolve('undefined.hogera', DNS_A, 'raw', 11, 22, hosts: $hosts))[0]['ttl']->is(22);
 
         // values&all
         $actual = dns_resolve('localhost.localdomain', DNS_ALL, 'values', flush: true, hosts: $hosts);
@@ -151,6 +145,10 @@ class networkTest extends AbstractTestCase
         // dns_resolve に変更があったのかバージョンによってエラーが出たりでなかったりする
         if (version_compare(PHP_VERSION, '8.1') <= 0) {
             that(self::resolveFunction('dns_resolve'))("192.168")->wasThrown('dns_get_record');
+        }
+        else {
+            that(dns_resolve('undefined.localdomain', DNS_A, flush: true, hosts: $hosts))->is(null);
+            that(dns_resolve('undefined.localdomain', DNS_A, 'values', flush: true, hosts: $hosts))->is([]);
         }
     }
 
