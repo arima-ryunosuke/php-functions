@@ -11,6 +11,13 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.38
+
+- [test] コケたテストを修正
+- [feature] object_assign を追加
+- [refactor] chain version 1 が地味に生き残っていたので削除
+- [refactor] is_exportable の判定順を修正
+
 ## 2.0.37
 
 - [feature] php8.4 でエラーが出ていたので対応
