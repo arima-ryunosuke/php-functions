@@ -10,6 +10,7 @@ require_once __DIR__ . '/../array/array_and.php';
  *
  * @see array_and()
  * @deprecated 標準関数と重複
+ * @conflict 8.4
  * @codeCoverageIgnore
  * @package ryunosuke\Functions\Package\array
  */

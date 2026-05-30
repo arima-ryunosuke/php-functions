@@ -9,6 +9,7 @@ namespace ryunosuke\Functions\Package;
  *
  * @see https://github.com/symfony/polyfill-php84/
  * @deprecated 標準関数と重複
+ * @conflict 8.4
  * @codeCoverageIgnore
  * @package ryunosuke\Functions\Package\strings
  */

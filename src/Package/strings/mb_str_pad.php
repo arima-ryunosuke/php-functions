@@ -10,6 +10,7 @@ require_once __DIR__ . '/../strings/mb_pad_width.php';
  *
  * @see mb_pad_width()
  * @deprecated 標準関数と重複
+ * @conflict 8.3
  * @codeCoverageIgnore
  * @package ryunosuke\Functions\Package\strings
  */

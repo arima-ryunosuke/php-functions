@@ -10,6 +10,7 @@ require_once __DIR__ . '/../array/array_or.php';
  *
  * @see array_or()
  * @deprecated 標準関数と重複
+ * @conflict 8.4
  * @codeCoverageIgnore
  * @package ryunosuke\Functions\Package\array
  */

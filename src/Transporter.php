@@ -81,6 +81,7 @@ class Transporter
      */
     public static function importAsGlobal()
     {
+        $_importAsGlobal = true;
         require_once __DIR__ . '/../include/global.php';
     }
 
@@ -147,8 +148,16 @@ class Transporter
             }
 
             $id = var_export(ltrim("$namespace\\$name", '\\'), true);
+            $conflict = var_export($function['conflict'], true);
+            if (strlen($namespace)) {
+                $assertion = "assert(!function_exists($id) || (new \ReflectionFunction($id))->isUserDefined())";
+            }
+            else {
+                $assertion = "($conflict === null || version_compare(PHP_VERSION, $conflict) < 0) ? assert(!function_exists($id) || (new \ReflectionFunction($id))->isUserDefined()) : (isset(\$_importAsGlobal) ? trigger_error($id . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null)";
+            }
+
             $funcs[] = <<<FUNCTION
-            assert(!function_exists($id) || (new \ReflectionFunction($id))->isUserDefined());
+            $assertion;
             if (!function_exists($id)) {
                 {$_(trim(php_indent("\n" . $function['codeblock'], ['baseline' => 0, 'indent' => 4])))}
             }
@@ -292,11 +301,16 @@ class Transporter
                 $name = basename($fn, '.php');
                 $contents = file_get_contents($fn);
                 $docstart = strpos($contents, "/**\n");
+                $docend = strpos($contents, " */", $docstart);
                 $codeblock = substr($contents, $docstart);
+                $doccomment = substr($contents, $docstart, $docend - $docstart + 3);
+                preg_match('#@conflict (\d+\.\d+)#', $doccomment, $matches);
+                $conflict = $matches[1] ?? null;
                 $funcstart = strpos($codeblock, " */\nfunction $name(") + 4;
                 $cache[$name] = [
                     'filename'  => $fn,
                     'directory' => basename(dirname($fn)),
+                    'conflict'  => $conflict,
                     'funcstart' => $funcstart,
                     'codeblock' => $codeblock,
                 ];

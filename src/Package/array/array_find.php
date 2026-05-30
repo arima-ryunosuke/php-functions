@@ -10,6 +10,7 @@ require_once __DIR__ . '/../array/array_find_first.php';
  *
  * @see array_find_first()
  * @deprecated 標準関数と重複
+ * @conflict 8.4
  * @codeCoverageIgnore
  * @package ryunosuke\Functions\Package\array
  */
