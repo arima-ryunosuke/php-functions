@@ -308,7 +308,7 @@ if (!defined('SORT_STRICT')) {
     define('SORT_STRICT', 256);
 }
 
-assert(!function_exists('array_add') || (new \ReflectionFunction('array_add'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_add') || (new \ReflectionFunction('array_add'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_add' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_add')) {
     /**
      * 配列の+演算子の関数版
@@ -336,7 +336,7 @@ if (!function_exists('array_add')) {
     }
 }
 
-assert(!function_exists('array_aggregate') || (new \ReflectionFunction('array_aggregate'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_aggregate') || (new \ReflectionFunction('array_aggregate'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_aggregate' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_aggregate')) {
     /**
      * 配列をコールバックの返り値で集計する
@@ -474,13 +474,14 @@ if (!function_exists('array_aggregate')) {
     }
 }
 
-assert(!function_exists('array_all') || (new \ReflectionFunction('array_all'))->isUserDefined());
+('8.4' === null || version_compare(PHP_VERSION, '8.4') < 0) ? assert(!function_exists('array_all') || (new \ReflectionFunction('array_all'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_all' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_all')) {
     /**
      * 全要素が true になるなら true を返す（1つでも false なら false を返す）
      *
      * @see array_and()
      * @deprecated 標準関数と重複
+     * @conflict 8.4
      * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\array
      */
@@ -491,7 +492,7 @@ if (!function_exists('array_all')) {
     }
 }
 
-assert(!function_exists('array_and') || (new \ReflectionFunction('array_and'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_and') || (new \ReflectionFunction('array_and'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_and' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_and')) {
     /**
      * 全要素が true になるなら true を返す（1つでも false なら false を返す）
@@ -530,13 +531,14 @@ if (!function_exists('array_and')) {
     }
 }
 
-assert(!function_exists('array_any') || (new \ReflectionFunction('array_any'))->isUserDefined());
+('8.4' === null || version_compare(PHP_VERSION, '8.4') < 0) ? assert(!function_exists('array_any') || (new \ReflectionFunction('array_any'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_any' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_any')) {
     /**
      * 全要素が false になるなら false を返す（1つでも true なら true を返す）
      *
      * @see array_or()
      * @deprecated 標準関数と重複
+     * @conflict 8.4
      * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\array
      */
@@ -547,7 +549,7 @@ if (!function_exists('array_any')) {
     }
 }
 
-assert(!function_exists('array_append') || (new \ReflectionFunction('array_append'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_append') || (new \ReflectionFunction('array_append'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_append' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_append')) {
     /**
      * 配列の末尾に要素を追加する
@@ -583,7 +585,7 @@ if (!function_exists('array_append')) {
     }
 }
 
-assert(!function_exists('array_assort') || (new \ReflectionFunction('array_assort'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_assort') || (new \ReflectionFunction('array_assort'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_assort' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_assort')) {
     /**
      * 配列をコールバックに従って分類する
@@ -636,7 +638,7 @@ if (!function_exists('array_assort')) {
     }
 }
 
-assert(!function_exists('array_columns') || (new \ReflectionFunction('array_columns'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_columns') || (new \ReflectionFunction('array_columns'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_columns' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_columns')) {
     /**
      * 全要素に対して array_column する
@@ -678,7 +680,7 @@ if (!function_exists('array_columns')) {
     }
 }
 
-assert(!function_exists('array_convert') || (new \ReflectionFunction('array_convert'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_convert') || (new \ReflectionFunction('array_convert'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_convert' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_convert')) {
     /**
      * 配列の各要素に再帰的にコールバックを適用して変換する
@@ -808,7 +810,7 @@ if (!function_exists('array_convert')) {
     }
 }
 
-assert(!function_exists('array_count') || (new \ReflectionFunction('array_count'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_count') || (new \ReflectionFunction('array_count'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_count' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_count')) {
     /**
      * 配列をコールバックに従ってカウントする
@@ -896,7 +898,7 @@ if (!function_exists('array_count')) {
     }
 }
 
-assert(!function_exists('array_cross') || (new \ReflectionFunction('array_cross'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_cross') || (new \ReflectionFunction('array_cross'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_cross' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_cross')) {
     /**
      * 配列の直積を返す
@@ -946,7 +948,7 @@ if (!function_exists('array_cross')) {
     }
 }
 
-assert(!function_exists('array_depth') || (new \ReflectionFunction('array_depth'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_depth') || (new \ReflectionFunction('array_depth'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_depth' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_depth')) {
     /**
      * 配列の次元数を返す
@@ -996,7 +998,7 @@ if (!function_exists('array_depth')) {
     }
 }
 
-assert(!function_exists('array_difference') || (new \ReflectionFunction('array_difference'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_difference') || (new \ReflectionFunction('array_difference'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_difference' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_difference')) {
     /**
      * 配列の差分を取り配列で返す
@@ -1106,7 +1108,7 @@ if (!function_exists('array_difference')) {
     }
 }
 
-assert(!function_exists('array_distinct') || (new \ReflectionFunction('array_distinct'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_distinct') || (new \ReflectionFunction('array_distinct'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_distinct' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_distinct')) {
     /**
      * 比較関数が渡せる array_unique
@@ -1207,7 +1209,7 @@ if (!function_exists('array_distinct')) {
     }
 }
 
-assert(!function_exists('array_dive') || (new \ReflectionFunction('array_dive'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_dive') || (new \ReflectionFunction('array_dive'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_dive' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_dive')) {
     /**
      * パス形式で配列値を取得
@@ -1253,7 +1255,7 @@ if (!function_exists('array_dive')) {
     }
 }
 
-assert(!function_exists('array_divide') || (new \ReflectionFunction('array_divide'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_divide') || (new \ReflectionFunction('array_divide'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_divide' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_divide')) {
     /**
      * array_chunk の配列長指定版
@@ -1291,7 +1293,7 @@ if (!function_exists('array_divide')) {
     }
 }
 
-assert(!function_exists('array_each') || (new \ReflectionFunction('array_each'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_each') || (new \ReflectionFunction('array_each'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_each' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_each')) {
     /**
      * array_reduce の参照版（のようなもの）
@@ -1375,7 +1377,7 @@ if (!function_exists('array_each')) {
     }
 }
 
-assert(!function_exists('array_explode') || (new \ReflectionFunction('array_explode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_explode') || (new \ReflectionFunction('array_explode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_explode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_explode')) {
     /**
      * 配列を指定条件で分割する
@@ -1454,7 +1456,7 @@ if (!function_exists('array_explode')) {
     }
 }
 
-assert(!function_exists('array_extend') || (new \ReflectionFunction('array_extend'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_extend') || (new \ReflectionFunction('array_extend'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_extend' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_extend')) {
     /**
      * 独自拡張した array_replace_recursive
@@ -1584,7 +1586,7 @@ if (!function_exists('array_extend')) {
     }
 }
 
-assert(!function_exists('array_fill_callback') || (new \ReflectionFunction('array_fill_callback'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_fill_callback') || (new \ReflectionFunction('array_fill_callback'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_fill_callback' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_fill_callback')) {
     /**
      * array_fill_keys のコールバック版のようなもの
@@ -1622,7 +1624,7 @@ if (!function_exists('array_fill_callback')) {
     }
 }
 
-assert(!function_exists('array_fill_gap') || (new \ReflectionFunction('array_fill_gap'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_fill_gap') || (new \ReflectionFunction('array_fill_gap'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_fill_gap' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_fill_gap')) {
     /**
      * 配列の隙間を埋める
@@ -1720,7 +1722,7 @@ if (!function_exists('array_fill_gap')) {
     }
 }
 
-assert(!function_exists('array_fill_values') || (new \ReflectionFunction('array_fill_values'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_fill_values') || (new \ReflectionFunction('array_fill_values'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_fill_values' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_fill_values')) {
     /**
      * 既存配列のキーを埋める
@@ -1810,7 +1812,7 @@ if (!function_exists('array_fill_values')) {
     }
 }
 
-assert(!function_exists('array_filter_map') || (new \ReflectionFunction('array_filter_map'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_filter_map') || (new \ReflectionFunction('array_filter_map'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_filter_map' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_filter_map')) {
     /**
      * array_filter + array_map する
@@ -1853,7 +1855,7 @@ if (!function_exists('array_filter_map')) {
     }
 }
 
-assert(!function_exists('array_filter_recursive') || (new \ReflectionFunction('array_filter_recursive'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_filter_recursive') || (new \ReflectionFunction('array_filter_recursive'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_filter_recursive' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_filter_recursive')) {
     /**
      * 再帰的に array_filter する
@@ -1954,7 +1956,7 @@ if (!function_exists('array_filter_recursive')) {
     }
 }
 
-assert(!function_exists('array_filters') || (new \ReflectionFunction('array_filters'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_filters') || (new \ReflectionFunction('array_filters'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_filters' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_filters')) {
     /**
      * 複数コールバックを指定できる array_filter
@@ -2033,13 +2035,14 @@ if (!function_exists('array_filters')) {
     }
 }
 
-assert(!function_exists('array_find') || (new \ReflectionFunction('array_find'))->isUserDefined());
+('8.4' === null || version_compare(PHP_VERSION, '8.4') < 0) ? assert(!function_exists('array_find') || (new \ReflectionFunction('array_find'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_find' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_find')) {
     /**
      * array_search のクロージャ版のようなもの
      *
      * @see array_find_first()
      * @deprecated 標準関数と重複
+     * @conflict 8.4
      * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\array
      */
@@ -2050,7 +2053,7 @@ if (!function_exists('array_find')) {
     }
 }
 
-assert(!function_exists('array_find_first') || (new \ReflectionFunction('array_find_first'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_find_first') || (new \ReflectionFunction('array_find_first'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_find_first' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_find_first')) {
     /**
      * array_search のクロージャ版のようなもの
@@ -2096,7 +2099,7 @@ if (!function_exists('array_find_first')) {
     }
 }
 
-assert(!function_exists('array_find_last') || (new \ReflectionFunction('array_find_last'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_find_last') || (new \ReflectionFunction('array_find_last'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_find_last' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_find_last')) {
     /**
      * array_find の後ろから探す版
@@ -2146,7 +2149,7 @@ if (!function_exists('array_find_last')) {
     }
 }
 
-assert(!function_exists('array_find_recursive') || (new \ReflectionFunction('array_find_recursive'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_find_recursive') || (new \ReflectionFunction('array_find_recursive'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_find_recursive' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_find_recursive')) {
     /**
      * array_find の再帰版
@@ -2211,7 +2214,7 @@ if (!function_exists('array_find_recursive')) {
     }
 }
 
-assert(!function_exists('array_flatmap') || (new \ReflectionFunction('array_flatmap'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_flatmap') || (new \ReflectionFunction('array_flatmap'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_flatmap' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_flatmap')) {
     /**
      * スタンダードな flatMap
@@ -2253,7 +2256,7 @@ if (!function_exists('array_flatmap')) {
     }
 }
 
-assert(!function_exists('array_flatten') || (new \ReflectionFunction('array_flatten'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_flatten') || (new \ReflectionFunction('array_flatten'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_flatten' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_flatten')) {
     /**
      * 多階層配列をフラットに展開する
@@ -2332,7 +2335,7 @@ if (!function_exists('array_flatten')) {
     }
 }
 
-assert(!function_exists('array_get') || (new \ReflectionFunction('array_get'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_get') || (new \ReflectionFunction('array_get'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_get' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_get')) {
     /**
      * デフォルト値付きの配列値取得
@@ -2415,7 +2418,7 @@ if (!function_exists('array_get')) {
     }
 }
 
-assert(!function_exists('array_grep_key') || (new \ReflectionFunction('array_grep_key'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_grep_key') || (new \ReflectionFunction('array_grep_key'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_grep_key' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_grep_key')) {
     /**
      * キーを正規表現でフィルタする
@@ -2443,7 +2446,7 @@ if (!function_exists('array_grep_key')) {
     }
 }
 
-assert(!function_exists('array_group') || (new \ReflectionFunction('array_group'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_group') || (new \ReflectionFunction('array_group'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_group' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_group')) {
     /**
      * 配列をコールバックの返り値でグループ化する
@@ -2514,7 +2517,7 @@ if (!function_exists('array_group')) {
     }
 }
 
-assert(!function_exists('array_implode') || (new \ReflectionFunction('array_implode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_implode') || (new \ReflectionFunction('array_implode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_implode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_implode')) {
     /**
      * 配列の各要素の間に要素を差し込む
@@ -2560,7 +2563,7 @@ if (!function_exists('array_implode')) {
     }
 }
 
-assert(!function_exists('array_insert') || (new \ReflectionFunction('array_insert'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_insert') || (new \ReflectionFunction('array_insert'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_insert' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_insert')) {
     /**
      * 配列・連想配列を問わず任意の位置に値を挿入する
@@ -2597,7 +2600,7 @@ if (!function_exists('array_insert')) {
     }
 }
 
-assert(!function_exists('array_intersection_differences') || (new \ReflectionFunction('array_intersection_differences'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_intersection_differences') || (new \ReflectionFunction('array_intersection_differences'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_intersection_differences' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_intersection_differences')) {
     /**
      * array_intersect+array_diff の組み合わせ
@@ -2736,7 +2739,7 @@ if (!function_exists('array_intersection_differences')) {
     }
 }
 
-assert(!function_exists('array_join') || (new \ReflectionFunction('array_join'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_join') || (new \ReflectionFunction('array_join'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_join' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_join')) {
     /**
      * 配列の SQL 的な JOIN を行う
@@ -2857,7 +2860,7 @@ if (!function_exists('array_join')) {
     }
 }
 
-assert(!function_exists('array_keys_exist') || (new \ReflectionFunction('array_keys_exist'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_keys_exist') || (new \ReflectionFunction('array_keys_exist'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_keys_exist' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_keys_exist')) {
     /**
      * array_key_exists の複数版
@@ -2917,7 +2920,7 @@ if (!function_exists('array_keys_exist')) {
     }
 }
 
-assert(!function_exists('array_kvmap') || (new \ReflectionFunction('array_kvmap'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_kvmap') || (new \ReflectionFunction('array_kvmap'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_kvmap' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_kvmap')) {
     /**
      * 配列の各キー・値にコールバックを適用する
@@ -3020,7 +3023,7 @@ if (!function_exists('array_kvmap')) {
     }
 }
 
-assert(!function_exists('array_limit') || (new \ReflectionFunction('array_limit'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_limit') || (new \ReflectionFunction('array_limit'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_limit' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_limit')) {
     /**
      * limit を主体とした array_slice
@@ -3109,7 +3112,7 @@ if (!function_exists('array_limit')) {
     }
 }
 
-assert(!function_exists('array_lookup') || (new \ReflectionFunction('array_lookup'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_lookup') || (new \ReflectionFunction('array_lookup'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_lookup' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_lookup')) {
     /**
      * キー保存可能な array_column
@@ -3175,7 +3178,7 @@ if (!function_exists('array_lookup')) {
     }
 }
 
-assert(!function_exists('array_map_filter') || (new \ReflectionFunction('array_map_filter'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_map_filter') || (new \ReflectionFunction('array_map_filter'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_map_filter' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_map_filter')) {
     /**
      * array_map + array_filter する
@@ -3220,7 +3223,7 @@ if (!function_exists('array_map_filter')) {
     }
 }
 
-assert(!function_exists('array_map_key') || (new \ReflectionFunction('array_map_key'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_map_key') || (new \ReflectionFunction('array_map_key'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_map_key' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_map_key')) {
     /**
      * キーをマップして変換する
@@ -3254,7 +3257,7 @@ if (!function_exists('array_map_key')) {
     }
 }
 
-assert(!function_exists('array_map_recursive') || (new \ReflectionFunction('array_map_recursive'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_map_recursive') || (new \ReflectionFunction('array_map_recursive'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_map_recursive' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_map_recursive')) {
     /**
      * array_map の再帰版
@@ -3347,7 +3350,7 @@ if (!function_exists('array_map_recursive')) {
     }
 }
 
-assert(!function_exists('array_maps') || (new \ReflectionFunction('array_maps'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_maps') || (new \ReflectionFunction('array_maps'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_maps' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_maps')) {
     /**
      * 複数コールバックを指定できる array_map
@@ -3425,7 +3428,7 @@ if (!function_exists('array_maps')) {
     }
 }
 
-assert(!function_exists('array_merge2') || (new \ReflectionFunction('array_merge2'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_merge2') || (new \ReflectionFunction('array_merge2'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_merge2' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_merge2')) {
     /**
      * 配列をマージして通常配列＋αで返す
@@ -3488,7 +3491,7 @@ if (!function_exists('array_merge2')) {
     }
 }
 
-assert(!function_exists('array_mix') || (new \ReflectionFunction('array_mix'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_mix') || (new \ReflectionFunction('array_mix'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_mix' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_mix')) {
     /**
      * 配列を交互に追加する
@@ -3547,7 +3550,7 @@ if (!function_exists('array_mix')) {
     }
 }
 
-assert(!function_exists('array_nest') || (new \ReflectionFunction('array_nest'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_nest') || (new \ReflectionFunction('array_nest'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_nest' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_nest')) {
     /**
      * シンプルな [キー => 値] な配列から階層配列を生成する
@@ -3628,7 +3631,7 @@ if (!function_exists('array_nest')) {
     }
 }
 
-assert(!function_exists('array_of') || (new \ReflectionFunction('array_of'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_of') || (new \ReflectionFunction('array_of'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_of' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_of')) {
     /**
      * 配列を与えると指定キーの値を返すクロージャを返す
@@ -3658,7 +3661,7 @@ if (!function_exists('array_of')) {
     }
 }
 
-assert(!function_exists('array_or') || (new \ReflectionFunction('array_or'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_or') || (new \ReflectionFunction('array_or'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_or' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_or')) {
     /**
      * 全要素が false になるなら false を返す（1つでも true なら true を返す）
@@ -3697,7 +3700,7 @@ if (!function_exists('array_or')) {
     }
 }
 
-assert(!function_exists('array_order') || (new \ReflectionFunction('array_order'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_order') || (new \ReflectionFunction('array_order'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_order' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_order')) {
     /**
      * 配列を $orders に従って並べ替える
@@ -3845,7 +3848,7 @@ if (!function_exists('array_order')) {
     }
 }
 
-assert(!function_exists('array_pickup') || (new \ReflectionFunction('array_pickup'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_pickup') || (new \ReflectionFunction('array_pickup'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_pickup' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_pickup')) {
     /**
      * キーを指定してそれだけの配列にする
@@ -3899,7 +3902,7 @@ if (!function_exists('array_pickup')) {
     }
 }
 
-assert(!function_exists('array_pos') || (new \ReflectionFunction('array_pos'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_pos') || (new \ReflectionFunction('array_pos'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_pos' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_pos')) {
     /**
      * 配列・連想配列を問わず「N番目(0ベース)」の要素を返す
@@ -3939,7 +3942,7 @@ if (!function_exists('array_pos')) {
     }
 }
 
-assert(!function_exists('array_pos_key') || (new \ReflectionFunction('array_pos_key'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_pos_key') || (new \ReflectionFunction('array_pos_key'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_pos_key' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_pos_key')) {
     /**
      * 配列の指定キーの位置を返す
@@ -3996,7 +3999,7 @@ if (!function_exists('array_pos_key')) {
     }
 }
 
-assert(!function_exists('array_prepend') || (new \ReflectionFunction('array_prepend'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_prepend') || (new \ReflectionFunction('array_prepend'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_prepend' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_prepend')) {
     /**
      * 配列の先頭に要素を追加する
@@ -4032,7 +4035,7 @@ if (!function_exists('array_prepend')) {
     }
 }
 
-assert(!function_exists('array_random') || (new \ReflectionFunction('array_random'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_random') || (new \ReflectionFunction('array_random'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_random' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_random')) {
     /**
      * array_rand の要素版
@@ -4098,7 +4101,7 @@ if (!function_exists('array_random')) {
     }
 }
 
-assert(!function_exists('array_range') || (new \ReflectionFunction('array_range'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_range') || (new \ReflectionFunction('array_range'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_range' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_range')) {
     /**
      * range を少し改良したもの
@@ -4336,7 +4339,7 @@ if (!function_exists('array_range')) {
     }
 }
 
-assert(!function_exists('array_rank') || (new \ReflectionFunction('array_rank'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_rank') || (new \ReflectionFunction('array_rank'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_rank' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_rank')) {
     /**
      * 配列をランク付けしてその順番でN件返す
@@ -4404,7 +4407,7 @@ if (!function_exists('array_rank')) {
     }
 }
 
-assert(!function_exists('array_rekey') || (new \ReflectionFunction('array_rekey'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_rekey') || (new \ReflectionFunction('array_rekey'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_rekey' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_rekey')) {
     /**
      * キーをマップ配列・callable で置換する
@@ -4464,7 +4467,7 @@ if (!function_exists('array_rekey')) {
     }
 }
 
-assert(!function_exists('array_remove') || (new \ReflectionFunction('array_remove'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_remove') || (new \ReflectionFunction('array_remove'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_remove' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_remove')) {
     /**
      * キーを指定してそれらを除いた配列にする
@@ -4496,7 +4499,7 @@ if (!function_exists('array_remove')) {
     }
 }
 
-assert(!function_exists('array_replace_callback') || (new \ReflectionFunction('array_replace_callback'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_replace_callback') || (new \ReflectionFunction('array_replace_callback'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_replace_callback' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_replace_callback')) {
     /**
      * array_replace のコールバック版
@@ -4565,7 +4568,7 @@ if (!function_exists('array_replace_callback')) {
     }
 }
 
-assert(!function_exists('array_revise') || (new \ReflectionFunction('array_revise'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_revise') || (new \ReflectionFunction('array_revise'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_revise' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_revise')) {
     /**
      * 配列要素の追加・変更・削除を行う
@@ -4626,7 +4629,7 @@ if (!function_exists('array_revise')) {
     }
 }
 
-assert(!function_exists('array_schema') || (new \ReflectionFunction('array_schema'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_schema') || (new \ReflectionFunction('array_schema'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_schema' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_schema')) {
     /**
      * 配列のスキーマを定義して配列を正規化する
@@ -4857,7 +4860,7 @@ if (!function_exists('array_schema')) {
     }
 }
 
-assert(!function_exists('array_select') || (new \ReflectionFunction('array_select'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_select') || (new \ReflectionFunction('array_select'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_select' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_select')) {
     /**
      * 指定キーの要素で抽出する
@@ -4967,7 +4970,7 @@ if (!function_exists('array_select')) {
     }
 }
 
-assert(!function_exists('array_set') || (new \ReflectionFunction('array_set'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_set') || (new \ReflectionFunction('array_set'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_set' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_set')) {
     /**
      * キー指定の配列値設定
@@ -5038,7 +5041,7 @@ if (!function_exists('array_set')) {
     }
 }
 
-assert(!function_exists('array_shrink_key') || (new \ReflectionFunction('array_shrink_key'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_shrink_key') || (new \ReflectionFunction('array_shrink_key'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_shrink_key' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_shrink_key')) {
     /**
      * 値の優先順位を逆にした array_intersect_key
@@ -5073,7 +5076,7 @@ if (!function_exists('array_shrink_key')) {
     }
 }
 
-assert(!function_exists('array_shuffle') || (new \ReflectionFunction('array_shuffle'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_shuffle') || (new \ReflectionFunction('array_shuffle'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_shuffle' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_shuffle')) {
     /**
      * shuffle のキーが保存される＋参照渡しではない版
@@ -5101,7 +5104,7 @@ if (!function_exists('array_shuffle')) {
     }
 }
 
-assert(!function_exists('array_sprintf') || (new \ReflectionFunction('array_sprintf'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_sprintf') || (new \ReflectionFunction('array_sprintf'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_sprintf' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_sprintf')) {
     /**
      * キーと値で sprintf する
@@ -5163,7 +5166,7 @@ if (!function_exists('array_sprintf')) {
     }
 }
 
-assert(!function_exists('array_strpad') || (new \ReflectionFunction('array_strpad'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_strpad') || (new \ReflectionFunction('array_strpad'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_strpad' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_strpad')) {
     /**
      * 配列のキー・要素に文字列を付加する
@@ -5216,7 +5219,7 @@ if (!function_exists('array_strpad')) {
     }
 }
 
-assert(!function_exists('array_uncolumns') || (new \ReflectionFunction('array_uncolumns'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_uncolumns') || (new \ReflectionFunction('array_uncolumns'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_uncolumns' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_uncolumns')) {
     /**
      * array_columns のほぼ逆で [キー => [要素]] 配列から連想配列の配列を生成する
@@ -5265,7 +5268,7 @@ if (!function_exists('array_uncolumns')) {
     }
 }
 
-assert(!function_exists('array_unset') || (new \ReflectionFunction('array_unset'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_unset') || (new \ReflectionFunction('array_unset'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_unset' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_unset')) {
     /**
      * 伏せると同時にその値を返す
@@ -5356,7 +5359,7 @@ if (!function_exists('array_unset')) {
     }
 }
 
-assert(!function_exists('array_walk_recursive2') || (new \ReflectionFunction('array_walk_recursive2'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_walk_recursive2') || (new \ReflectionFunction('array_walk_recursive2'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_walk_recursive2' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_walk_recursive2')) {
     /**
      * array_walk_recursive の改善版
@@ -5408,7 +5411,7 @@ if (!function_exists('array_walk_recursive2')) {
     }
 }
 
-assert(!function_exists('array_where') || (new \ReflectionFunction('array_where'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_where') || (new \ReflectionFunction('array_where'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_where' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_where')) {
     /**
      * 指定キーの要素で array_filter する
@@ -5535,7 +5538,7 @@ if (!function_exists('array_where')) {
     }
 }
 
-assert(!function_exists('array_zip') || (new \ReflectionFunction('array_zip'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('array_zip') || (new \ReflectionFunction('array_zip'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('array_zip' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('array_zip')) {
     /**
      * 配列の各要素値で順番に配列を作る
@@ -5614,7 +5617,7 @@ if (!function_exists('array_zip')) {
     }
 }
 
-assert(!function_exists('arrayize') || (new \ReflectionFunction('arrayize'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('arrayize') || (new \ReflectionFunction('arrayize'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('arrayize' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('arrayize')) {
     /**
      * 引数の配列を生成する。
@@ -5661,7 +5664,7 @@ if (!function_exists('arrayize')) {
     }
 }
 
-assert(!function_exists('arrays') || (new \ReflectionFunction('arrays'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('arrays') || (new \ReflectionFunction('arrays'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('arrays' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('arrays')) {
     /**
      * 配列をシーケンシャルに走査するジェネレータを返す
@@ -5738,7 +5741,7 @@ if (!function_exists('arrays')) {
     }
 }
 
-assert(!function_exists('first_key') || (new \ReflectionFunction('first_key'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('first_key') || (new \ReflectionFunction('first_key'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('first_key' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('first_key')) {
     /**
      * 配列の最初のキーを返す
@@ -5768,7 +5771,7 @@ if (!function_exists('first_key')) {
     }
 }
 
-assert(!function_exists('first_keyvalue') || (new \ReflectionFunction('first_keyvalue'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('first_keyvalue') || (new \ReflectionFunction('first_keyvalue'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('first_keyvalue' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('first_keyvalue')) {
     /**
      * 配列の最初のキー/値ペアをタプルで返す
@@ -5796,7 +5799,7 @@ if (!function_exists('first_keyvalue')) {
     }
 }
 
-assert(!function_exists('first_value') || (new \ReflectionFunction('first_value'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('first_value') || (new \ReflectionFunction('first_value'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('first_value' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('first_value')) {
     /**
      * 配列の最初の値を返す
@@ -5826,7 +5829,7 @@ if (!function_exists('first_value')) {
     }
 }
 
-assert(!function_exists('groupsort') || (new \ReflectionFunction('groupsort'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('groupsort') || (new \ReflectionFunction('groupsort'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('groupsort' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('groupsort')) {
     /**
      * 配列を部分的にソートする
@@ -5913,7 +5916,7 @@ if (!function_exists('groupsort')) {
     }
 }
 
-assert(!function_exists('in_array_and') || (new \ReflectionFunction('in_array_and'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('in_array_and') || (new \ReflectionFunction('in_array_and'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('in_array_and' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('in_array_and')) {
     /**
      * in_array の複数版（AND）
@@ -5953,7 +5956,7 @@ if (!function_exists('in_array_and')) {
     }
 }
 
-assert(!function_exists('in_array_or') || (new \ReflectionFunction('in_array_or'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('in_array_or') || (new \ReflectionFunction('in_array_or'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('in_array_or' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('in_array_or')) {
     /**
      * in_array の複数版（OR）
@@ -5993,7 +5996,7 @@ if (!function_exists('in_array_or')) {
     }
 }
 
-assert(!function_exists('is_hasharray') || (new \ReflectionFunction('is_hasharray'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_hasharray') || (new \ReflectionFunction('is_hasharray'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_hasharray' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_hasharray')) {
     /**
      * 配列が連想配列か調べる
@@ -6028,7 +6031,7 @@ if (!function_exists('is_hasharray')) {
     }
 }
 
-assert(!function_exists('is_indexarray') || (new \ReflectionFunction('is_indexarray'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_indexarray') || (new \ReflectionFunction('is_indexarray'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_indexarray' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_indexarray')) {
     /**
      * 配列が数値配列か調べる
@@ -6063,7 +6066,7 @@ if (!function_exists('is_indexarray')) {
     }
 }
 
-assert(!function_exists('kvsort') || (new \ReflectionFunction('kvsort'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('kvsort') || (new \ReflectionFunction('kvsort'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('kvsort' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('kvsort')) {
     /**
      * 比較関数にキーも渡ってくる安定ソート
@@ -6193,7 +6196,7 @@ if (!function_exists('kvsort')) {
     }
 }
 
-assert(!function_exists('last_key') || (new \ReflectionFunction('last_key'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('last_key') || (new \ReflectionFunction('last_key'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('last_key' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('last_key')) {
     /**
      * 配列の最後のキーを返す
@@ -6223,7 +6226,7 @@ if (!function_exists('last_key')) {
     }
 }
 
-assert(!function_exists('last_keyvalue') || (new \ReflectionFunction('last_keyvalue'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('last_keyvalue') || (new \ReflectionFunction('last_keyvalue'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('last_keyvalue' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('last_keyvalue')) {
     /**
      * 配列の最後のキー/値ペアをタプルで返す
@@ -6263,7 +6266,7 @@ if (!function_exists('last_keyvalue')) {
     }
 }
 
-assert(!function_exists('last_value') || (new \ReflectionFunction('last_value'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('last_value') || (new \ReflectionFunction('last_value'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('last_value' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('last_value')) {
     /**
      * 配列の最後の値を返す
@@ -6293,7 +6296,7 @@ if (!function_exists('last_value')) {
     }
 }
 
-assert(!function_exists('next_key') || (new \ReflectionFunction('next_key'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('next_key') || (new \ReflectionFunction('next_key'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('next_key' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('next_key')) {
     /**
      * 配列の指定キーの次のキーを返す
@@ -6350,7 +6353,7 @@ if (!function_exists('next_key')) {
     }
 }
 
-assert(!function_exists('prev_key') || (new \ReflectionFunction('prev_key'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('prev_key') || (new \ReflectionFunction('prev_key'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('prev_key' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('prev_key')) {
     /**
      * 配列の指定キーの前のキーを返す
@@ -6389,7 +6392,7 @@ if (!function_exists('prev_key')) {
     }
 }
 
-assert(!function_exists('auto_loader') || (new \ReflectionFunction('auto_loader'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('auto_loader') || (new \ReflectionFunction('auto_loader'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('auto_loader' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('auto_loader')) {
     /**
      * vendor/autoload.php を返す
@@ -6422,7 +6425,7 @@ if (!function_exists('auto_loader')) {
     }
 }
 
-assert(!function_exists('class_aliases') || (new \ReflectionFunction('class_aliases'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_aliases') || (new \ReflectionFunction('class_aliases'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_aliases' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('class_aliases')) {
     /**
      * 遅延ロードする class_alias
@@ -6465,7 +6468,7 @@ if (!function_exists('class_aliases')) {
     }
 }
 
-assert(!function_exists('class_constants') || (new \ReflectionFunction('class_constants'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_constants') || (new \ReflectionFunction('class_constants'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_constants' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('class_constants')) {
     /**
      * クラス定数を配列で返す
@@ -6530,7 +6533,7 @@ if (!function_exists('class_constants')) {
     }
 }
 
-assert(!function_exists('class_extends') || (new \ReflectionFunction('class_extends'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_extends') || (new \ReflectionFunction('class_extends'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_extends' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('class_extends')) {
     /**
      * インスタンスを動的に拡張する
@@ -6600,7 +6603,7 @@ if (!function_exists('class_extends')) {
                     private        $__methods       = [];
                     private static $__staticMethods = [];
 
-                    public function __construct(\ReflectionClass $refclass = null, $original = null, $fields = [], $methods = [])
+                    public function __construct(?\ReflectionClass $refclass = null, $original = null, $fields = [], $methods = [])
                     {
                         if ($refclass === null) {
                             return;
@@ -6779,7 +6782,7 @@ if (!function_exists('class_extends')) {
     }
 }
 
-assert(!function_exists('class_loader') || (new \ReflectionFunction('class_loader'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_loader') || (new \ReflectionFunction('class_loader'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_loader' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('class_loader')) {
     /**
      * composer のクラスローダを返す
@@ -6802,7 +6805,7 @@ if (!function_exists('class_loader')) {
     }
 }
 
-assert(!function_exists('class_map') || (new \ReflectionFunction('class_map'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_map') || (new \ReflectionFunction('class_map'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_map' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('class_map')) {
     /**
      * 指定クラスローダで読み込まれるであろう class => file を返す
@@ -6910,7 +6913,7 @@ if (!function_exists('class_map')) {
     }
 }
 
-assert(!function_exists('class_namespace') || (new \ReflectionFunction('class_namespace'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_namespace') || (new \ReflectionFunction('class_namespace'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_namespace' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('class_namespace')) {
     /**
      * クラスの名前空間部分を取得する
@@ -6937,7 +6940,7 @@ if (!function_exists('class_namespace')) {
     }
 }
 
-assert(!function_exists('class_replace') || (new \ReflectionFunction('class_replace'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_replace') || (new \ReflectionFunction('class_replace'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_replace' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('class_replace')) {
     /**
      * 既存（未読み込みに限る）クラスを強制的に置換する
@@ -7101,7 +7104,7 @@ if (!function_exists('class_replace')) {
     }
 }
 
-assert(!function_exists('class_shorten') || (new \ReflectionFunction('class_shorten'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_shorten') || (new \ReflectionFunction('class_shorten'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_shorten' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('class_shorten')) {
     /**
      * クラスの名前空間部分を除いた短い名前を取得する
@@ -7127,7 +7130,7 @@ if (!function_exists('class_shorten')) {
     }
 }
 
-assert(!function_exists('class_uses_all') || (new \ReflectionFunction('class_uses_all'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_uses_all') || (new \ReflectionFunction('class_uses_all'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_uses_all' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('class_uses_all')) {
     /**
      * クラスが use しているトレイトを再帰的に取得する
@@ -7190,7 +7193,7 @@ if (!function_exists('class_uses_all')) {
     }
 }
 
-assert(!function_exists('const_exists') || (new \ReflectionFunction('const_exists'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('const_exists') || (new \ReflectionFunction('const_exists'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('const_exists' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('const_exists')) {
     /**
      * クラス定数が存在するか調べる
@@ -7245,7 +7248,7 @@ if (!function_exists('const_exists')) {
     }
 }
 
-assert(!function_exists('namespace_detect') || (new \ReflectionFunction('namespace_detect'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('namespace_detect') || (new \ReflectionFunction('namespace_detect'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('namespace_detect' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('namespace_detect')) {
     /**
      * ディレクトリ構造から名前空間を推測して返す
@@ -7316,7 +7319,7 @@ if (!function_exists('namespace_detect')) {
     }
 }
 
-assert(!function_exists('object_dive') || (new \ReflectionFunction('object_dive'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('object_dive') || (new \ReflectionFunction('object_dive'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('object_dive' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('object_dive')) {
     /**
      * パス形式でプロパティ値を取得
@@ -7359,7 +7362,7 @@ if (!function_exists('object_dive')) {
     }
 }
 
-assert(!function_exists('object_id') || (new \ReflectionFunction('object_id'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('object_id') || (new \ReflectionFunction('object_id'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('object_id' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('object_id')) {
     /**
      * 重複しない spl_object_id
@@ -7437,7 +7440,7 @@ if (!function_exists('object_id')) {
     }
 }
 
-assert(!function_exists('object_properties') || (new \ReflectionFunction('object_properties'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('object_properties') || (new \ReflectionFunction('object_properties'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('object_properties' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('object_properties')) {
     /**
      * オブジェクトのプロパティを可視・不可視を問わず取得する
@@ -7517,7 +7520,7 @@ if (!function_exists('object_properties')) {
     }
 }
 
-assert(!function_exists('object_storage') || (new \ReflectionFunction('object_storage'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('object_storage') || (new \ReflectionFunction('object_storage'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('object_storage' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('object_storage')) {
     /**
      * オブジェクトに付加データを付与する
@@ -7682,7 +7685,7 @@ if (!function_exists('object_storage')) {
     }
 }
 
-assert(!function_exists('register_autoload_function') || (new \ReflectionFunction('register_autoload_function'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('register_autoload_function') || (new \ReflectionFunction('register_autoload_function'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('register_autoload_function' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('register_autoload_function')) {
     /**
      * オートロード前後にコールバックする
@@ -7765,7 +7768,7 @@ if (!function_exists('register_autoload_function')) {
     }
 }
 
-assert(!function_exists('stdclass') || (new \ReflectionFunction('stdclass'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('stdclass') || (new \ReflectionFunction('stdclass'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('stdclass' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('stdclass')) {
     /**
      * stdClass を生成して返す
@@ -7793,7 +7796,7 @@ if (!function_exists('stdclass')) {
     }
 }
 
-assert(!function_exists('type_exists') || (new \ReflectionFunction('type_exists'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('type_exists') || (new \ReflectionFunction('type_exists'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('type_exists' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('type_exists')) {
     /**
      * 型が存在するか返す
@@ -7835,7 +7838,7 @@ if (!function_exists('type_exists')) {
     }
 }
 
-assert(!function_exists('import_once') || (new \ReflectionFunction('import_once'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('import_once') || (new \ReflectionFunction('import_once'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('import_once' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('import_once')) {
     /**
      * 一度しか読み込まない require
@@ -7885,7 +7888,7 @@ if (!function_exists('import_once')) {
     }
 }
 
-assert(!function_exists('sql_bind') || (new \ReflectionFunction('sql_bind'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('sql_bind') || (new \ReflectionFunction('sql_bind'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('sql_bind' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('sql_bind')) {
     /**
      * ものすごく雑に SQL に値を埋め込む
@@ -7932,7 +7935,7 @@ if (!function_exists('sql_bind')) {
     }
 }
 
-assert(!function_exists('sql_export') || (new \ReflectionFunction('sql_export'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('sql_export') || (new \ReflectionFunction('sql_export'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('sql_export' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('sql_export')) {
     /**
      * 連想配列の配列を SQL 的文字列に変換する
@@ -8079,7 +8082,7 @@ if (!function_exists('sql_export')) {
     }
 }
 
-assert(!function_exists('sql_format') || (new \ReflectionFunction('sql_format'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('sql_format') || (new \ReflectionFunction('sql_format'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('sql_format' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('sql_format')) {
     /**
      * ものすごく雑に SQL を整形する
@@ -9200,7 +9203,7 @@ if (!function_exists('sql_format')) {
     }
 }
 
-assert(!function_exists('sql_quote') || (new \ReflectionFunction('sql_quote'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('sql_quote') || (new \ReflectionFunction('sql_quote'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('sql_quote' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('sql_quote')) {
     /**
      * ものすごく雑に値をクオートする
@@ -9247,7 +9250,7 @@ if (!function_exists('sql_quote')) {
     }
 }
 
-assert(!function_exists('css_selector') || (new \ReflectionFunction('css_selector'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('css_selector') || (new \ReflectionFunction('css_selector'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('css_selector' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('css_selector')) {
     /**
      * CSS セレクタ文字をパースして配列で返す
@@ -9399,7 +9402,7 @@ if (!function_exists('css_selector')) {
     }
 }
 
-assert(!function_exists('csv_export') || (new \ReflectionFunction('csv_export'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('csv_export') || (new \ReflectionFunction('csv_export'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('csv_export' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('csv_export')) {
     /**
      * 連想配列の配列を CSV 的文字列に変換する
@@ -9617,7 +9620,7 @@ if (!function_exists('csv_export')) {
     }
 }
 
-assert(!function_exists('csv_import') || (new \ReflectionFunction('csv_import'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('csv_import') || (new \ReflectionFunction('csv_import'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('csv_import' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('csv_import')) {
     /**
      * CSV 的文字列を連想配列の配列に変換する
@@ -9872,7 +9875,7 @@ if (!function_exists('csv_import')) {
     }
 }
 
-assert(!function_exists('html_attr') || (new \ReflectionFunction('html_attr'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('html_attr') || (new \ReflectionFunction('html_attr'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('html_attr' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('html_attr')) {
     /**
      * 配列を html の属性文字列に変換する
@@ -10087,7 +10090,7 @@ if (!function_exists('html_attr')) {
     }
 }
 
-assert(!function_exists('html_strip') || (new \ReflectionFunction('html_strip'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('html_strip') || (new \ReflectionFunction('html_strip'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('html_strip' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('html_strip')) {
     /**
      * html の空白類を除去して minify する
@@ -10215,7 +10218,7 @@ if (!function_exists('html_strip')) {
     }
 }
 
-assert(!function_exists('html_tag') || (new \ReflectionFunction('html_tag'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('html_tag') || (new \ReflectionFunction('html_tag'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('html_tag' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('html_tag')) {
     /**
      * css セレクタから html 文字列を生成する
@@ -10319,7 +10322,7 @@ if (!function_exists('html_tag')) {
     }
 }
 
-assert(!function_exists('ini_export') || (new \ReflectionFunction('ini_export'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ini_export') || (new \ReflectionFunction('ini_export'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ini_export' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ini_export')) {
     /**
      * 連想配列を INI 的文字列に変換する
@@ -10367,7 +10370,7 @@ if (!function_exists('ini_export')) {
     }
 }
 
-assert(!function_exists('ini_import') || (new \ReflectionFunction('ini_import'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ini_import') || (new \ReflectionFunction('ini_import'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ini_import' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ini_import')) {
     /**
      * INI 的文字列を連想配列に変換する
@@ -10398,7 +10401,7 @@ if (!function_exists('ini_import')) {
     }
 }
 
-assert(!function_exists('json_export') || (new \ReflectionFunction('json_export'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('json_export') || (new \ReflectionFunction('json_export'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('json_export' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('json_export')) {
     /**
      * json_encode のプロキシ関数
@@ -10612,7 +10615,7 @@ if (!function_exists('json_export')) {
     }
 }
 
-assert(!function_exists('json_import') || (new \ReflectionFunction('json_import'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('json_import') || (new \ReflectionFunction('json_import'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('json_import' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('json_import')) {
     /**
      * json_decode のプロキシ関数
@@ -10997,7 +11000,7 @@ if (!function_exists('json_import')) {
     }
 }
 
-assert(!function_exists('ltsv_export') || (new \ReflectionFunction('ltsv_export'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ltsv_export') || (new \ReflectionFunction('ltsv_export'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ltsv_export' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ltsv_export')) {
     /**
      * 配列を LTSV 的文字列に変換する
@@ -11077,7 +11080,7 @@ if (!function_exists('ltsv_export')) {
     }
 }
 
-assert(!function_exists('ltsv_import') || (new \ReflectionFunction('ltsv_import'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ltsv_import') || (new \ReflectionFunction('ltsv_import'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ltsv_import' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ltsv_import')) {
     /**
      * LTSV 的文字列を配列に変換する
@@ -11157,7 +11160,7 @@ if (!function_exists('ltsv_import')) {
     }
 }
 
-assert(!function_exists('markdown_list') || (new \ReflectionFunction('markdown_list'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('markdown_list') || (new \ReflectionFunction('markdown_list'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('markdown_list' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('markdown_list')) {
     /**
      * 配列を markdown リスト文字列にする
@@ -11237,7 +11240,7 @@ if (!function_exists('markdown_list')) {
     }
 }
 
-assert(!function_exists('markdown_table') || (new \ReflectionFunction('markdown_table'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('markdown_table') || (new \ReflectionFunction('markdown_table'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('markdown_table' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('markdown_table')) {
     /**
      * 連想配列の配列を markdown テーブル文字列にする
@@ -11346,7 +11349,7 @@ if (!function_exists('markdown_table')) {
     }
 }
 
-assert(!function_exists('paml_export') || (new \ReflectionFunction('paml_export'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('paml_export') || (new \ReflectionFunction('paml_export'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('paml_export' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('paml_export')) {
     /**
      * 連想配列を paml 的文字列に変換する
@@ -11415,7 +11418,7 @@ if (!function_exists('paml_export')) {
     }
 }
 
-assert(!function_exists('paml_import') || (new \ReflectionFunction('paml_import'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('paml_import') || (new \ReflectionFunction('paml_import'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('paml_import' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('paml_import')) {
     /**
      * paml 的文字列をパースする
@@ -11578,7 +11581,7 @@ if (!function_exists('paml_import')) {
     }
 }
 
-assert(!function_exists('xmlss_export') || (new \ReflectionFunction('xmlss_export'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('xmlss_export') || (new \ReflectionFunction('xmlss_export'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('xmlss_export' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('xmlss_export')) {
     /**
      * 連想配列の配列を XML SpreadSheet 的文字列に変換する
@@ -12032,7 +12035,7 @@ if (!function_exists('xmlss_export')) {
     }
 }
 
-assert(!function_exists('xmlss_import') || (new \ReflectionFunction('xmlss_import'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('xmlss_import') || (new \ReflectionFunction('xmlss_import'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('xmlss_import' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('xmlss_import')) {
     /**
      * XML SpreadSheet 的文字列を連想配列の配列に変換する
@@ -12332,7 +12335,7 @@ if (!function_exists('xmlss_import')) {
     }
 }
 
-assert(!function_exists('date_alter') || (new \ReflectionFunction('date_alter'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_alter') || (new \ReflectionFunction('date_alter'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_alter' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_alter')) {
     /**
      * 日付を除外日リストに基づいてずらす
@@ -12373,7 +12376,7 @@ if (!function_exists('date_alter')) {
     }
 }
 
-assert(!function_exists('date_convert') || (new \ReflectionFunction('date_convert'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_convert') || (new \ReflectionFunction('date_convert'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_convert' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_convert')) {
     /**
      * 日時文字列をよしなに別のフォーマットに変換する
@@ -12482,7 +12485,7 @@ if (!function_exists('date_convert')) {
     }
 }
 
-assert(!function_exists('date_fromto') || (new \ReflectionFunction('date_fromto'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_fromto') || (new \ReflectionFunction('date_fromto'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_fromto' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_fromto')) {
     /**
      * 日時っぽい文字列とフォーマットを与えると取りうる範囲を返す
@@ -12549,7 +12552,7 @@ if (!function_exists('date_fromto')) {
     }
 }
 
-assert(!function_exists('date_interval') || (new \ReflectionFunction('date_interval'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_interval') || (new \ReflectionFunction('date_interval'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_interval' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_interval')) {
     /**
      * ISO8601継続時間文字列を DateInterval に変換する
@@ -12623,7 +12626,7 @@ if (!function_exists('date_interval')) {
     }
 }
 
-assert(!function_exists('date_interval_second') || (new \ReflectionFunction('date_interval_second'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_interval_second') || (new \ReflectionFunction('date_interval_second'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_interval_second' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_interval_second')) {
     /**
      * DateInterval を秒に変換する
@@ -12672,7 +12675,7 @@ if (!function_exists('date_interval_second')) {
     }
 }
 
-assert(!function_exists('date_interval_string') || (new \ReflectionFunction('date_interval_string'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_interval_string') || (new \ReflectionFunction('date_interval_string'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_interval_string' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_interval_string')) {
     /**
      * 秒を世紀・年・月・日・時間・分・秒・ミリ秒の各要素に分解する
@@ -12876,7 +12879,7 @@ if (!function_exists('date_interval_string')) {
     }
 }
 
-assert(!function_exists('date_match') || (new \ReflectionFunction('date_match'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_match') || (new \ReflectionFunction('date_match'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_match' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_match')) {
     /**
      * 日時と cron ライクな表記のマッチングを行う
@@ -13088,7 +13091,7 @@ if (!function_exists('date_match')) {
     }
 }
 
-assert(!function_exists('date_modulate') || (new \ReflectionFunction('date_modulate'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_modulate') || (new \ReflectionFunction('date_modulate'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_modulate' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_modulate')) {
     /**
      * 日時を加減算する
@@ -13154,7 +13157,7 @@ if (!function_exists('date_modulate')) {
     }
 }
 
-assert(!function_exists('date_parse_format') || (new \ReflectionFunction('date_parse_format'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_parse_format') || (new \ReflectionFunction('date_parse_format'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_parse_format' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_parse_format')) {
     /**
      * 日時文字列のフォーマットを返す
@@ -13320,7 +13323,7 @@ if (!function_exists('date_parse_format')) {
     }
 }
 
-assert(!function_exists('date_timestamp') || (new \ReflectionFunction('date_timestamp'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_timestamp') || (new \ReflectionFunction('date_timestamp'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_timestamp' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_timestamp')) {
     /**
      * 日時的なものをよしなにタイムスタンプに変換する
@@ -13506,7 +13509,7 @@ if (!function_exists('date_timestamp')) {
     }
 }
 
-assert(!function_exists('date_validate') || (new \ReflectionFunction('date_validate'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('date_validate') || (new \ReflectionFunction('date_validate'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('date_validate' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('date_validate')) {
     /**
      * 日時文字列のバリデーション
@@ -13574,7 +13577,7 @@ if (!function_exists('date_validate')) {
     }
 }
 
-assert(!function_exists('now') || (new \ReflectionFunction('now'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('now') || (new \ReflectionFunction('now'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('now' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('now')) {
     /**
      * 現在日時を float で返す
@@ -13608,7 +13611,7 @@ if (!function_exists('now')) {
     }
 }
 
-assert(!function_exists('add_error_handler') || (new \ReflectionFunction('add_error_handler'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('add_error_handler') || (new \ReflectionFunction('add_error_handler'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('add_error_handler' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('add_error_handler')) {
     /**
      * エラーハンドラを追加する
@@ -13639,7 +13642,7 @@ if (!function_exists('add_error_handler')) {
      * @param int $error_types エラータイプ
      * @return callable|null 直近に設定されていたエラーハンドラ（未設定の場合は null）
      */
-    function add_error_handler($handler, $error_types = \E_ALL | \E_STRICT)
+    function add_error_handler($handler, $error_types = \E_ALL)
     {
         $already = set_error_handler(static function () use ($handler, &$already) {
             $result = $handler(...func_get_args());
@@ -13652,7 +13655,7 @@ if (!function_exists('add_error_handler')) {
     }
 }
 
-assert(!function_exists('backtrace') || (new \ReflectionFunction('backtrace'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('backtrace') || (new \ReflectionFunction('backtrace'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('backtrace' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('backtrace')) {
     /**
      * 特定条件までのバックトレースを取得する
@@ -13716,7 +13719,7 @@ if (!function_exists('backtrace')) {
     }
 }
 
-assert(!function_exists('error') || (new \ReflectionFunction('error'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('error') || (new \ReflectionFunction('error'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('error' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('error')) {
     /**
      * エラー出力する
@@ -13782,7 +13785,7 @@ if (!function_exists('error')) {
     }
 }
 
-assert(!function_exists('set_all_error_handler') || (new \ReflectionFunction('set_all_error_handler'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('set_all_error_handler') || (new \ReflectionFunction('set_all_error_handler'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('set_all_error_handler' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('set_all_error_handler')) {
     /**
      * あらゆるエラーをハンドルする
@@ -13908,7 +13911,7 @@ if (!function_exists('set_all_error_handler')) {
     }
 }
 
-assert(!function_exists('set_error_exception_handler') || (new \ReflectionFunction('set_error_exception_handler'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('set_error_exception_handler') || (new \ReflectionFunction('set_error_exception_handler'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('set_error_exception_handler' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('set_error_exception_handler')) {
     /**
      * エラーを ErrorException に変換するハンドラを設定する
@@ -13954,7 +13957,7 @@ if (!function_exists('set_error_exception_handler')) {
     }
 }
 
-assert(!function_exists('set_trace_logger') || (new \ReflectionFunction('set_trace_logger'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('set_trace_logger') || (new \ReflectionFunction('set_trace_logger'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('set_trace_logger' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('set_trace_logger')) {
     /**
      * メソッド呼び出しロガーを仕込む
@@ -13991,7 +13994,7 @@ if (!function_exists('set_trace_logger')) {
     }
 }
 
-assert(!function_exists('stacktrace') || (new \ReflectionFunction('stacktrace'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('stacktrace') || (new \ReflectionFunction('stacktrace'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('stacktrace' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('stacktrace')) {
     /**
      * スタックトレースを文字列で返す
@@ -14136,7 +14139,7 @@ if (!function_exists('stacktrace')) {
     }
 }
 
-assert(!function_exists('process') || (new \ReflectionFunction('process'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('process') || (new \ReflectionFunction('process'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('process' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('process')) {
     /**
      * proc_open ～ proc_close の一連の処理を行う
@@ -14175,7 +14178,7 @@ if (!function_exists('process')) {
      * @param ?array $options その他の追加オプション
      * @return int リターンコード
      */
-    function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null, $options = null)
+    function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, ?array $env = null, $options = null)
     {
         $rc = process_async($command, $args, $stdin, $stdout, $stderr, $cwd, $env, $options)();
         if ($rc === -1) {
@@ -14186,7 +14189,7 @@ if (!function_exists('process')) {
     }
 }
 
-assert(!function_exists('process_async') || (new \ReflectionFunction('process_async'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('process_async') || (new \ReflectionFunction('process_async'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('process_async' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('process_async')) {
     /**
      * proc_open ～ proc_close の一連の処理を行う（非同期版）
@@ -14204,7 +14207,7 @@ if (!function_exists('process_async')) {
      * @param ?array $options その他の追加オプション
      * @return \ProcessAsync|object プロセスオブジェクト
      */
-    function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null, $options = null)
+    function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, ?array $env = null, $options = null)
     {
         if (is_array($args)) {
             $statement = [$command];
@@ -14433,7 +14436,7 @@ if (!function_exists('process_async')) {
     }
 }
 
-assert(!function_exists('process_closure') || (new \ReflectionFunction('process_closure'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('process_closure') || (new \ReflectionFunction('process_closure'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('process_closure' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('process_closure')) {
     /**
      * クロージャを別プロセスで実行する
@@ -14544,7 +14547,7 @@ if (!function_exists('process_closure')) {
     }
 }
 
-assert(!function_exists('process_parallel') || (new \ReflectionFunction('process_parallel'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('process_parallel') || (new \ReflectionFunction('process_parallel'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('process_parallel' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('process_parallel')) {
     /**
      * 複数の callable を並列で実行する
@@ -14678,7 +14681,7 @@ if (!function_exists('process_parallel')) {
     }
 }
 
-assert(!function_exists('cp_rf') || (new \ReflectionFunction('cp_rf'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('cp_rf') || (new \ReflectionFunction('cp_rf'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('cp_rf' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('cp_rf')) {
     /**
      * ディレクトリのコピー
@@ -14754,7 +14757,7 @@ if (!function_exists('cp_rf')) {
     }
 }
 
-assert(!function_exists('dir_clean') || (new \ReflectionFunction('dir_clean'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('dir_clean') || (new \ReflectionFunction('dir_clean'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('dir_clean' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('dir_clean')) {
     /**
      * 指定条件のファイル・ディレクトリを再帰的に消す
@@ -14830,7 +14833,7 @@ if (!function_exists('dir_clean')) {
     }
 }
 
-assert(!function_exists('dir_diff') || (new \ReflectionFunction('dir_diff'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('dir_diff') || (new \ReflectionFunction('dir_diff'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('dir_diff' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('dir_diff')) {
     /**
      * ファイルツリーを比較して配列で返す
@@ -14941,7 +14944,7 @@ if (!function_exists('dir_diff')) {
     }
 }
 
-assert(!function_exists('dirmtime') || (new \ReflectionFunction('dirmtime'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('dirmtime') || (new \ReflectionFunction('dirmtime'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('dirmtime' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('dirmtime')) {
     /**
      * ディレクトリの最終更新日時を返す
@@ -14993,7 +14996,7 @@ if (!function_exists('dirmtime')) {
     }
 }
 
-assert(!function_exists('dirname_r') || (new \ReflectionFunction('dirname_r'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('dirname_r') || (new \ReflectionFunction('dirname_r'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('dirname_r' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('dirname_r')) {
     /**
      * コールバックが true 相当を返すまで親ディレクトリを辿り続ける
@@ -15031,7 +15034,7 @@ if (!function_exists('dirname_r')) {
     }
 }
 
-assert(!function_exists('file_equals') || (new \ReflectionFunction('file_equals'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_equals') || (new \ReflectionFunction('file_equals'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_equals' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_equals')) {
     /**
      * ファイルが同じ内容か返す
@@ -15100,7 +15103,7 @@ if (!function_exists('file_equals')) {
     }
 }
 
-assert(!function_exists('file_extension') || (new \ReflectionFunction('file_extension'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_extension') || (new \ReflectionFunction('file_extension'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_extension' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_extension')) {
     /**
      * ファイルの拡張子を変更する。引数を省略すると拡張子を返す
@@ -15141,7 +15144,7 @@ if (!function_exists('file_extension')) {
     }
 }
 
-assert(!function_exists('file_generator') || (new \ReflectionFunction('file_generator'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_generator') || (new \ReflectionFunction('file_generator'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_generator' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_generator')) {
     /**
      * ファイルを少しずつ読む Generator を返す
@@ -15212,7 +15215,7 @@ if (!function_exists('file_generator')) {
     }
 }
 
-assert(!function_exists('file_get_arrays') || (new \ReflectionFunction('file_get_arrays'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_get_arrays') || (new \ReflectionFunction('file_get_arrays'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_get_arrays' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_get_arrays')) {
     /**
      * 指定ファイルを拡張子別に php の配列として読み込む
@@ -15301,7 +15304,7 @@ if (!function_exists('file_get_arrays')) {
     }
 }
 
-assert(!function_exists('file_list') || (new \ReflectionFunction('file_list'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_list') || (new \ReflectionFunction('file_list'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_list' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_list')) {
     /**
      * ファイル一覧を配列で返す
@@ -15409,7 +15412,7 @@ if (!function_exists('file_list')) {
     }
 }
 
-assert(!function_exists('file_matcher') || (new \ReflectionFunction('file_matcher'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_matcher') || (new \ReflectionFunction('file_matcher'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_matcher' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_matcher')) {
     /**
      * 各種属性を指定してファイルのマッチングを行うクロージャを返す
@@ -15625,7 +15628,7 @@ if (!function_exists('file_matcher')) {
     }
 }
 
-assert(!function_exists('file_mimetype') || (new \ReflectionFunction('file_mimetype'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_mimetype') || (new \ReflectionFunction('file_mimetype'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_mimetype' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_mimetype')) {
     /**
      * ファイルの mimetype を返す
@@ -15701,7 +15704,7 @@ if (!function_exists('file_mimetype')) {
     }
 }
 
-assert(!function_exists('file_pos') || (new \ReflectionFunction('file_pos'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_pos') || (new \ReflectionFunction('file_pos'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_pos' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_pos')) {
     /**
      * 範囲指定でファイルを読んで位置を返す
@@ -15781,7 +15784,7 @@ if (!function_exists('file_pos')) {
     }
 }
 
-assert(!function_exists('file_rename') || (new \ReflectionFunction('file_rename'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_rename') || (new \ReflectionFunction('file_rename'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_rename' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_rename')) {
     /**
      * ファイルをコールバックでリネームする
@@ -15887,7 +15890,7 @@ if (!function_exists('file_rename')) {
     }
 }
 
-assert(!function_exists('file_rewrite_contents') || (new \ReflectionFunction('file_rewrite_contents'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_rewrite_contents') || (new \ReflectionFunction('file_rewrite_contents'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_rewrite_contents' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_rewrite_contents')) {
     /**
      * ファイルを読み込んで内容をコールバックに渡して書き込む
@@ -15953,7 +15956,7 @@ if (!function_exists('file_rewrite_contents')) {
     }
 }
 
-assert(!function_exists('file_rotate') || (new \ReflectionFunction('file_rotate'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_rotate') || (new \ReflectionFunction('file_rotate'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_rotate' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_rotate')) {
     /**
      * ファイルをローテーションする
@@ -16089,7 +16092,7 @@ if (!function_exists('file_rotate')) {
     }
 }
 
-assert(!function_exists('file_set_contents') || (new \ReflectionFunction('file_set_contents'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_set_contents') || (new \ReflectionFunction('file_set_contents'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_set_contents' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_set_contents')) {
     /**
      * ディレクトリも掘る file_put_contents
@@ -16141,7 +16144,7 @@ if (!function_exists('file_set_contents')) {
     }
 }
 
-assert(!function_exists('file_set_tree') || (new \ReflectionFunction('file_set_tree'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_set_tree') || (new \ReflectionFunction('file_set_tree'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_set_tree' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_set_tree')) {
     /**
      * ツリー構造で file_set_contents する
@@ -16203,7 +16206,7 @@ if (!function_exists('file_set_tree')) {
     }
 }
 
-assert(!function_exists('file_slice') || (new \ReflectionFunction('file_slice'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_slice') || (new \ReflectionFunction('file_slice'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_slice' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_slice')) {
     /**
      * file の行範囲を指定できる板
@@ -16308,7 +16311,7 @@ if (!function_exists('file_slice')) {
     }
 }
 
-assert(!function_exists('file_suffix') || (new \ReflectionFunction('file_suffix'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_suffix') || (new \ReflectionFunction('file_suffix'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_suffix' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_suffix')) {
     /**
      * ファイル名にサフィックスを付与する
@@ -16348,7 +16351,7 @@ if (!function_exists('file_suffix')) {
     }
 }
 
-assert(!function_exists('file_tree') || (new \ReflectionFunction('file_tree'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('file_tree') || (new \ReflectionFunction('file_tree'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('file_tree' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('file_tree')) {
     /**
      * ディレクトリ階層をツリー構造で返す
@@ -16418,7 +16421,7 @@ if (!function_exists('file_tree')) {
     }
 }
 
-assert(!function_exists('fnmatch_and') || (new \ReflectionFunction('fnmatch_and'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('fnmatch_and') || (new \ReflectionFunction('fnmatch_and'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('fnmatch_and' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('fnmatch_and')) {
     /**
      * fnmatch の AND 版
@@ -16457,7 +16460,7 @@ if (!function_exists('fnmatch_and')) {
     }
 }
 
-assert(!function_exists('fnmatch_or') || (new \ReflectionFunction('fnmatch_or'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('fnmatch_or') || (new \ReflectionFunction('fnmatch_or'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('fnmatch_or' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('fnmatch_or')) {
     /**
      * fnmatch の OR 版
@@ -16496,7 +16499,7 @@ if (!function_exists('fnmatch_or')) {
     }
 }
 
-assert(!function_exists('fwrite_stream') || (new \ReflectionFunction('fwrite_stream'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('fwrite_stream') || (new \ReflectionFunction('fwrite_stream'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('fwrite_stream' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('fwrite_stream')) {
     /**
      * fwrite の改善版
@@ -16556,7 +16559,7 @@ if (!function_exists('fwrite_stream')) {
     }
 }
 
-assert(!function_exists('globstar') || (new \ReflectionFunction('globstar'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('globstar') || (new \ReflectionFunction('globstar'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('globstar' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('globstar')) {
     /**
      * globstar（再帰パターン有効）な glob
@@ -16605,7 +16608,7 @@ if (!function_exists('globstar')) {
     }
 }
 
-assert(!function_exists('mkdir_p') || (new \ReflectionFunction('mkdir_p'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mkdir_p') || (new \ReflectionFunction('mkdir_p'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mkdir_p' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mkdir_p')) {
     /**
      * ディレクトリを再帰的に掘る
@@ -16632,7 +16635,7 @@ if (!function_exists('mkdir_p')) {
     }
 }
 
-assert(!function_exists('path_build') || (new \ReflectionFunction('path_build'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('path_build') || (new \ReflectionFunction('path_build'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('path_build' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('path_build')) {
     /**
      * パスをビルドする
@@ -16713,7 +16716,7 @@ if (!function_exists('path_build')) {
     }
 }
 
-assert(!function_exists('path_is_absolute') || (new \ReflectionFunction('path_is_absolute'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('path_is_absolute') || (new \ReflectionFunction('path_is_absolute'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('path_is_absolute' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('path_is_absolute')) {
     /**
      * パスが絶対パスか判定する
@@ -16759,7 +16762,7 @@ if (!function_exists('path_is_absolute')) {
     }
 }
 
-assert(!function_exists('path_normalize') || (new \ReflectionFunction('path_normalize'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('path_normalize') || (new \ReflectionFunction('path_normalize'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('path_normalize' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('path_normalize')) {
     /**
      * パスを正規化する
@@ -16826,7 +16829,7 @@ if (!function_exists('path_normalize')) {
     }
 }
 
-assert(!function_exists('path_parse') || (new \ReflectionFunction('path_parse'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('path_parse') || (new \ReflectionFunction('path_parse'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('path_parse' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('path_parse')) {
     /**
      * パスをパースする
@@ -16980,7 +16983,7 @@ if (!function_exists('path_parse')) {
     }
 }
 
-assert(!function_exists('path_relative') || (new \ReflectionFunction('path_relative'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('path_relative') || (new \ReflectionFunction('path_relative'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('path_relative' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('path_relative')) {
     /**
      * パスを相対パスに変換して正規化する
@@ -17016,7 +17019,7 @@ if (!function_exists('path_relative')) {
     }
 }
 
-assert(!function_exists('path_resolve') || (new \ReflectionFunction('path_resolve'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('path_resolve') || (new \ReflectionFunction('path_resolve'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('path_resolve' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('path_resolve')) {
     /**
      * パスを絶対パスに変換して正規化する
@@ -17058,7 +17061,7 @@ if (!function_exists('path_resolve')) {
     }
 }
 
-assert(!function_exists('rm_rf') || (new \ReflectionFunction('rm_rf'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('rm_rf') || (new \ReflectionFunction('rm_rf'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('rm_rf' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('rm_rf')) {
     /**
      * 中身があっても消せる rmdir
@@ -17115,7 +17118,7 @@ if (!function_exists('rm_rf')) {
     }
 }
 
-assert(!function_exists('rsync') || (new \ReflectionFunction('rsync'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('rsync') || (new \ReflectionFunction('rsync'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('rsync' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('rsync')) {
     /**
      * php レイヤーで rsync 的なことをする
@@ -17561,7 +17564,7 @@ if (!function_exists('rsync')) {
     }
 }
 
-assert(!function_exists('strmode') || (new \ReflectionFunction('strmode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strmode') || (new \ReflectionFunction('strmode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strmode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strmode')) {
     /**
      * 8進数値を ls -l 準拠なパーミッション文字列に変換する
@@ -17629,7 +17632,7 @@ if (!function_exists('strmode')) {
     }
 }
 
-assert(!function_exists('strmode2oct') || (new \ReflectionFunction('strmode2oct'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strmode2oct') || (new \ReflectionFunction('strmode2oct'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strmode2oct' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strmode2oct')) {
     /**
      * ls -l 準拠なパーミッション文字列を8進数値に変換する
@@ -17708,7 +17711,7 @@ if (!function_exists('strmode2oct')) {
     }
 }
 
-assert(!function_exists('tmpname') || (new \ReflectionFunction('tmpname'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('tmpname') || (new \ReflectionFunction('tmpname'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('tmpname' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('tmpname')) {
     /**
      * 終了時に削除される一時ファイル名を生成する
@@ -17759,7 +17762,7 @@ if (!function_exists('tmpname')) {
     }
 }
 
-assert(!function_exists('by_builtin') || (new \ReflectionFunction('by_builtin'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('by_builtin') || (new \ReflectionFunction('by_builtin'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('by_builtin' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('by_builtin')) {
     /**
      * Countable#count, Serializable#serialize などの「ネイティブ由来かメソッド由来か」を判定して返す
@@ -17822,7 +17825,7 @@ if (!function_exists('by_builtin')) {
     }
 }
 
-assert(!function_exists('chain') || (new \ReflectionFunction('chain'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('chain') || (new \ReflectionFunction('chain'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('chain' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('chain')) {
     /**
      * 関数をメソッドチェーンできるオブジェクトを返す
@@ -18150,7 +18153,7 @@ if (!function_exists('chain')) {
     }
 }
 
-assert(!function_exists('func_eval') || (new \ReflectionFunction('func_eval'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('func_eval') || (new \ReflectionFunction('func_eval'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('func_eval' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('func_eval')) {
     /**
      * 指定コードで eval するクロージャを返す
@@ -18202,7 +18205,7 @@ if (!function_exists('func_eval')) {
     }
 }
 
-assert(!function_exists('func_get_namedargs') || (new \ReflectionFunction('func_get_namedargs'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('func_get_namedargs') || (new \ReflectionFunction('func_get_namedargs'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('func_get_namedargs' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('func_get_namedargs')) {
     /**
      * 呼び出し元の名前付き引数を返す
@@ -18227,7 +18230,7 @@ if (!function_exists('func_get_namedargs')) {
 
         $ref = (function () use ($traces) {
             $trace = $traces[1];
-            if (!str_ends_with($trace['function'], '{closure}')) {
+            if (!str_contains($trace['function'], '{closure')) {
                 return isset($trace['class']) ? new \ReflectionMethod($trace['class'], $trace['function']) : new \ReflectionFunction($trace['function']);
             }
 
@@ -18278,7 +18281,7 @@ if (!function_exists('func_get_namedargs')) {
     }
 }
 
-assert(!function_exists('func_method') || (new \ReflectionFunction('func_method'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('func_method') || (new \ReflectionFunction('func_method'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('func_method' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('func_method')) {
     /**
      * 指定メソッドを呼び出すクロージャを返す
@@ -18325,7 +18328,7 @@ if (!function_exists('func_method')) {
     }
 }
 
-assert(!function_exists('func_new') || (new \ReflectionFunction('func_new'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('func_new') || (new \ReflectionFunction('func_new'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('func_new' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('func_new')) {
     /**
      * 指定クラスのコンストラクタを呼び出すクロージャを返す
@@ -18356,7 +18359,7 @@ if (!function_exists('func_new')) {
     }
 }
 
-assert(!function_exists('func_operator') || (new \ReflectionFunction('func_operator'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('func_operator') || (new \ReflectionFunction('func_operator'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('func_operator' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('func_operator')) {
     /**
      * 演算子のクロージャを返す
@@ -18440,7 +18443,7 @@ if (!function_exists('func_operator')) {
     }
 }
 
-assert(!function_exists('func_throttle') || (new \ReflectionFunction('func_throttle'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('func_throttle') || (new \ReflectionFunction('func_throttle'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('func_throttle' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('func_throttle')) {
     /**
      * callable の実行間隔を間引いた callable を返す
@@ -18514,7 +18517,7 @@ if (!function_exists('func_throttle')) {
     }
 }
 
-assert(!function_exists('func_user_func_array') || (new \ReflectionFunction('func_user_func_array'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('func_user_func_array') || (new \ReflectionFunction('func_user_func_array'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('func_user_func_array' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('func_user_func_array')) {
     /**
      * パラメータ定義数に応じて呼び出し引数を可変にしてコールする
@@ -18562,7 +18565,7 @@ if (!function_exists('func_user_func_array')) {
     }
 }
 
-assert(!function_exists('func_wiring') || (new \ReflectionFunction('func_wiring'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('func_wiring') || (new \ReflectionFunction('func_wiring'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('func_wiring' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('func_wiring')) {
     /**
      * 引数の型情報に基づいてワイヤリングしたクロージャを返す
@@ -18597,7 +18600,7 @@ if (!function_exists('func_wiring')) {
     }
 }
 
-assert(!function_exists('function_alias') || (new \ReflectionFunction('function_alias'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('function_alias') || (new \ReflectionFunction('function_alias'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('function_alias' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('function_alias')) {
     /**
      * 関数のエイリアスを作成する
@@ -18669,7 +18672,7 @@ if (!function_exists('function_alias')) {
     }
 }
 
-assert(!function_exists('function_shorten') || (new \ReflectionFunction('function_shorten'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('function_shorten') || (new \ReflectionFunction('function_shorten'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('function_shorten' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('function_shorten')) {
     /**
      * 関数の名前空間部分を除いた短い名前を取得する
@@ -18686,7 +18689,7 @@ if (!function_exists('function_shorten')) {
     }
 }
 
-assert(!function_exists('is_bindable_closure') || (new \ReflectionFunction('is_bindable_closure'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_bindable_closure') || (new \ReflectionFunction('is_bindable_closure'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_bindable_closure' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_bindable_closure')) {
     /**
      * $this を bind 可能なクロージャか調べる
@@ -18708,7 +18711,7 @@ if (!function_exists('is_bindable_closure')) {
     }
 }
 
-assert(!function_exists('is_callback') || (new \ReflectionFunction('is_callback'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_callback') || (new \ReflectionFunction('is_callback'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_callback' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_callback')) {
     /**
      * callable のうち、関数文字列を false で返す
@@ -18756,7 +18759,7 @@ if (!function_exists('is_callback')) {
     }
 }
 
-assert(!function_exists('ansi_colorize') || (new \ReflectionFunction('ansi_colorize'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ansi_colorize') || (new \ReflectionFunction('ansi_colorize'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ansi_colorize' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ansi_colorize')) {
     /**
      * 文字列に ANSI Color エスケープシーケンスを埋め込む
@@ -18826,7 +18829,7 @@ if (!function_exists('ansi_colorize')) {
     }
 }
 
-assert(!function_exists('ansi_strip') || (new \ReflectionFunction('ansi_strip'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ansi_strip') || (new \ReflectionFunction('ansi_strip'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ansi_strip' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ansi_strip')) {
     /**
      * ANSI エスケープ文字を取り除く
@@ -18851,7 +18854,7 @@ if (!function_exists('ansi_strip')) {
     }
 }
 
-assert(!function_exists('arguments') || (new \ReflectionFunction('arguments'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('arguments') || (new \ReflectionFunction('arguments'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('arguments' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('arguments')) {
     /**
      * コマンドライン引数をパースして引数とオプションを返す
@@ -19031,7 +19034,7 @@ if (!function_exists('arguments')) {
     }
 }
 
-assert(!function_exists('cpu_timer') || (new \ReflectionFunction('cpu_timer'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('cpu_timer') || (new \ReflectionFunction('cpu_timer'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('cpu_timer' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('cpu_timer')) {
     /**
      * CPU 時間を計れるオブジェクトを返す
@@ -19141,7 +19144,7 @@ if (!function_exists('cpu_timer')) {
     }
 }
 
-assert(!function_exists('finalize') || (new \ReflectionFunction('finalize'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('finalize') || (new \ReflectionFunction('finalize'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('finalize' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('finalize')) {
     /**
      * 自身が死ぬときに指定 callable を呼ぶオブジェクトを返す
@@ -19188,7 +19191,7 @@ if (!function_exists('finalize')) {
     }
 }
 
-assert(!function_exists('get_modified_files') || (new \ReflectionFunction('get_modified_files'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('get_modified_files') || (new \ReflectionFunction('get_modified_files'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('get_modified_files' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('get_modified_files')) {
     /**
      * 初回読み込み時から変更のあったファイル配列を返す
@@ -19250,7 +19253,7 @@ if (!function_exists('get_modified_files')) {
     }
 }
 
-assert(!function_exists('get_uploaded_files') || (new \ReflectionFunction('get_uploaded_files'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('get_uploaded_files') || (new \ReflectionFunction('get_uploaded_files'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('get_uploaded_files' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('get_uploaded_files')) {
     /**
      * $_FILES の構造を組み替えて $_POST などと同じにする
@@ -19280,7 +19283,7 @@ if (!function_exists('get_uploaded_files')) {
     }
 }
 
-assert(!function_exists('getenvs') || (new \ReflectionFunction('getenvs'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('getenvs') || (new \ReflectionFunction('getenvs'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('getenvs' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('getenvs')) {
     /**
      * 連想配列を元に環境変数を取得する
@@ -19349,7 +19352,7 @@ if (!function_exists('getenvs')) {
     }
 }
 
-assert(!function_exists('ini_sets') || (new \ReflectionFunction('ini_sets'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ini_sets') || (new \ReflectionFunction('ini_sets'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ini_sets' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ini_sets')) {
     /**
      * 複数の php.ini の設定をまとめて設定する
@@ -19378,7 +19381,7 @@ if (!function_exists('ini_sets')) {
     }
 }
 
-assert(!function_exists('is_ansi') || (new \ReflectionFunction('is_ansi'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_ansi') || (new \ReflectionFunction('is_ansi'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_ansi' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_ansi')) {
     /**
      * リソースが ansi color に対応しているか返す
@@ -19412,7 +19415,7 @@ if (!function_exists('is_ansi')) {
     }
 }
 
-assert(!function_exists('php_binary') || (new \ReflectionFunction('php_binary'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('php_binary') || (new \ReflectionFunction('php_binary'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('php_binary' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('php_binary')) {
     /**
      * php-cli のパスを返す
@@ -19443,7 +19446,7 @@ if (!function_exists('php_binary')) {
     }
 }
 
-assert(!function_exists('setenvs') || (new \ReflectionFunction('setenvs'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('setenvs') || (new \ReflectionFunction('setenvs'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('setenvs' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('setenvs')) {
     /**
      * 連想配列を元に環境変数を設定する
@@ -19483,7 +19486,7 @@ if (!function_exists('setenvs')) {
     }
 }
 
-assert(!function_exists('sys_get_memory') || (new \ReflectionFunction('sys_get_memory'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('sys_get_memory') || (new \ReflectionFunction('sys_get_memory'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('sys_get_memory' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('sys_get_memory')) {
     /**
      * システムのメモリを取得する
@@ -19538,7 +19541,7 @@ if (!function_exists('sys_get_memory')) {
     }
 }
 
-assert(!function_exists('sys_set_temp_dir') || (new \ReflectionFunction('sys_set_temp_dir'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('sys_set_temp_dir') || (new \ReflectionFunction('sys_set_temp_dir'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('sys_set_temp_dir' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('sys_set_temp_dir')) {
     /**
      * sys_get_temp_dir が返すディレクトリを変更する
@@ -19595,7 +19598,7 @@ if (!function_exists('sys_set_temp_dir')) {
     }
 }
 
-assert(!function_exists('system_status') || (new \ReflectionFunction('system_status'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('system_status') || (new \ReflectionFunction('system_status'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('system_status' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('system_status')) {
     /**
      * システムの各種情報配列を返す
@@ -20057,7 +20060,7 @@ if (!function_exists('system_status')) {
     }
 }
 
-assert(!function_exists('generatify') || (new \ReflectionFunction('generatify'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('generatify') || (new \ReflectionFunction('generatify'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('generatify' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('generatify')) {
     /**
      * コールバックを Generator に変換する
@@ -20121,7 +20124,7 @@ if (!function_exists('generatify')) {
     }
 }
 
-assert(!function_exists('generator_apply') || (new \ReflectionFunction('generator_apply'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('generator_apply') || (new \ReflectionFunction('generator_apply'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('generator_apply' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('generator_apply')) {
     /**
      * generator 専用の iterator_apply
@@ -20211,7 +20214,7 @@ if (!function_exists('generator_apply')) {
     }
 }
 
-assert(!function_exists('generator_end') || (new \ReflectionFunction('generator_end'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('generator_end') || (new \ReflectionFunction('generator_end'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('generator_end' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('generator_end')) {
     /**
      * generator を強制的に終了させ最終値を返す
@@ -20264,7 +20267,7 @@ if (!function_exists('generator_end')) {
     }
 }
 
-assert(!function_exists('iterator_chunk') || (new \ReflectionFunction('iterator_chunk'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('iterator_chunk') || (new \ReflectionFunction('iterator_chunk'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('iterator_chunk' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('iterator_chunk')) {
     /**
      * イテレータも使える array_chunk
@@ -20391,7 +20394,7 @@ if (!function_exists('iterator_chunk')) {
     }
 }
 
-assert(!function_exists('iterator_combine') || (new \ReflectionFunction('iterator_combine'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('iterator_combine') || (new \ReflectionFunction('iterator_combine'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('iterator_combine' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('iterator_combine')) {
     /**
      * キーと値のイテレータから キー => 値 なイテレータを作る
@@ -20434,7 +20437,7 @@ if (!function_exists('iterator_combine')) {
     }
 }
 
-assert(!function_exists('iterator_join') || (new \ReflectionFunction('iterator_join'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('iterator_join') || (new \ReflectionFunction('iterator_join'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('iterator_join' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('iterator_join')) {
     /**
      * 複数の iterator を一括して回せる iterator を返す。
@@ -20477,7 +20480,7 @@ if (!function_exists('iterator_join')) {
     }
 }
 
-assert(!function_exists('iterator_map') || (new \ReflectionFunction('iterator_map'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('iterator_map') || (new \ReflectionFunction('iterator_map'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('iterator_map' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('iterator_map')) {
     /**
      * array_map の iterator 版
@@ -20542,7 +20545,7 @@ if (!function_exists('iterator_map')) {
     }
 }
 
-assert(!function_exists('iterator_maps') || (new \ReflectionFunction('iterator_maps'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('iterator_maps') || (new \ReflectionFunction('iterator_maps'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('iterator_maps' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('iterator_maps')) {
     /**
      * iterable にコールバック（複数）を適用した Iterator を返す
@@ -20581,7 +20584,7 @@ if (!function_exists('iterator_maps')) {
     }
 }
 
-assert(!function_exists('iterator_split') || (new \ReflectionFunction('iterator_split'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('iterator_split') || (new \ReflectionFunction('iterator_split'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('iterator_split' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('iterator_split')) {
     /**
      * iterator から頭何件かを取り出してチャンク化して返す
@@ -20659,7 +20662,7 @@ if (!function_exists('iterator_split')) {
     }
 }
 
-assert(!function_exists('average') || (new \ReflectionFunction('average'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('average') || (new \ReflectionFunction('average'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('average' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('average')) {
     /**
      * 引数の意味平均値を返す
@@ -20682,7 +20685,7 @@ if (!function_exists('average')) {
     }
 }
 
-assert(!function_exists('base_convert_array') || (new \ReflectionFunction('base_convert_array'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('base_convert_array') || (new \ReflectionFunction('base_convert_array'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('base_convert_array' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('base_convert_array')) {
     /**
      * 配列を対象とした base_convert
@@ -20744,7 +20747,7 @@ if (!function_exists('base_convert_array')) {
     }
 }
 
-assert(!function_exists('calculate_formula') || (new \ReflectionFunction('calculate_formula'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('calculate_formula') || (new \ReflectionFunction('calculate_formula'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('calculate_formula' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('calculate_formula')) {
     /**
      * 数式を計算して結果を返す
@@ -20859,7 +20862,7 @@ if (!function_exists('calculate_formula')) {
     }
 }
 
-assert(!function_exists('clamp') || (new \ReflectionFunction('clamp'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('clamp') || (new \ReflectionFunction('clamp'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('clamp' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('clamp')) {
     /**
      * 値を一定範囲に収める
@@ -20912,7 +20915,7 @@ if (!function_exists('clamp')) {
     }
 }
 
-assert(!function_exists('decimal') || (new \ReflectionFunction('decimal'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('decimal') || (new \ReflectionFunction('decimal'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('decimal' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('decimal')) {
     /**
      * 数値を指定桁数に丸める
@@ -20979,7 +20982,7 @@ if (!function_exists('decimal')) {
     }
 }
 
-assert(!function_exists('hoelder_mean') || (new \ReflectionFunction('hoelder_mean'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('hoelder_mean') || (new \ReflectionFunction('hoelder_mean'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('hoelder_mean' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('hoelder_mean')) {
     /**
      * ヘルダー平均を返す
@@ -21035,7 +21038,7 @@ if (!function_exists('hoelder_mean')) {
     }
 }
 
-assert(!function_exists('int_divide') || (new \ReflectionFunction('int_divide'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('int_divide') || (new \ReflectionFunction('int_divide'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('int_divide' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('int_divide')) {
     /**
      * 整数を除算した配列を返す
@@ -21082,7 +21085,7 @@ if (!function_exists('int_divide')) {
     }
 }
 
-assert(!function_exists('maximum') || (new \ReflectionFunction('maximum'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('maximum') || (new \ReflectionFunction('maximum'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('maximum' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('maximum')) {
     /**
      * 引数の最大値を返す
@@ -21107,7 +21110,7 @@ if (!function_exists('maximum')) {
     }
 }
 
-assert(!function_exists('mean') || (new \ReflectionFunction('mean'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mean') || (new \ReflectionFunction('mean'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mean' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mean')) {
     /**
      * 引数の相加平均値を返す
@@ -21135,7 +21138,7 @@ if (!function_exists('mean')) {
     }
 }
 
-assert(!function_exists('median') || (new \ReflectionFunction('median'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('median') || (new \ReflectionFunction('median'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('median' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('median')) {
     /**
      * 引数の中央値を返す
@@ -21176,7 +21179,7 @@ if (!function_exists('median')) {
     }
 }
 
-assert(!function_exists('minimum') || (new \ReflectionFunction('minimum'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('minimum') || (new \ReflectionFunction('minimum'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('minimum' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('minimum')) {
     /**
      * 引数の最小値を返す
@@ -21201,7 +21204,7 @@ if (!function_exists('minimum')) {
     }
 }
 
-assert(!function_exists('mode') || (new \ReflectionFunction('mode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mode') || (new \ReflectionFunction('mode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mode')) {
     /**
      * 引数の最頻値を返す
@@ -21242,7 +21245,7 @@ if (!function_exists('mode')) {
     }
 }
 
-assert(!function_exists('numcmp') || (new \ReflectionFunction('numcmp'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('numcmp') || (new \ReflectionFunction('numcmp'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('numcmp' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('numcmp')) {
     /**
      * 数値比較の関数版
@@ -21279,7 +21282,7 @@ if (!function_exists('numcmp')) {
     }
 }
 
-assert(!function_exists('sum') || (new \ReflectionFunction('sum'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('sum') || (new \ReflectionFunction('sum'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('sum' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('sum')) {
     /**
      * 引数の合計値を返す
@@ -21311,7 +21314,7 @@ if (!function_exists('sum')) {
     }
 }
 
-assert(!function_exists('annotation_parse') || (new \ReflectionFunction('annotation_parse'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('annotation_parse') || (new \ReflectionFunction('annotation_parse'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('annotation_parse' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('annotation_parse')) {
     /**
      * アノテーションっぽい文字列をそれっぽくパースして返す
@@ -21509,7 +21512,7 @@ if (!function_exists('annotation_parse')) {
     }
 }
 
-assert(!function_exists('console_log') || (new \ReflectionFunction('console_log'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('console_log') || (new \ReflectionFunction('console_log'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('console_log' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('console_log')) {
     /**
      * js の console に値を吐き出す
@@ -21553,7 +21556,7 @@ if (!function_exists('console_log')) {
     }
 }
 
-assert(!function_exists('evaluate') || (new \ReflectionFunction('evaluate'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('evaluate') || (new \ReflectionFunction('evaluate'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('evaluate' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('evaluate')) {
     /**
      * eval のプロキシ関数
@@ -21630,7 +21633,7 @@ if (!function_exists('evaluate')) {
     }
 }
 
-assert(!function_exists('msleep') || (new \ReflectionFunction('msleep'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('msleep') || (new \ReflectionFunction('msleep'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('msleep' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('msleep')) {
     /**
      * float でのミリ秒も指定できる sleep
@@ -21692,7 +21695,7 @@ if (!function_exists('msleep')) {
     }
 }
 
-assert(!function_exists('namespace_parse') || (new \ReflectionFunction('namespace_parse'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('namespace_parse') || (new \ReflectionFunction('namespace_parse'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('namespace_parse' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('namespace_parse')) {
     /**
      * php ファイルをパースして名前空間配列を返す
@@ -21997,7 +22000,7 @@ if (!function_exists('namespace_parse')) {
     }
 }
 
-assert(!function_exists('namespace_resolve') || (new \ReflectionFunction('namespace_resolve'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('namespace_resolve') || (new \ReflectionFunction('namespace_resolve'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('namespace_resolve' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('namespace_resolve')) {
     /**
      * エイリアス名を完全修飾名に解決する
@@ -22067,7 +22070,7 @@ if (!function_exists('namespace_resolve')) {
     }
 }
 
-assert(!function_exists('php_highlight') || (new \ReflectionFunction('php_highlight'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('php_highlight') || (new \ReflectionFunction('php_highlight'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('php_highlight' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('php_highlight')) {
     /**
      * php のコードをハイライトする
@@ -22244,7 +22247,7 @@ if (!function_exists('php_highlight')) {
     }
 }
 
-assert(!function_exists('php_indent') || (new \ReflectionFunction('php_indent'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('php_indent') || (new \ReflectionFunction('php_indent'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('php_indent' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('php_indent')) {
     /**
      * php のコードのインデントを調整する
@@ -22376,7 +22379,7 @@ if (!function_exists('php_indent')) {
     }
 }
 
-assert(!function_exists('php_opcode') || (new \ReflectionFunction('php_opcode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('php_opcode') || (new \ReflectionFunction('php_opcode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('php_opcode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('php_opcode')) {
     /**
      * コード断片の opcode を返す
@@ -22418,7 +22421,7 @@ if (!function_exists('php_opcode')) {
     }
 }
 
-assert(!function_exists('php_parse') || (new \ReflectionFunction('php_parse'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('php_parse') || (new \ReflectionFunction('php_parse'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('php_parse' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('php_parse')) {
     /**
      * php のコード断片をパースする
@@ -22673,7 +22676,7 @@ if (!function_exists('php_parse')) {
     }
 }
 
-assert(!function_exists('php_strip') || (new \ReflectionFunction('php_strip'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('php_strip') || (new \ReflectionFunction('php_strip'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('php_strip' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('php_strip')) {
     /**
      * 文字列から php コードを取り除く
@@ -22785,7 +22788,7 @@ if (!function_exists('php_strip')) {
     }
 }
 
-assert(!function_exists('php_tokens') || (new \ReflectionFunction('php_tokens'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('php_tokens') || (new \ReflectionFunction('php_tokens'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('php_tokens' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('php_tokens')) {
     /**
      * PhpToken に便利メソッドを生やした配列を返す
@@ -22990,7 +22993,15 @@ if (!function_exists('php_tokens')) {
                     $text = $var_export($ref->getFileName());
                 }
                 if ($this->id === T_NS_C) {
-                    $text = $var_export($ref->getNamespaceName());
+                    // php8.4 から ReflectionFunction({closure})::getNamespaceName は値を返さなくなった
+                    // 「クロージャは名前空間を持つものではない」とのこと（それ自体は正しい）
+                    // 得る術が完全になくなったので自前で得るしかない
+                    if (version_compare(PHP_VERSION, '8.4.0') >= 0) {
+                        $text = $var_export(array_key_first(namespace_parse($ref->getFileName()))); // @codeCoverageIgnore
+                    }
+                    else {
+                        $text = $var_export($ref->getNamespaceName());
+                    }
                 }
                 return $text;
             }
@@ -23018,7 +23029,7 @@ if (!function_exists('php_tokens')) {
     }
 }
 
-assert(!function_exists('sleetflake') || (new \ReflectionFunction('sleetflake'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('sleetflake') || (new \ReflectionFunction('sleetflake'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('sleetflake' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('sleetflake')) {
     /**
      * 一意な id を生成するオブジェクトを返す
@@ -23217,7 +23228,7 @@ if (!function_exists('sleetflake')) {
     }
 }
 
-assert(!function_exists('unique_id') || (new \ReflectionFunction('unique_id'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('unique_id') || (new \ReflectionFunction('unique_id'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('unique_id' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('unique_id')) {
     /**
      * sleetflake::binary へのエイリアス
@@ -23240,7 +23251,7 @@ if (!function_exists('unique_id')) {
     }
 }
 
-assert(!function_exists('cidr2ip') || (new \ReflectionFunction('cidr2ip'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('cidr2ip') || (new \ReflectionFunction('cidr2ip'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('cidr2ip' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('cidr2ip')) {
     /**
      * cidr 内の IP アドレスを返す
@@ -23275,7 +23286,7 @@ if (!function_exists('cidr2ip')) {
     }
 }
 
-assert(!function_exists('cidr_parse') || (new \ReflectionFunction('cidr_parse'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('cidr_parse') || (new \ReflectionFunction('cidr_parse'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('cidr_parse' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('cidr_parse')) {
     /**
      * cidr を分割する
@@ -23303,7 +23314,7 @@ if (!function_exists('cidr_parse')) {
     }
 }
 
-assert(!function_exists('cidr_subnet') || (new \ReflectionFunction('cidr_subnet'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('cidr_subnet') || (new \ReflectionFunction('cidr_subnet'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('cidr_subnet' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('cidr_subnet')) {
     /**
      * cidr をサブネットに分割する
@@ -23340,7 +23351,7 @@ if (!function_exists('cidr_subnet')) {
     }
 }
 
-assert(!function_exists('dns_resolve') || (new \ReflectionFunction('dns_resolve'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('dns_resolve') || (new \ReflectionFunction('dns_resolve'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('dns_resolve' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('dns_resolve')) {
     /**
      * TTL 対応の DNS リゾルバ
@@ -23652,7 +23663,7 @@ if (!function_exists('dns_resolve')) {
     }
 }
 
-assert(!function_exists('fcgi_request') || (new \ReflectionFunction('fcgi_request'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('fcgi_request') || (new \ReflectionFunction('fcgi_request'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('fcgi_request' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('fcgi_request')) {
     /**
      * FastCGI リクエストを行う
@@ -23971,7 +23982,7 @@ if (!function_exists('fcgi_request')) {
     }
 }
 
-assert(!function_exists('getipaddress') || (new \ReflectionFunction('getipaddress'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('getipaddress') || (new \ReflectionFunction('getipaddress'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('getipaddress' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('getipaddress')) {
     /**
      * 接続元となる IP を返す
@@ -24040,7 +24051,7 @@ if (!function_exists('getipaddress')) {
     }
 }
 
-assert(!function_exists('http_bechmark') || (new \ReflectionFunction('http_bechmark'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('http_bechmark') || (new \ReflectionFunction('http_bechmark'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('http_bechmark' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('http_bechmark')) {
     /**
      * @see http_benchmark()
@@ -24060,7 +24071,7 @@ if (!function_exists('http_bechmark')) {
     }
 }
 
-assert(!function_exists('http_benchmark') || (new \ReflectionFunction('http_benchmark'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('http_benchmark') || (new \ReflectionFunction('http_benchmark'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('http_benchmark' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('http_benchmark')) {
     /**
      * http のベンチマークを取る
@@ -24192,7 +24203,7 @@ if (!function_exists('http_benchmark')) {
     }
 }
 
-assert(!function_exists('http_delete') || (new \ReflectionFunction('http_delete'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('http_delete') || (new \ReflectionFunction('http_delete'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('http_delete' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('http_delete')) {
     /**
      * {@link http_request() http_request} の DELETE 特化版
@@ -24215,7 +24226,7 @@ if (!function_exists('http_delete')) {
     }
 }
 
-assert(!function_exists('http_get') || (new \ReflectionFunction('http_get'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('http_get') || (new \ReflectionFunction('http_get'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('http_get' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('http_get')) {
     /**
      * {@link http_request() http_request} の GET 特化版
@@ -24240,7 +24251,7 @@ if (!function_exists('http_get')) {
     }
 }
 
-assert(!function_exists('http_head') || (new \ReflectionFunction('http_head'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('http_head') || (new \ReflectionFunction('http_head'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('http_head' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('http_head')) {
     /**
      * {@link http_request() http_request} の HEAD 特化版
@@ -24263,7 +24274,7 @@ if (!function_exists('http_head')) {
     }
 }
 
-assert(!function_exists('http_patch') || (new \ReflectionFunction('http_patch'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('http_patch') || (new \ReflectionFunction('http_patch'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('http_patch' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('http_patch')) {
     /**
      * {@link http_request() http_request} の PATCH 特化版
@@ -24286,7 +24297,7 @@ if (!function_exists('http_patch')) {
     }
 }
 
-assert(!function_exists('http_post') || (new \ReflectionFunction('http_post'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('http_post') || (new \ReflectionFunction('http_post'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('http_post' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('http_post')) {
     /**
      * {@link http_request() http_request} の POST 特化版
@@ -24309,7 +24320,7 @@ if (!function_exists('http_post')) {
     }
 }
 
-assert(!function_exists('http_put') || (new \ReflectionFunction('http_put'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('http_put') || (new \ReflectionFunction('http_put'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('http_put' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('http_put')) {
     /**
      * {@link http_request() http_request} の PUT 特化版
@@ -24332,7 +24343,7 @@ if (!function_exists('http_put')) {
     }
 }
 
-assert(!function_exists('http_request') || (new \ReflectionFunction('http_request'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('http_request') || (new \ReflectionFunction('http_request'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('http_request' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('http_request')) {
     /**
      * curl のラッパー関数
@@ -24751,7 +24762,7 @@ if (!function_exists('http_request')) {
     }
 }
 
-assert(!function_exists('http_requests') || (new \ReflectionFunction('http_requests'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('http_requests') || (new \ReflectionFunction('http_requests'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('http_requests' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('http_requests')) {
     /**
      * http リクエストを並列で投げる
@@ -24954,7 +24965,7 @@ if (!function_exists('http_requests')) {
     }
 }
 
-assert(!function_exists('incidr') || (new \ReflectionFunction('incidr'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('incidr') || (new \ReflectionFunction('incidr'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('incidr' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('incidr')) {
     /**
      * ipv4 の cidr チェック
@@ -25003,7 +25014,7 @@ if (!function_exists('incidr')) {
     }
 }
 
-assert(!function_exists('ip2cidr') || (new \ReflectionFunction('ip2cidr'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ip2cidr') || (new \ReflectionFunction('ip2cidr'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ip2cidr' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ip2cidr')) {
     /**
      * IP アドレスを含みうる cidr を返す
@@ -25059,7 +25070,7 @@ if (!function_exists('ip2cidr')) {
     }
 }
 
-assert(!function_exists('ip_info') || (new \ReflectionFunction('ip_info'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ip_info') || (new \ReflectionFunction('ip_info'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ip_info' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ip_info')) {
     /**
      * ipv4 の情報を返す
@@ -25215,7 +25226,7 @@ if (!function_exists('ip_info')) {
                         $this->transaction(function () use ($fp, $registry) {
                             // 同時に走らないように rand でバラす
                             $this->refresh($registry, time() + $this->options['ttl'] + rand(0, 60), (function () use ($fp) {
-                                while (($fields = fgetcsv($fp, 0, "|")) !== false) {
+                                while (($fields = fgetcsv($fp, 0, "|", escape: "\\")) !== false) { // for compatible: change to escape:"" in future scope
                                     if (($fields[2] ?? '') === 'ipv4' && in_array($fields[6] ?? '', ['assigned', 'allocated'], true)) {
                                         foreach ($this->cidr($fields[3], $fields[4]) as $cidr) {
                                             yield [
@@ -25386,7 +25397,7 @@ if (!function_exists('ip_info')) {
     }
 }
 
-assert(!function_exists('ip_normalize') || (new \ReflectionFunction('ip_normalize'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ip_normalize') || (new \ReflectionFunction('ip_normalize'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ip_normalize' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ip_normalize')) {
     /**
      * IP アドレスを正規化する
@@ -25465,7 +25476,7 @@ if (!function_exists('ip_normalize')) {
     }
 }
 
-assert(!function_exists('ping') || (new \ReflectionFunction('ping'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ping') || (new \ReflectionFunction('ping'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ping' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ping')) {
     /**
      * ネットワーク疎通を返す
@@ -25585,7 +25596,7 @@ if (!function_exists('ping')) {
     }
 }
 
-assert(!function_exists('snmp_trap') || (new \ReflectionFunction('snmp_trap'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('snmp_trap') || (new \ReflectionFunction('snmp_trap'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('snmp_trap' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('snmp_trap')) {
     /**
      * SNMPTrap を送信する
@@ -25657,7 +25668,7 @@ if (!function_exists('snmp_trap')) {
     }
 }
 
-assert(!function_exists('opcache_gc') || (new \ReflectionFunction('opcache_gc'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('opcache_gc') || (new \ReflectionFunction('opcache_gc'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('opcache_gc' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('opcache_gc')) {
     /**
      * opcache を減らす
@@ -25719,7 +25730,7 @@ if (!function_exists('opcache_gc')) {
     }
 }
 
-assert(!function_exists('opcache_info') || (new \ReflectionFunction('opcache_info'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('opcache_info') || (new \ReflectionFunction('opcache_info'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('opcache_info' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('opcache_info')) {
     /**
      * phpinfo の opcache 特化版
@@ -26063,7 +26074,7 @@ if (!function_exists('opcache_info')) {
 }
 }
 
-assert(!function_exists('opcache_reload') || (new \ReflectionFunction('opcache_reload'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('opcache_reload') || (new \ReflectionFunction('opcache_reload'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('opcache_reload' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('opcache_reload')) {
     /**
      * opcache の保存兼ウォームアップ
@@ -26172,7 +26183,7 @@ if (!function_exists('opcache_reload')) {
     }
 }
 
-assert(!function_exists('ob_capture') || (new \ReflectionFunction('ob_capture'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ob_capture') || (new \ReflectionFunction('ob_capture'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ob_capture' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ob_capture')) {
     /**
      * ob_start ～ ob_get_clean のブロックでコールバックを実行する
@@ -26209,7 +26220,7 @@ if (!function_exists('ob_capture')) {
     }
 }
 
-assert(!function_exists('ob_get_clean_all') || (new \ReflectionFunction('ob_get_clean_all'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ob_get_clean_all') || (new \ReflectionFunction('ob_get_clean_all'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ob_get_clean_all' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ob_get_clean_all')) {
     /**
      * 出力バッファを全部閉じて配列で返す
@@ -26244,7 +26255,7 @@ if (!function_exists('ob_get_clean_all')) {
     }
 }
 
-assert(!function_exists('ob_include') || (new \ReflectionFunction('ob_include'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ob_include') || (new \ReflectionFunction('ob_include'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ob_include' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ob_include')) {
     /**
      * 変数を extract して include する
@@ -26283,7 +26294,7 @@ if (!function_exists('ob_include')) {
     }
 }
 
-assert(!function_exists('ob_stdout') || (new \ReflectionFunction('ob_stdout'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ob_stdout') || (new \ReflectionFunction('ob_stdout'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ob_stdout' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ob_stdout')) {
     /**
      * 標準出力をコメント化して埋め込む ob_start
@@ -26406,7 +26417,7 @@ if (!function_exists('ob_stdout')) {
     }
 }
 
-assert(!function_exists('glob2regex') || (new \ReflectionFunction('glob2regex'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('glob2regex') || (new \ReflectionFunction('glob2regex'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('glob2regex' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('glob2regex')) {
     /**
      * glob 記法を正規表現に変換する
@@ -26541,7 +26552,7 @@ if (!function_exists('glob2regex')) {
     }
 }
 
-assert(!function_exists('preg_capture') || (new \ReflectionFunction('preg_capture'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('preg_capture') || (new \ReflectionFunction('preg_capture'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('preg_capture' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('preg_capture')) {
     /**
      * キャプチャを主軸においた preg_match
@@ -26585,7 +26596,7 @@ if (!function_exists('preg_capture')) {
     }
 }
 
-assert(!function_exists('preg_matches') || (new \ReflectionFunction('preg_matches'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('preg_matches') || (new \ReflectionFunction('preg_matches'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('preg_matches' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('preg_matches')) {
     /**
      * 複数マッチに対応した preg_match
@@ -26670,7 +26681,7 @@ if (!function_exists('preg_matches')) {
     }
 }
 
-assert(!function_exists('preg_replaces') || (new \ReflectionFunction('preg_replaces'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('preg_replaces') || (new \ReflectionFunction('preg_replaces'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('preg_replaces' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('preg_replaces')) {
     /**
      * パターン番号を指定して preg_replace する
@@ -26740,7 +26751,7 @@ if (!function_exists('preg_replaces')) {
     }
 }
 
-assert(!function_exists('preg_splice') || (new \ReflectionFunction('preg_splice'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('preg_splice') || (new \ReflectionFunction('preg_splice'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('preg_splice' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('preg_splice')) {
     /**
      * キャプチャも行える preg_replace
@@ -26792,7 +26803,7 @@ if (!function_exists('preg_splice')) {
     }
 }
 
-assert(!function_exists('probability') || (new \ReflectionFunction('probability'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('probability') || (new \ReflectionFunction('probability'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('probability' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('probability')) {
     /**
      * 一定確率で true を返す
@@ -26832,7 +26843,7 @@ if (!function_exists('probability')) {
     }
 }
 
-assert(!function_exists('probability_array') || (new \ReflectionFunction('probability_array'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('probability_array') || (new \ReflectionFunction('probability_array'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('probability_array' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('probability_array')) {
     /**
      * 指定確率で配列のキーを返す
@@ -26899,7 +26910,7 @@ if (!function_exists('probability_array')) {
     }
 }
 
-assert(!function_exists('random_at') || (new \ReflectionFunction('random_at'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('random_at') || (new \ReflectionFunction('random_at'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('random_at' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('random_at')) {
     /**
      * 引数をランダムで返す
@@ -26923,7 +26934,7 @@ if (!function_exists('random_at')) {
     }
 }
 
-assert(!function_exists('random_float') || (new \ReflectionFunction('random_float'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('random_float') || (new \ReflectionFunction('random_float'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('random_float' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('random_float')) {
     /**
      * 疑似乱数小数を返す
@@ -26954,7 +26965,7 @@ if (!function_exists('random_float')) {
     }
 }
 
-assert(!function_exists('random_normal') || (new \ReflectionFunction('random_normal'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('random_normal') || (new \ReflectionFunction('random_normal'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('random_normal' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('random_normal')) {
     /**
      * 正規乱数（正規分布に従う乱数）を返す
@@ -27001,7 +27012,7 @@ if (!function_exists('random_normal')) {
     }
 }
 
-assert(!function_exists('random_range') || (new \ReflectionFunction('random_range'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('random_range') || (new \ReflectionFunction('random_range'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('random_range' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('random_range')) {
     /**
      * 指定範囲内からランダムで返す
@@ -27055,7 +27066,7 @@ if (!function_exists('random_range')) {
     }
 }
 
-assert(!function_exists('random_string') || (new \ReflectionFunction('random_string'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('random_string') || (new \ReflectionFunction('random_string'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('random_string' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('random_string')) {
     /**
      * 安全な乱数文字列を生成する
@@ -27088,7 +27099,7 @@ if (!function_exists('random_string')) {
     }
 }
 
-assert(!function_exists('unique_string') || (new \ReflectionFunction('unique_string'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('unique_string') || (new \ReflectionFunction('unique_string'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('unique_string' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('unique_string')) {
     /**
      * 文字列に含まれない文字列を生成する
@@ -27154,7 +27165,7 @@ if (!function_exists('unique_string')) {
     }
 }
 
-assert(!function_exists('callable_code') || (new \ReflectionFunction('callable_code'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('callable_code') || (new \ReflectionFunction('callable_code'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('callable_code' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('callable_code')) {
     /**
      * callable のコードブロックを返す
@@ -27241,7 +27252,7 @@ if (!function_exists('callable_code')) {
     }
 }
 
-assert(!function_exists('function_doccomments') || (new \ReflectionFunction('function_doccomments'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('function_doccomments') || (new \ReflectionFunction('function_doccomments'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('function_doccomments' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('function_doccomments')) {
     /**
      * $callable の本体・引数・返り値の DocComment を返す
@@ -27309,7 +27320,7 @@ if (!function_exists('function_doccomments')) {
     }
 }
 
-assert(!function_exists('function_export_false2null') || (new \ReflectionFunction('function_export_false2null'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('function_export_false2null') || (new \ReflectionFunction('function_export_false2null'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('function_export_false2null' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('function_export_false2null')) {
     /**
      * 存在する関数の内、false 返しを null 返しに再定義したファイルを返す
@@ -27360,8 +27371,8 @@ if (!function_exists('function_export_false2null')) {
                 if (str_contains($funcname, '\\')) {
                     continue;
                 }
-                // assert を名前空間内に定義することはできない
-                if ($funcname === 'assert') {
+                // これらは名前空間内に定義することはできない
+                if (in_array($funcname, ['assert', 'exit', 'die'], true)) {
                     continue;
                 }
                 // 標準関数に参照返しは存在しないはず（したとしても1文で返すのが難しいので対応しない）
@@ -27398,7 +27409,7 @@ if (!function_exists('function_export_false2null')) {
     }
 }
 
-assert(!function_exists('function_parameter') || (new \ReflectionFunction('function_parameter'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('function_parameter') || (new \ReflectionFunction('function_parameter'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('function_parameter' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('function_parameter')) {
     /**
      * 関数/メソッドの引数定義を取得する
@@ -27420,8 +27431,10 @@ if (!function_exists('function_parameter')) {
         foreach ($reffunc->getParameters() as $parameter) {
             $declare = '';
 
+            $type = null;
             if ($parameter->hasType()) {
-                $declare .= reflect_type_resolve($parameter->getType()) . ' ';
+                $type = reflect_type_resolve($parameter->getType());
+                $declare .= $type . ' ';
             }
 
             if ($parameter->isPassedByReference()) {
@@ -27458,6 +27471,9 @@ if (!function_exists('function_parameter')) {
                     // Type に応じたデフォルト値が得られればベストだがそこまでする必要もない
                     // 少なくとも 8.0 時点では = null してしまえば型エラーも起きない（8.4 で非推奨になってるけど）
                     $defval = "null";
+                    if ($type !== null && !preg_match('#[^_0-9a-z]?(null|mixed)[^_0-9a-z]?#u', $type)) {
+                        $declare = 'null|' . $declare;
+                    }
                 }
 
                 if (isset($defval)) {
@@ -27473,7 +27489,7 @@ if (!function_exists('function_parameter')) {
     }
 }
 
-assert(!function_exists('parameter_default') || (new \ReflectionFunction('parameter_default'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('parameter_default') || (new \ReflectionFunction('parameter_default'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('parameter_default' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('parameter_default')) {
     /**
      * callable のデフォルト引数を返す
@@ -27535,7 +27551,7 @@ if (!function_exists('parameter_default')) {
     }
 }
 
-assert(!function_exists('parameter_length') || (new \ReflectionFunction('parameter_length'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('parameter_length') || (new \ReflectionFunction('parameter_length'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('parameter_length' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('parameter_length')) {
     /**
      * callable の引数の数を返す
@@ -27571,7 +27587,7 @@ if (!function_exists('parameter_length')) {
     }
 }
 
-assert(!function_exists('parameter_wiring') || (new \ReflectionFunction('parameter_wiring'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('parameter_wiring') || (new \ReflectionFunction('parameter_wiring'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('parameter_wiring' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('parameter_wiring')) {
     /**
      * callable の引数の型情報に基づいてワイヤリングした引数配列を返す
@@ -27665,7 +27681,7 @@ if (!function_exists('parameter_wiring')) {
         // recurse for closure
         return array_map(function ($arg) use ($dependency) {
             if ($arg instanceof \Closure) {
-                if ((new \ReflectionFunction($arg))->getShortName() === '{closure}') {
+                if (str_contains((new \ReflectionFunction($arg))->getShortName(), '{closure')) {
                     $arg = $arg->bindTo($dependency);
                 }
                 return $arg(...parameter_wiring($arg, $dependency));
@@ -27675,7 +27691,7 @@ if (!function_exists('parameter_wiring')) {
     }
 }
 
-assert(!function_exists('reflect_callable') || (new \ReflectionFunction('reflect_callable'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('reflect_callable') || (new \ReflectionFunction('reflect_callable'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('reflect_callable' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('reflect_callable')) {
     /**
      * callable から ReflectionFunctionAbstract を生成する
@@ -27928,7 +27944,7 @@ if (!function_exists('reflect_callable')) {
     }
 }
 
-assert(!function_exists('reflect_type_resolve') || (new \ReflectionFunction('reflect_type_resolve'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('reflect_type_resolve') || (new \ReflectionFunction('reflect_type_resolve'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('reflect_type_resolve' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('reflect_type_resolve')) {
     /**
      * ReflectionType の型に \\ を付与する
@@ -27964,7 +27980,7 @@ if (!function_exists('reflect_type_resolve')) {
     }
 }
 
-assert(!function_exists('reflect_types') || (new \ReflectionFunction('reflect_types'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('reflect_types') || (new \ReflectionFunction('reflect_types'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('reflect_types' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('reflect_types')) {
     /**
      * ReflectionType の型配列を返す
@@ -28266,7 +28282,7 @@ if (!function_exists('reflect_types')) {
     }
 }
 
-assert(!function_exists('include_stream') || (new \ReflectionFunction('include_stream'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('include_stream') || (new \ReflectionFunction('include_stream'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('include_stream' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('include_stream')) {
     /**
      * file スキームを上書きして include/require をフックできるストリームオブジェクトを返す
@@ -28558,7 +28574,7 @@ if (!function_exists('include_stream')) {
     }
 }
 
-assert(!function_exists('iterator_stream') || (new \ReflectionFunction('iterator_stream'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('iterator_stream') || (new \ReflectionFunction('iterator_stream'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('iterator_stream' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('iterator_stream')) {
     /**
      * iterator を resource に変換する
@@ -28713,7 +28729,7 @@ if (!function_exists('iterator_stream')) {
     }
 }
 
-assert(!function_exists('memory_stream') || (new \ReflectionFunction('memory_stream'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('memory_stream') || (new \ReflectionFunction('memory_stream'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('memory_stream' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('memory_stream')) {
     /**
      * ファイルのように扱えるメモリ上のパスを返す
@@ -29126,7 +29142,7 @@ if (!function_exists('memory_stream')) {
     }
 }
 
-assert(!function_exists('profiler') || (new \ReflectionFunction('profiler'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('profiler') || (new \ReflectionFunction('profiler'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('profiler' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('profiler')) {
     /**
      * 外部ツールに頼らない pure php なプロファイラを返す
@@ -29239,7 +29255,7 @@ if (!function_exists('profiler')) {
     }
 }
 
-assert(!function_exists('resource_stream') || (new \ReflectionFunction('resource_stream'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('resource_stream') || (new \ReflectionFunction('resource_stream'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('resource_stream' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('resource_stream')) {
     /**
      * resource を (file)stream にプロキシする
@@ -29464,7 +29480,7 @@ if (!function_exists('resource_stream')) {
     }
 }
 
-assert(!function_exists('stream_describe') || (new \ReflectionFunction('stream_describe'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('stream_describe') || (new \ReflectionFunction('stream_describe'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('stream_describe' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('stream_describe')) {
     /**
      * ストリームの雑多な情報を返す
@@ -29485,7 +29501,7 @@ if (!function_exists('stream_describe')) {
         if (DIRECTORY_SEPARATOR === '\\') {
             exec('handle -v -p ' . getmypid(), $output);
             foreach (array_slice($output, 6) as $descriptor) {
-                [, , , $fd, $type, , $realpath] = str_getcsv($descriptor);
+                [, , , $fd, $type, , $realpath] = str_getcsv($descriptor, escape: "\\"); // for compatible: change to escape:"" in future scope
                 if ($type === 'File') {
                     clearstatcache(true, $realpath);
                     if (file_exists($realpath)) {
@@ -29559,7 +29575,7 @@ if (!function_exists('stream_describe')) {
     }
 }
 
-assert(!function_exists('stream_transfer') || (new \ReflectionFunction('stream_transfer'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('stream_transfer') || (new \ReflectionFunction('stream_transfer'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('stream_transfer' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('stream_transfer')) {
     /**
      * ストリームの転送を並列で行う
@@ -29686,7 +29702,7 @@ if (!function_exists('stream_transfer')) {
     }
 }
 
-assert(!function_exists('var_stream') || (new \ReflectionFunction('var_stream'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_stream') || (new \ReflectionFunction('var_stream'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_stream' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('var_stream')) {
     /**
      * 変数をリソースのように扱えるファイルポインタを返す
@@ -29857,7 +29873,7 @@ if (!function_exists('var_stream')) {
     }
 }
 
-assert(!function_exists('camel_case') || (new \ReflectionFunction('camel_case'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('camel_case') || (new \ReflectionFunction('camel_case'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('camel_case' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('camel_case')) {
     /**
      * camelCase に変換する
@@ -29879,7 +29895,7 @@ if (!function_exists('camel_case')) {
     }
 }
 
-assert(!function_exists('chain_case') || (new \ReflectionFunction('chain_case'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('chain_case') || (new \ReflectionFunction('chain_case'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('chain_case' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('chain_case')) {
     /**
      * chain-case に変換する
@@ -29902,7 +29918,7 @@ if (!function_exists('chain_case')) {
     }
 }
 
-assert(!function_exists('concat') || (new \ReflectionFunction('concat'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('concat') || (new \ReflectionFunction('concat'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('concat' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('concat')) {
     /**
      * strcat の空文字回避版
@@ -29941,7 +29957,7 @@ if (!function_exists('concat')) {
     }
 }
 
-assert(!function_exists('damerau_levenshtein') || (new \ReflectionFunction('damerau_levenshtein'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('damerau_levenshtein') || (new \ReflectionFunction('damerau_levenshtein'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('damerau_levenshtein' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('damerau_levenshtein')) {
     /**
      * Damerau–Levenshtein 距離を返す
@@ -30023,7 +30039,7 @@ if (!function_exists('damerau_levenshtein')) {
     }
 }
 
-assert(!function_exists('ends_with') || (new \ReflectionFunction('ends_with'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ends_with') || (new \ReflectionFunction('ends_with'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ends_with' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ends_with')) {
     /**
      * 指定文字列で終わるか調べる
@@ -30064,7 +30080,7 @@ if (!function_exists('ends_with')) {
     }
 }
 
-assert(!function_exists('include_string') || (new \ReflectionFunction('include_string'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('include_string') || (new \ReflectionFunction('include_string'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('include_string' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('include_string')) {
     /**
      * 変数を extract して include する（文字列指定）
@@ -30087,7 +30103,7 @@ if (!function_exists('include_string')) {
     }
 }
 
-assert(!function_exists('kvsprintf') || (new \ReflectionFunction('kvsprintf'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('kvsprintf') || (new \ReflectionFunction('kvsprintf'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('kvsprintf' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('kvsprintf')) {
     /**
      * 連想配列を指定できるようにした vsprintf
@@ -30128,7 +30144,7 @@ if (!function_exists('kvsprintf')) {
     }
 }
 
-assert(!function_exists('mb_compatible_encoding') || (new \ReflectionFunction('mb_compatible_encoding'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mb_compatible_encoding') || (new \ReflectionFunction('mb_compatible_encoding'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_compatible_encoding' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_compatible_encoding')) {
     /**
      * 指定エンコーディング間に互換性があるかを返す
@@ -30227,7 +30243,7 @@ if (!function_exists('mb_compatible_encoding')) {
     }
 }
 
-assert(!function_exists('mb_ellipsis') || (new \ReflectionFunction('mb_ellipsis'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mb_ellipsis') || (new \ReflectionFunction('mb_ellipsis'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_ellipsis' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_ellipsis')) {
     /**
      * 文字列を指定幅に丸める
@@ -30293,7 +30309,7 @@ if (!function_exists('mb_ellipsis')) {
     }
 }
 
-assert(!function_exists('mb_ereg_options') || (new \ReflectionFunction('mb_ereg_options'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mb_ereg_options') || (new \ReflectionFunction('mb_ereg_options'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_ereg_options' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_ereg_options')) {
     /**
      * mb_系の全体設定を一括設定する
@@ -30356,7 +30372,7 @@ if (!function_exists('mb_ereg_options')) {
     }
 }
 
-assert(!function_exists('mb_ereg_split') || (new \ReflectionFunction('mb_ereg_split'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mb_ereg_split') || (new \ReflectionFunction('mb_ereg_split'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_ereg_split' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_ereg_split')) {
     /**
      * マルチバイト対応 preg_split
@@ -30481,7 +30497,7 @@ if (!function_exists('mb_ereg_split')) {
     }
 }
 
-assert(!function_exists('mb_monospace') || (new \ReflectionFunction('mb_monospace'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mb_monospace') || (new \ReflectionFunction('mb_monospace'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_monospace' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_monospace')) {
     /**
      * ASCII 文字を1, それ以外を2で計算した文字幅を返す
@@ -30553,7 +30569,7 @@ if (!function_exists('mb_monospace')) {
     }
 }
 
-assert(!function_exists('mb_pad_width') || (new \ReflectionFunction('mb_pad_width'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mb_pad_width') || (new \ReflectionFunction('mb_pad_width'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_pad_width' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_pad_width')) {
     /**
      * マルチバイト版 str_pad
@@ -30613,13 +30629,14 @@ if (!function_exists('mb_pad_width')) {
     }
 }
 
-assert(!function_exists('mb_str_pad') || (new \ReflectionFunction('mb_str_pad'))->isUserDefined());
+('8.3' === null || version_compare(PHP_VERSION, '8.3') < 0) ? assert(!function_exists('mb_str_pad') || (new \ReflectionFunction('mb_str_pad'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_str_pad' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_str_pad')) {
     /**
      * マルチバイト版 str_pad
      *
      * @see mb_pad_width()
      * @deprecated 標準関数と重複
+     * @conflict 8.3
      * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\strings
      */
@@ -30630,7 +30647,7 @@ if (!function_exists('mb_str_pad')) {
     }
 }
 
-assert(!function_exists('mb_substr_replace') || (new \ReflectionFunction('mb_substr_replace'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mb_substr_replace') || (new \ReflectionFunction('mb_substr_replace'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_substr_replace' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_substr_replace')) {
     /**
      * マルチバイト対応 substr_replace
@@ -30668,13 +30685,14 @@ if (!function_exists('mb_substr_replace')) {
     }
 }
 
-assert(!function_exists('mb_trim') || (new \ReflectionFunction('mb_trim'))->isUserDefined());
+('8.4' === null || version_compare(PHP_VERSION, '8.4') < 0) ? assert(!function_exists('mb_trim') || (new \ReflectionFunction('mb_trim'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_trim' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_trim')) {
     /**
      * マルチバイト対応 trim
      *
      * @see https://github.com/symfony/polyfill-php84/
      * @deprecated 標準関数と重複
+     * @conflict 8.4
      * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\strings
      */
@@ -30685,7 +30703,7 @@ if (!function_exists('mb_trim')) {
     }
 }
 
-assert(!function_exists('mb_wordwrap') || (new \ReflectionFunction('mb_wordwrap'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mb_wordwrap') || (new \ReflectionFunction('mb_wordwrap'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_wordwrap' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_wordwrap')) {
     /**
      * 文字列を指定文字幅で改行を挟み込む
@@ -30747,7 +30765,7 @@ if (!function_exists('mb_wordwrap')) {
     }
 }
 
-assert(!function_exists('multiexplode') || (new \ReflectionFunction('multiexplode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('multiexplode') || (new \ReflectionFunction('multiexplode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('multiexplode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('multiexplode')) {
     /**
      * explode の配列対応と $limit の挙動を変えたもの
@@ -30790,7 +30808,7 @@ if (!function_exists('multiexplode')) {
     }
 }
 
-assert(!function_exists('namespace_split') || (new \ReflectionFunction('namespace_split'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('namespace_split') || (new \ReflectionFunction('namespace_split'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('namespace_split' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('namespace_split')) {
     /**
      * 文字列を名前空間とローカル名に区切ってタプルで返す
@@ -30826,7 +30844,7 @@ if (!function_exists('namespace_split')) {
     }
 }
 
-assert(!function_exists('ngram') || (new \ReflectionFunction('ngram'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('ngram') || (new \ReflectionFunction('ngram'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('ngram' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('ngram')) {
     /**
      * N-gram 化して配列で返す
@@ -30864,7 +30882,7 @@ if (!function_exists('ngram')) {
     }
 }
 
-assert(!function_exists('pascal_case') || (new \ReflectionFunction('pascal_case'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('pascal_case') || (new \ReflectionFunction('pascal_case'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('pascal_case' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('pascal_case')) {
     /**
      * PascalCase に変換する
@@ -30887,7 +30905,7 @@ if (!function_exists('pascal_case')) {
     }
 }
 
-assert(!function_exists('quoteexplode') || (new \ReflectionFunction('quoteexplode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('quoteexplode') || (new \ReflectionFunction('quoteexplode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('quoteexplode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('quoteexplode')) {
     /**
      * エスケープやクオートに対応した explode
@@ -30962,7 +30980,7 @@ if (!function_exists('quoteexplode')) {
     }
 }
 
-assert(!function_exists('render_file') || (new \ReflectionFunction('render_file'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('render_file') || (new \ReflectionFunction('render_file'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('render_file' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('render_file')) {
     /**
      * "hoge {$hoge}" 形式のレンダリングのファイル版
@@ -30980,7 +30998,7 @@ if (!function_exists('render_file')) {
     }
 }
 
-assert(!function_exists('render_string') || (new \ReflectionFunction('render_string'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('render_string') || (new \ReflectionFunction('render_string'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('render_string' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('render_string')) {
     /**
      * "hoge {$hoge}" 形式のレンダリング
@@ -31052,7 +31070,7 @@ if (!function_exists('render_string')) {
     }
 }
 
-assert(!function_exists('render_template') || (new \ReflectionFunction('render_template'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('render_template') || (new \ReflectionFunction('render_template'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('render_template' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('render_template')) {
     /**
      * "hoge ${hoge}" 形式のレンダリング
@@ -31139,7 +31157,7 @@ if (!function_exists('render_template')) {
     }
 }
 
-assert(!function_exists('snake_case') || (new \ReflectionFunction('snake_case'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('snake_case') || (new \ReflectionFunction('snake_case'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('snake_case' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('snake_case')) {
     /**
      * snake_case に変換する
@@ -31169,7 +31187,7 @@ if (!function_exists('snake_case')) {
     }
 }
 
-assert(!function_exists('split_noempty') || (new \ReflectionFunction('split_noempty'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('split_noempty') || (new \ReflectionFunction('split_noempty'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('split_noempty' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('split_noempty')) {
     /**
      * 空文字を除外する文字列分割
@@ -31211,7 +31229,7 @@ if (!function_exists('split_noempty')) {
     }
 }
 
-assert(!function_exists('splitwords') || (new \ReflectionFunction('splitwords'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('splitwords') || (new \ReflectionFunction('splitwords'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('splitwords' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('splitwords')) {
     /**
      * ucwords の配列返し版
@@ -31254,7 +31272,7 @@ if (!function_exists('splitwords')) {
     }
 }
 
-assert(!function_exists('starts_with') || (new \ReflectionFunction('starts_with'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('starts_with') || (new \ReflectionFunction('starts_with'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('starts_with' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('starts_with')) {
     /**
      * 指定文字列で始まるか調べる
@@ -31295,7 +31313,7 @@ if (!function_exists('starts_with')) {
     }
 }
 
-assert(!function_exists('str_anyof') || (new \ReflectionFunction('str_anyof'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_anyof') || (new \ReflectionFunction('str_anyof'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_anyof' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_anyof')) {
     /**
      * 文字列が候補の中にあるか調べる
@@ -31339,7 +31357,7 @@ if (!function_exists('str_anyof')) {
     }
 }
 
-assert(!function_exists('str_array') || (new \ReflectionFunction('str_array'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_array') || (new \ReflectionFunction('str_array'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_array' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_array')) {
     /**
      * 文字列を区切り文字で区切って配列に変換する
@@ -31467,7 +31485,7 @@ if (!function_exists('str_array')) {
     }
 }
 
-assert(!function_exists('str_between') || (new \ReflectionFunction('str_between'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_between') || (new \ReflectionFunction('str_between'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_between' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_between')) {
     /**
      * 指定文字で囲まれた文字列を取得する
@@ -31537,7 +31555,7 @@ if (!function_exists('str_between')) {
     }
 }
 
-assert(!function_exists('str_bytes') || (new \ReflectionFunction('str_bytes'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_bytes') || (new \ReflectionFunction('str_bytes'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_bytes' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_bytes')) {
     /**
      * 文字列のバイト配列を得る
@@ -31578,7 +31596,7 @@ if (!function_exists('str_bytes')) {
     }
 }
 
-assert(!function_exists('str_chop') || (new \ReflectionFunction('str_chop'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_chop') || (new \ReflectionFunction('str_chop'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_chop' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_chop')) {
     /**
      * 先頭・末尾の指定文字列を削ぎ落とす
@@ -31612,7 +31630,7 @@ if (!function_exists('str_chop')) {
     }
 }
 
-assert(!function_exists('str_chunk') || (new \ReflectionFunction('str_chunk'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_chunk') || (new \ReflectionFunction('str_chunk'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_chunk' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_chunk')) {
     /**
      * 文字列を可変引数の数で分割する
@@ -31654,7 +31672,7 @@ if (!function_exists('str_chunk')) {
     }
 }
 
-assert(!function_exists('str_common_prefix') || (new \ReflectionFunction('str_common_prefix'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_common_prefix') || (new \ReflectionFunction('str_common_prefix'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_common_prefix' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_common_prefix')) {
     /**
      * 文字列群の共通のプレフィックスを返す
@@ -31698,7 +31716,7 @@ if (!function_exists('str_common_prefix')) {
     }
 }
 
-assert(!function_exists('str_control_apply') || (new \ReflectionFunction('str_control_apply'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_control_apply') || (new \ReflectionFunction('str_control_apply'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_control_apply' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_control_apply')) {
     /**
      * 制御文字を実際に適用させる
@@ -31777,7 +31795,7 @@ if (!function_exists('str_control_apply')) {
     }
 }
 
-assert(!function_exists('str_diff') || (new \ReflectionFunction('str_diff'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_diff') || (new \ReflectionFunction('str_diff'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_diff' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_diff')) {
     /**
      * テキストの diff を得る
@@ -32496,7 +32514,7 @@ if (!function_exists('str_diff')) {
     }
 }
 
-assert(!function_exists('str_divide') || (new \ReflectionFunction('str_divide'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_divide') || (new \ReflectionFunction('str_divide'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_divide' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_divide')) {
     /**
      * str_split の配列長指定版
@@ -32524,7 +32542,7 @@ if (!function_exists('str_divide')) {
     }
 }
 
-assert(!function_exists('str_ellipsis') || (new \ReflectionFunction('str_ellipsis'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_ellipsis') || (new \ReflectionFunction('str_ellipsis'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_ellipsis' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_ellipsis')) {
     /**
      * 文字列を指定数に丸める
@@ -32574,7 +32592,7 @@ if (!function_exists('str_ellipsis')) {
     }
 }
 
-assert(!function_exists('str_embed') || (new \ReflectionFunction('str_embed'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_embed') || (new \ReflectionFunction('str_embed'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_embed' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_embed')) {
     /**
      * エスケープ付きで文字列を置換する
@@ -32670,7 +32688,7 @@ if (!function_exists('str_embed')) {
     }
 }
 
-assert(!function_exists('str_equals') || (new \ReflectionFunction('str_equals'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_equals') || (new \ReflectionFunction('str_equals'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_equals' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_equals')) {
     /**
      * 文字列比較の関数版
@@ -32714,7 +32732,7 @@ if (!function_exists('str_equals')) {
     }
 }
 
-assert(!function_exists('str_exists') || (new \ReflectionFunction('str_exists'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_exists') || (new \ReflectionFunction('str_exists'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_exists' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_exists')) {
     /**
      * 指定文字列を含むか返す
@@ -32756,7 +32774,7 @@ if (!function_exists('str_exists')) {
     }
 }
 
-assert(!function_exists('str_guess') || (new \ReflectionFunction('str_guess'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_guess') || (new \ReflectionFunction('str_guess'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_guess' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_guess')) {
     /**
      * $string に最も近い文字列を返す
@@ -32850,7 +32868,7 @@ if (!function_exists('str_guess')) {
     }
 }
 
-assert(!function_exists('str_lchop') || (new \ReflectionFunction('str_lchop'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_lchop') || (new \ReflectionFunction('str_lchop'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_lchop' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_lchop')) {
     /**
      * 先頭の指定文字列を削ぎ落とす
@@ -32875,7 +32893,7 @@ if (!function_exists('str_lchop')) {
     }
 }
 
-assert(!function_exists('str_partition') || (new \ReflectionFunction('str_partition'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_partition') || (new \ReflectionFunction('str_partition'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_partition' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_partition')) {
     /**
      * 文字列をトークンで分割して後ろ優先で詰めて返す
@@ -32935,7 +32953,7 @@ if (!function_exists('str_partition')) {
     }
 }
 
-assert(!function_exists('str_patch') || (new \ReflectionFunction('str_patch'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_patch') || (new \ReflectionFunction('str_patch'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_patch' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_patch')) {
     /**
      * テキストに patch を当てる
@@ -33146,7 +33164,7 @@ if (!function_exists('str_patch')) {
     }
 }
 
-assert(!function_exists('str_putcsv') || (new \ReflectionFunction('str_putcsv'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_putcsv') || (new \ReflectionFunction('str_putcsv'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_putcsv' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_putcsv')) {
     /**
      * fputcsv の文字列版（str_getcsv の put 版）
@@ -33194,7 +33212,7 @@ if (!function_exists('str_putcsv')) {
     }
 }
 
-assert(!function_exists('str_quote') || (new \ReflectionFunction('str_quote'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_quote') || (new \ReflectionFunction('str_quote'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_quote' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_quote')) {
     /**
      * 文字列をダブルクォート文字列に変換する
@@ -33342,7 +33360,7 @@ if (!function_exists('str_quote')) {
     }
 }
 
-assert(!function_exists('str_rchop') || (new \ReflectionFunction('str_rchop'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_rchop') || (new \ReflectionFunction('str_rchop'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_rchop' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_rchop')) {
     /**
      * 末尾の指定文字列を削ぎ落とす
@@ -33367,7 +33385,7 @@ if (!function_exists('str_rchop')) {
     }
 }
 
-assert(!function_exists('str_resource') || (new \ReflectionFunction('str_resource'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_resource') || (new \ReflectionFunction('str_resource'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_resource' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_resource')) {
     /**
      * 文字列をリソース化する
@@ -33409,7 +33427,7 @@ if (!function_exists('str_resource')) {
     }
 }
 
-assert(!function_exists('str_submap') || (new \ReflectionFunction('str_submap'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_submap') || (new \ReflectionFunction('str_submap'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_submap' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_submap')) {
     /**
      * 指定文字列を置換する
@@ -33516,7 +33534,7 @@ if (!function_exists('str_submap')) {
     }
 }
 
-assert(!function_exists('str_subreplace') || (new \ReflectionFunction('str_subreplace'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('str_subreplace') || (new \ReflectionFunction('str_subreplace'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('str_subreplace' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('str_subreplace')) {
     /**
      * 指定文字列を置換する
@@ -33597,7 +33615,7 @@ if (!function_exists('str_subreplace')) {
     }
 }
 
-assert(!function_exists('strcat') || (new \ReflectionFunction('strcat'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strcat') || (new \ReflectionFunction('strcat'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strcat' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strcat')) {
     /**
      * 文字列結合の関数版
@@ -33618,7 +33636,7 @@ if (!function_exists('strcat')) {
     }
 }
 
-assert(!function_exists('stritr') || (new \ReflectionFunction('stritr'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('stritr') || (new \ReflectionFunction('stritr'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('stritr' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('stritr')) {
     /**
      * 大文字小文字を区別しない strtr
@@ -33669,7 +33687,7 @@ if (!function_exists('stritr')) {
     }
 }
 
-assert(!function_exists('strpos_array') || (new \ReflectionFunction('strpos_array'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strpos_array') || (new \ReflectionFunction('strpos_array'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strpos_array' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strpos_array')) {
     /**
      * 複数の文字列で strpos する
@@ -33714,7 +33732,7 @@ if (!function_exists('strpos_array')) {
     }
 }
 
-assert(!function_exists('strpos_closest') || (new \ReflectionFunction('strpos_closest'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strpos_closest') || (new \ReflectionFunction('strpos_closest'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strpos_closest' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strpos_closest')) {
     /**
      * 指定位置から左右どちらかの探索を行う
@@ -33803,7 +33821,7 @@ if (!function_exists('strpos_closest')) {
     }
 }
 
-assert(!function_exists('strpos_escaped') || (new \ReflectionFunction('strpos_escaped'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strpos_escaped') || (new \ReflectionFunction('strpos_escaped'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strpos_escaped' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strpos_escaped')) {
     /**
      * エスケープを考慮して strpos する
@@ -33880,7 +33898,7 @@ if (!function_exists('strpos_escaped')) {
     }
 }
 
-assert(!function_exists('strpos_quoted') || (new \ReflectionFunction('strpos_quoted'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strpos_quoted') || (new \ReflectionFunction('strpos_quoted'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strpos_quoted' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strpos_quoted')) {
     /**
      * クオートを考慮して strpos する
@@ -33956,7 +33974,7 @@ if (!function_exists('strpos_quoted')) {
     }
 }
 
-assert(!function_exists('strposr') || (new \ReflectionFunction('strposr'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strposr') || (new \ReflectionFunction('strposr'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strposr' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strposr')) {
     /**
      * デフォで左探索な strrpos
@@ -34027,7 +34045,7 @@ if (!function_exists('strposr')) {
     }
 }
 
-assert(!function_exists('strrstr') || (new \ReflectionFunction('strrstr'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strrstr') || (new \ReflectionFunction('strrstr'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strrstr' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strrstr')) {
     /**
      * 文字列が最後に現れる位置以前を返す
@@ -34076,7 +34094,7 @@ if (!function_exists('strrstr')) {
     }
 }
 
-assert(!function_exists('strtr_escaped') || (new \ReflectionFunction('strtr_escaped'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strtr_escaped') || (new \ReflectionFunction('strtr_escaped'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strtr_escaped' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strtr_escaped')) {
     /**
      * エスケープを考慮して strtr する
@@ -34124,7 +34142,7 @@ if (!function_exists('strtr_escaped')) {
     }
 }
 
-assert(!function_exists('train_case') || (new \ReflectionFunction('train_case'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('train_case') || (new \ReflectionFunction('train_case'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('train_case' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('train_case')) {
     /**
      * Train-Case に変換する
@@ -34147,7 +34165,7 @@ if (!function_exists('train_case')) {
     }
 }
 
-assert(!function_exists('blank_coalesce') || (new \ReflectionFunction('blank_coalesce'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('blank_coalesce') || (new \ReflectionFunction('blank_coalesce'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('blank_coalesce' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('blank_coalesce')) {
     /**
      * blank_if の可変引数版
@@ -34178,7 +34196,7 @@ if (!function_exists('blank_coalesce')) {
     }
 }
 
-assert(!function_exists('blank_if') || (new \ReflectionFunction('blank_if'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('blank_if') || (new \ReflectionFunction('blank_if'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('blank_if' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('blank_if')) {
     /**
      * 値が空なら null を返す
@@ -34275,7 +34293,7 @@ if (!function_exists('blank_if')) {
     }
 }
 
-assert(!function_exists('cast') || (new \ReflectionFunction('cast'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('cast') || (new \ReflectionFunction('cast'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('cast' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('cast')) {
     /**
      * php の型変換に準じてキャストする
@@ -34351,7 +34369,7 @@ if (!function_exists('cast')) {
     }
 }
 
-assert(!function_exists('instance_of') || (new \ReflectionFunction('instance_of'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('instance_of') || (new \ReflectionFunction('instance_of'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('instance_of' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('instance_of')) {
     /**
      * instanceof 構文の関数版
@@ -34387,7 +34405,7 @@ if (!function_exists('instance_of')) {
     }
 }
 
-assert(!function_exists('try_catch') || (new \ReflectionFunction('try_catch'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('try_catch') || (new \ReflectionFunction('try_catch'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('try_catch' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('try_catch')) {
     /**
      * try ～ catch 構文の関数版
@@ -34417,7 +34435,7 @@ if (!function_exists('try_catch')) {
     }
 }
 
-assert(!function_exists('try_catch_finally') || (new \ReflectionFunction('try_catch_finally'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('try_catch_finally') || (new \ReflectionFunction('try_catch_finally'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('try_catch_finally' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('try_catch_finally')) {
     /**
      * try ～ catch ～ finally 構文の関数版
@@ -34466,7 +34484,7 @@ if (!function_exists('try_catch_finally')) {
     }
 }
 
-assert(!function_exists('try_close') || (new \ReflectionFunction('try_close'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('try_close') || (new \ReflectionFunction('try_close'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('try_close' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('try_close')) {
     /**
      * try ～ finally 構文の close 特化版
@@ -34584,7 +34602,7 @@ if (!function_exists('try_close')) {
     }
 }
 
-assert(!function_exists('try_finally') || (new \ReflectionFunction('try_finally'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('try_finally') || (new \ReflectionFunction('try_finally'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('try_finally' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('try_finally')) {
     /**
      * try ～ finally 構文の関数版
@@ -34618,7 +34636,7 @@ if (!function_exists('try_finally')) {
     }
 }
 
-assert(!function_exists('try_null') || (new \ReflectionFunction('try_null'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('try_null') || (new \ReflectionFunction('try_null'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('try_null' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('try_null')) {
     /**
      * 例外を握りつぶす try 構文
@@ -34652,7 +34670,7 @@ if (!function_exists('try_null')) {
     }
 }
 
-assert(!function_exists('try_return') || (new \ReflectionFunction('try_return'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('try_return') || (new \ReflectionFunction('try_return'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('try_return' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('try_return')) {
     /**
      * 例外が飛んだら例外オブジェクトを返す
@@ -34686,7 +34704,7 @@ if (!function_exists('try_return')) {
     }
 }
 
-assert(!function_exists('base62_decode') || (new \ReflectionFunction('base62_decode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('base62_decode') || (new \ReflectionFunction('base62_decode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('base62_decode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('base62_decode')) {
     /**
      * 数値とアルファベットで base62 デコードする
@@ -34725,7 +34743,7 @@ if (!function_exists('base62_decode')) {
     }
 }
 
-assert(!function_exists('base62_encode') || (new \ReflectionFunction('base62_encode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('base62_encode') || (new \ReflectionFunction('base62_encode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('base62_encode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('base62_encode')) {
     /**
      * 数値とアルファベットで base62 エンコードする
@@ -34778,7 +34796,7 @@ if (!function_exists('base62_encode')) {
     }
 }
 
-assert(!function_exists('base64url_decode') || (new \ReflectionFunction('base64url_decode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('base64url_decode') || (new \ReflectionFunction('base64url_decode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('base64url_decode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('base64url_decode')) {
     /**
      * url safe な base64_decode
@@ -34796,7 +34814,7 @@ if (!function_exists('base64url_decode')) {
     }
 }
 
-assert(!function_exists('base64url_encode') || (new \ReflectionFunction('base64url_encode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('base64url_encode') || (new \ReflectionFunction('base64url_encode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('base64url_encode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('base64url_encode')) {
     /**
      * url safe な base64_encode
@@ -34815,7 +34833,7 @@ if (!function_exists('base64url_encode')) {
     }
 }
 
-assert(!function_exists('dataurl_decode') || (new \ReflectionFunction('dataurl_decode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('dataurl_decode') || (new \ReflectionFunction('dataurl_decode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('dataurl_decode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('dataurl_decode')) {
     /**
      * DataURL をデコードする
@@ -34877,7 +34895,7 @@ if (!function_exists('dataurl_decode')) {
     }
 }
 
-assert(!function_exists('dataurl_encode') || (new \ReflectionFunction('dataurl_encode'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('dataurl_encode') || (new \ReflectionFunction('dataurl_encode'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('dataurl_encode' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('dataurl_encode')) {
     /**
      * DataURL をエンコードする
@@ -34942,7 +34960,7 @@ if (!function_exists('dataurl_encode')) {
     }
 }
 
-assert(!function_exists('formdata_build') || (new \ReflectionFunction('formdata_build'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('formdata_build') || (new \ReflectionFunction('formdata_build'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('formdata_build' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('formdata_build')) {
     /**
      * multipart/formdata の構築
@@ -35111,7 +35129,7 @@ if (!function_exists('formdata_build')) {
     }
 }
 
-assert(!function_exists('formdata_parse') || (new \ReflectionFunction('formdata_parse'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('formdata_parse') || (new \ReflectionFunction('formdata_parse'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('formdata_parse' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('formdata_parse')) {
     /**
      * multipart/formdata のパース
@@ -35227,7 +35245,7 @@ if (!function_exists('formdata_parse')) {
     }
 }
 
-assert(!function_exists('query_build') || (new \ReflectionFunction('query_build'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('query_build') || (new \ReflectionFunction('query_build'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('query_build' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('query_build')) {
     /**
      * 数値キーを削除する http_build_query
@@ -35325,7 +35343,7 @@ if (!function_exists('query_build')) {
     }
 }
 
-assert(!function_exists('query_parse') || (new \ReflectionFunction('query_parse'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('query_parse') || (new \ReflectionFunction('query_parse'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('query_parse' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('query_parse')) {
     /**
      * parse_str の返り値版
@@ -35407,7 +35425,7 @@ if (!function_exists('query_parse')) {
     }
 }
 
-assert(!function_exists('uri_build') || (new \ReflectionFunction('uri_build'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('uri_build') || (new \ReflectionFunction('uri_build'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('uri_build' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('uri_build')) {
     /**
      * parse_uri の逆
@@ -35491,7 +35509,7 @@ if (!function_exists('uri_build')) {
     }
 }
 
-assert(!function_exists('uri_parse') || (new \ReflectionFunction('uri_parse'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('uri_parse') || (new \ReflectionFunction('uri_parse'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('uri_parse' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('uri_parse')) {
     /**
      * parse_url の仕様を少しいじったもの
@@ -35591,7 +35609,7 @@ if (!function_exists('uri_parse')) {
     }
 }
 
-assert(!function_exists('benchmark') || (new \ReflectionFunction('benchmark'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('benchmark') || (new \ReflectionFunction('benchmark'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('benchmark' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('benchmark')) {
     /**
      * 簡易ベンチマークを取る
@@ -35807,7 +35825,7 @@ if (!function_exists('benchmark')) {
     }
 }
 
-assert(!function_exists('built_in_server') || (new \ReflectionFunction('built_in_server'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('built_in_server') || (new \ReflectionFunction('built_in_server'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('built_in_server' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('built_in_server')) {
     /**
      * ビルトインサーバーを起動する
@@ -35901,7 +35919,7 @@ if (!function_exists('built_in_server')) {
     }
 }
 
-assert(!function_exists('cache') || (new \ReflectionFunction('cache'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('cache') || (new \ReflectionFunction('cache'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('cache' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('cache')) {
     /**
      * シンプルにキャッシュする
@@ -36046,7 +36064,7 @@ if (!function_exists('cache')) {
     }
 }
 
-assert(!function_exists('cache_fetch') || (new \ReflectionFunction('cache_fetch'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('cache_fetch') || (new \ReflectionFunction('cache_fetch'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('cache_fetch' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('cache_fetch')) {
     /**
      * psr-16 cache で「無かったらコールバックを実行して set」する
@@ -36070,7 +36088,7 @@ if (!function_exists('cache_fetch')) {
     }
 }
 
-assert(!function_exists('cacheobject') || (new \ReflectionFunction('cacheobject'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('cacheobject') || (new \ReflectionFunction('cacheobject'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('cacheobject' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('cacheobject')) {
     /**
      * psr-16 を実装したキャッシュオブジェクトを返す
@@ -36442,7 +36460,7 @@ if (!function_exists('cacheobject')) {
     }
 }
 
-assert(!function_exists('function_configure') || (new \ReflectionFunction('function_configure'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('function_configure') || (new \ReflectionFunction('function_configure'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('function_configure' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('function_configure')) {
     /**
      * 本ライブラリの設定を行う
@@ -36533,7 +36551,7 @@ if (!function_exists('function_configure')) {
     }
 }
 
-assert(!function_exists('function_resolve') || (new \ReflectionFunction('function_resolve'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('function_resolve') || (new \ReflectionFunction('function_resolve'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('function_resolve' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('function_resolve')) {
     /**
      * 本ライブラリの関数名を解決する
@@ -36561,7 +36579,7 @@ if (!function_exists('function_resolve')) {
     }
 }
 
-assert(!function_exists('json_storage') || (new \ReflectionFunction('json_storage'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('json_storage') || (new \ReflectionFunction('json_storage'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('json_storage' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('json_storage')) {
     /**
      * キーが json 化されてファイルシステムに永続化される ArrayAccess を返す
@@ -36704,7 +36722,7 @@ if (!function_exists('json_storage')) {
     }
 }
 
-assert(!function_exists('number_serial') || (new \ReflectionFunction('number_serial'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('number_serial') || (new \ReflectionFunction('number_serial'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('number_serial' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('number_serial')) {
     /**
      * 連続した数値の配列を縮めて返す
@@ -36779,7 +36797,7 @@ if (!function_exists('number_serial')) {
     }
 }
 
-assert(!function_exists('progressor') || (new \ReflectionFunction('progressor'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('progressor') || (new \ReflectionFunction('progressor'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('progressor' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('progressor')) {
     /**
      * 進捗(%)と見積もり(秒)を返すオブジェクトを返す
@@ -36922,7 +36940,7 @@ if (!function_exists('progressor')) {
     }
 }
 
-assert(!function_exists('arrayable_key_exists') || (new \ReflectionFunction('arrayable_key_exists'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('arrayable_key_exists') || (new \ReflectionFunction('arrayable_key_exists'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('arrayable_key_exists' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('arrayable_key_exists')) {
     /**
      * 配列・ArrayAccess にキーがあるか調べる
@@ -36966,7 +36984,7 @@ if (!function_exists('arrayable_key_exists')) {
     }
 }
 
-assert(!function_exists('arrayval') || (new \ReflectionFunction('arrayval'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('arrayval') || (new \ReflectionFunction('arrayval'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('arrayval' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('arrayval')) {
     /**
      * array キャストの関数版
@@ -37020,7 +37038,7 @@ if (!function_exists('arrayval')) {
     }
 }
 
-assert(!function_exists('attr_exists') || (new \ReflectionFunction('attr_exists'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('attr_exists') || (new \ReflectionFunction('attr_exists'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('attr_exists' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('attr_exists')) {
     /**
      * 配列・オブジェクトを問わずキーやプロパティの存在を確認する
@@ -37058,7 +37076,7 @@ if (!function_exists('attr_exists')) {
     }
 }
 
-assert(!function_exists('attr_get') || (new \ReflectionFunction('attr_get'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('attr_get') || (new \ReflectionFunction('attr_get'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('attr_get' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('attr_get')) {
     /**
      * 配列・オブジェクトを問わずキーやプロパティの値を取得する
@@ -37132,7 +37150,7 @@ if (!function_exists('attr_get')) {
     }
 }
 
-assert(!function_exists('cipher_metadata') || (new \ReflectionFunction('cipher_metadata'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('cipher_metadata') || (new \ReflectionFunction('cipher_metadata'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('cipher_metadata' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('cipher_metadata')) {
     /**
      * 暗号化アルゴリズムのメタデータを返す
@@ -37291,7 +37309,7 @@ if (!function_exists('cipher_metadata')) {
     }
 }
 
-assert(!function_exists('decimalstr') || (new \ReflectionFunction('decimalstr'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('decimalstr') || (new \ReflectionFunction('decimalstr'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('decimalstr' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('decimalstr')) {
     /**
      * 10進数小数文字列を返す
@@ -37342,7 +37360,7 @@ if (!function_exists('decimalstr')) {
     }
 }
 
-assert(!function_exists('decrypt') || (new \ReflectionFunction('decrypt'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('decrypt') || (new \ReflectionFunction('decrypt'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('decrypt' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('decrypt')) {
     /**
      * 指定されたパスワードで復号化する
@@ -37447,7 +37465,7 @@ if (!function_exists('decrypt')) {
     }
 }
 
-assert(!function_exists('encrypt') || (new \ReflectionFunction('encrypt'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('encrypt') || (new \ReflectionFunction('encrypt'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('encrypt' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('encrypt')) {
     /**
      * 指定されたパスワードで暗号化する
@@ -37527,7 +37545,7 @@ if (!function_exists('encrypt')) {
     }
 }
 
-assert(!function_exists('flagval') || (new \ReflectionFunction('flagval'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('flagval') || (new \ReflectionFunction('flagval'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('flagval' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('flagval')) {
     /**
      * falsy の範囲を少し拡張した bool キャスト
@@ -37564,7 +37582,7 @@ if (!function_exists('flagval')) {
     }
 }
 
-assert(!function_exists('hashvar') || (new \ReflectionFunction('hashvar'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('hashvar') || (new \ReflectionFunction('hashvar'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('hashvar' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('hashvar')) {
     /**
      * 変数指定をできるようにした compact
@@ -37657,7 +37675,7 @@ if (!function_exists('hashvar')) {
     }
 }
 
-assert(!function_exists('is_arithmetic') || (new \ReflectionFunction('is_arithmetic'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_arithmetic') || (new \ReflectionFunction('is_arithmetic'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_arithmetic' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_arithmetic')) {
     /**
      * 変数が算術可能か調べる
@@ -37693,7 +37711,7 @@ if (!function_exists('is_arithmetic')) {
     }
 }
 
-assert(!function_exists('is_arrayable') || (new \ReflectionFunction('is_arrayable'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_arrayable') || (new \ReflectionFunction('is_arrayable'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_arrayable' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_arrayable')) {
     /**
      * 変数が配列アクセス可能か調べる
@@ -37716,7 +37734,7 @@ if (!function_exists('is_arrayable')) {
     }
 }
 
-assert(!function_exists('is_decimal') || (new \ReflectionFunction('is_decimal'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_decimal') || (new \ReflectionFunction('is_decimal'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_decimal' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_decimal')) {
     /**
      * 値が10進的か調べる
@@ -37757,7 +37775,7 @@ if (!function_exists('is_decimal')) {
     }
 }
 
-assert(!function_exists('is_empty') || (new \ReflectionFunction('is_empty'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_empty') || (new \ReflectionFunction('is_empty'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_empty' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_empty')) {
     /**
      * 値が空か検査する
@@ -37826,7 +37844,7 @@ if (!function_exists('is_empty')) {
     }
 }
 
-assert(!function_exists('is_empty_recursive') || (new \ReflectionFunction('is_empty_recursive'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_empty_recursive') || (new \ReflectionFunction('is_empty_recursive'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_empty_recursive' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_empty_recursive')) {
     /**
      * 値が空か再帰的に検査する
@@ -37884,7 +37902,7 @@ if (!function_exists('is_empty_recursive')) {
     }
 }
 
-assert(!function_exists('is_exportable') || (new \ReflectionFunction('is_exportable'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_exportable') || (new \ReflectionFunction('is_exportable'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_exportable' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_exportable')) {
     /**
      * 値が var_export で出力可能か検査する
@@ -37962,7 +37980,7 @@ if (!function_exists('is_exportable')) {
     }
 }
 
-assert(!function_exists('is_primitive') || (new \ReflectionFunction('is_primitive'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_primitive') || (new \ReflectionFunction('is_primitive'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_primitive' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_primitive')) {
     /**
      * 値が複合型でないか検査する
@@ -37995,7 +38013,7 @@ if (!function_exists('is_primitive')) {
     }
 }
 
-assert(!function_exists('is_recursive') || (new \ReflectionFunction('is_recursive'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_recursive') || (new \ReflectionFunction('is_recursive'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_recursive' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_recursive')) {
     /**
      * 変数が再帰参照を含むか調べる
@@ -38048,7 +38066,7 @@ if (!function_exists('is_recursive')) {
     }
 }
 
-assert(!function_exists('is_resourcable') || (new \ReflectionFunction('is_resourcable'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_resourcable') || (new \ReflectionFunction('is_resourcable'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_resourcable' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_resourcable')) {
     /**
      * 閉じたリソースでも true を返す is_resource
@@ -38085,7 +38103,7 @@ if (!function_exists('is_resourcable')) {
     }
 }
 
-assert(!function_exists('is_stringable') || (new \ReflectionFunction('is_stringable'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_stringable') || (new \ReflectionFunction('is_stringable'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_stringable' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_stringable')) {
     /**
      * 変数が文字列化できるか調べる
@@ -38129,7 +38147,7 @@ if (!function_exists('is_stringable')) {
     }
 }
 
-assert(!function_exists('is_typeof') || (new \ReflectionFunction('is_typeof'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('is_typeof') || (new \ReflectionFunction('is_typeof'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('is_typeof' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('is_typeof')) {
     /**
      * 変数が型に合致するか調べる
@@ -38211,7 +38229,7 @@ if (!function_exists('is_typeof')) {
     }
 }
 
-assert(!function_exists('numberify') || (new \ReflectionFunction('numberify'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('numberify') || (new \ReflectionFunction('numberify'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('numberify' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('numberify')) {
     /**
      * 値を何とかして数値化する
@@ -38291,7 +38309,7 @@ if (!function_exists('numberify')) {
     }
 }
 
-assert(!function_exists('numval') || (new \ReflectionFunction('numval'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('numval') || (new \ReflectionFunction('numval'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('numval' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('numval')) {
     /**
      * 値を数値化する
@@ -38328,7 +38346,7 @@ if (!function_exists('numval')) {
     }
 }
 
-assert(!function_exists('phpval') || (new \ReflectionFunction('phpval'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('phpval') || (new \ReflectionFunction('phpval'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('phpval' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('phpval')) {
     /**
      * 文字列を php の式として評価して値を返す
@@ -38377,7 +38395,7 @@ if (!function_exists('phpval')) {
     }
 }
 
-assert(!function_exists('si_prefix') || (new \ReflectionFunction('si_prefix'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('si_prefix') || (new \ReflectionFunction('si_prefix'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('si_prefix' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('si_prefix')) {
     /**
      * 数値に SI 接頭辞を付与する
@@ -38449,7 +38467,7 @@ if (!function_exists('si_prefix')) {
     }
 }
 
-assert(!function_exists('si_unprefix') || (new \ReflectionFunction('si_unprefix'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('si_unprefix') || (new \ReflectionFunction('si_unprefix'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('si_unprefix' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('si_unprefix')) {
     /**
      * SI 接頭辞が付与された文字列を数値化する
@@ -38496,7 +38514,7 @@ if (!function_exists('si_unprefix')) {
     }
 }
 
-assert(!function_exists('strdec') || (new \ReflectionFunction('strdec'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('strdec') || (new \ReflectionFunction('strdec'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('strdec' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('strdec')) {
     /**
      * 0xff,0777 などを10進数値化する
@@ -38554,7 +38572,7 @@ if (!function_exists('strdec')) {
     }
 }
 
-assert(!function_exists('stringify') || (new \ReflectionFunction('stringify'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('stringify') || (new \ReflectionFunction('stringify'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('stringify' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('stringify')) {
     /**
      * 値を何とかして文字列化する
@@ -38598,7 +38616,7 @@ if (!function_exists('stringify')) {
     }
 }
 
-assert(!function_exists('timeval') || (new \ReflectionFunction('timeval'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('timeval') || (new \ReflectionFunction('timeval'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('timeval' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('timeval')) {
     /**
      * float（秒）を int[秒, マイクロ秒] に変換する
@@ -38624,7 +38642,7 @@ if (!function_exists('timeval')) {
     }
 }
 
-assert(!function_exists('var_apply') || (new \ReflectionFunction('var_apply'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_apply') || (new \ReflectionFunction('var_apply'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_apply' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('var_apply')) {
     /**
      * 値にコールバックを適用する
@@ -38668,7 +38686,7 @@ if (!function_exists('var_apply')) {
     }
 }
 
-assert(!function_exists('var_applys') || (new \ReflectionFunction('var_applys'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_applys') || (new \ReflectionFunction('var_applys'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_applys' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('var_applys')) {
     /**
      * 配列にコールバックを適用する
@@ -38711,7 +38729,7 @@ if (!function_exists('var_applys')) {
     }
 }
 
-assert(!function_exists('var_export2') || (new \ReflectionFunction('var_export2'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_export2') || (new \ReflectionFunction('var_export2'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_export2' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('var_export2')) {
     /**
      * 組み込みの var_export をいい感じにしたもの
@@ -38926,7 +38944,7 @@ if (!function_exists('var_export2')) {
     }
 }
 
-assert(!function_exists('var_export3') || (new \ReflectionFunction('var_export3'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_export3') || (new \ReflectionFunction('var_export3'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_export3' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('var_export3')) {
     /**
      * var_export を色々と出力できるようにしたもの
@@ -39536,7 +39554,7 @@ if (!function_exists('var_export3')) {
     }
 }
 
-assert(!function_exists('var_hash') || (new \ReflectionFunction('var_hash'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_hash') || (new \ReflectionFunction('var_hash'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_hash' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('var_hash')) {
     /**
      * 値に複数のハッシュアルゴリズムを適用させて結合して返す
@@ -39582,7 +39600,7 @@ if (!function_exists('var_hash')) {
     }
 }
 
-assert(!function_exists('var_html') || (new \ReflectionFunction('var_html'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_html') || (new \ReflectionFunction('var_html'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_html' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('var_html')) {
     /**
      * var_export2 を html コンテキストに特化させたようなもの
@@ -39659,7 +39677,7 @@ if (!function_exists('var_html')) {
     }
 }
 
-assert(!function_exists('var_mimetype') || (new \ReflectionFunction('var_mimetype'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_mimetype') || (new \ReflectionFunction('var_mimetype'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_mimetype' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('var_mimetype')) {
     /**
      * 値の mimetype を返す
@@ -39710,7 +39728,7 @@ if (!function_exists('var_mimetype')) {
     }
 }
 
-assert(!function_exists('var_pretty') || (new \ReflectionFunction('var_pretty'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_pretty') || (new \ReflectionFunction('var_pretty'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_pretty' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('var_pretty')) {
     /**
      * var_dump の出力を見やすくしたもの
@@ -40307,7 +40325,7 @@ if (!function_exists('var_pretty')) {
     }
 }
 
-assert(!function_exists('var_type') || (new \ReflectionFunction('var_type'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_type') || (new \ReflectionFunction('var_type'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_type' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('var_type')) {
     /**
      * 値の型を取得する
@@ -40604,7 +40622,7 @@ if (!function_exists('var_type')) {
     }
 }
 
-assert(!function_exists('varcmp') || (new \ReflectionFunction('varcmp'))->isUserDefined());
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('varcmp') || (new \ReflectionFunction('varcmp'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('varcmp' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('varcmp')) {
     /**
      * php7 の `<=>` の関数版

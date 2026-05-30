@@ -320,8 +320,8 @@ trait ChainObject4
 
     /** @see add_error_handler() */
     public self $add_error_handler;
-    public function add_error_handler($handler, $error_types = 32767): self { }
-    public function add_error_handler($error_types = 32767): self { }
+    public function add_error_handler($handler, $error_types = E_ALL): self { }
+    public function add_error_handler($error_types = E_ALL): self { }
 
     /** @see stacktrace() */
     public self $stacktrace;

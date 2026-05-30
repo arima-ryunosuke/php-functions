@@ -482,6 +482,7 @@ if (!function_exists('ryunosuke\\Functions\\array_all')) {
      *
      * @see array_and()
      * @deprecated 標準関数と重複
+     * @conflict 8.4
      * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\array
      */
@@ -538,6 +539,7 @@ if (!function_exists('ryunosuke\\Functions\\array_any')) {
      *
      * @see array_or()
      * @deprecated 標準関数と重複
+     * @conflict 8.4
      * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\array
      */
@@ -2041,6 +2043,7 @@ if (!function_exists('ryunosuke\\Functions\\array_find')) {
      *
      * @see array_find_first()
      * @deprecated 標準関数と重複
+     * @conflict 8.4
      * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\array
      */
@@ -6601,7 +6604,7 @@ if (!function_exists('ryunosuke\\Functions\\class_extends')) {
                     private        $__methods       = [];
                     private static $__staticMethods = [];
 
-                    public function __construct(\ReflectionClass $refclass = null, $original = null, $fields = [], $methods = [])
+                    public function __construct(?\ReflectionClass $refclass = null, $original = null, $fields = [], $methods = [])
                     {
                         if ($refclass === null) {
                             return;
@@ -13640,7 +13643,7 @@ if (!function_exists('ryunosuke\\Functions\\add_error_handler')) {
      * @param int $error_types エラータイプ
      * @return callable|null 直近に設定されていたエラーハンドラ（未設定の場合は null）
      */
-    function add_error_handler($handler, $error_types = \E_ALL | \E_STRICT)
+    function add_error_handler($handler, $error_types = \E_ALL)
     {
         $already = set_error_handler(static function () use ($handler, &$already) {
             $result = $handler(...func_get_args());
@@ -14176,7 +14179,7 @@ if (!function_exists('ryunosuke\\Functions\\process')) {
      * @param ?array $options その他の追加オプション
      * @return int リターンコード
      */
-    function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null, $options = null)
+    function process($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, ?array $env = null, $options = null)
     {
         $rc = process_async($command, $args, $stdin, $stdout, $stderr, $cwd, $env, $options)();
         if ($rc === -1) {
@@ -14205,7 +14208,7 @@ if (!function_exists('ryunosuke\\Functions\\process_async')) {
      * @param ?array $options その他の追加オプション
      * @return \ProcessAsync|object プロセスオブジェクト
      */
-    function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, array $env = null, $options = null)
+    function process_async($command, $args = [], $stdin = '', &$stdout = '', &$stderr = '', $cwd = null, ?array $env = null, $options = null)
     {
         if (is_array($args)) {
             $statement = [$command];
@@ -18228,7 +18231,7 @@ if (!function_exists('ryunosuke\\Functions\\func_get_namedargs')) {
 
         $ref = (function () use ($traces) {
             $trace = $traces[1];
-            if (!str_ends_with($trace['function'], '{closure}')) {
+            if (!str_contains($trace['function'], '{closure')) {
                 return isset($trace['class']) ? new \ReflectionMethod($trace['class'], $trace['function']) : new \ReflectionFunction($trace['function']);
             }
 
@@ -22991,7 +22994,15 @@ if (!function_exists('ryunosuke\\Functions\\php_tokens')) {
                     $text = $var_export($ref->getFileName());
                 }
                 if ($this->id === T_NS_C) {
-                    $text = $var_export($ref->getNamespaceName());
+                    // php8.4 から ReflectionFunction({closure})::getNamespaceName は値を返さなくなった
+                    // 「クロージャは名前空間を持つものではない」とのこと（それ自体は正しい）
+                    // 得る術が完全になくなったので自前で得るしかない
+                    if (version_compare(PHP_VERSION, '8.4.0') >= 0) {
+                        $text = $var_export(array_key_first(namespace_parse($ref->getFileName()))); // @codeCoverageIgnore
+                    }
+                    else {
+                        $text = $var_export($ref->getNamespaceName());
+                    }
                 }
                 return $text;
             }
@@ -25216,7 +25227,7 @@ if (!function_exists('ryunosuke\\Functions\\ip_info')) {
                         $this->transaction(function () use ($fp, $registry) {
                             // 同時に走らないように rand でバラす
                             $this->refresh($registry, time() + $this->options['ttl'] + rand(0, 60), (function () use ($fp) {
-                                while (($fields = fgetcsv($fp, 0, "|")) !== false) {
+                                while (($fields = fgetcsv($fp, 0, "|", escape: "\\")) !== false) { // for compatible: change to escape:"" in future scope
                                     if (($fields[2] ?? '') === 'ipv4' && in_array($fields[6] ?? '', ['assigned', 'allocated'], true)) {
                                         foreach ($this->cidr($fields[3], $fields[4]) as $cidr) {
                                             yield [
@@ -27361,8 +27372,8 @@ if (!function_exists('ryunosuke\\Functions\\function_export_false2null')) {
                 if (str_contains($funcname, '\\')) {
                     continue;
                 }
-                // assert を名前空間内に定義することはできない
-                if ($funcname === 'assert') {
+                // これらは名前空間内に定義することはできない
+                if (in_array($funcname, ['assert', 'exit', 'die'], true)) {
                     continue;
                 }
                 // 標準関数に参照返しは存在しないはず（したとしても1文で返すのが難しいので対応しない）
@@ -27421,8 +27432,10 @@ if (!function_exists('ryunosuke\\Functions\\function_parameter')) {
         foreach ($reffunc->getParameters() as $parameter) {
             $declare = '';
 
+            $type = null;
             if ($parameter->hasType()) {
-                $declare .= reflect_type_resolve($parameter->getType()) . ' ';
+                $type = reflect_type_resolve($parameter->getType());
+                $declare .= $type . ' ';
             }
 
             if ($parameter->isPassedByReference()) {
@@ -27459,6 +27472,9 @@ if (!function_exists('ryunosuke\\Functions\\function_parameter')) {
                     // Type に応じたデフォルト値が得られればベストだがそこまでする必要もない
                     // 少なくとも 8.0 時点では = null してしまえば型エラーも起きない（8.4 で非推奨になってるけど）
                     $defval = "null";
+                    if ($type !== null && !preg_match('#[^_0-9a-z]?(null|mixed)[^_0-9a-z]?#u', $type)) {
+                        $declare = 'null|' . $declare;
+                    }
                 }
 
                 if (isset($defval)) {
@@ -27666,7 +27682,7 @@ if (!function_exists('ryunosuke\\Functions\\parameter_wiring')) {
         // recurse for closure
         return array_map(function ($arg) use ($dependency) {
             if ($arg instanceof \Closure) {
-                if ((new \ReflectionFunction($arg))->getShortName() === '{closure}') {
+                if (str_contains((new \ReflectionFunction($arg))->getShortName(), '{closure')) {
                     $arg = $arg->bindTo($dependency);
                 }
                 return $arg(...parameter_wiring($arg, $dependency));
@@ -29486,7 +29502,7 @@ if (!function_exists('ryunosuke\\Functions\\stream_describe')) {
         if (DIRECTORY_SEPARATOR === '\\') {
             exec('handle -v -p ' . getmypid(), $output);
             foreach (array_slice($output, 6) as $descriptor) {
-                [, , , $fd, $type, , $realpath] = str_getcsv($descriptor);
+                [, , , $fd, $type, , $realpath] = str_getcsv($descriptor, escape: "\\"); // for compatible: change to escape:"" in future scope
                 if ($type === 'File') {
                     clearstatcache(true, $realpath);
                     if (file_exists($realpath)) {
@@ -30621,6 +30637,7 @@ if (!function_exists('ryunosuke\\Functions\\mb_str_pad')) {
      *
      * @see mb_pad_width()
      * @deprecated 標準関数と重複
+     * @conflict 8.3
      * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\strings
      */
@@ -30676,6 +30693,7 @@ if (!function_exists('ryunosuke\\Functions\\mb_trim')) {
      *
      * @see https://github.com/symfony/polyfill-php84/
      * @deprecated 標準関数と重複
+     * @conflict 8.4
      * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\strings
      */
