@@ -7320,6 +7320,68 @@ if (!function_exists('ryunosuke\\Functions\\namespace_detect')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\object_assign') || (new \ReflectionFunction('ryunosuke\\Functions\\object_assign'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\object_assign')) {
+    /**
+     * オブジェクトのプロパティを完全コピーする
+     *
+     * private/protected/public もすべて含める。
+     * 言い換えれば「serialize/get_mangled_object_vars の結果が同じになるようにコピー」する。
+     *
+     * 用途はかなり限定的で、大抵のケースでは clone で事足りる。
+     * この関数は言うなれば「既にオブジェクトが出来上がっている状態で clone 的なことがしたい」に近い。
+     *
+     * 未初期化プロパティはコピーしない（できない）。
+     * readonly はいかなる手段でも書き換えられないので、現状はスルーする。
+     * もちろん static も対象外。
+     *
+     * なお、シグネチャは js の Object.assign に意図的に似せてある。
+     * ただし、sources は target の下位互換であるような型でなければならない。
+     * 型が異なると例外を投げる。
+     *
+     * Example:
+     * ```php
+     * # 事前クラス定義はしんどいので組み込みの Exception による簡易的な例
+     * $source = new \Exception('message', 123);
+     * $target = new \Exception('');
+     *
+     * // $target を返し、その全プロパティは $source のもので上書きされている
+     * $target = object_assign($target, $source);
+     *
+     * // この辺は分かりやすい
+     * that($target->getMessage())->is($source->getMessage());
+     * that($target->getCode())->is($source->getCode());
+     * // この辺も同じになっている
+     * that($target->getFile())->is($source->getFile());
+     * that($target->getLine())->is($source->getLine());
+     * // もっと端的に言えば serialize 表現が完全一致する
+     * that(serialize($target))->is(serialize($source));
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\classobj
+     *
+     * @template T of object
+     * @param T $target コピー先オブジェクト
+     * @param T ...$sources コピー元オブジェクト
+     * @return T $target
+     */
+    function object_assign(object $target, object ...$sources): object
+    {
+        for ($ref = new \ReflectionClass($target); $ref !== false; $ref = $ref->getParentClass()) {
+            foreach ($sources as $source) {
+                foreach ($ref->getProperties() as $property) {
+                    $property->setAccessible(true);
+                    if (!$property->isStatic() && $property->isInitialized($source) && !(method_exists($property, 'isReadOnly') && $property->isReadOnly())) {
+                        $property->setValue($target, $property->getValue($source));
+                    }
+                }
+            }
+        }
+
+        return $target;
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\object_dive') || (new \ReflectionFunction('ryunosuke\\Functions\\object_dive'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\object_dive')) {
     /**
@@ -17911,246 +17973,244 @@ if (!function_exists('ryunosuke\\Functions\\chain')) {
      */
     function chain($source = null)
     {
-        if (function_configure('chain.version') >= 2) {
-            $chain_object = new class($source) implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable {
-                public static  $__CLASS__;
-                private static $metadata = [];
+        $chain_object = new class($source) implements \Countable, \ArrayAccess, \IteratorAggregate, \JsonSerializable {
+            public static  $__CLASS__;
+            private static $metadata = [];
 
-                private $data;
-                private $callback;
-                private $expression;
+            private $data;
+            private $callback;
+            private $expression;
 
-                public function __construct($source)
-                {
-                    $this->data = $source;
+            public function __construct($source)
+            {
+                $this->data = $source;
+            }
+
+            public function __get($name)
+            {
+                $this->data = $this();
+
+                $this->callback = $this->_resolve($name, $this->data);
+                return $this;
+            }
+
+            public function __call($name, $arguments)
+            {
+                return $this->$name[0](...$arguments);
+            }
+
+            public function __invoke(...$arguments)
+            {
+                if ($this->expression) {
+                    $return_mode = !!$arguments;
+                    $metadata = self::_cache($this->callback);
+
+                    $callables = $metadata['callables'];
+                    assert(count($callables) === 1);
+                    $first_callable = first_keyvalue($callables);
+                    unset($arguments[$first_callable[0]]);
+                    $arguments[$first_callable[1]] = func_eval(preg_match('#\$\d+#u', $this->expression) ? $this->expression : '$1 ' . $this->expression, '_');
+                    $offset = 0;
+
+                    $this->data = $this->_apply($this->callback, $arguments, [$offset => $this->data]);
+                    $this->callback = null;
+                    $this->expression = null;
+
+                    if ($return_mode) {
+                        return $this;
+                    }
+                }
+                return $this[0]()->data;
+            }
+
+            public function __toString()
+            {
+                return (string) $this();
+            }
+
+            public function getIterator(): \Traversable
+            {
+                yield from $this();
+            }
+
+            public function count(): int
+            {
+                return count($this());
+            }
+
+            public function jsonSerialize(): mixed
+            {
+                return $this();
+            }
+
+            public function offsetGet($offset): mixed
+            {
+                // 直 eval モード
+                if ($this->callback) {
+                    $metadata = self::_cache($this->callback);
+                    if (is_string($offset) && $offset !== 'E' && !isset($metadata['names'][$offset])) {
+                        $this->expression = $offset;
+                        return $this;
+                    }
                 }
 
-                public function __get($name)
-                {
-                    $this->data = $this();
-
-                    $this->callback = $this->_resolve($name, $this->data);
-                    return $this;
-                }
-
-                public function __call($name, $arguments)
-                {
-                    return $this->$name[0](...$arguments);
-                }
-
-                public function __invoke(...$arguments)
-                {
-                    if ($this->expression) {
-                        $return_mode = !!$arguments;
-                        $metadata = self::_cache($this->callback);
-
-                        $callables = $metadata['callables'];
-                        assert(count($callables) === 1);
-                        $first_callable = first_keyvalue($callables);
-                        unset($arguments[$first_callable[0]]);
-                        $arguments[$first_callable[1]] = func_eval(preg_match('#\$\d+#u', $this->expression) ? $this->expression : '$1 ' . $this->expression, '_');
-                        $offset = 0;
+                return function (...$arguments) use ($offset) {
+                    if ($this->callback !== null) {
+                        // E モード
+                        if ($offset === 'E') {
+                            $offset = 0;
+                            $expr = array_pop($arguments);
+                            $expr = preg_match('#\$\d+#u', $expr) ? $expr : '$1 ' . $expr;
+                            $arguments[] = func_eval($expr, '_');
+                        }
 
                         $this->data = $this->_apply($this->callback, $arguments, [$offset => $this->data]);
                         $this->callback = null;
-                        $this->expression = null;
-
-                        if ($return_mode) {
-                            return $this;
-                        }
                     }
-                    return $this[0]()->data;
-                }
-
-                public function __toString()
-                {
-                    return (string) $this();
-                }
-
-                public function getIterator(): \Traversable
-                {
-                    yield from $this();
-                }
-
-                public function count(): int
-                {
-                    return count($this());
-                }
-
-                public function jsonSerialize(): mixed
-                {
-                    return $this();
-                }
-
-                public function offsetGet($offset): mixed
-                {
-                    // 直 eval モード
-                    if ($this->callback) {
-                        $metadata = self::_cache($this->callback);
-                        if (is_string($offset) && $offset !== 'E' && !isset($metadata['names'][$offset])) {
-                            $this->expression = $offset;
-                            return $this;
-                        }
-                    }
-
-                    return function (...$arguments) use ($offset) {
-                        if ($this->callback !== null) {
-                            // E モード
-                            if ($offset === 'E') {
-                                $offset = 0;
-                                $expr = array_pop($arguments);
-                                $expr = preg_match('#\$\d+#u', $expr) ? $expr : '$1 ' . $expr;
-                                $arguments[] = func_eval($expr, '_');
-                            }
-
-                            $this->data = $this->_apply($this->callback, $arguments, [$offset => $this->data]);
-                            $this->callback = null;
-                        }
-                        return $this;
-                    };
-                }
-
-                public function apply($callback, ...$args)
-                {
-                    $this->data = $callback($this->data, ...$args);
                     return $this;
+                };
+            }
+
+            public function apply($callback, ...$args)
+            {
+                $this->data = $callback($this->data, ...$args);
+                return $this;
+            }
+
+            // @codeCoverageIgnoreStart
+
+            public function offsetExists($offset): bool { throw new \LogicException(__METHOD__ . ' is not supported'); }
+
+            public function offsetSet($offset, $value): void { throw new \LogicException(__METHOD__ . ' is not supported'); }
+
+            public function offsetUnset($offset): void { throw new \LogicException(__METHOD__ . ' is not supported'); }
+
+            // @codeCoverageIgnoreEnd
+
+            private static function _resolve($name, $data)
+            {
+                $isiterable = is_iterable($data);
+                $isstringable = is_stringable($data);
+                if (false
+                    || ($fname = function_resolve($name))
+                    || ($isiterable && $fname = function_resolve("array_$name"))
+                    || ($isstringable && $fname = function_resolve("str_$name"))
+                ) {
+                    return $fname;
                 }
 
-                // @codeCoverageIgnoreStart
+                throw new \BadFunctionCallException("function '$name' is not defined");
+            }
 
-                public function offsetExists($offset): bool { throw new \LogicException(__METHOD__ . ' is not supported'); }
+            private static function _cache($callback)
+            {
+                return self::$metadata[$callback] ??= (function ($callback) {
+                    $reffunc = reflect_callable($callback);
+                    $parameters = $reffunc->getParameters();
+                    $metadata = [
+                        // 可変長パラメータを無限に返す generator（適切に break しないと無限ループしてしまうので 999 個までとしてある）
+                        'parameters' => function () use ($parameters) {
+                            foreach ($parameters as $parameter) {
+                                if ($parameter->isVariadic()) {
+                                    for ($i = 0; $i < 999; $i++) {
+                                        yield $parameter->getPosition() + $i => $parameter;
+                                    }
+                                    throw new \ArgumentCountError("parameter length is too long(>=$i)"); // @codeCoverageIgnore
+                                }
+                                yield $parameter->getPosition() => $parameter;
+                            }
+                        },
+                        'variadic'   => $reffunc->isVariadic(),
+                        'nullable'   => [],
+                        'callables'  => (function () use ($parameters) {
+                            $result = [];
+                            foreach ($parameters as $parameter) {
+                                $typestring = (string) $parameter->getType();
+                                if (stripos($typestring, 'callable') !== false || stripos($typestring, '\\Closure') !== false || stripos($parameter->getName(), 'callback') !== false) {
+                                    $result[$parameter->getPosition()] = $parameter->getName();
+                                }
+                            }
+                            return $result;
+                        })(),
+                        'positions'  => [],
+                        'names'      => [],
+                    ];
+                    foreach ($parameters as $parameter) {
+                        $type = $parameter->getType();
+                        $metadata['nullable'][$parameter->getPosition()] = $type?->allowsNull();
+                        $metadata['nullable'][$parameter->getName()] = $type?->allowsNull();
+                        $metadata['positions'][$parameter->getPosition()] = $parameter->getName();
+                        $metadata['names'][$parameter->getName()] = $parameter->getPosition();
+                    }
+                    return $metadata;
+                })($callback);
+            }
 
-                public function offsetSet($offset, $value): void { throw new \LogicException(__METHOD__ . ' is not supported'); }
+            private static function _apply($callback, $arguments, $injections)
+            {
+                $metadata = self::_cache($callback);
 
-                public function offsetUnset($offset): void { throw new \LogicException(__METHOD__ . ' is not supported'); }
-
-                // @codeCoverageIgnoreEnd
-
-                private static function _resolve($name, $data)
-                {
-                    $isiterable = is_iterable($data);
-                    $isstringable = is_stringable($data);
+                foreach ($injections as $position => $injection) {
+                    // 可変じゃないのに位置引数 or 名前引数が存在しないチェック
                     if (false
-                        || ($fname = function_resolve($name))
-                        || ($isiterable && $fname = function_resolve("array_$name"))
-                        || ($isstringable && $fname = function_resolve("str_$name"))
+                        || is_int($position) && !isset($metadata['positions'][$position]) && !$metadata['variadic']
+                        || is_string($position) && !isset($metadata['names'][$position])
                     ) {
-                        return $fname;
+                        throw new \InvalidArgumentException("$callback(\$$position) does not exist");
                     }
 
-                    throw new \BadFunctionCallException("function '$name' is not defined");
+                    // null セーフモード
+                    if ($injection === null && function_configure('chain.nullsafe') && !($metadata['nullable'][$position] ?? false)) {
+                        return null;
+                    }
                 }
 
-                private static function _cache($callback)
-                {
-                    return self::$metadata[$callback] ??= (function ($callback) {
-                        $reffunc = reflect_callable($callback);
-                        $parameters = $reffunc->getParameters();
-                        $metadata = [
-                            // 可変長パラメータを無限に返す generator（適切に break しないと無限ループしてしまうので 999 個までとしてある）
-                            'parameters' => function () use ($parameters) {
-                                foreach ($parameters as $parameter) {
-                                    if ($parameter->isVariadic()) {
-                                        for ($i = 0; $i < 999; $i++) {
-                                            yield $parameter->getPosition() + $i => $parameter;
-                                        }
-                                        throw new \ArgumentCountError("parameter length is too long(>=$i)"); // @codeCoverageIgnore
-                                    }
-                                    yield $parameter->getPosition() => $parameter;
-                                }
-                            },
-                            'variadic'   => $reffunc->isVariadic(),
-                            'nullable'   => [],
-                            'callables'  => (function () use ($parameters) {
-                                $result = [];
-                                foreach ($parameters as $parameter) {
-                                    $typestring = (string) $parameter->getType();
-                                    if (stripos($typestring, 'callable') !== false || stripos($typestring, '\\Closure') !== false || stripos($parameter->getName(), 'callback') !== false) {
-                                        $result[$parameter->getPosition()] = $parameter->getName();
-                                    }
-                                }
-                                return $result;
-                            })(),
-                            'positions'  => [],
-                            'names'      => [],
-                        ];
-                        foreach ($parameters as $parameter) {
-                            $type = $parameter->getType();
-                            $metadata['nullable'][$parameter->getPosition()] = $type?->allowsNull();
-                            $metadata['nullable'][$parameter->getName()] = $type?->allowsNull();
-                            $metadata['positions'][$parameter->getPosition()] = $parameter->getName();
-                            $metadata['names'][$parameter->getName()] = $parameter->getPosition();
-                        }
-                        return $metadata;
-                    })($callback);
+                // プレースホルダモード
+                if (($placeholder = function_configure('placeholder')) && $placeholders = array_keys($arguments, constant($placeholder), true)) {
+                    $arguments = array_replace($arguments, array_fill_keys($placeholders, reset($injections)));
+                    $injections = [];
                 }
 
-                private static function _apply($callback, $arguments, $injections)
-                {
-                    $metadata = self::_cache($callback);
+                $positions = $namedargs = $variadics = [];
+                foreach ($metadata['parameters']() as $pos => $parameter) {
+                    if (!$injections && !$arguments) {
+                        break;
+                    }
 
-                    foreach ($injections as $position => $injection) {
-                        // 可変じゃないのに位置引数 or 名前引数が存在しないチェック
-                        if (false
-                            || is_int($position) && !isset($metadata['positions'][$position]) && !$metadata['variadic']
-                            || is_string($position) && !isset($metadata['names'][$position])
-                        ) {
-                            throw new \InvalidArgumentException("$callback(\$$position) does not exist");
+                    $nam = $parameter->getName();
+
+                    if ($parameter->isVariadic()) {
+                        if (array_key_exists($i = $pos, $injections) || array_key_exists($i = $nam, $injections)) {
+                            $variadics = array_merge($variadics, is_array($injections[$i]) ? $injections[$i] : [$injections[$i]]);
                         }
-
-                        // null セーフモード
-                        if ($injection === null && function_configure('chain.nullsafe') && !($metadata['nullable'][$position] ?? false)) {
-                            return null;
+                        if (array_key_exists($i = $pos, $arguments) || array_key_exists($i = $nam, $arguments)) {
+                            $variadics = array_merge($variadics, is_array($arguments[$i]) ? $arguments[$i] : [$arguments[$i]]);
+                        }
+                    }
+                    else {
+                        if (array_key_exists($i = $pos, $injections)) {
+                            $positions[] = $injections[$i];
+                        }
+                        if (array_key_exists($i = $pos, $arguments)) {
+                            $positions[] = $arguments[$i];
+                        }
+                        if (array_key_exists($i = $nam, $injections)) {
+                            $namedargs[$pos] = $injections[$i];
+                        }
+                        if (array_key_exists($i = $nam, $arguments)) {
+                            $namedargs[$pos] = $arguments[$i];
                         }
                     }
 
-                    // プレースホルダモード
-                    if (($placeholder = function_configure('placeholder')) && $placeholders = array_keys($arguments, constant($placeholder), true)) {
-                        $arguments = array_replace($arguments, array_fill_keys($placeholders, reset($injections)));
-                        $injections = [];
-                    }
-
-                    $positions = $namedargs = $variadics = [];
-                    foreach ($metadata['parameters']() as $pos => $parameter) {
-                        if (!$injections && !$arguments) {
-                            break;
-                        }
-
-                        $nam = $parameter->getName();
-
-                        if ($parameter->isVariadic()) {
-                            if (array_key_exists($i = $pos, $injections) || array_key_exists($i = $nam, $injections)) {
-                                $variadics = array_merge($variadics, is_array($injections[$i]) ? $injections[$i] : [$injections[$i]]);
-                            }
-                            if (array_key_exists($i = $pos, $arguments) || array_key_exists($i = $nam, $arguments)) {
-                                $variadics = array_merge($variadics, is_array($arguments[$i]) ? $arguments[$i] : [$arguments[$i]]);
-                            }
-                        }
-                        else {
-                            if (array_key_exists($i = $pos, $injections)) {
-                                $positions[] = $injections[$i];
-                            }
-                            if (array_key_exists($i = $pos, $arguments)) {
-                                $positions[] = $arguments[$i];
-                            }
-                            if (array_key_exists($i = $nam, $injections)) {
-                                $namedargs[$pos] = $injections[$i];
-                            }
-                            if (array_key_exists($i = $nam, $arguments)) {
-                                $namedargs[$pos] = $arguments[$i];
-                            }
-                        }
-
-                        unset($injections[$pos], $arguments[$pos]);
-                        unset($injections[$nam], $arguments[$nam]);
-                    }
-
-                    return $callback(...array_fill_gap($namedargs, ...$positions), ...$variadics);
+                    unset($injections[$pos], $arguments[$pos]);
+                    unset($injections[$nam], $arguments[$nam]);
                 }
-            };
-            $chain_object::$__CLASS__ = __CLASS__;
-            return $chain_object;
-        }
+
+                return $callback(...array_fill_gap($namedargs, ...$positions), ...$variadics);
+            }
+        };
+        $chain_object::$__CLASS__ = __CLASS__;
+        return $chain_object;
     }
 }
 
@@ -36484,7 +36544,6 @@ if (!function_exists('ryunosuke\\Functions\\function_configure')) {
         $config['var_stream'] ??= 'VarStreamV010000';
         $config['memory_stream'] ??= 'MemoryStreamV010000';
         $config['array.variant'] ??= false;
-        $config['chain.version'] ??= 2;
         $config['chain.nullsafe'] ??= false;
         $config['process.autoload'] ??= [];
         $config['datetime.class'] ??= \DateTimeImmutable::class;
@@ -37956,6 +38015,10 @@ if (!function_exists('ryunosuke\\Functions\\is_exportable')) {
         }
 
         if (is_object($var)) {
+            // マニュアルに記載はないが enum は export できる
+            if ($var instanceof \UnitEnum) {
+                return true;
+            }
             // 無名クラスは非常に特殊で、出力は class@anonymous{filename}:123$456::__set_state(...) のようになる
             // set_state さえ実装してれば復元可能に思えるが php コードとして不正なのでそのまま実行するとシンタックスエラーになる
             // 'class@anonymous{filename}:123$456'::__set_state(...) のようにクオートすれば実行可能になるが、それは標準 var_export の動作ではない
@@ -37970,10 +38033,6 @@ if (!function_exists('ryunosuke\\Functions\\is_exportable')) {
             }
             // これの唯一の例外は stdClass です。 stdClass は、配列をオブジェクトにキャストした形でエクスポートされます
             if (get_class($var) === \stdClass::class) {
-                return true;
-            }
-            // マニュアルに記載はないが enum は export できる
-            if ($var instanceof \UnitEnum) {
                 return true;
             }
             return false;

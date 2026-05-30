@@ -243,11 +243,6 @@ trait ChainObject4
     public function mb_convert_kana(string $string, string $mode = "KV", ?string $encoding = null): self { }
     public function mb_convert_kana(string $mode = "KV", ?string $encoding = null): self { }
 
-    /** @see mb_str_pad() */
-    public self $mb_str_pad;
-    public function mb_str_pad(string $string, int $length, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT, ?string $encoding = null): self { }
-    public function mb_str_pad(int $length, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT, ?string $encoding = null): self { }
-
     /** @see array_count() */
     public self $array_count;
     public function array_count(iterable $array, callable $callback, $recursive = false): self { }
@@ -402,6 +397,11 @@ trait ChainObject4
     public self $mb_monospace;
     public function mb_monospace(?string $string, $codepoints = []): self { }
     public function mb_monospace($codepoints = []): self { }
+
+    /** @see mb_str_pad() */
+    public self $mb_str_pad;
+    public function mb_str_pad(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
+    public function mb_str_pad($width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
 
     /** @see str_chunk() */
     public self $str_chunk;

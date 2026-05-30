@@ -373,11 +373,6 @@ trait ChainObject3
     public function mb_ereg_search_regs(?string $pattern = null, ?string $options = null): self { }
     public function mb_ereg_search_regs(?string $options = null): self { }
 
-    /** @see mb_ltrim() */
-    public self $mb_ltrim;
-    public function mb_ltrim(string $string, ?string $characters = null, ?string $encoding = null): self { }
-    public function mb_ltrim(?string $characters = null, ?string $encoding = null): self { }
-
     /** @see array_each() */
     public self $array_each;
     public function array_each(iterable $array, callable $callback, $default = null): self { }
@@ -462,6 +457,11 @@ trait ChainObject3
     public self $namespace_detect;
     public function namespace_detect($location): self { }
     public function namespace_detect(): self { }
+
+    /** @see object_assign() */
+    public self $object_assign;
+    public function object_assign(object ...$sources): self { }
+    public function object_assign(): self { }
 
     /** @see register_autoload_function() */
     public self $register_autoload_function;
