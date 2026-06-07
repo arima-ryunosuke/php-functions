@@ -15,6 +15,7 @@ use function ryunosuke\Functions\Package\class_shorten;
 use function ryunosuke\Functions\Package\class_uses_all;
 use function ryunosuke\Functions\Package\const_exists;
 use function ryunosuke\Functions\Package\namespace_detect;
+use function ryunosuke\Functions\Package\object_assign;
 use function ryunosuke\Functions\Package\object_dive;
 use function ryunosuke\Functions\Package\object_id;
 use function ryunosuke\Functions\Package\object_properties;
@@ -457,6 +458,42 @@ class classobjTest extends AbstractTestCase
         that(namespace_detect(__DIR__ . '/files/classes/NS/Valid/Hoge.php'))->is('A\\B\\C\\Hoge');
         that(namespace_detect(__DIR__ . '/../../../src/Package'))->is('ryunosuke\\Functions\\Package');
         that(self::resolveFunction('namespace_detect'))('/a/b/c/d/e/f/g/h/i/j/k/l/m/n')->wasThrown('can not detect namespace');
+    }
+
+    function test_object_assign()
+    {
+        $target = new \Nest3();
+        $source1 = (new \Nest3())->set1(-1);
+        $source2 = (new \Nest3())->set1(-2)->set2(-3);
+        $source3 = (new \Nest3())->set1(7)->set2(8)->set3(9);
+
+        $array1 = get_mangled_object_vars($source1);
+        $array2 = get_mangled_object_vars($source2);
+        $array3 = get_mangled_object_vars($source3);
+
+        $result = object_assign($target, $source1, $source2, $source3);
+
+        // sources 引数は変化しない
+        that($array1)->isSame(get_mangled_object_vars($source1));
+        that($array2)->isSame(get_mangled_object_vars($source2));
+        that($array3)->isSame(get_mangled_object_vars($source3));
+
+        // 返り値は $target そのもの
+        that($result)->isSame($target);
+
+        // get_mangled_object_vars が一致している（後方優先なので $source3）
+        that(get_mangled_object_vars($target))->is($array3);
+        // ついでに array キャストも
+        that((array) $target)->is((array) $source3);
+        // ついでに serialize 表現も
+        that(serialize($target))->is(serialize($source3));
+        // ついでに文字列表現も（未初期化が含まれているので）
+        $var_dump = function ($object) {
+            ob_start();
+            var_dump($object);
+            return preg_replace('@#\d+@', '', ob_get_clean());
+        };
+        that($var_dump($target))->isSame($var_dump($source3));
     }
 
     function test_object_dive()

@@ -327,23 +327,59 @@ class Invoker
 
 class Nest1
 {
+    private int $uninitialized;
+
     private $private = 1;
 
     private $private1 = 1;
+
+    protected $protected = 1;
+
+    public function set1($val)
+    {
+        $this->private = $val;
+        $this->private1 = $val;
+        $this->protected = $val;
+        return $this;
+    }
 }
 
 class Nest2 extends Nest1
 {
+    private int $uninitialized;
+
     private $private = 2;
 
     private $private2 = 2;
+
+    protected $protected = 1;
+
+    public function set2($val)
+    {
+        $this->private = $val;
+        $this->private2 = $val;
+        $this->protected = $val;
+        return $this;
+    }
 }
 
 class Nest3 extends Nest2
 {
+    private int $uninitialized;
+
     private $private = 3;
 
     private $private3 = 3;
+
+    protected $protected = 1;
+
+    public function set3($val)
+    {
+        $this->private = $val;
+        $this->private3 = $val;
+        $this->protected = $val;
+        return $this;
+    }
 
     public function set($val)
     {
