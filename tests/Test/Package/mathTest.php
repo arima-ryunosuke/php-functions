@@ -14,8 +14,15 @@ use function ryunosuke\Functions\Package\mean;
 use function ryunosuke\Functions\Package\median;
 use function ryunosuke\Functions\Package\minimum;
 use function ryunosuke\Functions\Package\mode;
+use function ryunosuke\Functions\Package\number_rebase;
 use function ryunosuke\Functions\Package\numcmp;
 use function ryunosuke\Functions\Package\sum;
+use const ryunosuke\Functions\Package\BASE10;
+use const ryunosuke\Functions\Package\BASE16_UPPER;
+use const ryunosuke\Functions\Package\BASE255;
+use const ryunosuke\Functions\Package\BASE32_RFC4648;
+use const ryunosuke\Functions\Package\BASE62_ASCII;
+use const ryunosuke\Functions\Package\BASE64_RFC4648;
 
 class mathTest extends AbstractTestCase
 {
@@ -595,6 +602,48 @@ class mathTest extends AbstractTestCase
         that(mode($data['datetime_evn']))->is(new \DateTime('2000/12/24 12:34:56'));
         that(mode($data['datetime_odd']))->is(new \DateTime('2000/12/24 12:34:56'));
         that(mode(new \Exception('a'), new \Exception('a'), new \Exception('b')))->is(new \Exception('a'));
+    }
+
+    function test_number_rebase()
+    {
+        $base = '123456';
+
+        // 大文字の 10->16進数
+        $base16 = number_rebase($base, BASE16_UPPER, BASE10);
+        that($base16)->is('1E240');
+        that($base16)->is(number_rebase($base, BASE16_UPPER, BASE10));
+
+        // 16進数 -> 5進数
+        $base5 = number_rebase($base16, '01234', '0123456789ABCDEF');
+        that($base5)->is('12422311');
+        that($base5)->is(number_rebase($base, '01234', BASE10));
+
+        // 5進数 -> 62進数
+        $base62 = number_rebase($base5, BASE62_ASCII, '01234');
+        that($base62)->is('W7E');
+        that($base62)->is(number_rebase($base, BASE62_ASCII, BASE10));
+
+        // XYZ を用いた 13進数
+        $base13convert = fn($v) => number_rebase($v, '0123456789XYZ', BASE10);
+        that($base13convert('0'))->is('0');
+        that($base13convert('9'))->is('9');
+        that($base13convert('10'))->is('X');
+        that($base13convert('11'))->is('Y');
+        that($base13convert('12'))->is('Z');
+        that($base13convert('13'))->is('10');
+
+        // 真っ当な 64進数
+        that(number_rebase('hogera', BASE64_RFC4648, BASE255))->is(rtrim(base64_encode('hogera')));
+
+        // 雑多なテスト
+        that(number_rebase('123', BASE10, BASE10))->is('123');
+        that(number_rebase('', BASE32_RFC4648, BASE10))->is('');
+        that(number_rebase('-0', BASE32_RFC4648, BASE10))->is('-0');
+        that(number_rebase('+0', BASE32_RFC4648, BASE10))->is('+0');
+        that(number_rebase('-1HogeRa', BASE10, BASE64_RFC4648))->is('-3650328061018');
+        that(self::resolveFunction('number_rebase'))('-', BASE32_RFC4648, BASE10)->wasThrown('$number is invalid');
+        that(self::resolveFunction('number_rebase'))('+hogera', BASE64_RFC4648, BASE255)->wasThrown('$number contains +/- sign');
+        that(self::resolveFunction('number_rebase'))('-1HogeRa', BASE10, 'undefined')->wasThrown('found unknown char');
     }
 
     function test_numcmp()
