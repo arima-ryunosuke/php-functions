@@ -1758,7 +1758,7 @@ class varTest extends AbstractTestCase
         $values = [
             'object'  => new #[Local] class ( ) { },
             'closure' => #[Bound] static fn() => null,
-            'misc'    => [#[A] #[A\B(true, SORT_ASC)] static fn() => null],
+            'misc'    => [#[A(sort: true, order: SORT_ASC)] #[A\B(true, SORT_ASC)] static fn() => null],
         ];
         $exported = var_export3($values, ['outmode' => 'eval']);
         $values2 = eval($exported);
@@ -1766,6 +1766,7 @@ class varTest extends AbstractTestCase
         that(new \ReflectionObject($values2['object']))->getAttributes()[0]->getName()->is(Local::class);
         that(new \ReflectionFunction($values2['closure']))->getAttributes()[0]->getName()->is(Bound::class);
         that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[0]->getName()->is(A::class);
+        that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[0]->getArguments()->is(['sort' => true, 'order' => SORT_ASC]);
         that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[1]->getName()->is(A\B::class);
         that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[1]->getArguments()->is([true, SORT_ASC]);
     }

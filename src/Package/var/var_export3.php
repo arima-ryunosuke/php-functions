@@ -301,7 +301,9 @@ function var_export3($value, $return = false)
 
             $attrs = [];
             foreach ($ref->getAttributes() as $attr) {
-                $attrs[] = "#[{$raw_export($attr->getName())}({$raw_export(implode(', ', array_map($export, $attr->getArguments())))})]";
+                $args      = $attr->getArguments();
+                $namedargs = array_map(fn($value, $name) => is_int($name) ? $export($value) : "$name: {$export($value)}", $args, array_keys($args));
+                $attrs[] = "#[{$raw_export($attr->getName())}({$raw_export(implode(', ', $namedargs))})]";
             }
             $attrs = $attrs ? (implode(' ', $attrs) . ' ') : '';
 
