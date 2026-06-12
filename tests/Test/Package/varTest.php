@@ -1784,6 +1784,35 @@ class varTest extends AbstractTestCase
         that($values2['pdo'])->isSame($values['pdo']);
     }
 
+    function test_var_export3_vars()
+    {
+        $curl = curl_init();
+        $pdo = new \PDO('sqlite::memory:');
+        $values = [
+            'curl' => $curl,
+            'pdo'  => $pdo,
+        ];
+        $exported = var_export3($values, ['outmode' => 'eval', 'vars' => $values]);
+        $values2 = eval($exported);
+
+        that($values2['curl'])->isSame($values['curl']);
+        that($values2['pdo'])->isSame($values['pdo']);
+    }
+
+    function test_var_export3_args_vars()
+    {
+        $curl = curl_init();
+        $values = [
+            'curl' => $curl,
+            'pdo'  => new \PDO('sqlite::memory:'),
+        ];
+        $exported = var_export3($values, ['outmode' => 'eval', 'args' => ['pdo' => $values['pdo']], 'vars' => ['curl' => $curl]]);
+        $values2 = (eval($exported))($values);
+
+        that($values2['curl'])->isSame($values['curl']);
+        that($values2['pdo'])->isSame($values['pdo']);
+    }
+
     function test_var_hash()
     {
         that(var_hash([1, 2, 3], ['md5'], false))->isSame('262bbc0aa0dc62a93e350f1f7df792b9');

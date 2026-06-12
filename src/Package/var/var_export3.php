@@ -26,6 +26,8 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  * - 大部分のリソース
  *
  * ただし args キーに指定した値は出力されず、import 時にそれらを引数とするクロージャを返すようになるため、疑似的に出力することは可能。
+ * vars キーも同様（クロージャではなく、ローカル変数が情報源になる）。
+ * args と vars は両立でき、その場合 vars+args が渡ってくるクロージャとなる。
  *
  * オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。
  * ただしコンストラクタが必須引数無しの場合はコールされる。
@@ -52,6 +54,7 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  *     'stdout' => STDOUT,
  *     'pdo'    => new \PDO('sqlite::memory:'),
  * ];
+ *
  * // args を指定すると実際はエクスポートされず、クロージャ表現を返すようになる（値だけ見るのでキーはなんでもよい）
  * $exported = var_export3($value, ['outmode' => 'eval', 'args' => ['k1' => STDOUT, 'k2' => $value['pdo']]]);
  * // import するとクロージャが得られる
@@ -65,6 +68,15 @@ require_once __DIR__ . '/../var/is_resourcable.php';
  * $imported = $closure(['k1' => 123, 'k2' => 456]);
  * that($imported['stdout'])->isSame(123);
  * that($imported['pdo'])->isSame(456);
+ *
+ * // vars を指定すると実際はエクスポートされず、実行時のローカルコンテキストを見るようになる（キーは変数名として valid なもの）
+ * $exported = var_export3($value, ['outmode' => 'eval', 'vars' => ['k1' => STDOUT, 'k2' => $value['pdo']]]);
+ * // ローカル変数を用意してから import すればその値が得られる
+ * $k1 = STDOUT;
+ * $k2 = $value['pdo'];
+ * $imported = eval($exported);
+ * that($imported['stdout'])->isSame($value['stdout']);
+ * that($imported['pdo'])->isSame($value['pdo']);
  * ```
  *
  * @package ryunosuke\Functions\Package\var
@@ -86,6 +98,7 @@ function var_export3($value, $return = false)
         'format'  => 'pretty', // pretty or minify
         'outmode' => null,     // null: 本体のみ, 'eval': return ...;, 'file': <?php return ...;
         'args'    => [],       // ここで指定した値は export に含まれず、import 時に引数で要求されるようになる
+        'vars'    => [],       // ここで指定した値は export に含まれず、import 時に変数で要求されるようになる
     ];
     $options['return'] ??= !!$options['outmode'];
 
@@ -178,7 +191,7 @@ function var_export3($value, $return = false)
             $vars[$vid] = $value;
         }
 
-        if (($arg = array_search($value, $options['args'], true)) !== false) {
+        if (($arg = array_search($value, $options['args'], true)) !== false || ($arg = array_search($value, $options['vars'], true)) !== false) {
             return "\$this->$vid = \$this->args[{$var_export($arg)}]";
         }
 
@@ -597,8 +610,14 @@ function var_export3($value, $return = false)
         }
         PHP;
 
-    if ($options['args']) {
+    if ($options['args'] && $options['vars']) {
+        $result = "fn(\$args) => ({$function})->call($factory, get_defined_vars() + \$args)";
+    }
+    elseif ($options['args']) {
         $result = "fn(\$args) => ({$function})->call($factory, \$args)";
+    }
+    elseif ($options['vars']) {
+        $result = "({$function})->call($factory, get_defined_vars())";
     }
     else {
         $result = "({$function})->call($factory, [])";
