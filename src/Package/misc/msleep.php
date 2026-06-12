@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../datetime/date_interval_second.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -19,7 +20,8 @@ namespace ryunosuke\Functions\Package;
  * $seconds は DateTime を受け入れ、DateTime の場合は指定日時まで待機という動作になる。
  * この時、過去日時を指定してもエラーにはならず 0 を返す（用途から考えてスケジューリングの都合で過去になることは多々ある）。
  * また、$cancel_signal 未指定の場合 false に設定される（time_sleep_until の思想を模した）。
- * 一方、float 指定の場合は 0 未満だとエラーになる（実装は assert）。
+ *
+ * DateInterval も指定でき、単純に float 化してから実行される。
  *
  * ちなみに pcntl_signal で php レベルでシグナルをハンドリングしていない場合は $cancel_signal の指定は無意味。
  * 実際のところ「ミリ秒対応の sleep」という雑な認識で問題ない。
@@ -27,7 +29,7 @@ namespace ryunosuke\Functions\Package;
  * @package ryunosuke\Functions\Package\misc
  */
 function msleep(
-    /** 待機するミリ秒|待機するまでの日時 */ float|\DateTimeInterface $seconds,
+    /** 待機するミリ秒|待機するまでの日時 */ float|\DateTimeInterface|\DateInterval $seconds,
     /** シグナルでキャンセルされるか */ ?bool $cancel_signal = null,
     /** 前回実行からの相対で待機するか */ bool $relative = false,
 ): /** 残りミリ秒数 */ float
@@ -36,13 +38,16 @@ function msleep(
 
     $now = microtime(true);
 
+    if ($seconds instanceof \DateInterval) {
+        $seconds = date_interval_second($seconds);
+    }
+
     if ($seconds instanceof \DateTimeInterface) {
         $cancel_signal ??= false;
         $seconds = (float) ($seconds->format('U.u') - $now);
     }
     else {
         $cancel_signal ??= true;
-        assert($seconds >= 0);
     }
 
     if ($relative) {

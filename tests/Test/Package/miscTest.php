@@ -426,6 +426,10 @@ syntax error
         that(msleep(new \DateTime('@' . (microtime(true) + 0.1)), false))->isSame(0.0);
         that(microtime(true) - $time)->isBetween(0.1, 0.12);
 
+        $time = microtime(true);
+        that(msleep(new \DateInterval('PT1S')))->isSame(0.0);
+        that(microtime(true) - $time)->isBetween(1, 1.2);
+
         // signal はテスト不可
     }
 
