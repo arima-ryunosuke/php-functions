@@ -7,6 +7,7 @@ use function ryunosuke\Functions\Package\auto_loader;
 use function ryunosuke\Functions\Package\class_aliases;
 use function ryunosuke\Functions\Package\class_constants;
 use function ryunosuke\Functions\Package\class_extends;
+use function ryunosuke\Functions\Package\class_find;
 use function ryunosuke\Functions\Package\class_loader;
 use function ryunosuke\Functions\Package\class_map;
 use function ryunosuke\Functions\Package\class_namespace;
@@ -192,6 +193,72 @@ class classobjTest extends AbstractTestCase
         ]);
         /** @noinspection PhpUndefinedMethodInspection */
         that($e->codemessage())->is('123:message');
+    }
+
+    function test_class_find()
+    {
+        if (version_compare(PHP_VERSION, '8.1.0') >= 0) {
+            that(class_find('ryunosuke\\Test\\Package\\files\\classes\\misc\\*'))->is([
+                \ryunosuke\Test\Package\files\classes\misc\classA::class,
+                \ryunosuke\Test\Package\files\classes\misc\enumA::class,
+                \ryunosuke\Test\Package\files\classes\misc\interfaceA::class,
+                \ryunosuke\Test\Package\files\classes\misc\traitA::class,
+            ]);
+            that(class_find('ryunosuke\\Test\\Package\\files\\classes\\mis*'))->is([
+                \ryunosuke\Test\Package\files\classes\misc\classA::class,
+                \ryunosuke\Test\Package\files\classes\misc\enumA::class,
+                \ryunosuke\Test\Package\files\classes\misc\interfaceA::class,
+                \ryunosuke\Test\Package\files\classes\misc\traitA::class,
+            ]);
+            that(class_find(\ryunosuke\Test\Package\files\classes\misc\classA::class))->is([
+                \ryunosuke\Test\Package\files\classes\misc\classA::class,
+                \ryunosuke\Test\Package\files\classes\misc\enumA::class,
+                \ryunosuke\Test\Package\files\classes\misc\interfaceA::class,
+                \ryunosuke\Test\Package\files\classes\misc\traitA::class,
+            ]);
+        }
+        else {
+            that(class_find('ryunosuke\\Test\\Package\\files\\classes\\misc\\*'))->is([
+                \ryunosuke\Test\Package\files\classes\misc\classA::class,
+                \ryunosuke\Test\Package\files\classes\misc\interfaceA::class,
+                \ryunosuke\Test\Package\files\classes\misc\traitA::class,
+            ]);
+            that(class_find('ryunosuke\\Test\\Package\\files\\classes\\mis*'))->is([
+                \ryunosuke\Test\Package\files\classes\misc\classA::class,
+                \ryunosuke\Test\Package\files\classes\misc\interfaceA::class,
+                \ryunosuke\Test\Package\files\classes\misc\traitA::class,
+            ]);
+            that(class_find(\ryunosuke\Test\Package\files\classes\misc\classA::class))->is([
+                \ryunosuke\Test\Package\files\classes\misc\classA::class,
+                \ryunosuke\Test\Package\files\classes\misc\interfaceA::class,
+                \ryunosuke\Test\Package\files\classes\misc\traitA::class,
+            ]);
+        }
+
+        that(class_find('ryunosuke\\Test\\Package\\files\\classes\\misc\\*undefined*'))->is([]);
+        that(class_find('ryunosuke\\Test\\Package\\files\\classes\\misc\\*t*'))->is([
+            \ryunosuke\Test\Package\files\classes\misc\interfaceA::class,
+            \ryunosuke\Test\Package\files\classes\misc\traitA::class,
+        ]);
+
+        that(class_find('ryunosuke\\Test\\Package\\files\\classes\\misc\\*', ['class' => true]))->is([
+            \ryunosuke\Test\Package\files\classes\misc\classA::class,
+        ]);
+        that(class_find('ryunosuke\\Test\\Package\\files\\classes\\misc\\*', ['interface' => true]))->is([
+            \ryunosuke\Test\Package\files\classes\misc\interfaceA::class,
+        ]);
+        that(class_find('ryunosuke\\Test\\Package\\files\\classes\\misc\\*', ['trait' => true]))->is([
+            \ryunosuke\Test\Package\files\classes\misc\traitA::class,
+        ]);
+        if (version_compare(PHP_VERSION, '8.1.0') >= 0) {
+            that(class_find('ryunosuke\\Test\\Package\\files\\classes\\misc\\*', ['enum' => true]))->is([
+                \ryunosuke\Test\Package\files\classes\misc\enumA::class,
+            ]);
+        }
+
+        that(class_find('ryunosuke\\Test\\Package\\files\\classes\\misc\\*', fn($class) => (new \ReflectionClass($class))->isInstantiable()))->is([
+            \ryunosuke\Test\Package\files\classes\misc\classA::class,
+        ]);
     }
 
     function test_class_loader()
