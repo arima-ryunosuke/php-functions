@@ -1893,6 +1893,12 @@ zero is index 0.
         // eval すると元に戻る
         that(eval("return $encoded;"))->is("a\n\tb\r\tc");
 
+        // バイナリは特別扱いしている
+        $encoded = str_quote("\"\x80あ\x81い\x82う\x83え\x84お\x85\r\n\"");
+        that($encoded)->containsAll(['\x80', '\x81', '\x82', '\x83', '\x84', '\x85', '\x0d', '\x0a']);
+        // eval すると元に戻る
+        that(eval("return $encoded;"))->is("\"\x80あ\x81い\x82う\x83え\x84お\x85\r\n\"");
+
         // 雑多なオプション
         that(str_quote("#a\nb\rc\tz", ['special-character' => ["#" => '\\#']]))->is("\"\#a\\nb\\rc\\tz\"");
         that(str_quote("a\nb\rc\tz", ['escape-character' => ["\t" => 'X']]))->is("\"a\\12b\\15cXz\"");

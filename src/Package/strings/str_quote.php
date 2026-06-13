@@ -42,6 +42,42 @@ namespace ryunosuke\Functions\Package;
  */
 function str_quote(string $string, array $options = []): string
 {
+    if (!mb_check_encoding($string, 'UTF-8')) {
+        $chunks = [];
+        $status = null;
+        $buffer = null;
+        foreach (mb_str_split($string, 1, 'UTF-8') as $char) {
+            $valid = (mb_check_encoding($char, 'UTF-8') && !preg_match('/[\x00-\x1F\x7F]/', $char));
+
+            if ($status !== $valid) {
+                $status = $valid;
+                $chunks[] = [$valid, ''];
+                $buffer = &$chunks[array_key_last($chunks)];
+            }
+
+            $buffer[1] .= $char;
+        }
+        unset($buffer);
+
+        $result = [];
+        foreach ($chunks as [$valid, $buffer]) {
+            if ($valid) {
+                $result[] = substr(str_quote($buffer, [
+                    'escape-character'  => false,
+                    'control-character' => false,
+                    'special-character' => true,
+                    'heredoc'           => '',
+                    'nowdoc'            => '',
+                    'indent'            => 0,
+                ]), 1, -1);
+            }
+            else {
+                $result[] = '\\x' . implode('\\x', str_split(bin2hex($buffer), 2));
+            }
+        }
+        return '"' . implode("", $result) . '"';
+    }
+
     $options += [
         'escape-character'  => true,
         'control-character' => true,
