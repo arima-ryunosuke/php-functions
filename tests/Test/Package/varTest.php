@@ -266,10 +266,10 @@ class varTest extends AbstractTestCase
         $rewrite = function ($eitherTagIv, $encrypted) {
             $cipherdata = base64_decode(strtr($encrypted, ['-' => '+', '_' => '/']));
             if ($eitherTagIv === 'tag') {
-                $cipherdata[0] = "\0";
+                $cipherdata[0] = $cipherdata[0] ^ "\xFF";
             }
             if ($eitherTagIv === 'iv') {
-                $cipherdata[16] = "\0";
+                $cipherdata[16] = $cipherdata[16] ^ "\xFF";
             }
             return strtr(base64_encode($cipherdata), ['+' => '-', '/' => '_']);
         };

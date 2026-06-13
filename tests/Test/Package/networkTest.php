@@ -201,7 +201,7 @@ class networkTest extends AbstractTestCase
         that($body)['POST']['long-post']->is($long_post);
 
         // docker 環境だと docker が stderr を握ってるので出ないことがある
-        that($response['stderr'])->isAny(['error', '']);
+        that($response['stderr'])->isAny(['PHP message: error', 'error', '']);
 
         // multipart/form-data
         $response = fcgi_request("$server/var/www/html/echo.php?q=123", [], [
