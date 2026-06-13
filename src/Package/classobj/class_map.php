@@ -72,6 +72,10 @@ function class_map(
                 $tokens = \PhpToken::tokenize(file_get_contents($file), TOKEN_PARSE);
                 $namespace = '';
                 $namespacing = false;
+                $type_consts = [T_CLASS, T_INTERFACE, T_TRAIT];
+                if (defined('T_ENUM')) {
+                    $type_consts[] = T_ENUM; // for compatible php<8.1
+                }
                 foreach ($tokens as $n => $token) {
                     switch (true) {
                         case $token->is(T_NAMESPACE):
@@ -87,7 +91,7 @@ function class_map(
                                 $namespace .= $token->text;
                             }
                             break;
-                        case $token->is([T_CLASS, T_INTERFACE, T_TRAIT, /*T_ENUM:*/]):
+                        case $token->is($type_consts):
                             // ある程度で区切らないと無名クラス（new class() { }）や class 定数（Hoge::class）で最後まで読んでしまい、極端に遅くなる
                             // class/interface/trait/enum キーワードとクラス名が16トークンも離れてることはまずないだろう
                             for ($i = $n + 1, $l = min($n + 16, count($tokens)); $i < $l; $i++) {
