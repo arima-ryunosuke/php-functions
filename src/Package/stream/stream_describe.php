@@ -79,7 +79,7 @@ function stream_describe($stream = null): ?array
                     // resource と fd は id は一致しないが時系列での増減は同じなので順番に取り出せば一致する
                     $descriptor = array_shift($descriptors[$fstat['ino']]);
                     $results[(int) $resource] = [
-                        'type'       => $metadata['wrapper_type'],
+                        'type'       => $metadata['wrapper_type'] ?? null,
                         'descriptor' => $descriptor['descriptor'],
                         'inode'      => $fstat['ino'],
                         'realpath'   => $descriptor['realpath'],
