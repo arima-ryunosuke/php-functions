@@ -14,6 +14,7 @@ use function ryunosuke\Functions\Package\resource_stream;
 use function ryunosuke\Functions\Package\rm_rf;
 use function ryunosuke\Functions\Package\str_resource;
 use function ryunosuke\Functions\Package\stream_describe;
+use function ryunosuke\Functions\Package\stream_put_contents;
 use function ryunosuke\Functions\Package\stream_transfer;
 use function ryunosuke\Functions\Package\uri_parse;
 use function ryunosuke\Functions\Package\var_stream;
@@ -659,6 +660,30 @@ class streamTest extends AbstractTestCase
 
         unset($dummy_resource);
         gc_collect_cycles();
+    }
+
+    function test_stream_put_contents()
+    {
+        $fp = fopen(tempnam(sys_get_temp_dir(), 'spc'), 'w+');
+
+        that(stream_put_contents($fp, "hoge"))->is(4);
+        that(stream_put_contents($fp, "fuga", 2))->is(4);
+        that(stream_put_contents($fp, "piyo", null))->is(4);
+        that(stream_put_contents($fp, "foo", -2))->is(3);
+
+        rewind($fp);
+        that(stream_get_contents($fp))->is('hofugapifoo');
+
+        rewind($fp);
+        that(stream_put_contents($fp, "bar"))->is(3);
+
+        rewind($fp);
+        that(stream_get_contents($fp))->is('bar');
+
+        $fp = fopen(tempnam(sys_get_temp_dir(), 'spc'), 'r');
+
+        that(@stream_put_contents($fp, "hoge"))->is(null);
+        that(@stream_put_contents(STDOUT, "hoge", 1))->is(null);
     }
 
     function test_stream_transfer()
