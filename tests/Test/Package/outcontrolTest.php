@@ -48,13 +48,22 @@ class outcontrolTest extends AbstractTestCase
 
     function test_ob_include()
     {
+        try {
+            ob_include(__DIR__ . '/files/template/template.php');
+        }
+        catch (\Throwable $t) {
+            that($t->getMessage())->contains('Undefined variable');
+        }
+
         $actual = ob_include(__DIR__ . '/files/template/template.php', [
             'variable' => 'variable',
         ]);
-        that($actual)->is("This is plain text.
-This is variable.
-This is VARIABLE.
-");
+        that($actual)->is(<<<OUTPUT
+        This is plain text.
+        This is variable.
+        This is VARIABLE.
+        
+        OUTPUT,);
     }
 
     function test_ob_stdout()

@@ -34,8 +34,14 @@ function ob_include($include_file, $array = [])
     /** @noinspection PhpMethodParametersCountMismatchInspection */
     return (static function () {
         ob_start();
-        extract(func_get_arg(1));
-        include func_get_arg(0);
-        return ob_get_clean();
+        try {
+            extract(func_get_arg(1));
+            include func_get_arg(0);
+            return ob_get_clean();
+        }
+        catch (\Throwable $t) {
+            ob_end_clean();
+            throw $t;
+        }
     })($include_file, $array);
 }
