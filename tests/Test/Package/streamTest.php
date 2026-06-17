@@ -551,18 +551,13 @@ class streamTest extends AbstractTestCase
 
         $tmpdir = sys_get_temp_dir();
 
-        $parts = parse_url(TESTSTREAMSFTPURL);
-        $ssh = ssh2_connect($parts['host'], $parts['port']);
-        ssh2_auth_password($ssh, $parts['user'], $parts['pass']);
-        $sftp = ssh2_sftp($ssh);
-
         that(stream_transfer([
             'http' => [
                 'read'  => fopen(TESTSTREAMHTTPURL, 'rb'),
                 'write' => "$tmpdir/http.txt",
             ],
             'sftp' => [
-                'read'  => fn() => fopen("{$parts['scheme']}://$sftp{$parts['path']}", 'rb'),
+                'read'  => fn() => fopen(TESTSTREAMSFTPURL, 'rb'),
                 'write' => "$tmpdir/sftp.txt",
             ],
         ]))->hasKeyAll(['http', 'sftp']);

@@ -3,6 +3,9 @@
     "process-timeout": 0,
     "platform": {
       "php": "8.0"
+    },
+    "audit": {
+      "block-insecure": false
     }
   },
   "name": "ryunosuke/functions",
@@ -31,6 +34,8 @@
     "phpunit/phpunit": "9.*",
     "ryunosuke/phpunit-extension": "4.*",
     "ryunosuke/polyfill-enum": "*",
+    "aws/aws-sdk-php": "3.*",
+    "phpseclib/phpseclib": "*",
     "psr/simple-cache": "*",
     "psr/log": "*"
   },

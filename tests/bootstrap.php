@@ -1,6 +1,7 @@
 <?php
 
 define('PHPUNIT', true);
+putenv('AWS_SUPPRESS_PHP_DEPRECATION_WARNING=true');
 
 // sys_get_temp_dir が返すディレクトリを変更しておく
 $tmpdir = __DIR__ . DIRECTORY_SEPARATOR . 'temporary' . DIRECTORY_SEPARATOR . 'tmp';
@@ -28,6 +29,7 @@ if (false) {
     define('TESTWEBSERVER', null);
     define('TESTSTREAMHTTPURL', null);
     define('TESTSTREAMSFTPURL', null);
+    define('TESTSTREAMS3URL', null);
     define('TESTFCGISERVER', null);
     define('TESTPINGSERVER', null);
     define('TESTRIRSERVER', null);
@@ -89,6 +91,9 @@ function range1_9()
 {
     yield from range(1, 9);
 }
+
+\phpseclib3\Net\SFTP\Stream::register();
+\Aws\S3\StreamWrapper::register(new \Aws\S3\S3MultiRegionClient([]));
 
 // ファイルシステム系テストで clearstatcache を呼ぶのを忘れて「？？？」となることが多かったのでいっその事 tick を利用して無効化する
 register_tick_function(function () {
