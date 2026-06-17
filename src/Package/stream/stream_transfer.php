@@ -31,6 +31,7 @@ require_once __DIR__ . '/../var/timeval.php';
 function stream_transfer(array $streams, array $options = []): array
 {
     $options += [
+        'context'       => null,
         'concurrency'   => 8,    // 同時並列数
         'buffer_size'   => 8192, // 読み込みバッファサイズ
         'select_second' => 1.5,  // stream_select の待機秒数（stream_select なので多少大きくてもよい）
@@ -42,7 +43,7 @@ function stream_transfer(array $streams, array $options = []): array
     $open = fn($target, $mode) => match (true) {
         default              => $target,
         is_callable($target) => $target(),
-        is_string($target)   => fopen($target, $mode),
+        is_string($target)   => fopen($target, $mode, false, $options['context']),
     };
 
     $result = array_fill_keys(array_keys($streams), 0);
