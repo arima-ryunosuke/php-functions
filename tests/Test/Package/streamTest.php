@@ -2,16 +2,20 @@
 
 namespace ryunosuke\Test\Package;
 
+use Aws\S3\S3Client;
 use function ryunosuke\Functions\Package\array_count;
+use function ryunosuke\Functions\Package\function_configure;
 use function ryunosuke\Functions\Package\include_stream;
 use function ryunosuke\Functions\Package\iterator_stream;
 use function ryunosuke\Functions\Package\memory_stream;
 use function ryunosuke\Functions\Package\profiler;
+use function ryunosuke\Functions\Package\proxy_stream;
 use function ryunosuke\Functions\Package\resource_stream;
 use function ryunosuke\Functions\Package\rm_rf;
 use function ryunosuke\Functions\Package\str_resource;
 use function ryunosuke\Functions\Package\stream_describe;
 use function ryunosuke\Functions\Package\stream_transfer;
+use function ryunosuke\Functions\Package\uri_parse;
 use function ryunosuke\Functions\Package\var_stream;
 
 class streamTest extends AbstractTestCase
@@ -425,6 +429,120 @@ class streamTest extends AbstractTestCase
             [300, 100],
             [500, 400],
         ]);
+    }
+
+    function test_proxy_stream()
+    {
+        proxy_stream(function ($url, $context) {
+            $parts = uri_parse($url);
+            if ($parts['scheme'] === 'file' || $parts['scheme'] === '') {
+                stream_context_set_option($context, 'file', 'pathSeparator', '');
+                stream_context_set_option($context, 'file', 'directoryMode', 0777);
+                return $url;
+            }
+            if ($parts['scheme'] === 'sftp') {
+                static $sftp = null;
+                $sftp ??= (function () {
+                    $parts = parse_url(TESTSTREAMSFTPURL);
+                    $sftp = new \phpseclib3\Net\SFTP($parts['host'], $parts['port']);
+                    $sftp->login($parts['user'], $parts['pass']);
+                    return $sftp;
+                })();
+                stream_context_set_option($context, 'sftp', 'sftp', $sftp);
+                stream_context_set_option($context, 'sftp', 'directoryMode', 0777);
+                return "sftp://dummy-host{$parts['path']}";
+            }
+            if ($parts['scheme'] === 's3') {
+                static $s3 = null, $bucket = null;
+                $s3 ??= (function () use (&$bucket) {
+                    $parts = parse_url(TESTSTREAMS3URL);
+                    $bucket = trim($parts['path'], '/');
+                    return new S3Client([
+                        'credentials'             => [
+                            'key'    => $parts['user'],
+                            'secret' => $parts['pass'],
+                        ],
+                        'region'                  => 'ap-northeast-1',
+                        'version'                 => 'latest',
+                        'endpoint'                => "http://{$parts['host']}:{$parts['port']}",
+                        'http'                    => ['verify' => false],
+                        'use_path_style_endpoint' => true,
+                    ]);
+                })();
+                stream_context_set_option($context, 's3', 'client', $s3);
+                return "s3://{$bucket}{$parts['path']}";
+            }
+        });
+
+        $tmp = sys_get_temp_dir();
+        foreach ([
+            "file://$tmp" => ['seekable' => true, 'unlink' => false, 'metadata' => true, 'posix' => DIRECTORY_SEPARATOR === '/'],
+            "sftp://"     => ['seekable' => true, 'unlink' => false, 'metadata' => true, 'posix' => true],
+            "s3://"       => ['seekable' => false, 'unlink' => true, 'metadata' => false, 'posix' => false],
+        ] as $scheme => $supports) {
+            $workdir = "proxy://{$scheme}/tmp/rstream/working";
+            @rm_rf($workdir);
+            @mkdir($workdir, 0777, true);
+
+            that(file_put_contents("$workdir/nest1/nest2/file", 'file'))->as($workdir)->is(4);
+
+            that(file_put_contents("$workdir/write", 'write'))->as($workdir)->is(5);
+            that(file_get_contents("$workdir/write"))->as($workdir)->is('write');
+            that(@file_get_contents("$workdir/notfound"))->as($workdir)->is(false);
+
+            $files = iterator_to_array(new \FilesystemIterator($workdir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::KEY_AS_FILENAME));
+            that(array_keys($files))->as($workdir)->is(['nest1', 'write'], canonicalize: true);
+            that(mime_content_type("$workdir/write"))->as($workdir)->is('text/plain');
+
+            that(filesize("$workdir/write"))->as($workdir)->is(5);
+            that(rename("$workdir/write", "$workdir/write2"))->as($workdir)->is(true);
+            that(@unlink("$workdir/write"))->as($workdir)->is($supports['unlink']);
+            that(unlink("$workdir/write2"))->as($workdir)->is(true);
+
+            if ($supports['metadata']) {
+                that(touch("$workdir/metadata", true))->as($workdir)->is(true);
+                if ($supports['posix']) {
+                    that(@chmod("$workdir/metadata", 0777))->as($workdir)->is(true);
+                    that(@chown("$workdir/metadata", 'root'))->as($workdir)->is(false);
+                    that(@chgrp("$workdir/metadata", 'root'))->as($workdir)->is(false);
+                }
+                unlink("$workdir/metadata");
+            }
+
+            if ($supports['seekable']) {
+                $fp = fopen("$workdir/stream", 'wb+');
+
+                that(fwrite($fp, "abcdef"))->as($workdir)->is(6);
+                $r = $w = $e = [];
+                $r[] = $fp;
+                that(stream_select($r, $w, $e, 1,1))->as($workdir)->isAny([0, 1]);
+                that(fwrite($fp, "abcdef"))->as($workdir)->is(6);
+                that(fseek($fp, 1))->as($workdir)->is(0);
+                that(ftell($fp))->as($workdir)->is(1);
+                that(fwrite($fp, "BCDEF"))->as($workdir)->is(5);
+                that(ftruncate($fp, 3))->as($workdir)->is(true);
+                that(fseek($fp, 0))->as($workdir)->is(0);
+                that(fread($fp, 1024))->as($workdir)->is('aBC');
+
+                that(flock($fp, LOCK_EX))->as($workdir)->isBool();
+                that(stream_set_blocking($fp, true))->as($workdir)->isBool();
+                that(stream_set_timeout($fp, 10))->as($workdir)->isBool();
+                that(stream_set_read_buffer($fp, 1024))->as($workdir)->isAny([0, -1]);
+                that(stream_set_write_buffer($fp, 1024))->as($workdir)->isAny([0, -1]);
+
+                that(fclose($fp))->as($workdir)->is(true);
+            }
+
+            that(@rmdir($workdir))->as($workdir)->is($supports['unlink']);
+            @rm_rf($workdir, false);
+            that(rmdir($workdir))->as($workdir)->is(true);
+        }
+
+        // 雑多
+        set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__);
+        that(file_get_contents("proxy://streamTest.php", true))->is(file_get_contents(__FILE__));
+        that(fn() => stat("proxy://undefined-scheme:///tmp/rstream/working"))()->wasThrown('invalid proxy');
+        proxy_stream(fn() => null, false, true);
     }
 
     function test_resource_stream_http()
