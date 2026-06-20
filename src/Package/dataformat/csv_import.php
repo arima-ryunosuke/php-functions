@@ -144,7 +144,13 @@ function csv_import($csvstring, $options = [])
 
             foreach ($initial as $rule => $count) {
                 for ($i = 0; $i < $count; $i++) {
-                    if ($rule === 'byte') {
+                    if ($rule === 'bom') {
+                        $bom = fread($fp, 3);
+                        if ($bom !== "\xEF\xBB\xBF") {
+                            fseek($fp, -strlen($bom), SEEK_CUR);
+                        }
+                    }
+                    elseif ($rule === 'byte') {
                         fgetc($fp);
                     }
                     elseif ($rule === 'line') {

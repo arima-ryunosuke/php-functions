@@ -433,6 +433,22 @@ a2,b2,c2
             ['xA' => 'a2', 'xC' => 'c2'],
         ]);
 
+        // 読み飛ばし（bom（ない））
+        that(csv_import('a,b,c
+a1,b1,c1
+a2,b2,c2
+', ['initial' => ['bom' => 1]]))->is([
+            ['a' => 'a1', 'b' => 'b1', 'c' => 'c1'],
+            ['a' => 'a2', 'b' => 'b2', 'c' => 'c2'],
+        ]);
+        // 読み飛ばし（bom（本当にある））
+        that(csv_import("\xEF\xBB\xBFa,b,c
+a1,b1,c1
+a2,b2,c2
+", ['initial' => ['bom' => 1]]))->is([
+            ['a' => 'a1', 'b' => 'b1', 'c' => 'c1'],
+            ['a' => 'a2', 'b' => 'b2', 'c' => 'c2'],
+        ]);
         // 読み飛ばし（csv）
         that(csv_import('"a is A",,"c is C"
 a,b,c
