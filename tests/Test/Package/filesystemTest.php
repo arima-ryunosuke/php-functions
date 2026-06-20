@@ -28,6 +28,7 @@ use function ryunosuke\Functions\Package\file_tree;
 use function ryunosuke\Functions\Package\fnmatch_and;
 use function ryunosuke\Functions\Package\fnmatch_or;
 use function ryunosuke\Functions\Package\fwrite_stream;
+use function ryunosuke\Functions\Package\glob_escape;
 use function ryunosuke\Functions\Package\globstar;
 use function ryunosuke\Functions\Package\json_export;
 use function ryunosuke\Functions\Package\ltsv_export;
@@ -1312,6 +1313,32 @@ class filesystemTest extends AbstractTestCase
 
         $fp = fopen('fake-stream://dummy.txt', 'r');
         that(@fwrite_stream($fp, 'hoge'))->isSame(false);
+    }
+
+    function test_glob_escape()
+    {
+        that(glob_escape(''))->is('');
+        that(glob_escape('hoge'))->is('hoge');
+        that(glob_escape('hoge*'))->is('hoge[*]');
+        that(glob_escape('?hoge'))->is('[?]hoge');
+        that(glob_escape('?hoge*'))->is('[?]hoge[*]');
+
+        that(glob_escape('hoge[abc]'))->is('hoge[[]abc[]]');
+        that(glob_escape('hoge[!abc]'))->is('hoge[[]!abc[]]');
+
+        that(glob_escape('hoge{a,b,c}'))->is('hoge{a,b,c}');
+        that(glob_escape('hoge{a,b,c}', GLOB_BRACE))->is('hoge\\{a,b,c\\}');
+
+        $dir = sys_get_temp_dir();
+        $file = "$dir/{重要}hoge[2026-12-24版].txt";
+        touch($file);
+
+        that(glob("$dir/*" . glob_escape('hoge[2026-12-24版]') . '.{txt,csv}', GLOB_BRACE))->count(1);
+
+        // Windows では BRACE の escape が効かない
+        if (DIRECTORY_SEPARATOR === '/') {
+            that(glob("$dir/" . glob_escape('{重要}hoge[2026-12-24版]', GLOB_BRACE) . '.{txt,csv}', GLOB_BRACE))->count(1);
+        }
     }
 
     function test_globstar()
