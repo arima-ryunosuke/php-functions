@@ -113,6 +113,16 @@ trait ChainObject4
     public function hex2bin(string $string): self { }
     public function hex2bin(): self { }
 
+    /** @see str_decrement() */
+    public self $str_decrement;
+    public function str_decrement(string $string): self { }
+    public function str_decrement(): self { }
+
+    /** @see str_decrement() */
+    public self $decrement;
+    public function decrement(string $string): self { }
+    public function decrement(): self { }
+
     /** @see str_replace() */
     public self $str_replace;
     public function str_replace(array|string $search, array|string $replace, array|string $subject, &$count = null): self { }
@@ -243,6 +253,11 @@ trait ChainObject4
     public function mb_convert_kana(string $string, string $mode = "KV", ?string $encoding = null): self { }
     public function mb_convert_kana(string $mode = "KV", ?string $encoding = null): self { }
 
+    /** @see mb_str_pad() */
+    public self $mb_str_pad;
+    public function mb_str_pad(string $string, int $length, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT, ?string $encoding = null): self { }
+    public function mb_str_pad(int $length, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT, ?string $encoding = null): self { }
+
     /** @see array_count() */
     public self $array_count;
     public function array_count(iterable $array, callable $callback, $recursive = false): self { }
@@ -368,6 +383,11 @@ trait ChainObject4
     public function iterator_join(iterable $iterables, $preserve_keys = true): self { }
     public function iterator_join($preserve_keys = true): self { }
 
+    /** @see number_rebase() */
+    public self $number_rebase;
+    public function number_rebase(string $number, string $to, string $from): self { }
+    public function number_rebase(string $to, string $from): self { }
+
     /** @see numcmp() */
     public self $numcmp;
     public function numcmp($number1, $number2): self { }
@@ -397,11 +417,6 @@ trait ChainObject4
     public self $mb_monospace;
     public function mb_monospace(?string $string, $codepoints = []): self { }
     public function mb_monospace($codepoints = []): self { }
-
-    /** @see mb_str_pad() */
-    public self $mb_str_pad;
-    public function mb_str_pad(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
-    public function mb_str_pad($width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
 
     /** @see str_chunk() */
     public self $str_chunk;

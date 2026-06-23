@@ -373,6 +373,11 @@ trait ChainObject3
     public function mb_ereg_search_regs(?string $pattern = null, ?string $options = null): self { }
     public function mb_ereg_search_regs(?string $options = null): self { }
 
+    /** @see mb_ltrim() */
+    public self $mb_ltrim;
+    public function mb_ltrim(?string $string, ?string $characters = null, ?string $encoding = null): self { }
+    public function mb_ltrim(?string $characters = null, ?string $encoding = null): self { }
+
     /** @see array_each() */
     public self $array_each;
     public function array_each(iterable $array, callable $callback, $default = null): self { }
@@ -597,6 +602,11 @@ trait ChainObject3
     public self $iterator_stream;
     public function iterator_stream(\Iterator $iterator, ?string $tmpdir = null): self { }
     public function iterator_stream(?string $tmpdir = null): self { }
+
+    /** @see proxy_stream() */
+    public self $proxy_stream;
+    public function proxy_stream(callable $proxy, bool $throw = true, bool $prepend = false): self { }
+    public function proxy_stream(bool $throw = true, bool $prepend = false): self { }
 
     /** @see namespace_split() */
     public self $namespace_split;

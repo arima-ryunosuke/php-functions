@@ -48,15 +48,18 @@ foreach ($targetFunction as $funcname => $argses) {
             if ($property->isPublic()) {
                 $doccomment = preg_replace('#\\R\s+#u', "\n ", $property->getDocComment());
                 $doccomment = concat($doccomment, "\n");
-                return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public $" . $property->getName() . ";");
+                $static = $property->isStatic() ? 'static ' : '';
+                $type = $property->getType() ?? 'mixed';
+                return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public $static$type $" . $property->getName() . ";");
             }
         }));
         $methods = array_merge($methods, array_map_filter($refobject->getMethods(), function (\ReflectionMethod $method) {
             if ($method->isPublic() && !$method->isConstructor() && !$method->isDestructor()) {
                 $doccomment = preg_replace('#\\R\s+#u', "\n ", $method->getDocComment());
                 $doccomment = concat($doccomment, "\n");
+                $static = $method->isStatic() ? 'static ' : '';
                 $return = $method->hasReturnType() ? ": {$method->getReturnType()}" : "";
-                return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public function " . $method->getName() . "(" . implode(", ", function_parameter($method)) . ")$return { }");
+                return "    " . preg_replace('#\\R#u', "\n    ", $doccomment . "public {$static}function " . $method->getName() . "(" . implode(", ", function_parameter($method)) . ")$return { }");
             }
         }));
     }

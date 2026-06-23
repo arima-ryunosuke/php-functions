@@ -309,6 +309,38 @@ if (!defined('ryunosuke\\Functions\\SORT_STRICT')) {
     define('ryunosuke\\Functions\\SORT_STRICT', 256);
 }
 
+if (!defined('ryunosuke\\Functions\\BASE10')) {
+    define('ryunosuke\\Functions\\BASE10', "0123456789");
+}
+
+if (!defined('ryunosuke\\Functions\\BASE16_UPPER')) {
+    define('ryunosuke\\Functions\\BASE16_UPPER', "0123456789ABCDEF");
+}
+
+if (!defined('ryunosuke\\Functions\\BASE16_LOWER')) {
+    define('ryunosuke\\Functions\\BASE16_LOWER', "0123456789abecdf");
+}
+
+if (!defined('ryunosuke\\Functions\\BASE32_RFC4648')) {
+    define('ryunosuke\\Functions\\BASE32_RFC4648', "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567");
+}
+
+if (!defined('ryunosuke\\Functions\\BASE32_RFC4648_EXTENDED')) {
+    define('ryunosuke\\Functions\\BASE32_RFC4648_EXTENDED', "0123456789ABCDEFGHIJKLMNOPQRSTUV");
+}
+
+if (!defined('ryunosuke\\Functions\\BASE62_ASCII')) {
+    define('ryunosuke\\Functions\\BASE62_ASCII', "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+}
+
+if (!defined('ryunosuke\\Functions\\BASE64_RFC4648')) {
+    define('ryunosuke\\Functions\\BASE64_RFC4648', "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
+}
+
+if (!defined('ryunosuke\\Functions\\BASE255')) {
+    define('ryunosuke\\Functions\\BASE255', "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f !\"#\$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff");
+}
+
 assert(!function_exists('ryunosuke\\Functions\\array_add') || (new \ReflectionFunction('ryunosuke\\Functions\\array_add'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\array_add')) {
     /**
@@ -9880,7 +9912,13 @@ if (!function_exists('ryunosuke\\Functions\\csv_import')) {
 
                 foreach ($initial as $rule => $count) {
                     for ($i = 0; $i < $count; $i++) {
-                        if ($rule === 'byte') {
+                        if ($rule === 'bom') {
+                            $bom = fread($fp, 3);
+                            if ($bom !== "\xEF\xBB\xBF") {
+                                fseek($fp, -strlen($bom), SEEK_CUR);
+                            }
+                        }
+                        elseif ($rule === 'byte') {
                             fgetc($fp);
                         }
                         elseif ($rule === 'line') {
@@ -16685,6 +16723,48 @@ if (!function_exists('ryunosuke\\Functions\\fwrite_stream')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\glob_escape') || (new \ReflectionFunction('ryunosuke\\Functions\\glob_escape'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\glob_escape')) {
+    /**
+     * glob パターンのエスケープ
+     *
+     * preg_quote のようにメタ文字を含む文字列自体を glob にマッチさせたい場合に使用する。
+     * ただし、現在手抜き実装である（glob は環境差異が激しすぎて正確な実装ができない）。
+     *
+     * @package ryunosuke\Functions\Package\filesystem
+     */
+    function glob_escape(string $pattern, int $flags = 0): string
+    {
+        $GLOB_BRACE = $flags & GLOB_BRACE;
+        $GLOB_NOESCAPE = $flags & GLOB_NOESCAPE;
+
+        // glob のエスケープは []
+        $charactors = [
+            '?' => '[?]',
+            '*' => '[*]',
+            '[' => '[[]',
+            ']' => '[]]',
+        ];
+
+        // ただし BRACE だけはバックスラッシュ（posix のみ）
+        if ($GLOB_BRACE) {
+            $charactors = array_replace($charactors, [
+                '{' => '\\{',
+                '}' => '\\}',
+            ]);
+        }
+
+        // 手抜きポイント（GLOB_BRACE+GLOB_NOESCAPE の組み合わせが考慮されていない）
+        if (!$GLOB_NOESCAPE) {
+            $charactors = array_replace($charactors, [
+                '\\' => '\\\\',
+            ]);
+        }
+
+        return strtr($pattern, $charactors);
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\globstar') || (new \ReflectionFunction('ryunosuke\\Functions\\globstar'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\globstar')) {
     /**
@@ -21369,6 +21449,65 @@ if (!function_exists('ryunosuke\\Functions\\mode')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\number_rebase') || (new \ReflectionFunction('ryunosuke\\Functions\\number_rebase'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\number_rebase')) {
+    /**
+     * 数値の任意基数変換
+     *
+     * 任意の文字を指定できる基数変換。
+     * 10,16,64 等の基数の代わりに使用文字列を渡す。その文字長が基数となる。
+     *
+     * Example:
+     * ```php
+     * // XYZ を使用した13進数
+     * that(number_rebase('4042', to: '0123456789XYZ', from: BASE10))->isSame('1XYZ');
+     * that(number_rebase('1XYZ', to: BASE10, from: '0123456789XYZ'))->isSame('4042');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\math
+     */
+    function number_rebase(string $number, string $to, string $from): string
+    {
+        $number = trim($number);
+
+        if (!strlen($number)) {
+            return '';
+        }
+        if ($to === $from) {
+            return $number;
+        }
+
+        $sign = match ($number[0]) {
+            '-'     => '-',
+            '+'     => '+',
+            default => '',
+        };
+        if ($sign !== '') {
+            if (str_contains($to, $sign)) {
+                throw new \InvalidArgumentException('$number contains +/- sign, but $to also contains one');
+            }
+            if (!str_contains($from, $sign)) {
+                $number = substr($number, 1);
+            }
+            if (!strlen($number)) {
+                throw new \InvalidArgumentException("\$number is invalid($sign$number)");
+            }
+        }
+
+        if ($number === '0') {
+            return $sign . $number;
+        }
+
+        //$to = array_flip(str_split($to));
+        $from = array_flip(str_split($from));
+
+        $chars = str_split($number);
+        $digits = array_map(fn($v) => $from[$v] ?? throw new \InvalidArgumentException("found unknown char({$v})"), $chars);
+        $converted = base_convert_array($digits, count($from), strlen($to));
+        return $sign . implode('', array_map(fn($v) => $to[$v], $converted));
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\numcmp') || (new \ReflectionFunction('ryunosuke\\Functions\\numcmp'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\numcmp')) {
     /**
@@ -21774,7 +21913,8 @@ if (!function_exists('ryunosuke\\Functions\\msleep')) {
      * $seconds は DateTime を受け入れ、DateTime の場合は指定日時まで待機という動作になる。
      * この時、過去日時を指定してもエラーにはならず 0 を返す（用途から考えてスケジューリングの都合で過去になることは多々ある）。
      * また、$cancel_signal 未指定の場合 false に設定される（time_sleep_until の思想を模した）。
-     * 一方、float 指定の場合は 0 未満だとエラーになる（実装は assert）。
+     *
+     * DateInterval も指定でき、単純に float 化してから実行される。
      *
      * ちなみに pcntl_signal で php レベルでシグナルをハンドリングしていない場合は $cancel_signal の指定は無意味。
      * 実際のところ「ミリ秒対応の sleep」という雑な認識で問題ない。
@@ -21782,7 +21922,7 @@ if (!function_exists('ryunosuke\\Functions\\msleep')) {
      * @package ryunosuke\Functions\Package\misc
      */
     function msleep(
-        /** 待機するミリ秒|待機するまでの日時 */ float|\DateTimeInterface $seconds,
+        /** 待機するミリ秒|待機するまでの日時 */ float|\DateTimeInterface|\DateInterval $seconds,
         /** シグナルでキャンセルされるか */ ?bool $cancel_signal = null,
         /** 前回実行からの相対で待機するか */ bool $relative = false,
     ): /** 残りミリ秒数 */ float
@@ -21791,13 +21931,16 @@ if (!function_exists('ryunosuke\\Functions\\msleep')) {
 
         $now = microtime(true);
 
+        if ($seconds instanceof \DateInterval) {
+            $seconds = date_interval_second($seconds);
+        }
+
         if ($seconds instanceof \DateTimeInterface) {
             $cancel_signal ??= false;
             $seconds = (float) ($seconds->format('U.u') - $now);
         }
         else {
             $cancel_signal ??= true;
-            assert($seconds >= 0);
         }
 
         if ($relative) {
@@ -26411,9 +26554,15 @@ if (!function_exists('ryunosuke\\Functions\\ob_include')) {
         /** @noinspection PhpMethodParametersCountMismatchInspection */
         return (static function () {
             ob_start();
-            extract(func_get_arg(1));
-            include func_get_arg(0);
-            return ob_get_clean();
+            try {
+                extract(func_get_arg(1));
+                include func_get_arg(0);
+                return ob_get_clean();
+            }
+            catch (\Throwable $t) {
+                ob_end_clean();
+                throw $t;
+            }
         })($include_file, $array);
     }
 }
@@ -29379,6 +29528,342 @@ if (!function_exists('ryunosuke\\Functions\\profiler')) {
     }
 }
 
+assert(!function_exists('ryunosuke\\Functions\\proxy_stream') || (new \ReflectionFunction('ryunosuke\\Functions\\proxy_stream'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\proxy_stream')) {
+    /**
+     * ストリームをプロキシするストリームを構築する
+     *
+     * 例えば AWS 謹製の s3:// は「元となった S3Client」か「context で渡された S3Client」でしか指定できず、スキームも s3:// 固定になる。
+     * 例えば phpseclib の sftp:// は元となる SFTP は不要だが「指定 URL」か「context で渡された SFTP」でしか指定できず、スキームも sftp:// 固定になる。
+     * この時、この関数を通せばその時渡ってきた URL を元に好きに書き換えることができる。
+     * ただし、対象ストリームが「$context で何かを受け取るストリーム」でないとほとんど意味はない（上記で言う S3Client, SFTP 等）。
+     * 言うなれば「動的なストリームラッパー」として動作する。
+     *
+     * 例えば下記を異なる S3Client で動作させられるようになる。
+     *
+     * - file_put_contents('proxy://s3://hoge-bucket/path/to/object')
+     * - file_put_contents('proxy://s3://fuga-bucket/path/to/object')
+     *
+     * 標準だと実はこれがあまり簡単ではない。
+     * S3Client の使い分けが必要なので、StreamWrapper 登録だと下記のように（使うかも分からないのに）その瞬間 Client が必要になるし、スキームも別になる。
+     *
+     * - \Aws\S3\StreamWrapper::register($hogeS3Client, 's3-hoge')
+     * - \Aws\S3\StreamWrapper::register($fugaS3Client, 's3-fuga')
+     *
+     * あるいは都度コンテキストを渡せば実現可能だが、使うたびに「このバケットはこのクライアントで…」等と意識したくないし、渡し忘れも多発する。
+     *
+     * - file_put_contents('s3://hoge-bucket/path/to/object', $hogeContext)
+     * - file_put_contents('s3://fuga-bucket/path/to/object', $fugaContext)
+     *
+     * これを「動的なストリームラッパー」として扱って、クロージャ内で一元管理できるようになる、というのがこの関数の趣旨。
+     * さらに別に S3 以外も混ぜてもよいので、ストリームラッパーを用いた「本当の意味での抽象化」がしやすくなる。
+     *
+     * また、stream wrapper は stat 系でコンテキストが渡らないので、
+     *
+     * - file_exists("sftp://host/path/to/file")
+     * - file_exists("s3://bucket/path/to/object")
+     *
+     * これらは基本的に動作しない（コンテキストが渡せないので、前者は本当に指定 URL になるし、後者は最初に登録した S3Client になる）。
+     * これをこの関数を使って
+     *
+     * - file_exists("proxy://sftp://host/path/to/file")
+     * - file_exists("proxy://s3://bucket/path/to/object")
+     *
+     * このようにするだけで動作するようになる。
+     *
+     * 特に S3 はその気になれば
+     *
+     * - file_exists("proxy://s3://key:secret@endpoint/bucket/path/to/object")
+     *
+     * このような sftp と同様に「完全指定 URL で動作」させることも可能になる（まぁこんなことはしないだろうが…）。
+     *
+     * Example:
+     * ```php
+     * # このように登録し・・・
+     * proxy_stream(function ($url, $context) {
+     *     $scheme = parse_url($url, PHP_URL_SCHEME);
+     *     if ($scheme === 's3') {
+     *         // $url の情報に基づいて S3Client を使い分け
+     *         stream_context_set_option($context, 's3', 'client', $s3);
+     *         // 同じく $url の情報に基づいて bucket や key は好きに返せばよい
+     *         return "s3://bucket-name/path/to/object";
+     *     }
+     *     if ($scheme === 'sftp') {
+     *         // $url の情報に基づいて SFTP を使い分け
+     *         stream_context_set_option($context, 'sftp', 'sftp', $sftp);
+     *         // 同じく $url の情報に基づいて host や path は好きに返せばよい
+     *         return "sftp://host:port/path/to/file";
+     *     }
+     * });
+     *
+     * # このようにアクセスすればプロキシされる
+     * // echo file_get_contets('proxy://s3://dummy/path/to/target');
+     * // echo file_get_contets('proxy://sftp://dummy/path/to/target');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\stream
+     */
+    function proxy_stream(
+        callable $proxy,
+        bool     $throw = true,
+        bool     $prepend = false,
+    ) {
+        static $wrapper = null;
+        $wrapper ??= new class() {
+            public static string $protocol;
+            public static array  $proxies = [];
+
+            public $resource; // stream_get_meta_data で抜けるように public にしてある
+            public $context;
+
+            private static function url(string $url, &$context)
+            {
+                $url = preg_replace('#^' . preg_quote(self::$protocol) . ':///?#', '', strtr($url, ['\\' => '/']));
+                $context ??= stream_context_create();
+
+                foreach (self::$proxies as $proxy) {
+                    $result = $proxy($url, $context);
+                    if ($result !== null) {
+                        return $result;
+                    }
+                }
+                throw new \DomainException("invalid proxy for $url");
+            }
+
+            private function defaultContext(string $url)
+            {
+                $scheme = parse_url($url, PHP_URL_SCHEME);
+                if ($scheme === false) {
+                    return fn() => null; // @codeCoverageIgnore
+                }
+
+                // stat や touch に $context 引数が無いので委譲ができず、仕方がないので default context に詰めて無理やり渡してるが注意点がある
+                // - そのスキームだけの変更に留めなければならない
+                // - 対象カスタムストリームが stream_context_get_default を見ているという前提が必要
+                $default = stream_context_get_options(stream_context_get_default());
+                $context = stream_context_get_options($this->context);
+                $changed = $default;
+                $changed[$scheme] = ($context[$scheme] ?? []) + ($default[$scheme] ?? []);
+
+                stream_context_set_default($changed);
+                return fn() => stream_context_set_default($default);
+            }
+
+            #<editor-fold desc="stream">
+
+            public function stream_open(string $path, string $mode, int $options, &$opened_path): bool
+            {
+                $url = self::url($path, $this->context);
+                $parts = uri_parse($url);
+
+                // S3 のようなディレクトリの概念が無いプロトコルに合わせるために自動ディレクトリ作成機能を備える
+                if (strlen($parts['scheme'])) {
+                    $context_options = stream_context_get_options($this->context);
+                    if (($context_options[$parts['scheme']]['directoryMode'] ?? null) !== null) {
+                        if (!str_contains($mode, 'r')) {
+                            // この辺で $this->context は不要。is_dir が context 対応していないし、$path を元にしてるので暗黙的にオリジナルのスキームで呼ばれている
+                            if (!is_dir($dirname = dirname($path))) {
+                                mkdir($dirname, $context_options[$parts['scheme']]['directoryMode'], true);
+                            }
+                        }
+                    }
+                }
+
+                $use_include_path = $options & STREAM_USE_PATH;
+                $report_errors = $options & STREAM_REPORT_ERRORS;
+
+                $resource = fopen($url, $mode, $use_include_path, $this->context);
+                if ($resource === false) {
+                    if ($report_errors) {
+                        trigger_error("failed to open stream: $url", E_USER_WARNING); // @codeCoverageIgnore
+                    }
+                    return false;
+                }
+
+                if ($use_include_path) {
+                    $opened_path = $url;
+                }
+
+                $this->resource = $resource;
+                return true;
+            }
+
+            public function stream_close(): bool
+            {
+                return fclose($this->resource);
+            }
+
+            public function stream_lock(int $operation): bool
+            {
+                return flock($this->resource, $operation);
+            }
+
+            public function stream_flush(): bool
+            {
+                return fflush($this->resource);
+            }
+
+            public function stream_eof(): bool
+            {
+                return feof($this->resource);
+            }
+
+            public function stream_read(int $count): string|false
+            {
+                return fread($this->resource, $count);
+            }
+
+            public function stream_write(string $data): int|false
+            {
+                return fwrite($this->resource, $data);
+            }
+
+            public function stream_truncate(int $new_size): bool
+            {
+                return ftruncate($this->resource, $new_size);
+            }
+
+            public function stream_tell(): int|false
+            {
+                return ftell($this->resource);
+            }
+
+            public function stream_seek(int $offset, int $whence): bool
+            {
+                return fseek($this->resource, $offset, $whence) === 0; // fseek は C が剥き出しで成功時に 0 を返す
+            }
+
+            public function stream_stat(): array|false
+            {
+                return fstat($this->resource);
+            }
+
+            public function stream_cast(int $cast_as)
+            {
+                if ($cast_as === STREAM_CAST_AS_STREAM) {
+                    return false;
+                }
+                return $this->resource;
+            }
+
+            public function stream_set_option(int $option, ?int $arg1, ?int $arg2): bool
+            {
+                return match ($option) {
+                    STREAM_OPTION_BLOCKING     => stream_set_blocking($this->resource, $arg1),
+                    STREAM_OPTION_READ_TIMEOUT => stream_set_timeout($this->resource, $arg1, $arg2),
+                    STREAM_OPTION_READ_BUFFER  => stream_set_read_buffer($this->resource, $arg2) === 0,  // C が剥き出しで成功時に 0 を返す
+                    STREAM_OPTION_WRITE_BUFFER => stream_set_write_buffer($this->resource, $arg2) === 0, // C が剥き出しで成功時に 0 を返す
+                };
+            }
+
+            #</editor-fold>
+
+            #<editor-fold desc="url">
+
+            public function stream_metadata(string $path, int $option, mixed $var)
+            {
+                // https://qiita.com/hnw/items/3af76d3d7ec2cf52fff8
+                clearstatcache(true, $path);
+
+                $url = self::url($path, $this->context);
+                $default = $this->defaultContext($url);
+                try {
+                    return match ($option) {
+                        STREAM_META_TOUCH  => touch($url),
+                        STREAM_META_ACCESS => chmod($url, $var & ~umask()),
+                        STREAM_META_OWNER_NAME,
+                        STREAM_META_OWNER  => chown($url, $var),
+                        STREAM_META_GROUP_NAME,
+                        STREAM_META_GROUP  => chgrp($url, $var),
+                    };
+                }
+                finally {
+                    $default();
+                }
+            }
+
+            public function url_stat(string $path, int $flags): array|false
+            {
+                $url = self::url($path, $this->context);
+                $default = $this->defaultContext($url);
+                try {
+                    $fn = $flags & STREAM_URL_STAT_LINK ? 'lstat' : 'stat';
+                    if ($flags & STREAM_URL_STAT_QUIET) {
+                        return @$fn($url);
+                    }
+                    else {
+                        return $fn($url);
+                    }
+                }
+                finally {
+                    $default();
+                }
+            }
+
+            public function rename(string $path_from, string $path_to): bool
+            {
+                return rename(self::url($path_from, $this->context), self::url($path_to, $this->context), $this->context);
+            }
+
+            public function unlink(string $path): bool
+            {
+                return unlink(self::url($path, $this->context), $this->context);
+            }
+
+            #</editor-fold>
+
+            #<editor-fold desc="directory">
+
+            public function mkdir($path, $mode, $options): bool
+            {
+                return mkdir(self::url($path, $this->context), $mode, $options & STREAM_MKDIR_RECURSIVE, $this->context);
+            }
+
+            public function rmdir($path, $options)
+            {
+                return rmdir(self::url($path, $this->context), $this->context);
+            }
+
+            public function dir_opendir(string $path, int $options)
+            {
+                return !!($this->resource = opendir(self::url($path, $this->context), $this->context));
+            }
+
+            public function dir_readdir()
+            {
+                return readdir($this->resource);
+            }
+
+            public function dir_rewinddir()
+            {
+                rewinddir($this->resource);
+            }
+
+            public function dir_closedir()
+            {
+                closedir($this->resource);
+            }
+
+            #</editor-fold>
+        };
+
+        $STREAM_NAME = function_configure('proxy_stream');
+        if (!in_array($STREAM_NAME, stream_get_wrappers())) {
+            if (!stream_wrapper_register($STREAM_NAME, get_class($wrapper)) && $throw) {
+                throw new \RuntimeException("stream_wrapper_register failed, $STREAM_NAME is already defined"); // @codeCoverageIgnore
+            }
+        }
+
+        $wrapper::$protocol = $STREAM_NAME;
+        if ($prepend) {
+            $wrapper::$proxies = [$proxy, ...$wrapper::$proxies];
+        }
+        else {
+            $wrapper::$proxies = [...$wrapper::$proxies, $proxy];
+        }
+    }
+}
+
 assert(!function_exists('ryunosuke\\Functions\\resource_stream') || (new \ReflectionFunction('ryunosuke\\Functions\\resource_stream'))->isUserDefined());
 if (!function_exists('ryunosuke\\Functions\\resource_stream')) {
     /**
@@ -29681,7 +30166,7 @@ if (!function_exists('ryunosuke\\Functions\\stream_describe')) {
                         // resource と fd は id は一致しないが時系列での増減は同じなので順番に取り出せば一致する
                         $descriptor = array_shift($descriptors[$fstat['ino']]);
                         $results[(int) $resource] = [
-                            'type'       => $metadata['wrapper_type'],
+                            'type'       => $metadata['wrapper_type'] ?? null,
                             'descriptor' => $descriptor['descriptor'],
                             'inode'      => $fstat['ino'],
                             'realpath'   => $descriptor['realpath'],
@@ -29696,6 +30181,63 @@ if (!function_exists('ryunosuke\\Functions\\stream_describe')) {
         }
 
         return $results;
+    }
+}
+
+assert(!function_exists('ryunosuke\\Functions\\stream_put_contents') || (new \ReflectionFunction('ryunosuke\\Functions\\stream_put_contents'))->isUserDefined());
+if (!function_exists('ryunosuke\\Functions\\stream_put_contents')) {
+    /**
+     * ストリームに文字列を書き込む
+     *
+     * 基本的に fseek+ftruncate+fwrite するだけのユーティリティ関数。
+     * ただし、末尾のヌル文字は発生させない実装となっている。
+     * 言い換えれば「指定オフセット以降を指定文字列にする」（その方が実用に近いだろう）。
+     *
+     * $offset は nullable で、
+     * - null: seek しない
+     * - 正数: SEEK_SET で seek する
+     * - 負数: SEEK_END で seek する
+     * という動作になる（要するに正数で先頭から、負数で末尾から、ということ）。
+     * その仕様上、「本当に末尾に追加」はできない（言わば -0 だが 0 と区別できない）ので適宜呼び元で設定しておくこと。
+     *
+     * Example:
+     * ```php
+     * $fn = tempnam(sys_get_temp_dir(), 'tmp');
+     * $fp = fopen($fn, 'w+');
+     * // この時点で中身は hogera になる
+     * stream_put_contents($fp, 'hogera');
+     * that(file_get_contents($fn))->is('hogera');
+     * // 4バイト目から書き込むので hogefuga になる（ra が消える）
+     * stream_put_contents($fp, 'fuga', 4);
+     * that(file_get_contents($fn))->is('hogefuga');
+     * // 先頭からより少ない文字を書き込んでも後ろは維持されないし末尾にヌル文字も付かない（piyo になる）
+     * stream_put_contents($fp, 'piyo', 0);
+     * that(file_get_contents($fn))->is('piyo');
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\stream
+     * @return ?int 書き込んだバイト数（失敗時 null）
+     */
+    function stream_put_contents($stream, string $contents, ?int $offset = null): ?int
+    {
+        if ($offset !== null) {
+            $whence = $offset >= 0 ? SEEK_SET : SEEK_END;
+            if (fseek($stream, $offset, $whence) === -1) {
+                return null;
+            }
+        }
+
+        if (($return = fwrite($stream, $contents)) === false) {
+            return null;
+        }
+
+        // この辺の返り値は見ない（これらが失敗しようと「書き込んだバイト数」という返り値に変わりはないから。ただ notice くらいは出した方がいいような気もする）
+        ftruncate($stream, ftell($stream));
+        // 勝手に flush/sync するより呼び元で制御した方が効率がいいだろうのでいったんコメントアウト
+        //fflush($stream);
+        //fsync($stream);
+
+        return $return;
     }
 }
 
@@ -29727,6 +30269,7 @@ if (!function_exists('ryunosuke\\Functions\\stream_transfer')) {
     function stream_transfer(array $streams, array $options = []): array
     {
         $options += [
+            'context'       => null,
             'concurrency'   => 8,    // 同時並列数
             'buffer_size'   => 8192, // 読み込みバッファサイズ
             'select_second' => 1.5,  // stream_select の待機秒数（stream_select なので多少大きくてもよい）
@@ -29738,7 +30281,7 @@ if (!function_exists('ryunosuke\\Functions\\stream_transfer')) {
         $open = fn($target, $mode) => match (true) {
             default              => $target,
             is_callable($target) => $target(),
-            is_string($target)   => fopen($target, $mode),
+            is_string($target)   => fopen($target, $mode, false, $options['context']),
         };
 
         $result = array_fill_keys(array_keys($streams), 0);
@@ -33376,6 +33919,42 @@ if (!function_exists('ryunosuke\\Functions\\str_quote')) {
      */
     function str_quote(string $string, array $options = []): string
     {
+        if (!mb_check_encoding($string, 'UTF-8')) {
+            $chunks = [];
+            $status = null;
+            $buffer = null;
+            foreach (mb_str_split($string, 1, 'UTF-8') as $char) {
+                $valid = (mb_check_encoding($char, 'UTF-8') && !preg_match('/[\x00-\x1F\x7F]/', $char));
+
+                if ($status !== $valid) {
+                    $status = $valid;
+                    $chunks[] = [$valid, ''];
+                    $buffer = &$chunks[array_key_last($chunks)];
+                }
+
+                $buffer[1] .= $char;
+            }
+            unset($buffer);
+
+            $result = [];
+            foreach ($chunks as [$valid, $buffer]) {
+                if ($valid) {
+                    $result[] = substr(str_quote($buffer, [
+                        'escape-character'  => false,
+                        'control-character' => false,
+                        'special-character' => true,
+                        'heredoc'           => '',
+                        'nowdoc'            => '',
+                        'indent'            => 0,
+                    ]), 1, -1);
+                }
+                else {
+                    $result[] = '\\x' . implode('\\x', str_split(bin2hex($buffer), 2));
+                }
+            }
+            return '"' . implode("", $result) . '"';
+        }
+
         $options += [
             'escape-character'  => true,
             'control-character' => true,
@@ -36606,6 +37185,7 @@ if (!function_exists('ryunosuke\\Functions\\function_configure')) {
         $config['placeholder'] ??= '';
         $config['var_stream'] ??= 'VarStreamV010000';
         $config['memory_stream'] ??= 'MemoryStreamV010000';
+        $config['proxy_stream'] ??= 'proxy';
         $config['array.variant'] ??= false;
         $config['chain.nullsafe'] ??= false;
         $config['process.autoload'] ??= [];
@@ -39081,6 +39661,8 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
      * - 大部分のリソース
      *
      * ただし args キーに指定した値は出力されず、import 時にそれらを引数とするクロージャを返すようになるため、疑似的に出力することは可能。
+     * vars キーも同様（クロージャではなく、ローカル変数が情報源になる）。
+     * args と vars は両立でき、その場合 vars+args が渡ってくるクロージャとなる。
      *
      * オブジェクトは「リフレクションを用いてコンストラクタなしで生成してプロパティを代入する」という手法で復元する。
      * ただしコンストラクタが必須引数無しの場合はコールされる。
@@ -39107,6 +39689,7 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
      *     'stdout' => STDOUT,
      *     'pdo'    => new \PDO('sqlite::memory:'),
      * ];
+     *
      * // args を指定すると実際はエクスポートされず、クロージャ表現を返すようになる（値だけ見るのでキーはなんでもよい）
      * $exported = var_export3($value, ['outmode' => 'eval', 'args' => ['k1' => STDOUT, 'k2' => $value['pdo']]]);
      * // import するとクロージャが得られる
@@ -39120,6 +39703,15 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
      * $imported = $closure(['k1' => 123, 'k2' => 456]);
      * that($imported['stdout'])->isSame(123);
      * that($imported['pdo'])->isSame(456);
+     *
+     * // vars を指定すると実際はエクスポートされず、実行時のローカルコンテキストを見るようになる（キーは変数名として valid なもの）
+     * $exported = var_export3($value, ['outmode' => 'eval', 'vars' => ['k1' => STDOUT, 'k2' => $value['pdo']]]);
+     * // ローカル変数を用意してから import すればその値が得られる
+     * $k1 = STDOUT;
+     * $k2 = $value['pdo'];
+     * $imported = eval($exported);
+     * that($imported['stdout'])->isSame($value['stdout']);
+     * that($imported['pdo'])->isSame($value['pdo']);
      * ```
      *
      * @package ryunosuke\Functions\Package\var
@@ -39141,6 +39733,7 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
             'format'  => 'pretty', // pretty or minify
             'outmode' => null,     // null: 本体のみ, 'eval': return ...;, 'file': <?php return ...;
             'args'    => [],       // ここで指定した値は export に含まれず、import 時に引数で要求されるようになる
+            'vars'    => [],       // ここで指定した値は export に含まれず、import 時に変数で要求されるようになる
         ];
         $options['return'] ??= !!$options['outmode'];
 
@@ -39233,7 +39826,7 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
                 $vars[$vid] = $value;
             }
 
-            if (($arg = array_search($value, $options['args'], true)) !== false) {
+            if (($arg = array_search($value, $options['args'], true)) !== false || ($arg = array_search($value, $options['vars'], true)) !== false) {
                 return "\$this->$vid = \$this->args[{$var_export($arg)}]";
             }
 
@@ -39356,7 +39949,9 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
 
                 $attrs = [];
                 foreach ($ref->getAttributes() as $attr) {
-                    $attrs[] = "#[{$raw_export($attr->getName())}({$raw_export(implode(', ', array_map($export, $attr->getArguments())))})]";
+                    $args      = $attr->getArguments();
+                    $namedargs = array_map(fn($value, $name) => is_int($name) ? $export($value) : "$name: {$export($value)}", $args, array_keys($args));
+                    $attrs[] = "#[{$raw_export($attr->getName())}({$raw_export(implode(', ', $namedargs))})]";
                 }
                 $attrs = $attrs ? (implode(' ', $attrs) . ' ') : '';
 
@@ -39650,8 +40245,14 @@ if (!function_exists('ryunosuke\\Functions\\var_export3')) {
             }
             PHP;
 
-        if ($options['args']) {
+        if ($options['args'] && $options['vars']) {
+            $result = "fn(\$args) => ({$function})->call($factory, get_defined_vars() + \$args)";
+        }
+        elseif ($options['args']) {
             $result = "fn(\$args) => ({$function})->call($factory, \$args)";
+        }
+        elseif ($options['vars']) {
+            $result = "({$function})->call($factory, get_defined_vars())";
         }
         else {
             $result = "({$function})->call($factory, [])";

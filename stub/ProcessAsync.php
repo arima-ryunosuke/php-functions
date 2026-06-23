@@ -12,8 +12,8 @@
  */
 class ProcessAsync
 {
-    public $stdout;
-    public $stderr;
+    public mixed $stdout;
+    public mixed $stderr;
 
     public function __invoke() { }
     public function setDestructAction($action): self { }

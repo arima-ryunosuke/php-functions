@@ -359,6 +359,11 @@ TEXT): self { }
     public function file_extension($filename, $extension = ""): self { }
     public function file_extension($extension = ""): self { }
 
+    /** @see glob_escape() */
+    public self $glob_escape;
+    public function glob_escape(string $pattern, int $flags = 0): self { }
+    public function glob_escape(int $flags = 0): self { }
+
     /** @see rsync() */
     public self $rsync;
     public function rsync($src, $dst, $options = []): self { }

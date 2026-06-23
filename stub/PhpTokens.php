@@ -12,12 +12,12 @@
  */
 class PhpTokens extends PhpToken implements Stringable
 {
-    public $tokens;
-    public $index;
-    public $id;
-    public $text;
-    public $line;
-    public $pos;
+    public array $tokens;
+    public int $index;
+    public int $id;
+    public string $text;
+    public int $line;
+    public int $pos;
 
     public function __debugInfo(): array { }
     public function clone(...$newparams): self { }
@@ -28,7 +28,7 @@ class PhpTokens extends PhpToken implements Stringable
     public function end(): self { }
     public function contents(?int $end = null): string { }
     public function resolve($ref): string { }
-    public function tokenize(string $code, int $flags = 0): array { }
+    public static function tokenize(string $code, int $flags = 0): array { }
     public function is($kind): bool { }
     public function isIgnorable(): bool { }
     public function getTokenName(): ?string { }

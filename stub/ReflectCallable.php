@@ -12,8 +12,8 @@
  */
 class ReflectCallable extends ReflectionFunction implements Reflector, Stringable
 {
-    public $name;
-    public $class;
+    public string $name;
+    public string $class;
 
     public function __invoke(...$args): mixed { }
     public function call($newThis = null, ...$args): mixed { }
@@ -60,6 +60,7 @@ class ReflectCallable extends ReflectionFunction implements Reflector, Stringabl
     public function getAttributes(?string $name = null, int $flags = 0): array { }
     public function getClosure(?object $object = null): Closure { }
     public function getTraitMethod(): ?ReflectionMethod { }
+    public static function createFromMethodName(string $method): static { }
     public function isPublic() { }
     public function isPrivate() { }
     public function isProtected() { }

@@ -14,7 +14,7 @@
  */
 class IncludeStream
 {
-    public $context;
+    public mixed $context;
 
     public function dir_opendir($path, $options) { }
     public function dir_readdir() { }

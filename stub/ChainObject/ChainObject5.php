@@ -55,8 +55,8 @@ trait ChainObject5
 
     /** @see range() */
     public self $range;
-    public function range($start, $end, int|float $step = 1): self { }
-    public function range($end, int|float $step = 1): self { }
+    public function range(string|int|float $start, string|int|float $end, int|float $step = 1): self { }
+    public function range(string|int|float $end, int|float $step = 1): self { }
 
     /** @see array_replace() */
     public self $array_replace;
@@ -138,6 +138,16 @@ trait ChainObject5
     public function join(array|string $separator, ?array $array = null): self { }
     public function join(?array $array = null): self { }
 
+    /** @see str_increment() */
+    public self $str_increment;
+    public function str_increment(string $string): self { }
+    public function str_increment(): self { }
+
+    /** @see str_increment() */
+    public self $increment;
+    public function increment(string $string): self { }
+    public function increment(): self { }
+
     /** @see strstr() */
     public self $strstr;
     public function strstr(string $haystack, string $needle, bool $before_needle = false): self { }
@@ -145,8 +155,8 @@ trait ChainObject5
 
     /** @see strrchr() */
     public self $strrchr;
-    public function strrchr(string $haystack, string $needle): self { }
-    public function strrchr(string $needle): self { }
+    public function strrchr(string $haystack, string $needle, bool $before_needle = false): self { }
+    public function strrchr(string $needle, bool $before_needle = false): self { }
 
     /** @see ucwords() */
     public self $ucwords;
@@ -364,6 +374,11 @@ TEXT): self { }
     public function mb_ereg_search_setpos(int $offset): self { }
     public function mb_ereg_search_setpos(): self { }
 
+    /** @see mb_rtrim() */
+    public self $mb_rtrim;
+    public function mb_rtrim(?string $string, ?string $characters = null, ?string $encoding = null): self { }
+    public function mb_rtrim(?string $characters = null, ?string $encoding = null): self { }
+
     /** @see array_append() */
     public self $array_append;
     public function array_append(iterable $array, $value, $key = null): self { }
@@ -563,6 +578,11 @@ TEXT): self { }
     public self $parameter_length;
     public function parameter_length(callable $callable, $require_only = false, $thought_variadic = false): self { }
     public function parameter_length($require_only = false, $thought_variadic = false): self { }
+
+    /** @see stream_put_contents() */
+    public self $stream_put_contents;
+    public function stream_put_contents($stream, string $contents, ?int $offset = null): self { }
+    public function stream_put_contents(string $contents, ?int $offset = null): self { }
 
     /** @see concat() */
     public self $concat;
