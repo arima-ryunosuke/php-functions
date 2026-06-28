@@ -8,7 +8,7 @@ namespace ryunosuke\Functions\Package;
  * コールバックを Generator に変換する
  *
  * Example:
- * ``php
+ * ```php
  * // - iterable を回して $v,$k でコールバックする
  * // - その返り値が true ならループを打ち切る
  * // - 最終的に合計値を返す
