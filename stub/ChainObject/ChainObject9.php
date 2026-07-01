@@ -473,6 +473,21 @@ trait ChainObject9
     public function class_constants($class, $filter = null): self { }
     public function class_constants($filter = null): self { }
 
+    /** @see class_find() */
+    public self $class_find;
+    public function class_find(string $pattern, \Closure|array $filter = [
+    "class"     => true,
+    "interface" => true,
+    "trait"     => true,
+    "enum"      => true,
+], bool $cache = true): self { }
+    public function class_find(\Closure|array $filter = [
+    "class"     => true,
+    "interface" => true,
+    "trait"     => true,
+    "enum"      => true,
+], bool $cache = true): self { }
+
     /** @see class_loader() */
     public self $class_loader;
     public function class_loader($startdir = null): self { }

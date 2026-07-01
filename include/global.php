@@ -6782,6 +6782,65 @@ if (!function_exists('class_extends')) {
     }
 }
 
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_find') || (new \ReflectionFunction('class_find'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_find' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
+if (!function_exists('class_find')) {
+    /**
+     * 指定パターンに一致したクラス配列を返す
+     *
+     * 正味はただの class_map のラッパー。
+     * クラス FQSEN をファイルシステムとみなして $pattern は glob パターンを指定する。
+     * その際クラス名を渡すとその兄弟要素を返す。
+     *
+     * $filter には4種のタイプ名を bool で指定し、true にしたもののみ返される。
+     * ただし enum は明示的に指定しない限り class とは見なされないので注意。
+     *
+     * @package ryunosuke\Functions\Package\classobj
+     */
+    function class_find(
+        /** @var string glob パターン */
+        string         $pattern,
+        /** @var \Closure|array フィルタ条件 */
+        \Closure|array $filter = [
+            'class'     => true,
+            'interface' => true,
+            'trait'     => true,
+            'enum'      => true,
+        ],
+        /** キャッシュを使用するか */
+        bool           $cache = true,
+    ): /** [class] の配列 */ array
+    {
+        $enum_support = function_exists('enum_exists');
+
+        if (type_exists($pattern)) {
+            $pattern = class_namespace($pattern) . "\\*";
+        }
+        $pattern = ltrim($pattern, '\\');
+
+        $result = [];
+        foreach (class_map(null, null, $cache) as $class => $file) {
+            if (fnmatch($pattern, $class, FNM_NOESCAPE | FNM_CASEFOLD)) {
+                if (is_array($filter)) {
+                    if (false
+                        || ($filter['class'] ?? false) && class_exists($class) && (!$enum_support || !enum_exists($class))
+                        || ($filter['interface'] ?? false) && interface_exists($class)
+                        || ($filter['trait'] ?? false) && trait_exists($class)
+                        || $enum_support && ($filter['enum'] ?? false) && enum_exists($class) // @codeCoverageIgnore for php<8.1
+                    ) {
+                        $result[] = $class;
+                    }
+                }
+                else {
+                    if ($filter($class, $file)) {
+                        $result[] = $class;
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+}
+
 (NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('class_loader') || (new \ReflectionFunction('class_loader'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('class_loader' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('class_loader')) {
     /**
@@ -6869,6 +6928,10 @@ if (!function_exists('class_map')) {
                     $tokens = \PhpToken::tokenize(file_get_contents($file), TOKEN_PARSE);
                     $namespace = '';
                     $namespacing = false;
+                    $type_consts = [T_CLASS, T_INTERFACE, T_TRAIT];
+                    if (defined('T_ENUM')) {
+                        $type_consts[] = T_ENUM; // for compatible php<8.1
+                    }
                     foreach ($tokens as $n => $token) {
                         switch (true) {
                             case $token->is(T_NAMESPACE):
@@ -6884,7 +6947,7 @@ if (!function_exists('class_map')) {
                                     $namespace .= $token->text;
                                 }
                                 break;
-                            case $token->is([T_CLASS, T_INTERFACE, T_TRAIT, /*T_ENUM:*/]):
+                            case $token->is($type_consts):
                                 // ある程度で区切らないと無名クラス（new class() { }）や class 定数（Hoge::class）で最後まで読んでしまい、極端に遅くなる
                                 // class/interface/trait/enum キーワードとクラス名が16トークンも離れてることはまずないだろう
                                 for ($i = $n + 1, $l = min($n + 16, count($tokens)); $i < $l; $i++) {
@@ -20126,7 +20189,7 @@ if (!function_exists('generatify')) {
      * コールバックを Generator に変換する
      *
      * Example:
-     * ``php
+     * ```php
      * // - iterable を回して $v,$k でコールバックする
      * // - その返り値が true ならループを打ち切る
      * // - 最終的に合計値を返す
