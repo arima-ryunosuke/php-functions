@@ -11,6 +11,12 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.39
+
+- [docs] ドキュメントが千切れていたので修正
+- [feature] 名前空間 glob でクラスを得る class_find を追加
+- [fixbug] class_map に enum が含まれない不具合
+
 ## 2.0.38
 
 - [test] コケたテストを修正
