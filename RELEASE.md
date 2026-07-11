@@ -11,6 +11,22 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.40
+
+- [feature] csv_import に BOM 読み飛ばし機能を追加
+- [feature] glob_escape を追加
+- [feature] stream_put_contents を追加
+- [feature] proxy_stream を追加
+- [feature] stream_transfer に fopen 時の context オプションを追加
+- [feature] number_rebase 追加
+- [feature] msleep の DateInterval 対応
+- [feature] var_export3 に vars オプションを追加
+- [fixbug] var_export3 で属性の引数名が消える不具合
+- [fixbug] ob_include が原因で ob レベルが乱れる不具合
+- [fixbug] wrapper_type が無いリソースがある
+- [fixbug] str_quote でバイナリが化ける不具合
+- [composer] stream 回りのテストのためにパッケージ追加
+
 ## 2.0.39
 
 - [docs] ドキュメントが千切れていたので修正
