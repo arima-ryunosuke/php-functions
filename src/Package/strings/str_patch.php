@@ -2,8 +2,8 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
-require_once __DIR__ . '/../strings/mb_ereg_options.php';
 require_once __DIR__ . '/../strings/mb_ereg_split.php';
+require_once __DIR__ . '/../strings/mb_setting.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -54,7 +54,7 @@ function str_patch(?string $string, ?string $patch, $options = [])
         return $string;
     }
 
-    $recover = mb_ereg_options([
+    $recover = mb_setting([
         'encoding'      => $options['encoding'],
         'regex_options' => 'r',
     ]);

@@ -6,9 +6,9 @@ require_once __DIR__ . '/../array/array_maps.php';
 require_once __DIR__ . '/../array/array_zip.php';
 require_once __DIR__ . '/../info/ansi_colorize.php';
 require_once __DIR__ . '/../info/is_ansi.php';
-require_once __DIR__ . '/../strings/mb_ereg_options.php';
 require_once __DIR__ . '/../strings/mb_monospace.php';
 require_once __DIR__ . '/../strings/mb_pad_width.php';
+require_once __DIR__ . '/../strings/mb_setting.php';
 require_once __DIR__ . '/../strings/mb_wordwrap.php';
 // @codeCoverageIgnoreEnd
 
@@ -130,7 +130,7 @@ function str_diff($xstring, $ystring, $options = [])
             }
             $this->options = $options;
 
-            $this->recover = mb_ereg_options([
+            $this->recover = mb_setting([
                 'encoding'      => $options['encoding'] ?? null,
                 'regex_options' => 'r',
             ]);
