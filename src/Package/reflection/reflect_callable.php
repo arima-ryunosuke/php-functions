@@ -132,6 +132,10 @@ function reflect_callable($callable)
 
             public function isStatic(): bool
             {
+                if (method_exists(\ReflectionFunction::class, 'isStatic')) {
+                    return parent::isStatic(); // @codeCoverageIgnore
+                }
+
                 return !is_bindable_closure($this->callable);
             }
 
