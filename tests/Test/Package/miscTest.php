@@ -1333,10 +1333,13 @@ aplain text
         that($tokens[11]->resolve($ref))->is(var_export(__FILE__, true));
         that($tokens[14]->resolve($ref))->is(var_export(__NAMESPACE__, true));
 
-        $alias = function () {
+        $alias = #[a]#[x\y\z]function () {
             return php_tokens_dummy_function(PHP_TOKENS_DUMMY_CONST);
         };
         $ref = new \ReflectionFunction($alias);
+        //\ryunosuke\Functions\Package\var_pretty($tokens);
+        that(callable_code($alias, true)[2][0][1]->resolve($ref))->is(__NAMESPACE__ . "\\a");
+        that(callable_code($alias, true)[2][1][1]->resolve($ref))->is(__NAMESPACE__ . "\\x\\y\\z");
         $tokens = php_tokens('<?php return ' . callable_code($alias)[1]);
         //\ryunosuke\Functions\Package\var_pretty($tokens);
         that($tokens[7]->resolve($ref))->is('\\' . __NAMESPACE__ . '\\' . 'php_tokens_dummy_function');

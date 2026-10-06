@@ -173,7 +173,7 @@ function php_tokens(string $code, int $flags = 0)
             $next = $this->next();
 
             $text = $this->text;
-            if ($this->id === T_STRING) {
+            if ($this->id === T_STRING || $this->id === T_NAME_QUALIFIED) {
                 $namespaces = [$ref->getNamespaceName()];
                 if ($ref instanceof \ReflectionFunctionAbstract) {
                     $namespaces[] = $ref->getClosureScopeClass()?->getNamespaceName();
