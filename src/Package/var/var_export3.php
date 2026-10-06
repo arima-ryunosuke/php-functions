@@ -290,9 +290,11 @@ function var_export3($value, $return = false)
                 }
 
                 // fromCallable 由来だと名前がついてしまう
-                if (!$context['class'] && $prev->id === T_FUNCTION && $token->id === T_STRING) {
-                    unset($tokens[$n]);
-                    continue;
+                if ($prev->id === T_FUNCTION && $token->id === T_STRING) {
+                    if ((!$arrow && $context['class'] === 0) || ($arrow && $context['class'] === 1)) {
+                        unset($tokens[$n]);
+                        continue;
+                    }
                 }
 
                 // use 変数の導出

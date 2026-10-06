@@ -1414,6 +1414,14 @@ class varTest extends AbstractTestCase
                 $object->array = array_merge($object->array, ['Z']);
                 return $object;
             })(),
+            'factory1'  => function () {
+                return new class('not-arrow') {
+                    public function __construct(public string $name) { }
+                };
+            },
+            'factory2'  => fn() => new class('arrow') {
+                public function __construct(public string $name) { }
+            },
         ];
         $exported = var_export3($objects, ['outmode' => 'eval']);
         $objects2 = eval($exported);
@@ -1426,6 +1434,8 @@ class varTest extends AbstractTestCase
         that($objects2['internal'])->pdo1->getAttribute(\PDO::ATTR_DRIVER_NAME)->is('sqlite');
         that($objects2['internal'])->pdo2->getAttribute(\PDO::ATTR_DRIVER_NAME)->is('sqlite');
         that($objects2['internal'])->array->is(['A', 'B', 'C', 'Z']);
+        that($objects2['factory1']())->name->is('not-arrow');
+        that($objects2['factory2']())->name->is('arrow');
     }
 
     function test_var_export3_array()
