@@ -28,16 +28,19 @@ class reflectionTest extends AbstractTestCase
         that($code)->is([
             'fn(mixed $value, mixed ...$values): void',
             '\\var_dump($value, $values)',
+            [],
         ]);
         $code = callable_code(\Closure::fromCallable('str_replace'));
         that($code)->is([
             'fn(array|string $search, array|string $replace, array|string $subject, &$count = null): array|string',
             '\\str_replace($search, $replace, $subject, $count)',
+            [],
         ]);
         $code = callable_code(\Closure::fromCallable('date_create'));
         that($code)->is([
             'fn(string $datetime = "now", ?\DateTimeZone $timezone = null): \DateTime|false',
             '\\date_create($datetime, $timezone)',
+            [],
         ]);
 
         $code = callable_code(__NAMESPACE__ . "\\hoge_callable_code");
@@ -46,14 +49,16 @@ class reflectionTest extends AbstractTestCase
             '{
             return true;
         }',
+            [],
         ]);
 
         $code = callable_code([$this, 'createResult']);
         that($code)->is([
-            'function createResult(): TestResult',
+            'protected function createResult(): TestResult',
             '{
         return new TestResult;
     }',
+            [],
         ]);
 
         $code = callable_code(new \ReflectionFunction(__NAMESPACE__ . "\\hoge_callable_code"));
@@ -62,6 +67,7 @@ class reflectionTest extends AbstractTestCase
             '{
             return true;
         }',
+            [],
         ]);
 
         $usevar = null;
@@ -81,6 +87,7 @@ class reflectionTest extends AbstractTestCase
                 };
             }
         }',
+            [],
         ]);
 
         $code = callable_code(function ($a, $b) {
@@ -93,36 +100,42 @@ class reflectionTest extends AbstractTestCase
             $x = fn() => $a + $b;
             return $x();
         }',
+            [],
         ]);
 
         $code = callable_code(fn($a, $b) => $a + $b);
         that($code)->is([
             'fn($a, $b)',
             '$a + $b',
+            [],
         ]);
 
         $code = callable_code(fn($a, $b) => min($a, $b));
         that($code)->is([
             'fn($a, $b)',
             'min($a, $b)',
+            [],
         ]);
 
         $code = callable_code(fn($a, $b) => [[$a + $b]]);
         that($code)->is([
             'fn($a, $b)',
             '[[$a + $b]]',
+            [],
         ]);
 
         $code = callable_code(fn($x = ['x' => 'X']) => [[$x]]);
         that($code)->is([
             "fn(\$x = ['x' => 'X'])",
             '[[$x]]',
+            [],
         ]);
 
-        $code = callable_code(fn() => [#[A] fn() => []]);
+        $code = callable_code(#[A]#[B]fn() => [#[A] fn() => []]);
         that($code)->is([
             'fn()',
             '[#[A] fn() => []]',
+            ['#[A]', '#[B]'],
         ]);
 
         $fn = fn($a, $b) => [fn() => [$a + $b]];
@@ -130,6 +143,7 @@ class reflectionTest extends AbstractTestCase
         that($code)->is([
             'fn($a, $b)',
             '[fn() => [$a + $b]]',
+            [],
         ]);
 
         $fn = fn($a, $b) => fn($a) => fn() => [$a, $b];
@@ -137,6 +151,7 @@ class reflectionTest extends AbstractTestCase
         that($code)->is([
             'fn($a, $b)',
             'fn($a) => fn() => [$a, $b]',
+            [],
         ]);
 
         $fn = fn($a, $b) => new class ( $a, $b ) { public function __construct($a, $b) { } };
@@ -144,18 +159,22 @@ class reflectionTest extends AbstractTestCase
         that($code)->is([
             'fn($a, $b)',
             'new class ( $a, $b ) { public function __construct($a, $b) { } }',
+            [],
         ]);
 
-        ?><?php $fn = fn($a, $b) => [$a, $b] ?><?php
+        ?><?php $fn = #[X(["x"])]#[Y]static fn($a, $b) => [$a, $b] ?><?php
         $code = callable_code($fn);
         that($code)->is([
-            'fn($a, $b)',
+            'static fn($a, $b)',
             '[$a, $b]',
+            ['#[X(["x"])]', '#[Y]'],
         ]);
 
         $code = callable_code($fn, true);
-        that($code[0])->isArray();
-        that($code[1])->isArray();
+        that(array_column($code[0], 'text'))->is(['static', ' ', 'fn', '(', '$a', ',', ' ', '$b', ')']);
+        that(array_column($code[1], 'text'))->is(['[', '$a', ',', ' ', '$b', ']', ' ']);
+        that(array_column($code[2][0], 'text'))->is(['#[', 'X', '(', '[', '"x"', ']', ')', ']']);
+        that(array_column($code[2][1], 'text'))->is(['#[', 'Y', ']']);
     }
 
     function test_function_doccomments()
@@ -430,7 +449,7 @@ class reflectionTest extends AbstractTestCase
         that($reffunc->getClosure()(x: 1))->is(4);
 
         $reffunc = reflect_callable(static function ($x) use (&$use): int { return $x + $use++; });
-        that($reffunc->getDeclaration())->is('function ($x) use (&$use): int');
+        that($reffunc->getDeclaration())->is('static function ($x) use (&$use): int');
         that($reffunc->getCode())->contains('return $x + $use++;');
         that($reffunc->getUsedVariables())->is(['use' => $use]);
         that($reffunc->isStatic())->is(true);
@@ -449,7 +468,7 @@ class reflectionTest extends AbstractTestCase
         that($reffunc->isArrow())->is(true);
 
         $reffunc = reflect_callable([new Concrete('hoge'), 'getName']);
-        that($reffunc->getDeclaration())->is('function getName($prefix = \'\', $upper = false)');
+        that($reffunc->getDeclaration())->is('public function getName($prefix = \'\', $upper = false)');
         that($reffunc->getCode())->contains('return $name;');
         that($reffunc->call(new Concrete('fuga')))->is('fuga');
         that($reffunc('p-'))->is('p-hoge');
@@ -457,21 +476,21 @@ class reflectionTest extends AbstractTestCase
         that($reffunc->getClosure()(upper: true))->is('HOGE');
 
         $reffunc = reflect_callable([new Concrete('hoge'), 'staticMethod']);
-        that($reffunc->getDeclaration())->is('function staticMethod($a = null)');
+        that($reffunc->getDeclaration())->is('public static function staticMethod($a = null)');
         that($reffunc->getCode())->contains('return __METHOD__;');
         that($reffunc->call(new Concrete('fuga')))->is('Concrete::staticMethod');
         that($reffunc(a: 1))->is('Concrete::staticMethod');
         that($reffunc->getClosure()(a: 1))->is('Concrete::staticMethod');
 
         $reffunc = reflect_callable([new Concrete('hoge'), 'hogera']);
-        that($reffunc->getDeclaration())->is('function __call($name, $arguments)');
+        that($reffunc->getDeclaration())->is('public function __call($name, $arguments)');
         that($reffunc->getCode())->contains('return $name;');
         that($reffunc->call(new Concrete('fuga')))->is('hogera');
         that($reffunc())->is('hogera');
         that($reffunc->getClosure()())->is('hogera');
 
         $reffunc = reflect_callable([Concrete::class, 'hogera']);
-        that($reffunc->getDeclaration())->is('function __callStatic($name, $arguments)');
+        that($reffunc->getDeclaration())->is('public static function __callStatic($name, $arguments)');
         that($reffunc->getCode())->contains('return $name;');
         that($reffunc->call(new Concrete('fuga')))->is('hogera');
         that($reffunc())->is('hogera');

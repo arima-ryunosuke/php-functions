@@ -5,11 +5,9 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/array_and.php';
 require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../classobj/object_properties.php';
-require_once __DIR__ . '/../funchand/is_bindable_closure.php';
 require_once __DIR__ . '/../misc/php_indent.php';
 require_once __DIR__ . '/../misc/php_tokens.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
-require_once __DIR__ . '/../strings/starts_with.php';
 require_once __DIR__ . '/../var/is_primitive.php';
 require_once __DIR__ . '/../var/is_resourcable.php';
 // @codeCoverageIgnoreEnd
@@ -257,9 +255,12 @@ function var_export3($value, $return = false)
                 return "\$this->$vid = \\Closure::fromCallable({$export($callee, $nest)})";
             }
 
-            [$meta, $body] = callable_code($value);
-            $arrow = starts_with($meta, 'fn') ? ' => ' : ' ';
-            $tokens = array_slice(php_tokens("<?php $meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
+            [$meta, $body, $attrs] = callable_code($value, true);
+            $arrow = !!array_filter($meta, fn($token) => $token->is(T_FN));
+            $tokens = array_merge(
+                ...$attrs,
+                ...[$meta, [$meta[0]->clone(id: -1, text: $arrow ? ' => ' : ' ')], $body],
+            );
 
             $uses = [];
             $context = [
@@ -312,14 +313,6 @@ function var_export3($value, $return = false)
                 'baseline' => -1,
             ]);
 
-            $attrs = [];
-            foreach ($ref->getAttributes() as $attr) {
-                $args      = $attr->getArguments();
-                $namedargs = array_map(fn($value, $name) => is_int($name) ? $export($value) : "$name: {$export($value)}", $args, array_keys($args));
-                $attrs[] = "#[{$raw_export($attr->getName())}({$raw_export(implode(', ', $namedargs))})]";
-            }
-            $attrs = $attrs ? (implode(' ', $attrs) . ' ') : '';
-
             if ($bind) {
                 $instance = $export($bind, $nest + 1);
                 if ($class->isAnonymous()) {
@@ -328,10 +321,7 @@ function var_export3($value, $return = false)
                 else {
                     $scope = $var_export($class?->getName() === 'Closure' ? 'static' : $class?->getName());
                 }
-                $code = "\Closure::bind({$attrs}$code, $instance, $scope)";
-            }
-            elseif (!is_bindable_closure($value)) {
-                $code = "{$attrs}static $code";
+                $code = "\Closure::bind($code, $instance, $scope)";
             }
 
             return "\$this->$vid = (function () {\n{$raw_export(implode('', $uses))}{$spacer1}return $code;\n$spacer0})->call(\$this)";

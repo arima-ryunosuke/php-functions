@@ -2,6 +2,7 @@
 namespace ryunosuke\Functions\Package;
 
 // @codeCoverageIgnoreStart
+require_once __DIR__ . '/../array/array_find_first.php';
 require_once __DIR__ . '/../misc/php_tokens.php';
 require_once __DIR__ . '/../reflection/function_parameter.php';
 require_once __DIR__ . '/../reflection/reflect_callable.php';
@@ -11,18 +12,20 @@ require_once __DIR__ . '/../reflection/reflect_type_resolve.php';
 /**
  * callable のコードブロックを返す
  *
- * 返り値は2値の配列。0番目の要素が定義部、1番目の要素が処理部を表す。
+ * 返り値は3値の配列。0番目の要素が定義部、1番目の要素が処理部、2番目の要素が属性の配列を表す。
  *
  * Example:
  * ```php
- * list($meta, $body) = callable_code(function (...$args) {return true;});
+ * list($meta, $body, $attrs) = callable_code(#[Attr1]#[Attr2]function (...$args) {return true;});
  * that($meta)->isSame('function (...$args)');
  * that($body)->isSame('{return true;}');
+ * that($attrs)->isSame(['#[Attr1]', '#[Attr2]']);
  *
  * // ReflectionFunctionAbstract を渡しても動作する
- * list($meta, $body) = callable_code(new \ReflectionFunction(function (...$args) {return true;}));
+ * list($meta, $body, $attrs) = callable_code(new \ReflectionFunction(#[Attr1]#[Attr2]function (...$args) {return true;}));
  * that($meta)->isSame('function (...$args)');
  * that($body)->isSame('{return true;}');
+ * that($attrs)->isSame(['#[Attr1]', '#[Attr2]']);
  * ```
  *
  * @package ryunosuke\Functions\Package\reflection
@@ -35,28 +38,55 @@ function callable_code($callable, bool $return_token = false)
 {
     $ref = $callable instanceof \ReflectionFunctionAbstract ? $callable : reflect_callable($callable);
     if ($ref->getFileName() === false) {
+        $static = $ref->isStatic() ? 'static ' : '';
         $reference = $ref->returnsReference() ? '&' : '';
         $return = reflect_type_resolve($ref->getReturnType()) ?? 'void';
         $params = function_parameter($ref);
         $keys = implode(', ', array_map(fn($v) => ltrim($v, '&'), array_keys($params)));
         $vals = implode(', ', $params);
-        return ["fn$reference($vals): $return", "\\$ref->name($keys)"];
+        return ["{$static}fn$reference($vals): $return", "\\$ref->name($keys)", []];
     }
 
-    $contents = file($ref->getFileName());
-    $start = $ref->getStartLine();
-    $end = $ref->getEndLine();
-    $codeblock = implode('', array_slice($contents, $start - 1, $end - $start + 1));
+    // リフレクションの getStartLine で得られるのは function/fn の始まりであり、属性はその前に配置されている可能性があるので全体をパースせざるを得ない
+    $tokens = php_tokens(file_get_contents($ref->getFileName()));
+    $first = array_find_first($tokens, function ($token) use ($ref) {
+        if ($token->line === $ref->getStartLine() && ($token->is([T_FUNCTION, T_FN]))) {
+            return $token;
+        }
+    }, false);
 
-    $tokens = php_tokens("<?php $codeblock");
+    // メソッドは修飾子があり単純ではないので分岐
+    if ($ref instanceof \ReflectionMethod) {
+        // function method(){} という修飾子なしが許容されている以上、キーワードでの検索は不可能で、「前の終わり」でやるしかない
+        $prev = $first->prev(['{', '}', ';']);
+        $first = $prev->next([T_FUNCTION, T_FINAL, T_ABSTRACT, T_STATIC, T_PRIVATE, T_PROTECTED, T_PUBLIC]);
+    }
+    else {
+        // static は直前のみ可
+        $static = $first->prev()->is(T_STATIC);
+        if ($static) {
+            $first = $first->prev();
+        }
+    }
 
-    $begin = $tokens[0]->next([T_FUNCTION, T_FN]);
+    // 属性は直前のみ
+    $attrs = [];
+    $attr_end = $first->prev();
+    while ($attr_end->is(']')) {
+        $attr_begin = $attr_end->prev(T_ATTRIBUTE);
+        $attrs[] = array_slice($tokens, $attr_begin->index, $attr_end->index - $attr_begin->index + 1);
+        $attr_end = $attr_begin->prev();
+    }
+    $attrs = array_reverse($attrs);
+    assert(count($ref->getAttributes()) === count($attrs), "The function/fn line does not match the attribute line");
+
+    $begin = $first;
     $close = $begin->next(['{', T_DOUBLE_ARROW, '[']);
     if ($close->is('[')) {
         $close = $close->end()->next(['{', T_DOUBLE_ARROW]);
     }
 
-    if ($begin->is(T_FN)) {
+    if ($begin->is([T_FN]) || $begin->next()->is(T_FN)) {
         $meta = array_slice($tokens, $begin->index, $close->prev()->index - $begin->index + 1);
         $temp = $close->find([';', ',', T_CLOSE_TAG]);
         // アロー関数は終了トークンが明確ではない
@@ -86,8 +116,12 @@ function callable_code($callable, bool $return_token = false)
     }
 
     if ($return_token) {
-        return [$meta, $body];
+        return [$meta, $body, $attrs];
     }
 
-    return [trim(implode('', array_column($meta, 'text'))), trim(implode('', array_column($body, 'text')))];
+    return [
+        trim(implode('', array_column($meta, 'text'))),
+        trim(implode('', array_column($body, 'text'))),
+        array_map(fn($attr) => trim(implode('', array_column($attr, 'text'))), $attrs),
+    ];
 }

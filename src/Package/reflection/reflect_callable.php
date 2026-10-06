@@ -69,12 +69,12 @@ function reflect_callable($callable)
 
             public function getDeclaration(): string
             {
-                return ($this->definition ??= callable_code($this))[0];
+                return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[0], 'text')));
             }
 
             public function getCode(): string
             {
-                return ($this->definition ??= callable_code($this))[1];
+                return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[1], 'text')));
             }
 
             public function isAnonymous(): bool
@@ -107,12 +107,12 @@ function reflect_callable($callable)
 
             public function getDeclaration(): string
             {
-                return ($this->definition ??= callable_code($this))[0];
+                return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[0], 'text')));
             }
 
             public function getCode(): string
             {
-                return ($this->definition ??= callable_code($this))[1];
+                return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[1], 'text')));
             }
 
             public function isAnonymous(): bool
@@ -126,8 +126,8 @@ function reflect_callable($callable)
 
             public function isArrow(): bool
             {
-                // しっかりやるなら PHPToken を使った方がいいけど今の php 構文ならこれで大丈夫のはず
-                return str_starts_with($this->getDeclaration(), 'fn') !== false;
+                $this->getDeclaration();
+                return !!array_filter($this->definition[0], fn($token) => $token->is(T_FN));
             }
 
             public function isStatic(): bool
@@ -197,12 +197,12 @@ function reflect_callable($callable)
 
             public function getDeclaration(): string
             {
-                return ($this->definition ??= callable_code($this))[0];
+                return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[0], 'text')));
             }
 
             public function getCode(): string
             {
-                return ($this->definition ??= callable_code($this))[1];
+                return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[1], 'text')));
             }
 
             public function isAnonymous(): bool
