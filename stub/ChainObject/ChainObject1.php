@@ -512,8 +512,8 @@ TEXT): self { }
 
     /** @see preg_capture() */
     public self $preg_capture;
-    public function preg_capture($pattern, $subject, $default): self { }
-    public function preg_capture($subject, $default): self { }
+    public function preg_capture($pattern, $subject, $default, int $flags = 0, int $offset = 0): self { }
+    public function preg_capture($subject, $default, int $flags = 0, int $offset = 0): self { }
 
     /** @see random_float() */
     public self $random_float;

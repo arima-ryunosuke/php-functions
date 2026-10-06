@@ -464,6 +464,11 @@ TEXT): self { }
     public function phpval($var, $contextvars = []): self { }
     public function phpval($contextvars = []): self { }
 
+    /** @see var_export3_importer() */
+    public self $var_export3_importer;
+    public function var_export3_importer(?string $class_name = null): self { }
+    public function var_export3_importer(): self { }
+
     /** @see var_type() */
     public self $var_type;
     public function var_type(mixed $var, array $options = []): self { }

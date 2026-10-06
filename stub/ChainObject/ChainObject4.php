@@ -270,13 +270,13 @@ trait ChainObject4
 
     /** @see array_flatten() */
     public self $array_flatten;
-    public function array_flatten(iterable $array, $delimiter = null): self { }
-    public function array_flatten($delimiter = null): self { }
+    public function array_flatten(iterable $array, $delimiter = null, bool $iterable = true): self { }
+    public function array_flatten($delimiter = null, bool $iterable = true): self { }
 
     /** @see array_flatten() */
     public self $flatten;
-    public function flatten(iterable $array, $delimiter = null): self { }
-    public function flatten($delimiter = null): self { }
+    public function flatten(iterable $array, $delimiter = null, bool $iterable = true): self { }
+    public function flatten($delimiter = null, bool $iterable = true): self { }
 
     /** @see array_unset() */
     public self $array_unset;
@@ -415,8 +415,8 @@ trait ChainObject4
 
     /** @see mb_monospace() */
     public self $mb_monospace;
-    public function mb_monospace(?string $string, $codepoints = []): self { }
-    public function mb_monospace($codepoints = []): self { }
+    public function mb_monospace(?string $string, array $codepoints = [], ?string $encoding = null): self { }
+    public function mb_monospace(array $codepoints = [], ?string $encoding = null): self { }
 
     /** @see str_chunk() */
     public self $str_chunk;

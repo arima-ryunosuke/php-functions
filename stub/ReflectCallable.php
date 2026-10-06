@@ -19,6 +19,7 @@ class ReflectCallable extends ReflectionFunction implements Reflector, Stringabl
     public function call($newThis = null, ...$args): mixed { }
     public function getDeclaration(): string { }
     public function getCode(): string { }
+    public function getDeclarationCode(bool $resolve): string { }
     public function isAnonymous(): bool { }
     public function isArrow(): bool { }
     public function isStatic(): bool { }

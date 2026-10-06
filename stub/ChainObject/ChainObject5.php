@@ -566,8 +566,8 @@ TEXT): self { }
 
     /** @see preg_splice() */
     public self $preg_splice;
-    public function preg_splice($pattern, $replacement, $subject, &$matches = [], $limit = -1): self { }
-    public function preg_splice($replacement, $subject, &$matches = [], $limit = -1): self { }
+    public function preg_splice($pattern, $replacement, $subject, &$matches = [], $limit = -1, int $flags = 0): self { }
+    public function preg_splice($replacement, $subject, &$matches = [], $limit = -1, int $flags = 0): self { }
 
     /** @see function_parameter() */
     public self $function_parameter;
@@ -603,6 +603,11 @@ TEXT): self { }
     public self $mb_pad_width;
     public function mb_pad_width(?string $string, $width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
     public function mb_pad_width($width, $pad_string = " ", $pad_type = STR_PAD_RIGHT): self { }
+
+    /** @see mb_setting() */
+    public self $mb_setting;
+    public function mb_setting($options): self { }
+    public function mb_setting(): self { }
 
     /** @see quoteexplode() */
     public self $quoteexplode;

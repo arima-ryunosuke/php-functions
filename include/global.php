@@ -2296,73 +2296,125 @@ if (!function_exists('array_flatten')) {
      * 巷にあふれている実装と違って、 ["$pkey.$ckey" => $value] 形式の配列でも返せる。
      * $delimiter で区切り文字を指定した場合にそのようになる。
      * $delimiter = null の場合に本当の配列で返す（巷の実装と同じ）。
+     * $delimiter に bool を与えると preserve_keys 的な動きになる。
+     * - true: 数値キーをできるだけ維持する
+     * - false: 数値キーを完全に振りなおす
      *
      * Example:
      * ```php
      * $array = [
-     *    'k1' => 'v1',
-     *    'k2' => [
-     *        'k21' => 'v21',
-     *        'k22' => [
-     *            'k221' => 'v221',
-     *            'k222' => 'v222',
-     *            'k223' => [1, 2, 3],
-     *        ],
-     *    ],
+     *     'k1' => 'v1',
+     *     'k2' => [
+     *         'k21' => 'v21',
+     *         'k22' => [
+     *             'k221' => 'v221',
+     *             'k222' => 'v222',
+     *             'k223' => [1 => 1, 2, 3],
+     *         ],
+     *     ],
      * ];
      * // 区切り文字指定なし
      * that(array_flatten($array))->isSame([
-     *    0 => 'v1',
-     *    1 => 'v21',
-     *    2 => 'v221',
-     *    3 => 'v222',
-     *    4 => 1,
-     *    5 => 2,
-     *    6 => 3,
+     *     0 => 'v1',
+     *     1 => 'v21',
+     *     2 => 'v221',
+     *     3 => 'v222',
+     *     4 => 1,
+     *     5 => 2,
+     *     6 => 3,
      * ]);
      * // 区切り文字指定
      * that(array_flatten($array, '.'))->isSame([
-     *    'k1'            => 'v1',
-     *    'k2.k21'        => 'v21',
-     *    'k2.k22.k221'   => 'v221',
-     *    'k2.k22.k222'   => 'v222',
-     *    'k2.k22.k223.0' => 1,
-     *    'k2.k22.k223.1' => 2,
-     *    'k2.k22.k223.2' => 3,
+     *     'k1'            => 'v1',
+     *     'k2.k21'        => 'v21',
+     *     'k2.k22.k221'   => 'v221',
+     *     'k2.k22.k222'   => 'v222',
+     *     'k2.k22.k223.1' => 1,
+     *     'k2.k22.k223.2' => 2,
+     *     'k2.k22.k223.3' => 3,
+     * ]);
+     * // true 指定（連番キーをなるべく維持）
+     * that(array_flatten($array, true))->isSame([
+     *     'k1'   => 'v1',
+     *     'k21'  => 'v21',
+     *     'k221' => 'v221',
+     *     'k222' => 'v222',
+     *     1      => 1,
+     *     2      => 2,
+     *     3      => 3,
+     * ]);
+     * // false 指定（連番キーを振り直し）
+     * that(array_flatten($array, false))->isSame([
+     *    'k1'   => 'v1',
+     *    'k21'  => 'v21',
+     *    'k221' => 'v221',
+     *    'k222' => 'v222',
+     *    0      => 1,
+     *    1      => 2,
+     *    2      => 3,
      * ]);
      * ```
      *
      * @package ryunosuke\Functions\Package\array
      *
      * @param iterable $array 対象配列
-     * @param string|\Closure|null $delimiter キーの区切り文字。 null を与えると連番になる
+     * @param string|bool|\Closure|null $delimiter キーの区切り文字。 null を与えると連番になる
+     * @param bool $iterable is_iterable で再帰判定するか
      * @return array フラット化された配列
      */
-    function array_flatten($array, $delimiter = null)
+    function array_flatten($array, $delimiter = null, bool $iterable = true)
     {
         $result = [];
-        $core = function ($array, $delimiter, $parents) use (&$core, &$result) {
+        $core = function ($array, $parents) use (&$core, &$result, $delimiter, $iterable) {
+            $array_is_list = null;
             foreach ($array as $k => $v) {
                 $keys = $parents;
                 $keys[] = $k;
-                if (is_iterable($v)) {
-                    $core($v, $delimiter, $keys);
+                if (($iterable && is_iterable($v)) || (!$iterable && is_array($v))) {
+                    $core($v, $keys);
                 }
                 else {
-                    if ($delimiter === null) {
-                        $result[] = $v;
+                    $delimiter2 = $delimiter;
+                    if ($delimiter2 instanceof \Closure) {
+                        $delimiter2 = $delimiter2($keys);
                     }
-                    elseif ($delimiter instanceof \Closure) {
-                        $result[$delimiter($keys)] = $v;
+
+                    $newkey = null;
+                    if ($delimiter2 === null) {
+                        // do nothing
+                    }
+                    elseif ($delimiter2 === true) {
+                        $array_is_list ??= is_array($array) && !is_hasharray($array);
+                        if (is_string($k) || !$array_is_list) {
+                            $newkey = $k;
+                        }
+                    }
+                    elseif ($delimiter2 === false) {
+                        if (is_string($k)) {
+                            $newkey = $k;
+                        }
                     }
                     else {
-                        $result[implode($delimiter, $keys)] = $v;
+                        if ($delimiter2 !== $delimiter) {
+                            $newkey = $delimiter2;
+                        }
+                        else {
+                            $newkey = implode($delimiter2, $keys);
+                        }
+                    }
+
+                    if ($newkey === null) {
+                        $result[] = $v;
+                    }
+                    else {
+                        assert(!array_key_exists($newkey, $result)); // for compatible. change to throw in future scope
+                        $result[$newkey] = $v;
                     }
                 }
             }
         };
 
-        $core($array, $delimiter, []);
+        $core($array, []);
         return $result;
     }
 }
@@ -7638,6 +7690,8 @@ if (!function_exists('object_properties')) {
      */
     function object_properties($object, &$privates = [])
     {
+        $privates = [];
+
         if ($object instanceof \Closure) {
             $ref = new \ReflectionFunction($object);
             $uses = method_exists($ref, 'getClosureUsedVariables') ? $ref->getClosureUsedVariables() : $ref->getStaticVariables();
@@ -7650,7 +7704,7 @@ if (!function_exists('object_properties')) {
             $names = explode("\0", $name);
             if (count($names) > 1) {
                 $name = array_pop($names);
-                $cname = $names[1];
+                $cname = implode("\0", array_slice($names, 1));
             }
             $fields[$cname][$name] = $field;
         }
@@ -9623,7 +9677,7 @@ if (!function_exists('csv_export')) {
      *
      * @param iterable $csvarrays 連想配列の配列
      * @param array $options オプション配列。fputcsv の第3引数以降もここで指定する
-     * @return string|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
+     * @return \Generator|string|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
      */
     function csv_export($csvarrays, $options = [])
     {
@@ -9637,30 +9691,69 @@ if (!function_exists('csv_export')) {
             'initial'   => '', // "\xEF\xBB\xBF"
             'headers'   => null,
             'structure' => false,
+            'align'     => null,
             'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
             'output'    => null,
+            'generator' => false,
         ];
 
-        $output = $options['output'];
+        $positions = [];
+        $str_putcsv = function ($array, $delimiter, $enclosure, $escape, $eol, $encoding, $null, $align) use (&$positions) {
+            if (strlen($null)) {
+                foreach ($array as $k => $v) {
+                    if ($v === null) {
+                        $array[$k] = $null;
+                    }
+                }
+            }
 
-        if ($output) {
-            $fp = $options['output'];
-        }
-        else {
-            $fp = fopen('php://temp', 'rw+');
-        }
+            if ($align) {
+                $fields = [];
+                $position = 0;
+
+                $array = array_values(array_map(function ($value) use ($delimiter, $enclosure, $escape, $encoding, $null) {
+                    $value = str_putcsv([$value], $delimiter, $enclosure, $escape);
+
+                    $lines = preg_split('@\\r\\n|\\n@u', $value);
+                    $first = $lines[array_key_first($lines)];
+                    $last = $lines[array_key_last($lines)];
+
+                    return [$value, $lines, $first, $last];
+                }, $array));
+
+                $column = 0;
+                foreach ($array as $i => [$value, $lines, $first, $last]) {
+                    $delimiter_length = $column * strlen($delimiter);
+                    $padding_length = ($positions[$i] ?? 0) - $position - $delimiter_length;
+                    if ($padding_length > 0) {
+                        if (($value[0] ?? '') !== '"') {
+                            $value = '"' . $value . '"';
+                        }
+                        $value = str_repeat(' ', min($align, $padding_length)) . $value;
+                    }
+                    $fields[] = $value;
+
+                    $positions[$i] = max($positions[$i] ?? 0, $position + $delimiter_length);
+                    if (count($lines) > 1) {
+                        $position = mb_monospace($last, [], $encoding);
+                        $column = 0;
+                    }
+                    else {
+                        $position += mb_monospace($value, [], $encoding);
+                    }
+                    $column++;
+                }
+
+                return implode($delimiter, $fields) . $eol;
+            }
+
+            return str_putcsv($array, $delimiter, $enclosure, $escape) . $eol;
+        };
 
         $restore = set_error_exception_handler();
         try {
-            $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $scrub, $null, $initial, $headers, $structure, $callback) {
-                $default_charset = ini_get('default_charset');
-                if ($default_charset !== $encoding) {
-                    // import とは違い、吐き出すときは明確なエラーだろうので TRANSLIT も IGNORE もしない
-                    stream_filter_append($fp, "convert.iconv.$default_charset/$encoding" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_WRITE);
-                }
-
+            $generate = function ($csvarrays, $delimiter, $enclosure, $escape, $encoding, $null, $initial, $headers, $structure, $align, $callback) use ($str_putcsv) {
                 $eol = "\n"; // いつの間にか $eol 引数が生えていたがこの関数自体の対応はしていないので暫定で決め打ちにしてある
-                $size = 0;
 
                 if (!is_array($csvarrays)) {
                     [$csvarrays, $csvarrays2] = iterator_split($csvarrays, [1], true);
@@ -9673,10 +9766,10 @@ if (!function_exists('csv_export')) {
                     }
                 }
                 if (is_stringable($initial) && strlen($initial)) {
-                    $size += fwrite($fp, $initial);
+                    yield $initial;
                 }
                 elseif (is_array($initial) && $initial) {
-                    $size += fputcsv($fp, $initial, $delimiter, $enclosure, $escape);
+                    yield $str_putcsv($initial, $delimiter, $enclosure, $escape, $eol, $encoding, $null, $align);
                 }
                 if (!$headers) {
                     $tmp = [];
@@ -9726,7 +9819,7 @@ if (!function_exists('csv_export')) {
                     if ($structure) {
                         $headerline = array_map(fn($header) => preg_replace('#\[\d+]$#imu', '[]', $header), $headerline);
                     }
-                    $size += fputcsv($fp, $headerline, $delimiter, $enclosure, $escape);
+                    yield $str_putcsv($headerline, $delimiter, $enclosure, $escape, $eol, $encoding, $null, $align);
                 }
 
                 BODY:
@@ -9744,25 +9837,42 @@ if (!function_exists('csv_export')) {
                         }
                     }
                     $row = array_intersect_key(array_replace($default, $array), $default);
-                    if (strlen($null)) {
-                        $line = [];
-                        foreach ($row as $v) {
-                            if ($v === null) {
-                                $line[] = $null;
-                            }
-                            else {
-                                $line[] = str_putcsv([$v], $delimiter, $enclosure, $escape);
-                            }
-                        }
-                        $size += fwrite($fp, implode($delimiter, $line) . $eol);
-                    }
-                    else {
-                        $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
-                    }
+                    yield $str_putcsv($row, $delimiter, $enclosure, $escape, $eol, $encoding, $null, $align);
                 }
-                return $size;
-            })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['null'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
-            if ($output) {
+            };
+
+            $generator = $generate($csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['null'], $options['initial'], $options['headers'], $options['structure'], $options['align'], $options['callback']);
+
+            $default_charset = ini_get('default_charset');
+
+            if ($options['generator']) {
+                if ($default_charset !== $options['encoding']) {
+                    $generator = iterator_map(function ($fields) use ($options, $default_charset) {
+                        mb_convert_variables($options['encoding'], $default_charset, $fields);
+                        return $fields;
+                    }, $generator);
+                }
+                return $generator;
+            }
+
+            if ($options['output']) {
+                $fp = $options['output'];
+            }
+            else {
+                $fp = fopen('php://temp', 'rw+');
+            }
+
+            if ($default_charset !== $options['encoding']) {
+                // import とは違い、吐き出すときは明確なエラーだろうので TRANSLIT も IGNORE もしない
+                stream_filter_append($fp, "convert.iconv.$default_charset/{$options['encoding']}" . (strlen($options['scrub']) ? "//{$options['scrub']}" : ""), STREAM_FILTER_WRITE);
+            }
+
+            $size = 0;
+            foreach ($generator as $fields) {
+                $size += fwrite($fp, $fields);
+            }
+
+            if ($options['output']) {
                 return $size;
             }
             rewind($fp);
@@ -9770,7 +9880,7 @@ if (!function_exists('csv_export')) {
         }
         finally {
             $restore();
-            if (!$output) {
+            if (!$options['output'] && isset($fp)) {
                 fclose($fp);
             }
         }
@@ -23221,7 +23331,7 @@ if (!function_exists('php_tokens')) {
                 $next = $this->next();
 
                 $text = $this->text;
-                if ($this->id === T_STRING) {
+                if ($this->id === T_STRING || $this->id === T_NAME_QUALIFIED) {
                     $namespaces = [$ref->getNamespaceName()];
                     if ($ref instanceof \ReflectionFunctionAbstract) {
                         $namespaces[] = $ref->getClosureScopeClass()?->getNamespaceName();
@@ -26854,12 +26964,12 @@ if (!function_exists('preg_capture')) {
      * @param array $default デフォルト値
      * @return array キャプチャした配列
      */
-    function preg_capture($pattern, $subject, $default)
+    function preg_capture($pattern, $subject, $default, int $flags = 0, int $offset = 0)
     {
-        preg_match($pattern, $subject, $matches);
+        preg_match($pattern, $subject, $matches, $flags, $offset);
 
         foreach ($matches as $n => $match) {
-            if (array_key_exists($n, $default) && strlen($match)) {
+            if (array_key_exists($n, $default) && (is_array($match) || strlen($match ?? ''))) {
                 $default[$n] = $match;
             }
         }
@@ -27058,12 +27168,12 @@ if (!function_exists('preg_splice')) {
      * @param int $limit 置換回数
      * @return string 置換された文字列
      */
-    function preg_splice($pattern, $replacement, $subject, &$matches = [], $limit = -1)
+    function preg_splice($pattern, $replacement, $subject, &$matches = [], $limit = -1, int $flags = 0)
     {
         // for compatible. $limit => 1
         // preg_match なので $matches は最初しか引っかからないにも関わらず $limit:-1 だとすべて置換されてしまう
 
-        if (preg_match($pattern, $subject, $matches)) {
+        if (preg_match($pattern, $subject, $matches, $flags)) {
             if (!is_string($replacement) && is_callable($replacement)) {
                 $subject = preg_replace_callback($pattern, $replacement, $subject, $limit);
             }
@@ -27442,18 +27552,20 @@ if (!function_exists('callable_code')) {
     /**
      * callable のコードブロックを返す
      *
-     * 返り値は2値の配列。0番目の要素が定義部、1番目の要素が処理部を表す。
+     * 返り値は3値の配列。0番目の要素が定義部、1番目の要素が処理部、2番目の要素が属性の配列を表す。
      *
      * Example:
      * ```php
-     * list($meta, $body) = callable_code(function (...$args) {return true;});
+     * list($meta, $body, $attrs) = callable_code(#[Attr1]#[Attr2]function (...$args) {return true;});
      * that($meta)->isSame('function (...$args)');
      * that($body)->isSame('{return true;}');
+     * that($attrs)->isSame(['#[Attr1]', '#[Attr2]']);
      *
      * // ReflectionFunctionAbstract を渡しても動作する
-     * list($meta, $body) = callable_code(new \ReflectionFunction(function (...$args) {return true;}));
+     * list($meta, $body, $attrs) = callable_code(new \ReflectionFunction(#[Attr1]#[Attr2]function (...$args) {return true;}));
      * that($meta)->isSame('function (...$args)');
      * that($body)->isSame('{return true;}');
+     * that($attrs)->isSame(['#[Attr1]', '#[Attr2]']);
      * ```
      *
      * @package ryunosuke\Functions\Package\reflection
@@ -27466,28 +27578,55 @@ if (!function_exists('callable_code')) {
     {
         $ref = $callable instanceof \ReflectionFunctionAbstract ? $callable : reflect_callable($callable);
         if ($ref->getFileName() === false) {
+            $static = $ref->isStatic() ? 'static ' : '';
             $reference = $ref->returnsReference() ? '&' : '';
             $return = reflect_type_resolve($ref->getReturnType()) ?? 'void';
             $params = function_parameter($ref);
             $keys = implode(', ', array_map(fn($v) => ltrim($v, '&'), array_keys($params)));
             $vals = implode(', ', $params);
-            return ["fn$reference($vals): $return", "\\$ref->name($keys)"];
+            return ["{$static}fn$reference($vals): $return", "\\$ref->name($keys)", []];
         }
 
-        $contents = file($ref->getFileName());
-        $start = $ref->getStartLine();
-        $end = $ref->getEndLine();
-        $codeblock = implode('', array_slice($contents, $start - 1, $end - $start + 1));
+        // リフレクションの getStartLine で得られるのは function/fn の始まりであり、属性はその前に配置されている可能性があるので全体をパースせざるを得ない
+        $tokens = php_tokens(file_get_contents($ref->getFileName()));
+        $first = array_find_first($tokens, function ($token) use ($ref) {
+            if ($token->line === $ref->getStartLine() && ($token->is([T_FUNCTION, T_FN]))) {
+                return $token;
+            }
+        }, false);
 
-        $tokens = php_tokens("<?php $codeblock");
+        // メソッドは修飾子があり単純ではないので分岐
+        if ($ref instanceof \ReflectionMethod) {
+            // function method(){} という修飾子なしが許容されている以上、キーワードでの検索は不可能で、「前の終わり」でやるしかない
+            $prev = $first->prev(['{', '}', ';']);
+            $first = $prev->next([T_FUNCTION, T_FINAL, T_ABSTRACT, T_STATIC, T_PRIVATE, T_PROTECTED, T_PUBLIC]);
+        }
+        else {
+            // static は直前のみ可
+            $static = $first->prev()->is(T_STATIC);
+            if ($static) {
+                $first = $first->prev();
+            }
+        }
 
-        $begin = $tokens[0]->next([T_FUNCTION, T_FN]);
+        // 属性は直前のみ
+        $attrs = [];
+        $attr_end = $first->prev();
+        while ($attr_end->is(']')) {
+            $attr_begin = $attr_end->prev(T_ATTRIBUTE);
+            $attrs[] = array_slice($tokens, $attr_begin->index, $attr_end->index - $attr_begin->index + 1);
+            $attr_end = $attr_begin->prev();
+        }
+        $attrs = array_reverse($attrs);
+        assert(count($ref->getAttributes()) === count($attrs), "The function/fn line does not match the attribute line");
+
+        $begin = $first;
         $close = $begin->next(['{', T_DOUBLE_ARROW, '[']);
         if ($close->is('[')) {
             $close = $close->end()->next(['{', T_DOUBLE_ARROW]);
         }
 
-        if ($begin->is(T_FN)) {
+        if ($begin->is([T_FN]) || $begin->next()->is(T_FN)) {
             $meta = array_slice($tokens, $begin->index, $close->prev()->index - $begin->index + 1);
             $temp = $close->find([';', ',', T_CLOSE_TAG]);
             // アロー関数は終了トークンが明確ではない
@@ -27517,10 +27656,14 @@ if (!function_exists('callable_code')) {
         }
 
         if ($return_token) {
-            return [$meta, $body];
+            return [$meta, $body, $attrs];
         }
 
-        return [trim(implode('', array_column($meta, 'text'))), trim(implode('', array_column($body, 'text')))];
+        return [
+            trim(implode('', array_column($meta, 'text'))),
+            trim(implode('', array_column($body, 'text'))),
+            array_map(fn($attr) => trim(implode('', array_column($attr, 'text'))), $attrs),
+        ];
     }
 }
 
@@ -27974,6 +28117,7 @@ if (!function_exists('reflect_callable')) {
      *   - 上記二つは __call/__callStatic のメソッドも呼び出せる
      * - getDeclaration: 宣言部のコードを返す
      * - getCode: 定義部のコードを返す
+     * - getDeclarationCode: 宣言・定義部を合わせた完全なコードを返す
      * - isAnonymous: 無名関数なら true を返す（8.2 の isAnonymous 互換）
      * - isArrow: アロー演算子で定義されたかを返す（クロージャのみ）
      * - isStatic: $this バインド可能かを返す（クロージャのみ）
@@ -28027,12 +28171,27 @@ if (!function_exists('reflect_callable')) {
 
                 public function getDeclaration(): string
                 {
-                    return ($this->definition ??= callable_code($this))[0];
+                    return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[0], 'text')));
                 }
 
                 public function getCode(): string
                 {
-                    return ($this->definition ??= callable_code($this))[1];
+                    return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[1], 'text')));
+                }
+
+                public function getDeclarationCode(bool $resolve): string
+                {
+                    [$meta, $body, $attrs] = $this->definition ??= callable_code($this, true);
+                    if ($resolve) {
+                        $meta = array_map(fn($token) => $token->resolve($this), $meta);
+                        $body = array_map(fn($token) => $token->resolve($this), $body);
+                        $attrs = array_map(fn($attr) => array_map(fn($token) => $token->resolve($this), $attr), $attrs);
+                    }
+                    return sprintf('%s%s%s',
+                        implode('', array_map(fn($attr) => implode('', $attr), $attrs)),
+                        implode('', $meta),
+                        implode('', $body),
+                    );
                 }
 
                 public function isAnonymous(): bool
@@ -28065,12 +28224,28 @@ if (!function_exists('reflect_callable')) {
 
                 public function getDeclaration(): string
                 {
-                    return ($this->definition ??= callable_code($this))[0];
+                    return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[0], 'text')));
                 }
 
                 public function getCode(): string
                 {
-                    return ($this->definition ??= callable_code($this))[1];
+                    return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[1], 'text')));
+                }
+
+                public function getDeclarationCode(bool $resolve): string
+                {
+                    [$meta, $body, $attrs] = $this->definition ??= callable_code($this, true);
+                    if ($resolve) {
+                        $meta = array_map(fn($token) => $token->resolve($this), $meta);
+                        $body = array_map(fn($token) => $token->resolve($this), $body);
+                        $attrs = array_map(fn($attr) => array_map(fn($token) => $token->resolve($this), $attr), $attrs);
+                    }
+                    return sprintf('%s%s%s%s',
+                        implode('', array_map(fn($attr) => implode('', $attr), $attrs)),
+                        implode('', $meta),
+                        $this->isArrow() ? " => " : "",
+                        implode('', $body),
+                    );
                 }
 
                 public function isAnonymous(): bool
@@ -28084,12 +28259,16 @@ if (!function_exists('reflect_callable')) {
 
                 public function isArrow(): bool
                 {
-                    // しっかりやるなら PHPToken を使った方がいいけど今の php 構文ならこれで大丈夫のはず
-                    return str_starts_with($this->getDeclaration(), 'fn') !== false;
+                    $this->getDeclaration();
+                    return !!array_filter($this->definition[0], fn($token) => $token->is(T_FN));
                 }
 
                 public function isStatic(): bool
                 {
+                    if (method_exists(\ReflectionFunction::class, 'isStatic')) {
+                        return parent::isStatic(); // @codeCoverageIgnore
+                    }
+
                     return !is_bindable_closure($this->callable);
                 }
 
@@ -28151,12 +28330,27 @@ if (!function_exists('reflect_callable')) {
 
                 public function getDeclaration(): string
                 {
-                    return ($this->definition ??= callable_code($this))[0];
+                    return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[0], 'text')));
                 }
 
                 public function getCode(): string
                 {
-                    return ($this->definition ??= callable_code($this))[1];
+                    return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[1], 'text')));
+                }
+
+                public function getDeclarationCode(bool $resolve): string
+                {
+                    [$meta, $body, $attrs] = $this->definition ??= callable_code($this, true);
+                    if ($resolve) {
+                        $meta = array_map(fn($token) => $token->resolve($this), $meta);
+                        $body = array_map(fn($token) => $token->resolve($this), $body);
+                        $attrs = array_map(fn($attr) => array_map(fn($token) => $token->resolve($this), $attr), $attrs);
+                    }
+                    return sprintf('%s%s%s',
+                        implode('', array_map(fn($attr) => implode('', $attr), $attrs)),
+                        implode('', $meta),
+                        implode('', $body),
+                    );
                 }
 
                 public function isAnonymous(): bool
@@ -30975,66 +31169,20 @@ if (!function_exists('mb_ellipsis')) {
     }
 }
 
-(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mb_ereg_options') || (new \ReflectionFunction('mb_ereg_options'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_ereg_options' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
+('8.4' === null || version_compare(PHP_VERSION, '8.4') < 0) ? assert(!function_exists('mb_ereg_options') || (new \ReflectionFunction('mb_ereg_options'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_ereg_options' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
 if (!function_exists('mb_ereg_options')) {
     /**
      * mb_系の全体設定を一括設定する
      *
-     * 返り値として「コールすると元に戻す callable」を返す。
-     * あるいはその返り値はスコープが外れると自動で元に戻す処理が行われる。
-     *
-     * 余計なことはしない素直な実装だが、'encoding' というキーは mb_internal_encoding と regex_encoding の両方に適用される。
-     *
-     * Example:
-     * ```php
-     * $recover = mb_ereg_options([
-     *     'internal_encoding' => 'SJIS', // 今だけは internal_encoding を SJIS にする
-     *     'regex_options'     => 'ir',   // 今だけは regex_options を ir にする
-     * ]);
-     * that($recover)->isCallable();             // 返り値は callable
-     * that(mb_internal_encoding())->is('SJIS'); // 今だけは SJIS
-     * that(mb_regex_set_options())->is('ir');   // 今だけは ir
-     *
-     * $recover();
-     * that(mb_internal_encoding())->is('UTF-8'); // $recover をコールすると戻る
-     * that(mb_regex_set_options())->is('pr');    // $recover をコールすると戻る
-     * ```
-     *
+     * @see array_or()
+     * @deprecated use mb_setting
+     * @conflict 8.4
+     * @codeCoverageIgnore
      * @package ryunosuke\Functions\Package\strings
-     *
-     * @param array $options オプション配列
-     * @return callable 元に戻す callable
      */
     function mb_ereg_options($options)
     {
-        $set = static function ($setting) {
-            if (strlen((string) $setting['internal_encoding'])) {
-                mb_internal_encoding($setting['internal_encoding']);
-            }
-            if (strlen((string) $setting['substitute_character'])) {
-                mb_substitute_character($setting['substitute_character']);
-            }
-            if (strlen((string) $setting['regex_encoding'])) {
-                mb_regex_encoding($setting['regex_encoding']);
-            }
-            if (strlen((string) $setting['regex_options'])) {
-                mb_regex_set_options($setting['regex_options']);
-            }
-        };
-
-        $backup = [
-            'internal_encoding'    => mb_internal_encoding(),
-            'substitute_character' => mb_substitute_character(),
-            'regex_encoding'       => mb_regex_encoding(),
-            'regex_options'        => mb_regex_set_options(),
-        ];
-        $set([
-            'internal_encoding'    => $options['internal_encoding'] ?? $options['encoding'] ?? null,
-            'substitute_character' => $options['substitute_character'] ?? null,
-            'regex_encoding'       => $options['regex_encoding'] ?? $options['encoding'] ?? null,
-            'regex_options'        => $options['regex_options'] ?? null,
-        ]);
-        return finalize(fn() => $set($backup));
+        return mb_setting($options);
     }
 }
 
@@ -31178,7 +31326,7 @@ if (!function_exists('mb_monospace')) {
      * ```php
      * that(mb_monospace("※★▼…"))->is(8);     // 記号類も2バイト換算で8
      * that(mb_monospace("123456７8８"))->is(11); // 比較用（フォントに依存するが）
-     * that(mb_monospace("Σ(ﾟДﾟ)え!！"))->is(15); // 半角全角の判定ではなく ASCII 判定なので 15
+     * that(mb_monospace("Σ(ﾟДﾟ)え!！"))->is(13); // 半角全角の判定ではなく ASCII 判定なので 13
      * that(mb_monospace("Σ(ﾟДﾟ)え!！", [         // コードポイントを指定すれば合わせることが可能
      *     "Σ"    => 1, // 単体指定（シグマ）
      *     "Ѐ-ӿ"  => 1, // 範囲指定（キリル文字）
@@ -31190,48 +31338,67 @@ if (!function_exists('mb_monospace')) {
      *
      * @param string $string 対象文字列
      * @param array $codepoints コードポイント配列
+     * @param ?string $encoding エンコーディング
      * @return int 等幅の文字幅
      */
-    function mb_monospace(?string $string, $codepoints = [])
+    function mb_monospace(?string $string, array $codepoints = [], ?string $encoding = null)
     {
-        $widthmap = [];
-        foreach ($codepoints as $codepoint => $width) {
-            // 数値あるいは数値に準ずる値（intval がややこしくなるのでコードポイント 0 は考慮しない）
-            if (is_int($codepoint) || intval($codepoint, 0) !== 0) {
-                $widthmap[mb_chr(intval($codepoint, 0))] = $width;
-            }
-            // 文字列あるいは - による範囲指定
-            else {
-                // mb_ereg_search_regs が使いにくすぎるので callback で代用している
-                $pairs = [];
-                $codepoint = mb_ereg_replace_callback('([^-])\-([^-])', function ($m) use (&$pairs) {
-                    $pairs[] = [mb_ord($m[1]), mb_ord($m[2])];
-                    return '';
-                }, $codepoint);
-                foreach ($pairs as [$s, $e]) {
-                    for ($i = $s; $i <= $e; $i++) {
-                        $widthmap[mb_chr($i)] = $width;
-                    }
-                }
-                foreach (mb_str_split($codepoint) as $char) {
-                    $widthmap[$char] = $width;
-                }
-            }
+        $encoding ??= mb_internal_encoding();
+
+        // 頻出の utf8 と sjis で文字幅が違うので特別扱いする
+        if (!$codepoints && in_array(strtoupper($encoding), ['UTF8', 'UTF-8'], true)) {
+            $codepoints = ['ｦ-ﾟ' => 1];
         }
 
-        $width = 0;
-        foreach (mb_str_split($string) as $char) {
-            if (isset($widthmap[$char])) {
-                $width += $widthmap[$char];
+        // 個別指定は漏れが出そうだし regex_encoding はいずれにせよ個別引数がないので try~catch でまとめてやる
+        $recover = mb_setting([
+            'internal_encoding' => $encoding,
+            'regex_encoding'    => $encoding,
+        ]);
+
+        try {
+            $widthmap = [];
+            foreach ($codepoints as $codepoint => $width) {
+                // 数値あるいは数値に準ずる値（intval がややこしくなるのでコードポイント 0 は考慮しない）
+                if (is_int($codepoint) || intval($codepoint, 0) !== 0) {
+                    $widthmap[mb_chr(intval($codepoint, 0))] = $width;
+                }
+                // 文字列あるいは - による範囲指定
+                else {
+                    // mb_ereg_search_regs が使いにくすぎるので callback で代用している
+                    $pairs = [];
+                    $codepoint = mb_ereg_replace_callback('([^-])\-([^-])', function ($m) use (&$pairs) {
+                        $pairs[] = [mb_ord($m[1]), mb_ord($m[2])];
+                        return '';
+                    }, $codepoint);
+                    foreach ($pairs as [$s, $e]) {
+                        for ($i = $s; $i <= $e; $i++) {
+                            $widthmap[mb_chr($i)] = $width;
+                        }
+                    }
+                    foreach (mb_str_split($codepoint) as $char) {
+                        $widthmap[$char] = $width;
+                    }
+                }
             }
-            elseif (strlen($char) === 1) {
-                $width += 1;
+
+            $width = 0;
+            foreach (mb_str_split($string) as $char) {
+                if (isset($widthmap[$char])) {
+                    $width += $widthmap[$char];
+                }
+                elseif (strlen($char) === 1) {
+                    $width += 1;
+                }
+                else {
+                    $width += 2;
+                }
             }
-            else {
-                $width += 2;
-            }
+            return $width;
         }
-        return $width;
+        finally {
+            $recover();
+        }
     }
 }
 
@@ -31292,6 +31459,69 @@ if (!function_exists('mb_pad_width')) {
             case STR_PAD_LEFT:
                 return str_repeat($pad_string, floor($pad_count)) . $string;
         }
+    }
+}
+
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('mb_setting') || (new \ReflectionFunction('mb_setting'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('mb_setting' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
+if (!function_exists('mb_setting')) {
+    /**
+     * mb_系の全体設定を一括設定する
+     *
+     * 返り値として「コールすると元に戻す callable」を返す。
+     * あるいはその返り値はスコープが外れると自動で元に戻す処理が行われる。
+     *
+     * 余計なことはしない素直な実装だが、'encoding' というキーは mb_internal_encoding と regex_encoding の両方に適用される。
+     *
+     * Example:
+     * ```php
+     * $recover = mb_setting([
+     *     'internal_encoding' => 'SJIS', // 今だけは internal_encoding を SJIS にする
+     *     'regex_options'     => 'ir',   // 今だけは regex_options を ir にする
+     * ]);
+     * that($recover)->isCallable();             // 返り値は callable
+     * that(mb_internal_encoding())->is('SJIS'); // 今だけは SJIS
+     * that(mb_regex_set_options())->is('ir');   // 今だけは ir
+     *
+     * $recover();
+     * that(mb_internal_encoding())->is('UTF-8'); // $recover をコールすると戻る
+     * that(mb_regex_set_options())->is('pr');    // $recover をコールすると戻る
+     * ```
+     *
+     * @package ryunosuke\Functions\Package\strings
+     *
+     * @param array $options オプション配列
+     * @return callable 元に戻す callable
+     */
+    function mb_setting($options)
+    {
+        $set = static function ($setting) {
+            if (strlen((string) $setting['internal_encoding'])) {
+                mb_internal_encoding($setting['internal_encoding']);
+            }
+            if (strlen((string) $setting['substitute_character'])) {
+                mb_substitute_character($setting['substitute_character']);
+            }
+            if (strlen((string) $setting['regex_encoding'])) {
+                mb_regex_encoding($setting['regex_encoding']);
+            }
+            if (strlen((string) $setting['regex_options'])) {
+                mb_regex_set_options($setting['regex_options']);
+            }
+        };
+
+        $backup = [
+            'internal_encoding'    => mb_internal_encoding(),
+            'substitute_character' => mb_substitute_character(),
+            'regex_encoding'       => mb_regex_encoding(),
+            'regex_options'        => mb_regex_set_options(),
+        ];
+        $set([
+            'internal_encoding'    => $options['internal_encoding'] ?? $options['encoding'] ?? null,
+            'substitute_character' => $options['substitute_character'] ?? null,
+            'regex_encoding'       => $options['regex_encoding'] ?? $options['encoding'] ?? null,
+            'regex_options'        => $options['regex_options'] ?? null,
+        ]);
+        return finalize(fn() => $set($backup));
     }
 }
 
@@ -32581,7 +32811,7 @@ if (!function_exists('str_diff')) {
                 }
                 $this->options = $options;
 
-                $this->recover = mb_ereg_options([
+                $this->recover = mb_setting([
                     'encoding'      => $options['encoding'] ?? null,
                     'regex_options' => 'r',
                 ]);
@@ -33669,7 +33899,7 @@ if (!function_exists('str_patch')) {
             return $string;
         }
 
-        $recover = mb_ereg_options([
+        $recover = mb_setting([
             'encoding'      => $options['encoding'],
             'regex_options' => 'r',
         ]);
@@ -39729,16 +39959,19 @@ if (!function_exists('var_export3')) {
         }
         $options = $return;
         $options += [
-            'format'  => 'pretty', // pretty or minify
-            'outmode' => null,     // null: 本体のみ, 'eval': return ...;, 'file': <?php return ...;
-            'args'    => [],       // ここで指定した値は export に含まれず、import 時に引数で要求されるようになる
-            'vars'    => [],       // ここで指定した値は export に含まれず、import 時に変数で要求されるようになる
+            'format'   => 'pretty', // pretty or minify
+            'outmode'  => null,     // null: 本体のみ, 'eval': return ...;, 'file': <?php return ...;
+            'callback' => null,     // 値1つごとのコールバック（値とキー配列とネストレベルが引数で渡ってくる）
+            'args'     => [],       // ここで指定した値は export に含まれず、import 時に引数で要求されるようになる
+            'vars'     => [],       // ここで指定した値は export に含まれず、import 時に変数で要求されるようになる
+            'importer' => null,     // importer 指定（普段使いは気にしなくてよい）
         ];
         $options['return'] ??= !!$options['outmode'];
 
         $var_manager = new class() {
             private $vars = [];
             private $refs = [];
+            private $ids  = [];
 
             private function arrayHasReference($array)
             {
@@ -39789,12 +40022,11 @@ if (!function_exists('var_export3')) {
 
             public function refId($array, $k)
             {
-                static $ids = [];
                 $ref = \ReflectionReference::fromArrayElement($array, $k);
                 if ($ref) {
                     $refid = $ref->getId();
-                    $ids[$refid] = ($ids[$refid] ?? count($ids) + 1);
-                    $id = 'reference' . $ids[$refid];
+                    $this->ids[$refid] = ($this->ids[$refid] ?? count($this->ids) + 1);
+                    $id = 'reference' . $this->ids[$refid];
                     $this->refs[$id] = $array[$k];
                     return $id;
                 }
@@ -39806,6 +40038,7 @@ if (!function_exists('var_export3')) {
                     $vid = array_search($var, $this->vars, true);
                     yield $rid => [!!$vid, $vid, $var];
                 }
+                return $this->vars || $this->refs;
             }
         };
 
@@ -39823,6 +40056,13 @@ if (!function_exists('var_export3')) {
                     return "\$this->$vid";
                 }
                 $vars[$vid] = $value;
+            }
+
+            if ($options['callback']) {
+                $exported = $options['callback']($value, $nest);
+                if ($exported !== null) {
+                    return "\$this->$vid = $exported";
+                }
             }
 
             if (($arg = array_search($value, $options['args'], true)) !== false || ($arg = array_search($value, $options['vars'], true)) !== false) {
@@ -39882,7 +40122,6 @@ if (!function_exists('var_export3')) {
                 $ref = new \ReflectionFunction($value);
                 $bind = $ref->getClosureThis();
                 $class = $ref->getClosureScopeClass();
-                $statics = $ref->getStaticVariables();
 
                 // 内部由来はきちんと fromCallable しないと差異が出てしまう
                 if ($ref->isInternal()) {
@@ -39891,11 +40130,18 @@ if (!function_exists('var_export3')) {
                     return "\$this->$vid = \\Closure::fromCallable({$export($callee, $nest)})";
                 }
 
-                [$meta, $body] = callable_code($value);
-                $arrow = starts_with($meta, 'fn') ? ' => ' : ' ';
-                $tokens = array_slice(php_tokens("<?php $meta{$arrow}$body;", TOKEN_PARSE), 1, -1);
+                // use 変数の導出 for compatible php8.1
+                $statics = method_exists($ref, 'getClosureUsedVariables') ? null : $ref->getStaticVariables();
+                $uses = method_exists($ref, 'getClosureUsedVariables') ? $ref->getClosureUsedVariables() : [];
+                $uses = array_map(fn($v, $k) => "$spacer1\$$k = {$raw_export($v === $value ? '&' : '')}{$export($v, $nest + 1)};\n", $uses, array_keys($uses));
 
-                $uses = [];
+                [$meta, $body, $attrs] = callable_code($value, true);
+                $arrow = !!array_filter($meta, fn($token) => $token->is(T_FN));
+                $tokens = array_merge(
+                    ...$attrs,
+                    ...[$meta, [$meta[0]->clone(id: -1, text: $arrow ? ' => ' : ' ')], $body],
+                );
+
                 $context = [
                     'class' => 0,
                     'brace' => 0,
@@ -39923,18 +40169,22 @@ if (!function_exists('var_export3')) {
                     }
 
                     // fromCallable 由来だと名前がついてしまう
-                    if (!$context['class'] && $prev->id === T_FUNCTION && $token->id === T_STRING) {
-                        unset($tokens[$n]);
-                        continue;
+                    if ($prev->id === T_FUNCTION && $token->id === T_STRING) {
+                        if ((!$arrow && $context['class'] === 0) || ($arrow && $context['class'] === 1)) {
+                            unset($tokens[$n]);
+                            continue;
+                        }
                     }
 
-                    // use 変数の導出
-                    if ($token->id === T_VARIABLE) {
-                        $varname = substr($token->text, 1);
-                        // クロージャ内クロージャの use に反応してしまうので存在するときのみとする
-                        if (array_key_exists($varname, $statics) && !isset($uses[$varname])) {
-                            $recurself = $statics[$varname] === $value ? '&' : '';
-                            $uses[$varname] = "$spacer1\$$varname = $recurself{$export($statics[$varname], $nest + 1)};\n";
+                    // use 変数の導出 for compatible php8.1
+                    if ($statics !== null) {
+                        if ($token->id === T_VARIABLE) {
+                            $varname = substr($token->text, 1);
+                            // クロージャ内クロージャの use に反応してしまうので存在するときのみとする
+                            if (array_key_exists($varname, $statics) && !isset($uses[$varname])) {
+                                $recurself = $statics[$varname] === $value ? '&' : '';
+                                $uses[$varname] = "$spacer1\$$varname = $recurself{$export($statics[$varname], $nest + 1)};\n";
+                            }
                         }
                     }
 
@@ -39946,14 +40196,6 @@ if (!function_exists('var_export3')) {
                     'baseline' => -1,
                 ]);
 
-                $attrs = [];
-                foreach ($ref->getAttributes() as $attr) {
-                    $args      = $attr->getArguments();
-                    $namedargs = array_map(fn($value, $name) => is_int($name) ? $export($value) : "$name: {$export($value)}", $args, array_keys($args));
-                    $attrs[] = "#[{$raw_export($attr->getName())}({$raw_export(implode(', ', $namedargs))})]";
-                }
-                $attrs = $attrs ? (implode(' ', $attrs) . ' ') : '';
-
                 if ($bind) {
                     $instance = $export($bind, $nest + 1);
                     if ($class->isAnonymous()) {
@@ -39962,10 +40204,7 @@ if (!function_exists('var_export3')) {
                     else {
                         $scope = $var_export($class?->getName() === 'Closure' ? 'static' : $class?->getName());
                     }
-                    $code = "\Closure::bind({$attrs}$code, $instance, $scope)";
-                }
-                elseif (!is_bindable_closure($value)) {
-                    $code = "{$attrs}static $code";
+                    $code = "\Closure::bind($code, $instance, $scope)";
                 }
 
                 return "\$this->$vid = (function () {\n{$raw_export(implode('', $uses))}{$spacer1}return $code;\n$spacer0})->call(\$this)";
@@ -40031,60 +40270,60 @@ if (!function_exists('var_export3')) {
                     $tokens = php_tokens('<?php ' . implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
 
                     $block = [];
-                    $starting = false;
-                    $constructing = 0;
-                    $nesting = 0;
-                    foreach ($tokens as $token) {
-                        $prev = $token->prev() ?? (object) ['id' => null, 'text' => null, 'line' => null];
-                        $next = $token->next() ?? (object) ['id' => null, 'text' => null, 'line' => null];
-                        assert([$prev, $next]); // あらかじめ取得しておかないとズレるかもしれない
-
-                        // 無名クラスは new class か new #[Attribute] で始まるはず（new #[A] ClassName は許可されていない）
-                        if (($token->id === T_NEW && $next->id === T_CLASS) || ($token->id === T_NEW && $next->id === T_ATTRIBUTE)) {
-                            $starting = true;
-                        }
-                        if (!$starting) {
-                            continue;
-                        }
+                    // 無名クラスは new class か new #[Attribute] で始まるはず（new #[A] ClassName は許可されていない）
+                    $new = $tokens[0]->next(T_NEW);
+                    if ($new->next()->is(T_CLASS) || $new->next()->is(T_ATTRIBUTE)) {
+                        $brace_begin = $new->next(['(', '{']);
 
                         // コンストラクタの呼び出し引数はスキップする
-                        if ($constructing !== null) {
-                            if ($token->text === '(') {
-                                $constructing++;
+                        if ($brace_begin->is('(')) {
+                            $end = $brace_begin->end();
+                            for ($i = $brace_begin->index; $i <= $end->index; $i++) {
+                                $tokens[$i]->id = -1;
+                                $tokens[$i]->text = '';
                             }
-                            if ($token->text === ')') {
-                                $constructing--;
-                                if ($constructing === 0) {
-                                    $constructing = null;          // null を終了済みマークとして変数を再利用している
-                                    $block[] = [null, '()', null]; // for psr-12
-                                    continue;
-                                }
-                            }
-                            if ($constructing) {
-                                continue;
+                            $brace_begin = $brace_begin->next('{');
+                        }
+
+                        // 引数ありコンストラクタは潰すので昇格プロパティを宣言しなければならない
+                        $promoted_properties = [];
+                        foreach (array_filter($ref->getProperties(), fn($property) => $property->isPromoted()) as $property) {
+                            $modifierBits = [
+                                \ReflectionProperty::IS_PUBLIC    => 'public',
+                                \ReflectionProperty::IS_PROTECTED => 'protected',
+                                \ReflectionProperty::IS_PRIVATE   => 'private',
+                                //\ReflectionProperty::IS_READONLY  => 'readonly', // 後から入れる関係上 readonly は対応できない
+                            ];
+
+                            $promoted_properties[] = sprintf('%s %s $%s;',
+                                implode(' ', array_filter($modifierBits, fn($bit) => $property->getModifiers() & $bit, ARRAY_FILTER_USE_KEY)),
+                                $property?->getType() ?? '',
+                                $property->getName(),
+                            );
+                        }
+
+                        // 引数ありコンストラクタは呼ばないので潰しておく
+                        $construct = $brace_begin->next('__construct');
+                        if ($construct && $ref->getConstructor() && $ref->getConstructor()->getNumberOfRequiredParameters()) {
+                            $construct->text = 'replaced__construct';
+                            $parenthesis_begin = $construct->next('(');
+                            $parenthesis_end = $parenthesis_begin->end();
+                            for ($i = $parenthesis_begin->index + 1; $i < $parenthesis_end->index; $i++) {
+                                $tokens[$i]->id = -1;
+                                $tokens[$i]->text = '';
                             }
                         }
 
-                        // 引数ありコンストラクタは呼ばないのでリネームしておく
-                        if ($token->text === '__construct' && $ref->getConstructor() && $ref->getConstructor()->getNumberOfRequiredParameters()) {
-                            $token = clone $token;
-                            $token->text = "replaced__construct";
-                        }
-
-                        $block[] = $token->clone(text: $token->resolve($ref));
-
-                        if ($token->text === '{') {
-                            $nesting++;
-                        }
-                        if ($token->text === '}') {
-                            $nesting--;
-                            if ($nesting === 0) {
-                                break;
+                        $brace_end = $brace_begin->end();
+                        foreach (array_slice($tokens, $new->index, $brace_end->index - $new->index + 1) as $token) {
+                            $block[] = $token->resolve($ref);
+                            if ($token === $brace_begin) {
+                                $block[] = implode("", $promoted_properties);
                             }
                         }
                     }
 
-                    $code = php_indent(implode('', array_column($block, 'text')), [
+                    $code = php_indent(implode('', $block), [
                         'indent'   => $spacer1,
                         'baseline' => -1,
                     ]);
@@ -40136,103 +40375,10 @@ if (!function_exists('var_export3')) {
         $exported = $export($value, 1);
         $others = [];
         $vars = [];
-        foreach ($var_manager->orphan() as $rid => [$isref, $vid, $var]) {
+        $orphan = $var_manager->orphan();
+        foreach ($orphan as $rid => [$isref, $vid, $var]) {
             $declare = $isref ? "&\$this->$vid" : $export($var, 1);
             $others[] = "\$this->$rid = $declare;";
-        }
-
-        static $factory = null;
-        if ($factory === null) {
-            // @codeCoverageIgnoreStart
-            $factory = $export(new #[\AllowDynamicProperties] class() {
-                public function new(&$object, $class, $provider)
-                {
-                    if ($class instanceof \Closure) {
-                        $object = $class();
-                        $reflection = $this->reflect(get_class($object));
-                    }
-                    else {
-                        $reflection = $this->reflect($class);
-                        if ($reflection["constructor"] && $reflection["constructor"]->getNumberOfRequiredParameters() === 0) {
-                            $object = $reflection["self"]->newInstance();
-                        }
-                        else {
-                            $object = $reflection["self"]->newInstanceWithoutConstructor();
-                        }
-                    }
-                    [$fields, $privates] = $provider();
-
-                    if ($reflection["unserialize"]) {
-                        $object->__unserialize($fields);
-                        return $object;
-                    }
-
-                    foreach ($reflection["parents"] as $parent) {
-                        foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
-                            if (isset($privates[$parent->name][$name]) && !$privates[$parent->name][$name] instanceof \__PHP_Incomplete_Class) {
-                                $property->setValue($object, $privates[$parent->name][$name]);
-                            }
-                            if (array_key_exists($name, $fields)) {
-                                if (!$fields[$name] instanceof \__PHP_Incomplete_Class) {
-                                    $property->setValue($object, $fields[$name]);
-                                }
-                                unset($fields[$name]);
-                            }
-                        }
-                    }
-                    foreach ($fields as $name => $value) {
-                        $object->$name = $value;
-                    }
-
-                    if ($reflection["wakeup"]) {
-                        $object->__wakeup();
-                    }
-
-                    return $object;
-                }
-
-                public function open($metadata)
-                {
-                    $resource = fopen($metadata['uri'], $metadata['mode'], false, stream_context_create($metadata['context']));
-                    if ($resource === false) {
-                        return null;
-                    }
-                    if ($metadata['seekable'] && is_string($metadata['buffer'])) {
-                        fwrite($resource, $metadata['buffer']);
-                    }
-                    if ($metadata['seekable'] && is_int($metadata['position'])) {
-                        fseek($resource, $metadata['position']);
-                    }
-                    return $resource;
-                }
-
-                private function reflect($class)
-                {
-                    static $cache = [];
-                    if (!isset($cache[$class])) {
-                        $refclass = new \ReflectionClass($class);
-                        $cache[$class] = [
-                            "self"        => $refclass,
-                            "constructor" => $refclass->getConstructor(),
-                            "parents"     => [],
-                            "properties"  => [],
-                            "unserialize" => $refclass->hasMethod("__unserialize"),
-                            "wakeup"      => $refclass->hasMethod("__wakeup"),
-                        ];
-                        for ($current = $refclass; $current; $current = $current->getParentClass()) {
-                            $cache[$class]["parents"][$current->name] = $current;
-                        }
-                        foreach ($refclass->getProperties() as $property) {
-                            if (!$property->isStatic()) {
-                                $property->setAccessible(true);
-                                $cache[$class]["properties"][$property->name] = $property;
-                            }
-                        }
-                    }
-                    return $cache[$class];
-                }
-            }, -1, true);
-            // @codeCoverageIgnoreEnd
         }
 
         $E = fn($v) => $v;
@@ -40244,7 +40390,18 @@ if (!function_exists('var_export3')) {
             }
             PHP;
 
-        if ($options['args'] && $options['vars']) {
+        $importer = var_export3_importer($options['importer']);
+        if ($options['importer'] === null) {
+            $factory = $export($importer, -1, true);
+        }
+        else {
+            $factory = "new {$options['importer']}()";
+        }
+
+        if (!($options['args'] || $options['vars'] || $orphan->getReturn())) {
+            $result = $exported;
+        }
+        elseif ($options['args'] && $options['vars']) {
             $result = "fn(\$args) => ({$function})->call($factory, get_defined_vars() + \$args)";
         }
         elseif ($options['args']) {
@@ -40274,6 +40431,146 @@ if (!function_exists('var_export3')) {
             echo $result;
         }
         return $result;
+    }
+}
+
+(NULL === null || version_compare(PHP_VERSION, NULL) < 0) ? assert(!function_exists('var_export3_importer') || (new \ReflectionFunction('var_export3_importer'))->isUserDefined()) : (isset($_importAsGlobal) ? trigger_error('var_export3_importer' . ' is conflicted. please use carefully', E_USER_DEPRECATED) : null);
+if (!function_exists('var_export3_importer')) {
+    /**
+     * var_export3 の出力を取り込むクラスを定義する
+     *
+     * 下記の理由で var_export3 内の無名クラスから分離。
+     * 原則として内部向けであり、これを外部から使うことは想定していない。
+     *
+     * - var_export3 の出力の末尾に毎回くっついてくるのが気持ち悪い
+     * - 小さいとは言えどクラス定義が為されるので class 領域の無駄
+     * - たまに外部から指定したいケースがある
+     *
+     * @codeCoverageIgnore
+     * @package ryunosuke\Functions\Package\var
+     */
+    function var_export3_importer(?string $class_name = null): bool|object
+    {
+        static $factory = null;
+        $factory ??= new #[\AllowDynamicProperties] class() {
+            public function new(&$object, $class, $provider)
+            {
+                if ($class instanceof \Closure) {
+                    $object = $class();
+                    $reflection = $this->reflect(get_class($object));
+                }
+                else {
+                    $reflection = $this->reflect($class);
+                    if ($reflection["constructor"] && $reflection["constructor"]->getNumberOfRequiredParameters() === 0) {
+                        $object = $reflection["self"]->newInstance();
+                    }
+                    else {
+                        $object = $reflection["self"]->newInstanceWithoutConstructor();
+                    }
+                }
+                [$fields, $privates] = $provider();
+
+                if ($reflection["unserialize"]) {
+                    $object->__unserialize($fields);
+                    return $object;
+                }
+
+                foreach ($reflection["parents"] as $parent) {
+                    foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
+                        if (isset($privates[$parent->name][$name]) && !$privates[$parent->name][$name] instanceof \__PHP_Incomplete_Class) {
+                            $property->setValue($object, $privates[$parent->name][$name]);
+                        }
+                        if (array_key_exists($name, $fields)) {
+                            if (!$fields[$name] instanceof \__PHP_Incomplete_Class) {
+                                $property->setValue($object, $fields[$name]);
+                            }
+                            unset($fields[$name]);
+                        }
+                    }
+                }
+                foreach ($fields as $name => $value) {
+                    $object->$name = $value;
+                }
+
+                if ($reflection["wakeup"]) {
+                    $object->__wakeup();
+                }
+
+                return $object;
+            }
+
+            public function open($metadata)
+            {
+                $resource = fopen($metadata['uri'], $metadata['mode'], false, stream_context_create($metadata['context']));
+                if ($resource === false) {
+                    return null;
+                }
+                if ($metadata['seekable'] && is_string($metadata['buffer'])) {
+                    fwrite($resource, $metadata['buffer']);
+                }
+                if ($metadata['seekable'] && is_int($metadata['position'])) {
+                    fseek($resource, $metadata['position']);
+                }
+                return $resource;
+            }
+
+            private function reflect($class)
+            {
+                static $cache = [];
+                if (!isset($cache[$class])) {
+                    $refclass = new \ReflectionClass($class);
+                    $cache[$class] = [
+                        "self"        => $refclass,
+                        "constructor" => $refclass->getConstructor(),
+                        "parents"     => [],
+                        "properties"  => [],
+                        "unserialize" => $refclass->hasMethod("__unserialize"),
+                        "wakeup"      => $refclass->hasMethod("__wakeup"),
+                    ];
+                    for ($current = $refclass; $current; $current = $current->getParentClass()) {
+                        $cache[$class]["parents"][$current->name] = $current;
+                    }
+                    foreach ($refclass->getProperties() as $property) {
+                        if (!$property->isStatic()) {
+                            $property->setAccessible(true);
+                            $cache[$class]["properties"][$property->name] = $property;
+                        }
+                    }
+                }
+                return $cache[$class];
+            }
+        };
+
+        if ($class_name === null) {
+            return $factory;
+        }
+
+        if (!class_exists($class_name)) {
+            $parts = explode('\\', $class_name);
+            $classname = array_pop($parts);
+            $namespace = trim(implode('\\', $parts), '\\');
+
+            $ref = new \ReflectionObject($factory);
+            $file = file($ref->getFileName());
+            $sline = $ref->getStartLine();
+            $eline = $ref->getEndLine();
+            $body = implode("", array_slice($file, $sline, $eline - $sline - 1));
+
+            $declare = <<<CLASS
+            namespace $namespace {
+                #[\\AllowDynamicProperties]
+                class $classname
+                {
+            $body
+                }
+            }
+            
+            CLASS;
+            eval($declare);
+
+            return true;
+        }
+        return false;
     }
 }
 
@@ -40940,12 +41237,7 @@ if (!function_exists('var_pretty')) {
                     $ref = reflect_callable($value);
 
                     if (!str_contains($ref->getFileName(), "eval()'d code") && $ref->isArrow()) {
-                        $this->plain("(");
-                        if ($ref->isStatic()) {
-                            $this->plain("static ");
-                        }
-                        $this->plain("{$ref->getDeclaration()} => {$ref->getCode()}");
-                        $this->plain(')');
+                        $this->plain("({$ref->getDeclaration()} => {$ref->getCode()})");
                         goto FINALLY_;
                     }
 
@@ -41045,6 +41337,7 @@ if (!function_exists('var_pretty')) {
             return $result;
         }
         echo $result, "\n";
+        return $value;
     }
 }
 
