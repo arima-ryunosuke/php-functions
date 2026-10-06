@@ -246,7 +246,6 @@ function var_export3($value, $return = false)
             $ref = new \ReflectionFunction($value);
             $bind = $ref->getClosureThis();
             $class = $ref->getClosureScopeClass();
-            $statics = $ref->getStaticVariables();
 
             // 内部由来はきちんと fromCallable しないと差異が出てしまう
             if ($ref->isInternal()) {
@@ -255,6 +254,11 @@ function var_export3($value, $return = false)
                 return "\$this->$vid = \\Closure::fromCallable({$export($callee, $nest)})";
             }
 
+            // use 変数の導出 for compatible php8.1
+            $statics = method_exists($ref, 'getClosureUsedVariables') ? null : $ref->getStaticVariables();
+            $uses = method_exists($ref, 'getClosureUsedVariables') ? $ref->getClosureUsedVariables() : [];
+            $uses = array_map(fn($v, $k) => "$spacer1\$$k = {$raw_export($v === $value ? '&' : '')}{$export($v, $nest + 1)};\n", $uses, array_keys($uses));
+
             [$meta, $body, $attrs] = callable_code($value, true);
             $arrow = !!array_filter($meta, fn($token) => $token->is(T_FN));
             $tokens = array_merge(
@@ -262,7 +266,6 @@ function var_export3($value, $return = false)
                 ...[$meta, [$meta[0]->clone(id: -1, text: $arrow ? ' => ' : ' ')], $body],
             );
 
-            $uses = [];
             $context = [
                 'class' => 0,
                 'brace' => 0,
@@ -297,13 +300,15 @@ function var_export3($value, $return = false)
                     }
                 }
 
-                // use 変数の導出
-                if ($token->id === T_VARIABLE) {
-                    $varname = substr($token->text, 1);
-                    // クロージャ内クロージャの use に反応してしまうので存在するときのみとする
-                    if (array_key_exists($varname, $statics) && !isset($uses[$varname])) {
-                        $recurself = $statics[$varname] === $value ? '&' : '';
-                        $uses[$varname] = "$spacer1\$$varname = $recurself{$export($statics[$varname], $nest + 1)};\n";
+                // use 変数の導出 for compatible php8.1
+                if ($statics !== null) {
+                    if ($token->id === T_VARIABLE) {
+                        $varname = substr($token->text, 1);
+                        // クロージャ内クロージャの use に反応してしまうので存在するときのみとする
+                        if (array_key_exists($varname, $statics) && !isset($uses[$varname])) {
+                            $recurself = $statics[$varname] === $value ? '&' : '';
+                            $uses[$varname] = "$spacer1\$$varname = $recurself{$export($statics[$varname], $nest + 1)};\n";
+                        }
                     }
                 }
 
