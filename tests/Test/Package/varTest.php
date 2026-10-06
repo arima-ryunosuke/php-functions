@@ -1573,14 +1573,15 @@ class varTest extends AbstractTestCase
 
     function test_var_export3_misc()
     {
-        that(var_export3([1, 2, 3], ['outmode' => 'file', 'return' => true]))->stringStartsWith('<?php return (function ($args) {');
-        that(var_export3([1, 2, 3], ['outmode' => 'eval', 'return' => true]))->stringStartsWith('return (function ($args) {');
-        that(var_export3([1, 2, 3], ['format' => 'minify', 'return' => true]))->notContains("\n");
+        that(var_export3([1, 2, 3], ['return' => true]))->is('[1, 2, 3]');
+        that(var_export3((object) [1, 2, 3], ['outmode' => 'file', 'return' => true]))->stringStartsWith('<?php return (function ($args) {');
+        that(var_export3((object) [1, 2, 3], ['outmode' => 'eval', 'return' => true]))->stringStartsWith('return (function ($args) {');
+        that(var_export3((object) [1, 2, 3], ['format' => 'minify', 'return' => true]))->notContains("\n");
 
         $generator = (function ($a) { yield $a; })(1);
         that(self::resolveFunction('var_export3'))($generator)->wasThrown('is not support');
 
-        that(self::resolveFunction('var_export3'))->fn([1, 2, 3])->outputMatches('#newInstanceWithoutConstructor#');
+        that(self::resolveFunction('var_export3'))->fn((object) [1, 2, 3])->outputMatches('#newInstanceWithoutConstructor#');
     }
 
     function test_var_export3_object()

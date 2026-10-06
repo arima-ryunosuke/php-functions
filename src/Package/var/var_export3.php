@@ -171,6 +171,7 @@ function var_export3($value, $return = false)
                 $vid = array_search($var, $this->vars, true);
                 yield $rid => [!!$vid, $vid, $var];
             }
+            return $this->vars || $this->refs;
         }
     };
 
@@ -507,7 +508,8 @@ function var_export3($value, $return = false)
     $exported = $export($value, 1);
     $others = [];
     $vars = [];
-    foreach ($var_manager->orphan() as $rid => [$isref, $vid, $var]) {
+    $orphan = $var_manager->orphan();
+    foreach ($orphan as $rid => [$isref, $vid, $var]) {
         $declare = $isref ? "&\$this->$vid" : $export($var, 1);
         $others[] = "\$this->$rid = $declare;";
     }
@@ -615,7 +617,10 @@ function var_export3($value, $return = false)
         }
         PHP;
 
-    if ($options['args'] && $options['vars']) {
+    if (!($options['args'] || $options['vars'] || $orphan->getReturn())) {
+        $result = $exported;
+    }
+    elseif ($options['args'] && $options['vars']) {
         $result = "fn(\$args) => ({$function})->call($factory, get_defined_vars() + \$args)";
     }
     elseif ($options['args']) {
