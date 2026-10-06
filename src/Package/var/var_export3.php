@@ -93,10 +93,11 @@ function var_export3($value, $return = false)
     }
     $options = $return;
     $options += [
-        'format'  => 'pretty', // pretty or minify
-        'outmode' => null,     // null: 本体のみ, 'eval': return ...;, 'file': <?php return ...;
-        'args'    => [],       // ここで指定した値は export に含まれず、import 時に引数で要求されるようになる
-        'vars'    => [],       // ここで指定した値は export に含まれず、import 時に変数で要求されるようになる
+        'format'   => 'pretty', // pretty or minify
+        'outmode'  => null,     // null: 本体のみ, 'eval': return ...;, 'file': <?php return ...;
+        'callback' => null,     // 値1つごとのコールバック（値とキー配列とネストレベルが引数で渡ってくる）
+        'args'     => [],       // ここで指定した値は export に含まれず、import 時に引数で要求されるようになる
+        'vars'     => [],       // ここで指定した値は export に含まれず、import 時に変数で要求されるようになる
     ];
     $options['return'] ??= !!$options['outmode'];
 
@@ -187,6 +188,13 @@ function var_export3($value, $return = false)
                 return "\$this->$vid";
             }
             $vars[$vid] = $value;
+        }
+
+        if ($options['callback']) {
+            $exported = $options['callback']($value, $nest);
+            if ($exported !== null) {
+                return "\$this->$vid = $exported";
+            }
         }
 
         if (($arg = array_search($value, $options['args'], true)) !== false || ($arg = array_search($value, $options['vars'], true)) !== false) {

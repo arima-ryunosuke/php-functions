@@ -1776,6 +1776,26 @@ class varTest extends AbstractTestCase
         that(new \ReflectionFunction($values2['misc'][0]))->getAttributes()[1]->getArguments()->is([true, SORT_ASC]);
     }
 
+    function test_var_export3_callback()
+    {
+        $values = [
+            'object1' => $object1 = (object) ['a' => 'A'],
+            'object2' => $object2 = (object) ['b' => 'B'],
+        ];
+        $exported = var_export3($values, [
+            'outmode'  => 'eval',
+            'callback' => function ($value) use ($object1) {
+                if ($value === $object1) {
+                    return var_export(json_encode($value), true);
+                }
+            },
+        ]);
+        $values2 = eval($exported);
+
+        that($values2['object1'])->isSame('{"a":"A"}');
+        that($values2['object2'])->is($object2);
+    }
+
     function test_var_export3_args()
     {
         $values = [
