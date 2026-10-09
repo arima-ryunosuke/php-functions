@@ -16,6 +16,7 @@ require_once __DIR__ . '/../reflection/callable_code.php';
  *   - 上記二つは __call/__callStatic のメソッドも呼び出せる
  * - getDeclaration: 宣言部のコードを返す
  * - getCode: 定義部のコードを返す
+ * - getDeclarationCode: 宣言・定義部を合わせた完全なコードを返す
  * - isAnonymous: 無名関数なら true を返す（8.2 の isAnonymous 互換）
  * - isArrow: アロー演算子で定義されたかを返す（クロージャのみ）
  * - isStatic: $this バインド可能かを返す（クロージャのみ）
@@ -77,6 +78,21 @@ function reflect_callable($callable)
                 return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[1], 'text')));
             }
 
+            public function getDeclarationCode(bool $resolve): string
+            {
+                [$meta, $body, $attrs] = $this->definition ??= callable_code($this, true);
+                if ($resolve) {
+                    $meta = array_map(fn($token) => $token->resolve($this), $meta);
+                    $body = array_map(fn($token) => $token->resolve($this), $body);
+                    $attrs = array_map(fn($attr) => array_map(fn($token) => $token->resolve($this), $attr), $attrs);
+                }
+                return sprintf('%s%s%s',
+                    implode('', array_map(fn($attr) => implode('', $attr), $attrs)),
+                    implode('', $meta),
+                    implode('', $body),
+                );
+            }
+
             public function isAnonymous(): bool
             {
                 return false;
@@ -113,6 +129,22 @@ function reflect_callable($callable)
             public function getCode(): string
             {
                 return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[1], 'text')));
+            }
+
+            public function getDeclarationCode(bool $resolve): string
+            {
+                [$meta, $body, $attrs] = $this->definition ??= callable_code($this, true);
+                if ($resolve) {
+                    $meta = array_map(fn($token) => $token->resolve($this), $meta);
+                    $body = array_map(fn($token) => $token->resolve($this), $body);
+                    $attrs = array_map(fn($attr) => array_map(fn($token) => $token->resolve($this), $attr), $attrs);
+                }
+                return sprintf('%s%s%s%s',
+                    implode('', array_map(fn($attr) => implode('', $attr), $attrs)),
+                    implode('', $meta),
+                    $this->isArrow() ? " => " : "",
+                    implode('', $body),
+                );
             }
 
             public function isAnonymous(): bool
@@ -203,6 +235,21 @@ function reflect_callable($callable)
             public function getCode(): string
             {
                 return trim(implode('', array_column(($this->definition ??= callable_code($this, true))[1], 'text')));
+            }
+
+            public function getDeclarationCode(bool $resolve): string
+            {
+                [$meta, $body, $attrs] = $this->definition ??= callable_code($this, true);
+                if ($resolve) {
+                    $meta = array_map(fn($token) => $token->resolve($this), $meta);
+                    $body = array_map(fn($token) => $token->resolve($this), $body);
+                    $attrs = array_map(fn($attr) => array_map(fn($token) => $token->resolve($this), $attr), $attrs);
+                }
+                return sprintf('%s%s%s',
+                    implode('', array_map(fn($attr) => implode('', $attr), $attrs)),
+                    implode('', $meta),
+                    implode('', $body),
+                );
             }
 
             public function isAnonymous(): bool

@@ -430,16 +430,25 @@ class reflectionTest extends AbstractTestCase
 
     function test_reflect_callable_instance()
     {
+        $NS = __NAMESPACE__;
+
         $reffunc = reflect_callable('nullsafe_int_func');
         that($reffunc->getDeclaration())->is('function nullsafe_int_func(int $x, int $y, ?int $z = null)');
         that($reffunc->getCode())->contains('return $x - $y + ($z ?? 100);');
+        that($reffunc->getDeclarationCode(false))->is(<<<'ACTUAL'
+        #[\Attr()]function nullsafe_int_func(int $x, int $y, ?int $z = null)
+        {
+            return $x - $y + ($z ?? 100);
+        }
+        ACTUAL);
         that($reffunc(4, 1))->is(103);
         that($reffunc(y: 1, x: 4))->is(103);
         that($reffunc->getClosure()(y: 1, x: 4))->is(103);
 
-        $reffunc = reflect_callable(function ($x) use (&$use): int { return $x + $use++; });
+        $reffunc = reflect_callable(#[Attr(1, reflectionTest::class)] function ($x) use (&$use): int { return $x + $use++; });
         that($reffunc->getDeclaration())->is('function ($x) use (&$use): int');
         that($reffunc->getCode())->contains('return $x + $use++;');
+        that($reffunc->getDeclarationCode(true))->is("#[$NS\\Attr(1, $NS\\reflectionTest::class)]function (\$x) use (&\$use): int { return \$x + \$use++; }");
         that($reffunc->getUsedVariables())->is(['use' => $use]);
         that($reffunc->isStatic())->is(false);
         that($reffunc->isArrow())->is(false);
@@ -470,6 +479,22 @@ class reflectionTest extends AbstractTestCase
         $reffunc = reflect_callable([new Concrete('hoge'), 'getName']);
         that($reffunc->getDeclaration())->is('public function getName($prefix = \'\', $upper = false)');
         that($reffunc->getCode())->contains('return $name;');
+        that($reffunc->getDeclarationCode(true))->is(<<<'ACTUAL'
+        #[Attr()]public function getName($prefix = '', $upper = false)
+            {
+                $name = $this->name;
+                if ($name === null) {
+                    return null;
+                }
+                if (strlen($prefix)) {
+                    $name = $prefix . $name;
+                }
+                if ($upper) {
+                    $name = strtoupper($name);
+                }
+                return $name;
+            }
+        ACTUAL);
         that($reffunc->call(new Concrete('fuga')))->is('fuga');
         that($reffunc('p-'))->is('p-hoge');
         that($reffunc(upper: true))->is('HOGE');
