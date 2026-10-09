@@ -1368,12 +1368,7 @@ class varTest extends AbstractTestCase
         };
         $objects = [
             'anonymous' => new class($anonymous) {
-                private $object;
-
-                public function __construct($object)
-                {
-                    $this->object = $object;
-                }
+                public function __construct(private object $object) { }
 
                 function __invoke()
                 {

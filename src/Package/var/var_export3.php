@@ -389,60 +389,60 @@ function var_export3($value, $return = false)
                 $tokens = php_tokens('<?php ' . implode('', array_slice(file($fname), $sline - 1, $eline - $sline + 1)));
 
                 $block = [];
-                $starting = false;
-                $constructing = 0;
-                $nesting = 0;
-                foreach ($tokens as $token) {
-                    $prev = $token->prev() ?? (object) ['id' => null, 'text' => null, 'line' => null];
-                    $next = $token->next() ?? (object) ['id' => null, 'text' => null, 'line' => null];
-                    assert([$prev, $next]); // あらかじめ取得しておかないとズレるかもしれない
-
-                    // 無名クラスは new class か new #[Attribute] で始まるはず（new #[A] ClassName は許可されていない）
-                    if (($token->id === T_NEW && $next->id === T_CLASS) || ($token->id === T_NEW && $next->id === T_ATTRIBUTE)) {
-                        $starting = true;
-                    }
-                    if (!$starting) {
-                        continue;
-                    }
+                // 無名クラスは new class か new #[Attribute] で始まるはず（new #[A] ClassName は許可されていない）
+                $new = $tokens[0]->next(T_NEW);
+                if ($new->next()->is(T_CLASS) || $new->next()->is(T_ATTRIBUTE)) {
+                    $brace_begin = $new->next(['(', '{']);
 
                     // コンストラクタの呼び出し引数はスキップする
-                    if ($constructing !== null) {
-                        if ($token->text === '(') {
-                            $constructing++;
+                    if ($brace_begin->is('(')) {
+                        $end = $brace_begin->end();
+                        for ($i = $brace_begin->index; $i <= $end->index; $i++) {
+                            $tokens[$i]->id = -1;
+                            $tokens[$i]->text = '';
                         }
-                        if ($token->text === ')') {
-                            $constructing--;
-                            if ($constructing === 0) {
-                                $constructing = null;          // null を終了済みマークとして変数を再利用している
-                                $block[] = [null, '()', null]; // for psr-12
-                                continue;
-                            }
-                        }
-                        if ($constructing) {
-                            continue;
+                        $brace_begin = $brace_begin->next('{');
+                    }
+
+                    // 引数ありコンストラクタは潰すので昇格プロパティを宣言しなければならない
+                    $promoted_properties = [];
+                    foreach (array_filter($ref->getProperties(), fn($property) => $property->isPromoted()) as $property) {
+                        $modifierBits = [
+                            \ReflectionProperty::IS_PUBLIC    => 'public',
+                            \ReflectionProperty::IS_PROTECTED => 'protected',
+                            \ReflectionProperty::IS_PRIVATE   => 'private',
+                            //\ReflectionProperty::IS_READONLY  => 'readonly', // 後から入れる関係上 readonly は対応できない
+                        ];
+
+                        $promoted_properties[] = sprintf('%s %s $%s;',
+                            implode(' ', array_filter($modifierBits, fn($bit) => $property->getModifiers() & $bit, ARRAY_FILTER_USE_KEY)),
+                            $property?->getType() ?? '',
+                            $property->getName(),
+                        );
+                    }
+
+                    // 引数ありコンストラクタは呼ばないので潰しておく
+                    $construct = $brace_begin->next('__construct');
+                    if ($construct && $ref->getConstructor() && $ref->getConstructor()->getNumberOfRequiredParameters()) {
+                        $construct->text = 'replaced__construct';
+                        $parenthesis_begin = $construct->next('(');
+                        $parenthesis_end = $parenthesis_begin->end();
+                        for ($i = $parenthesis_begin->index + 1; $i < $parenthesis_end->index; $i++) {
+                            $tokens[$i]->id = -1;
+                            $tokens[$i]->text = '';
                         }
                     }
 
-                    // 引数ありコンストラクタは呼ばないのでリネームしておく
-                    if ($token->text === '__construct' && $ref->getConstructor() && $ref->getConstructor()->getNumberOfRequiredParameters()) {
-                        $token = clone $token;
-                        $token->text = "replaced__construct";
-                    }
-
-                    $block[] = $token->clone(text: $token->resolve($ref));
-
-                    if ($token->text === '{') {
-                        $nesting++;
-                    }
-                    if ($token->text === '}') {
-                        $nesting--;
-                        if ($nesting === 0) {
-                            break;
+                    $brace_end = $brace_begin->end();
+                    foreach (array_slice($tokens, $new->index, $brace_end->index - $new->index + 1) as $token) {
+                        $block[] = $token->resolve($ref);
+                        if ($token === $brace_begin) {
+                            $block[] = implode("", $promoted_properties);
                         }
                     }
                 }
 
-                $code = php_indent(implode('', array_column($block, 'text')), [
+                $code = php_indent(implode('', $block), [
                     'indent'   => $spacer1,
                     'baseline' => -1,
                 ]);
