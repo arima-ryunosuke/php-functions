@@ -103,6 +103,7 @@ function var_export3($value, $return = false)
     $var_manager = new class() {
         private $vars = [];
         private $refs = [];
+        private $ids  = [];
 
         private function arrayHasReference($array)
         {
@@ -153,12 +154,11 @@ function var_export3($value, $return = false)
 
         public function refId($array, $k)
         {
-            static $ids = [];
             $ref = \ReflectionReference::fromArrayElement($array, $k);
             if ($ref) {
                 $refid = $ref->getId();
-                $ids[$refid] = ($ids[$refid] ?? count($ids) + 1);
-                $id = 'reference' . $ids[$refid];
+                $this->ids[$refid] = ($this->ids[$refid] ?? count($this->ids) + 1);
+                $id = 'reference' . $this->ids[$refid];
                 $this->refs[$id] = $array[$k];
                 return $id;
             }
