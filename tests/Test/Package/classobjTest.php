@@ -666,11 +666,12 @@ class classobjTest extends AbstractTestCase
             private   $private   = 1;
             protected $protected = 2;
             public    $public    = 3;
-        }))->is([
+        }, $privates))->is([
             'private'   => 1,
             'protected' => 2,
             'public'    => 3,
         ]);
+        that($privates)->isEmpty();
 
         // クロージャは this と use 変数を返す
         $a = 123;

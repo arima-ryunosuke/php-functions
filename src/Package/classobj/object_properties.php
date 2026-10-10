@@ -43,6 +43,8 @@ namespace ryunosuke\Functions\Package;
  */
 function object_properties($object, &$privates = [])
 {
+    $privates = [];
+
     if ($object instanceof \Closure) {
         $ref = new \ReflectionFunction($object);
         $uses = method_exists($ref, 'getClosureUsedVariables') ? $ref->getClosureUsedVariables() : $ref->getStaticVariables();
@@ -55,7 +57,7 @@ function object_properties($object, &$privates = [])
         $names = explode("\0", $name);
         if (count($names) > 1) {
             $name = array_pop($names);
-            $cname = $names[1];
+            $cname = implode("\0", array_slice($names, 1));
         }
         $fields[$cname][$name] = $field;
     }
