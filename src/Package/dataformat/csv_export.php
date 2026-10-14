@@ -5,7 +5,9 @@ namespace ryunosuke\Functions\Package;
 require_once __DIR__ . '/../array/is_hasharray.php';
 require_once __DIR__ . '/../errorfunc/set_error_exception_handler.php';
 require_once __DIR__ . '/../iterator/iterator_join.php';
+require_once __DIR__ . '/../iterator/iterator_map.php';
 require_once __DIR__ . '/../iterator/iterator_split.php';
+require_once __DIR__ . '/../strings/mb_monospace.php';
 require_once __DIR__ . '/../strings/starts_with.php';
 require_once __DIR__ . '/../strings/str_array.php';
 require_once __DIR__ . '/../strings/str_putcsv.php';
@@ -74,7 +76,7 @@ require_once __DIR__ . '/../var/is_stringable.php';
  *
  * @param iterable $csvarrays 連想配列の配列
  * @param array $options オプション配列。fputcsv の第3引数以降もここで指定する
- * @return string|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
+ * @return \Generator|string|int CSV 的文字列。output オプションを渡した場合は書き込みバイト数
  */
 function csv_export($csvarrays, $options = [])
 {
@@ -88,30 +90,69 @@ function csv_export($csvarrays, $options = [])
         'initial'   => '', // "\xEF\xBB\xBF"
         'headers'   => null,
         'structure' => false,
+        'align'     => null,
         'callback'  => null, // map + filter 用コールバック（1行が参照で渡ってくるので書き換えられる&&false を返すと結果から除かれる）
         'output'    => null,
+        'generator' => false,
     ];
 
-    $output = $options['output'];
+    $positions = [];
+    $str_putcsv = function ($array, $delimiter, $enclosure, $escape, $eol, $encoding, $null, $align) use (&$positions) {
+        if (strlen($null)) {
+            foreach ($array as $k => $v) {
+                if ($v === null) {
+                    $array[$k] = $null;
+                }
+            }
+        }
 
-    if ($output) {
-        $fp = $options['output'];
-    }
-    else {
-        $fp = fopen('php://temp', 'rw+');
-    }
+        if ($align) {
+            $fields = [];
+            $position = 0;
+
+            $array = array_values(array_map(function ($value) use ($delimiter, $enclosure, $escape, $encoding, $null) {
+                $value = str_putcsv([$value], $delimiter, $enclosure, $escape);
+
+                $lines = preg_split('@\\r\\n|\\n@u', $value);
+                $first = $lines[array_key_first($lines)];
+                $last = $lines[array_key_last($lines)];
+
+                return [$value, $lines, $first, $last];
+            }, $array));
+
+            $column = 0;
+            foreach ($array as $i => [$value, $lines, $first, $last]) {
+                $delimiter_length = $column * strlen($delimiter);
+                $padding_length = ($positions[$i] ?? 0) - $position - $delimiter_length;
+                if ($padding_length > 0) {
+                    if (($value[0] ?? '') !== '"') {
+                        $value = '"' . $value . '"';
+                    }
+                    $value = str_repeat(' ', min($align, $padding_length)) . $value;
+                }
+                $fields[] = $value;
+
+                $positions[$i] = max($positions[$i] ?? 0, $position + $delimiter_length);
+                if (count($lines) > 1) {
+                    $position = mb_monospace($last, [], $encoding);
+                    $column = 0;
+                }
+                else {
+                    $position += mb_monospace($value, [], $encoding);
+                }
+                $column++;
+            }
+
+            return implode($delimiter, $fields) . $eol;
+        }
+
+        return str_putcsv($array, $delimiter, $enclosure, $escape) . $eol;
+    };
 
     $restore = set_error_exception_handler();
     try {
-        $size = (function ($fp, $csvarrays, $delimiter, $enclosure, $escape, $encoding, $scrub, $null, $initial, $headers, $structure, $callback) {
-            $default_charset = ini_get('default_charset');
-            if ($default_charset !== $encoding) {
-                // import とは違い、吐き出すときは明確なエラーだろうので TRANSLIT も IGNORE もしない
-                stream_filter_append($fp, "convert.iconv.$default_charset/$encoding" . (strlen($scrub) ? "//$scrub" : ""), STREAM_FILTER_WRITE);
-            }
-
+        $generate = function ($csvarrays, $delimiter, $enclosure, $escape, $encoding, $null, $initial, $headers, $structure, $align, $callback) use ($str_putcsv) {
             $eol = "\n"; // いつの間にか $eol 引数が生えていたがこの関数自体の対応はしていないので暫定で決め打ちにしてある
-            $size = 0;
 
             if (!is_array($csvarrays)) {
                 [$csvarrays, $csvarrays2] = iterator_split($csvarrays, [1], true);
@@ -124,10 +165,10 @@ function csv_export($csvarrays, $options = [])
                 }
             }
             if (is_stringable($initial) && strlen($initial)) {
-                $size += fwrite($fp, $initial);
+                yield $initial;
             }
             elseif (is_array($initial) && $initial) {
-                $size += fputcsv($fp, $initial, $delimiter, $enclosure, $escape);
+                yield $str_putcsv($initial, $delimiter, $enclosure, $escape, $eol, $encoding, $null, $align);
             }
             if (!$headers) {
                 $tmp = [];
@@ -177,7 +218,7 @@ function csv_export($csvarrays, $options = [])
                 if ($structure) {
                     $headerline = array_map(fn($header) => preg_replace('#\[\d+]$#imu', '[]', $header), $headerline);
                 }
-                $size += fputcsv($fp, $headerline, $delimiter, $enclosure, $escape);
+                yield $str_putcsv($headerline, $delimiter, $enclosure, $escape, $eol, $encoding, $null, $align);
             }
 
             BODY:
@@ -195,25 +236,42 @@ function csv_export($csvarrays, $options = [])
                     }
                 }
                 $row = array_intersect_key(array_replace($default, $array), $default);
-                if (strlen($null)) {
-                    $line = [];
-                    foreach ($row as $v) {
-                        if ($v === null) {
-                            $line[] = $null;
-                        }
-                        else {
-                            $line[] = str_putcsv([$v], $delimiter, $enclosure, $escape);
-                        }
-                    }
-                    $size += fwrite($fp, implode($delimiter, $line) . $eol);
-                }
-                else {
-                    $size += fputcsv($fp, $row, $delimiter, $enclosure, $escape);
-                }
+                yield $str_putcsv($row, $delimiter, $enclosure, $escape, $eol, $encoding, $null, $align);
             }
-            return $size;
-        })($fp, $csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['scrub'], $options['null'], $options['initial'], $options['headers'], $options['structure'], $options['callback']);
-        if ($output) {
+        };
+
+        $generator = $generate($csvarrays, $options['delimiter'], $options['enclosure'], $options['escape'], $options['encoding'], $options['null'], $options['initial'], $options['headers'], $options['structure'], $options['align'], $options['callback']);
+
+        $default_charset = ini_get('default_charset');
+
+        if ($options['generator']) {
+            if ($default_charset !== $options['encoding']) {
+                $generator = iterator_map(function ($fields) use ($options, $default_charset) {
+                    mb_convert_variables($options['encoding'], $default_charset, $fields);
+                    return $fields;
+                }, $generator);
+            }
+            return $generator;
+        }
+
+        if ($options['output']) {
+            $fp = $options['output'];
+        }
+        else {
+            $fp = fopen('php://temp', 'rw+');
+        }
+
+        if ($default_charset !== $options['encoding']) {
+            // import とは違い、吐き出すときは明確なエラーだろうので TRANSLIT も IGNORE もしない
+            stream_filter_append($fp, "convert.iconv.$default_charset/{$options['encoding']}" . (strlen($options['scrub']) ? "//{$options['scrub']}" : ""), STREAM_FILTER_WRITE);
+        }
+
+        $size = 0;
+        foreach ($generator as $fields) {
+            $size += fwrite($fp, $fields);
+        }
+
+        if ($options['output']) {
             return $size;
         }
         rewind($fp);
@@ -221,7 +279,7 @@ function csv_export($csvarrays, $options = [])
     }
     finally {
         $restore();
-        if (!$output) {
+        if (!$options['output'] && isset($fp)) {
             fclose($fp);
         }
     }

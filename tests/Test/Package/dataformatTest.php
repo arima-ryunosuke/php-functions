@@ -76,6 +76,7 @@ class dataformatTest extends AbstractTestCase
         $sjisstringnohead = require "$DATADIR/sjisstringnohead.php";
 
         that(csv_export($utf8array, ['encoding' => 'SJIS']))->is($sjisstring);
+        that(implode("", iterator_to_array(csv_export($utf8array, ['encoding' => 'SJIS', 'generator' => true]))))->is($sjisstring);
         that(csv_import($sjisstring, ['encoding' => 'SJIS']))->is($utf8array);
 
         that(csv_export($utf8array, [
@@ -183,10 +184,17 @@ class dataformatTest extends AbstractTestCase
             ['a' => null, 'b' => ',B2,'],
         ];
 
-        $csv = csv_export($csvarrays, ['null' => "\\N"]);
+        $csv = csv_export($csvarrays, ['null' => "\\N", 'escape' => '']);
         that($csv)->is('a,b
 """A1""",\\N
 \\N,",B2,"
+');
+        that(csv_import($csv, ['null' => "\\N"]))->is($csvarrays);
+
+        $csv = csv_export($csvarrays, ['null' => "\\N", 'align' => 128, 'escape' => '']);
+        that($csv)->is('a,b
+"""A1""",\\N
+\\N,      ",B2,"
 ');
         that(csv_import($csv, ['null' => "\\N"]))->is($csvarrays);
     }
@@ -338,6 +346,22 @@ a3 b3 c3
 1,x1,y1,11,,,
 1,x1,y1,,a2,b2,22
 ");
+
+        // align
+        that(csv_export([
+            ['a' => 'a1', 'b' => 'b1', 'c' => 'c1'],
+            ['a' => 'a2', 'b' => "message1\nmessage2", 'c' => 'c2'],
+            ['a' => 'a3', 'b' => 'b3', 'c' => 'c3'],
+        ], [
+            'align' => 64,
+        ]))->is(<<<CSV
+        a,b,c
+        a1,b1,c1
+        a2,"message1
+        message2",c2
+        a3,b3,    "c3"
+        
+        CSV,);
 
         // Generator
         that(csv_export((function () {
