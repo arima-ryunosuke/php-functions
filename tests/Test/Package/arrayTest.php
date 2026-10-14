@@ -1591,6 +1591,15 @@ class arrayTest extends AbstractTestCase
             ],
             'o'  => $o,
         ];
+        $array2 = [
+            'k1' => 'v1',
+            'k2' => [
+                'k21' => [1 => 1, 3 => 2, 5 => 3],
+                'k22' => [2 => 4, 4 => 5, 6 => 6],
+                'k23' => [7, 8, 9],
+            ],
+            'o'  => $o,
+        ];
 
         // 区切り文字指定なし
         that(array_flatten($array))->isSame([
@@ -1634,6 +1643,58 @@ class arrayTest extends AbstractTestCase
             'o'          => $o,
         ]);
 
+        // クロージャの結果が文字列でない時は引数としての挙動になる
+        that(array_flatten($array, fn($keys) => null))->isSame([
+            'v1',
+            'v21',
+            123,
+            1,
+            2,
+            3,
+            $o,
+        ]);
+
+        // true 指定
+        that(array_flatten($array, true))->isSame([
+            "k1"  => "v1",
+            "k21" => "v21",
+            "k22" => 123,
+            0     => 1,
+            1     => 2,
+            2     => 3,
+            'o'   => $o,
+        ]);
+
+        // true 指定（連番維持）
+        that(array_flatten($array2, true))->isSame([
+            "k1" => "v1",
+            1    => 1,
+            3    => 2,
+            5    => 3,
+            2    => 4,
+            4    => 5,
+            6    => 6,
+            7    => 7,
+            8    => 8,
+            9    => 9,
+            'o'  => $o,
+        ]);
+
+        // false 指定（連番振り直し）
+        that(array_flatten($array2, false))->isSame([
+            "k1" => "v1",
+            0    => 1,
+            1    => 2,
+            2    => 3,
+            3    => 4,
+            4    => 5,
+            5    => 6,
+            6    => 7,
+            7    => 8,
+            8    => 9,
+            'o'  => $o,
+        ]);
+
         // Generator
         that(array_flatten((function () {
             yield 1 => 1;
@@ -1653,6 +1714,13 @@ class arrayTest extends AbstractTestCase
             '2.11.200' => 200,
             '2.20'     => 20,
             '2'        => 2,
+        ]);
+
+        // iterable:false
+        that(array_flatten([1, $ao = new \ArrayObject(['n' => new \ArrayObject(['Z'])]), [2]], null, false))->isSame([
+            0 => 1,
+            1 => $ao,
+            2 => 2,
         ]);
     }
 
