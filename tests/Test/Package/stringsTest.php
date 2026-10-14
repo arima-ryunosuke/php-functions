@@ -328,7 +328,8 @@ This is VARIABLE.
     {
         that(mb_monospace('※★▼…'))->isSame(8);
         that(mb_monospace('123456７8８'))->isSame(11);
-        that(mb_monospace('Σ(ﾟДﾟ)え!！'))->isSame(15);
+        that(mb_monospace('ﾊﾋﾌﾍﾎﾊﾞﾋﾞﾌﾞﾍﾞﾎﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ'))->isSame(25);
+        that(mb_monospace('Σ(ﾟДﾟ)え!！'))->isSame(13);
         that(mb_monospace('Σ(ﾟДﾟ)え!！', [
             "Σ"    => 1,
             "Ѐ-ӿ"  => 1,
@@ -337,6 +338,9 @@ This is VARIABLE.
         that(mb_monospace('あいうえおかきくけこさしすせそたちつてとなにぬねの', [
             "あいうえおさ-そな-の" => 1,
         ]))->isSame(35);
+
+        that(mb_monospace(mb_convert_encoding('あいうえおかきくけこさしすせそたちつてとなにぬねの', 'SJIS', 'UTF-8'), encoding: 'SJIS'))->isSame(50);
+        that(mb_monospace(mb_convert_encoding('ﾊﾋﾌﾍﾎﾊﾞﾋﾞﾌﾞﾍﾞﾎﾞﾊﾟﾋﾟﾌﾟﾍﾟﾎﾟ', 'SJIS', 'UTF-8'), encoding: 'SJIS'))->isSame(25);
     }
 
     function test_mb_pad_width()
