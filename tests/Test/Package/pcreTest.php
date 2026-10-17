@@ -83,6 +83,9 @@ class pcreTest extends AbstractTestCase
         that(preg_capture('#([a-z])([0-9])([A-Z]?)#', 'a0', [3 => '']))->is([3 => '']);
         that(preg_capture('#([a-z])([0-9])([A-Z]?)#', 'a0Z', [3 => '']))->is([3 => 'Z']);
 
+        that(preg_capture('#([a-z])([0-9])([A-Z])#', 'a0Z', [1 => ''], PREG_OFFSET_CAPTURE))->is([1 => ["a", 0]]);
+        that(preg_capture('#([a-z])([0-9])([A-Z])#', 'a0Z', [1 => ''], PREG_OFFSET_CAPTURE, 1))->is([1 => '']);
+
         that(preg_capture('#(?<one>[a-z])(?<two>[0-9])(?<thr>[A-Z]?)#', 'a0Z', [
             'one' => 'ONE',
             'two' => 'TWO',
@@ -224,5 +227,10 @@ class pcreTest extends AbstractTestCase
         that($m)->is(['abc', 'abc']);
         that(preg_splice('#[a-z]+#', 'strtoupper', 'abc123', $m))->is('strtoupper123');
         that($m)->is(['abc']);
+        that(preg_splice('#[a-z]+(\d+)#', 'strtoupper', 'abc123', $m, -1, PREG_OFFSET_CAPTURE))->is('strtoupper');
+        that($m)->is([
+            ["abc123", 0],
+            ["123", 3],
+        ]);
     }
 }

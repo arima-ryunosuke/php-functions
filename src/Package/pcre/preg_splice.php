@@ -37,12 +37,12 @@ namespace ryunosuke\Functions\Package;
  * @param int $limit 置換回数
  * @return string 置換された文字列
  */
-function preg_splice($pattern, $replacement, $subject, &$matches = [], $limit = -1)
+function preg_splice($pattern, $replacement, $subject, &$matches = [], $limit = -1, int $flags = 0)
 {
     // for compatible. $limit => 1
     // preg_match なので $matches は最初しか引っかからないにも関わらず $limit:-1 だとすべて置換されてしまう
 
-    if (preg_match($pattern, $subject, $matches)) {
+    if (preg_match($pattern, $subject, $matches, $flags)) {
         if (!is_string($replacement) && is_callable($replacement)) {
             $subject = preg_replace_callback($pattern, $replacement, $subject, $limit);
         }

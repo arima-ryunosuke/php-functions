@@ -32,12 +32,12 @@ namespace ryunosuke\Functions\Package;
  * @param array $default デフォルト値
  * @return array キャプチャした配列
  */
-function preg_capture($pattern, $subject, $default)
+function preg_capture($pattern, $subject, $default, int $flags = 0, int $offset = 0)
 {
-    preg_match($pattern, $subject, $matches);
+    preg_match($pattern, $subject, $matches, $flags, $offset);
 
     foreach ($matches as $n => $match) {
-        if (array_key_exists($n, $default) && strlen($match)) {
+        if (array_key_exists($n, $default) && (is_array($match) || strlen($match ?? ''))) {
             $default[$n] = $match;
         }
     }
