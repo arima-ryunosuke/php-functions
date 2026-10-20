@@ -607,4 +607,5 @@ function var_pretty($value, $options = [])
         return $result;
     }
     echo $result, "\n";
+    return $value;
 }
