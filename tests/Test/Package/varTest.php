@@ -1354,7 +1354,11 @@ class varTest extends AbstractTestCase
             'string'      => 'ABC',
             'object'      => new \DateTime(),
         ];
+
         $exported = var_export3($values, ['outmode' => 'eval']);
+        that(serialize(eval($exported)))->isSame(serialize($values));
+
+        $exported = var_export3($values, ['outmode' => 'eval', 'importer' => 'Hoge\\Fuga\\Piyo']);
         that(serialize(eval($exported)))->isSame(serialize($values));
     }
 

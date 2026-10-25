@@ -10,6 +10,7 @@ require_once __DIR__ . '/../misc/php_tokens.php';
 require_once __DIR__ . '/../reflection/callable_code.php';
 require_once __DIR__ . '/../var/is_primitive.php';
 require_once __DIR__ . '/../var/is_resourcable.php';
+require_once __DIR__ . '/../var/var_export3_importer.php';
 // @codeCoverageIgnoreEnd
 
 /**
@@ -98,6 +99,7 @@ function var_export3($value, $return = false)
         'callback' => null,     // 値1つごとのコールバック（値とキー配列とネストレベルが引数で渡ってくる）
         'args'     => [],       // ここで指定した値は export に含まれず、import 時に引数で要求されるようになる
         'vars'     => [],       // ここで指定した値は export に含まれず、import 時に変数で要求されるようになる
+        'importer' => null,     // importer 指定（普段使いは気にしなくてよい）
     ];
     $options['return'] ??= !!$options['outmode'];
 
@@ -514,100 +516,6 @@ function var_export3($value, $return = false)
         $others[] = "\$this->$rid = $declare;";
     }
 
-    static $factory = null;
-    if ($factory === null) {
-        // @codeCoverageIgnoreStart
-        $factory = $export(new #[\AllowDynamicProperties] class() {
-            public function new(&$object, $class, $provider)
-            {
-                if ($class instanceof \Closure) {
-                    $object = $class();
-                    $reflection = $this->reflect(get_class($object));
-                }
-                else {
-                    $reflection = $this->reflect($class);
-                    if ($reflection["constructor"] && $reflection["constructor"]->getNumberOfRequiredParameters() === 0) {
-                        $object = $reflection["self"]->newInstance();
-                    }
-                    else {
-                        $object = $reflection["self"]->newInstanceWithoutConstructor();
-                    }
-                }
-                [$fields, $privates] = $provider();
-
-                if ($reflection["unserialize"]) {
-                    $object->__unserialize($fields);
-                    return $object;
-                }
-
-                foreach ($reflection["parents"] as $parent) {
-                    foreach ($this->reflect($parent->name)["properties"] as $name => $property) {
-                        if (isset($privates[$parent->name][$name]) && !$privates[$parent->name][$name] instanceof \__PHP_Incomplete_Class) {
-                            $property->setValue($object, $privates[$parent->name][$name]);
-                        }
-                        if (array_key_exists($name, $fields)) {
-                            if (!$fields[$name] instanceof \__PHP_Incomplete_Class) {
-                                $property->setValue($object, $fields[$name]);
-                            }
-                            unset($fields[$name]);
-                        }
-                    }
-                }
-                foreach ($fields as $name => $value) {
-                    $object->$name = $value;
-                }
-
-                if ($reflection["wakeup"]) {
-                    $object->__wakeup();
-                }
-
-                return $object;
-            }
-
-            public function open($metadata)
-            {
-                $resource = fopen($metadata['uri'], $metadata['mode'], false, stream_context_create($metadata['context']));
-                if ($resource === false) {
-                    return null;
-                }
-                if ($metadata['seekable'] && is_string($metadata['buffer'])) {
-                    fwrite($resource, $metadata['buffer']);
-                }
-                if ($metadata['seekable'] && is_int($metadata['position'])) {
-                    fseek($resource, $metadata['position']);
-                }
-                return $resource;
-            }
-
-            private function reflect($class)
-            {
-                static $cache = [];
-                if (!isset($cache[$class])) {
-                    $refclass = new \ReflectionClass($class);
-                    $cache[$class] = [
-                        "self"        => $refclass,
-                        "constructor" => $refclass->getConstructor(),
-                        "parents"     => [],
-                        "properties"  => [],
-                        "unserialize" => $refclass->hasMethod("__unserialize"),
-                        "wakeup"      => $refclass->hasMethod("__wakeup"),
-                    ];
-                    for ($current = $refclass; $current; $current = $current->getParentClass()) {
-                        $cache[$class]["parents"][$current->name] = $current;
-                    }
-                    foreach ($refclass->getProperties() as $property) {
-                        if (!$property->isStatic()) {
-                            $property->setAccessible(true);
-                            $cache[$class]["properties"][$property->name] = $property;
-                        }
-                    }
-                }
-                return $cache[$class];
-            }
-        }, -1, true);
-        // @codeCoverageIgnoreEnd
-    }
-
     $E = fn($v) => $v;
     $function = <<<PHP
         function (\$args) {
@@ -616,6 +524,14 @@ function var_export3($value, $return = false)
             return $exported;
         }
         PHP;
+
+    $importer = var_export3_importer($options['importer']);
+    if ($options['importer'] === null) {
+        $factory = $export($importer, -1, true);
+    }
+    else {
+        $factory = "new {$options['importer']}()";
+    }
 
     if (!($options['args'] || $options['vars'] || $orphan->getReturn())) {
         $result = $exported;
