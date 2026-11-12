@@ -11,6 +11,27 @@
 - Utility が増えてきたから然るべき場所へ移動する
 - sql_format がカオスなのでリファクタしないとまずい
 
+## 2.0.41
+
+- [feature] preg 系に $flags と $offset を追加
+- [feature] csv_export の align と generator オプション
+- [feature] mb_monospace の encoding 対応
+- [feature] array_flatten の rework
+- [fixbug] object_properties に無名クラスを与えると $privates に自身のプロパティが混在してくる不具合
+- [feature] reflect_callable に getDeclarationCode を追加
+- [feature] var_pretty の echo モードでは元の値をそのまま返す
+- [feature] var_export3 の importer を外出しして指定可能に変更
+- [feature] var_export3 でオブジェクトや参照を含まない場合はシンプルな出力にする機能
+- [feature] var_export3 の callback 対応
+- [refactor] var_export3 で getClosureUsedVariables が使えるなら使う
+- [fixbug] var_export3 の var_manager で static 変数が残存する不具合
+- [fixbug] var_export3 の昇格プロパティでエラーになる不具合
+- [fixbug] var_export3 で fn() => new class すると syntax error になる不具合
+- [fixbug] callable_code で 修飾子/属性 が取れない不具合
+- [fixbug] 相対空間が resolve されない不具合
+- [refactor] mb_ereg_options を mb_setting に変更
+- [refactor] isStatic で native を使うように修正
+
 ## 2.0.40
 
 - [feature] csv_import に BOM 読み飛ばし機能を追加
